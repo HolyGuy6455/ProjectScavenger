@@ -4,16 +4,18 @@ using UnityEngine.InputSystem;
 /// <summary>
 /// 쿼터뷰 캐릭터 이동 스크립트
 /// Unity Input System을 통해 키보드(WASD/화살표), 게임패드(XInput), 안드로이드 가상 조이스틱을 지원합니다.
-/// 안드로이드 가상 조이스틱 UI는 IInputProvider를 구현하거나 SetMoveInput()을 직접 호출해 연동하세요.
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float rotationSpeed = 720f;
 
     private Rigidbody _rb;
     private PlayerInputActions _inputActions;
-    private Vector2 _moveInput;
+    private Vector2 _keyboardInput;
+    private Vector2 _joystickInput;
+    private Vector2 _joystickRotationInput;
 
     private void Awake()
     {
@@ -37,7 +39,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnMove(InputAction.CallbackContext ctx)
     {
-        _moveInput = ctx.ReadValue<Vector2>();
+        _keyboardInput = ctx.ReadValue<Vector2>();
     }
 
     /// <summary>
@@ -45,12 +47,48 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     public void SetMoveInput(Vector2 input)
     {
-        _moveInput = input;
+        _joystickInput = input;
+    }
+
+    /// <summary>
+    /// 안드로이드 가상 회전 조이스틱 등 외부에서 회전값을 주입할 때 사용합니다.
+    /// </summary>
+    public void SetRotationInput(Vector2 input)
+    {
+        _joystickRotationInput = input;
     }
 
     private void FixedUpdate()
     {
-        Vector3 moveDir = new Vector3(_moveInput.x, 0f, _moveInput.y).normalized;
+        // 1. 이동 처리
+        // 키보드 입력과 조이스틱 입력을 합산한 후, 최대 크기가 1을 넘지 않도록 제한합니다.
+        Vector2 combinedInput = _keyboardInput + _joystickInput;
+        if (combinedInput.sqrMagnitude > 1f)
+        {
+            combinedInput.Normalize();
+        }
+
+        Vector3 moveDir = new Vector3(combinedInput.x, 0f, combinedInput.y);
         _rb.MovePosition(_rb.position + moveDir * (moveSpeed * Time.fixedDeltaTime));
+
+        // 2. 회전 처리
+        Vector3 lookDir = Vector3.zero;
+
+        // 우측 회전 조이스틱 입력이 있는 경우 우선 처리
+        if (_joystickRotationInput.sqrMagnitude > 0.001f)
+        {
+            lookDir = new Vector3(_joystickRotationInput.x, 0f, _joystickRotationInput.y);
+        }
+        // 우측 조이스틱 입력은 없지만 이동 입력이 있는 경우 이동 방향으로 회전
+        else if (combinedInput.sqrMagnitude > 0.001f)
+        {
+            lookDir = new Vector3(combinedInput.x, 0f, combinedInput.y);
+        }
+
+        if (lookDir.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(lookDir, Vector3.up);
+            _rb.MoveRotation(Quaternion.RotateTowards(_rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
+        }
     }
 }

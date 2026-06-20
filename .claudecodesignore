@@ -1,0 +1,27 @@
+# Unity 자동 생성 폴더
+Library/
+Temp/
+Logs/
+obj/
+Build/
+Builds/
+UserSettings/
+
+# 바이너리 에셋 (읽어도 의미없음)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.tga
+*.psd
+*.fbx
+*.obj
+*.wav
+*.mp3
+*.ogg
+*.mp4
+*.ttf
+*.otf
+*.dll
+*.exe
+*.pdf
