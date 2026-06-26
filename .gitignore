@@ -46,3 +46,11 @@ ExportedObj/
 # Crash reports
 sysinfo.txt
 crashlytics-build.properties
+
+# 로컬 로그 및 프록시 디버그 스크립트
+debug.log
+wsl_debug_proxy.log
+wsl_debug_proxy.ps1
+
+# 개인 VSCode 설정
+.vscode/
