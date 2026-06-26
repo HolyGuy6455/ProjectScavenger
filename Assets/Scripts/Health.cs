@@ -8,11 +8,16 @@ public class Health : MonoBehaviour, IDamageable
 {
     [Header("Health Settings")]
     [SerializeField] private float maxHealth = 100f;
+    [SerializeField] private float currentHealth;
     [SerializeField] private bool destroyOnDeath = false;
     [SerializeField] private float destroyDelay = 0f;
 
     // 현재 체력 프로퍼티
-    public float CurrentHealth { get; private set; }
+    public float CurrentHealth
+    {
+        get => currentHealth;
+        private set => currentHealth = value;
+    }
     public float MaxHealth => maxHealth;
     public bool IsDead { get; private set; }
 
@@ -115,6 +120,19 @@ public class Health : MonoBehaviour, IDamageable
         if (destroyOnDeath)
         {
             Destroy(gameObject, destroyDelay);
+        }
+    }
+
+    private void OnValidate()
+    {
+        if (maxHealth < 0) maxHealth = 0;
+        currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+
+        // 플레이 모드에서 인스펙터로 체력을 직접 수정할 경우 이벤트를 발생시켜 UI 등을 동기화합니다.
+        if (Application.isPlaying)
+        {
+            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+            onHealthChangedUnityEvent?.Invoke(currentHealth, maxHealth);
         }
     }
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// 마우스 클릭을 통해 IDamageable 컴포넌트를 가진 오브젝트를 원거리 공격하는 테스트 스크립트입니다.
@@ -24,7 +25,7 @@ public class DummyAttackTester : MonoBehaviour
     private void Update()
     {
         // 마우스 좌클릭 시 공격 테스트
-        if (Input.GetMouseButtonDown(0))
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
             PerformAttack();
         }
@@ -35,7 +36,8 @@ public class DummyAttackTester : MonoBehaviour
         if (_mainCamera == null) return;
 
         // 마우스 포인터 위치로부터 광선(Ray) 생성
-        Ray ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
+        Vector2 mousePosition = Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
+        Ray ray = _mainCamera.ScreenPointToRay(mousePosition);
         RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit, maxRange, hitLayers))
