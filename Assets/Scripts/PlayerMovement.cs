@@ -10,12 +10,16 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float rotationSpeed = 720f;
+    
+    [Header("Combat")]
+    [SerializeField] private Shooter shooter;
 
     private Rigidbody _rb;
     private PlayerInputActions _inputActions;
     private Vector2 _keyboardInput;
     private Vector2 _joystickInput;
     private Vector2 _joystickRotationInput;
+    private bool _isShooting = false;
 
     private void Awake()
     {
@@ -35,6 +39,24 @@ public class PlayerMovement : MonoBehaviour
         _inputActions.Player.Move.performed -= OnMove;
         _inputActions.Player.Move.canceled -= OnMove;
         _inputActions.Player.Disable();
+    }
+
+    private void Start()
+    {
+        // 임시 테스트 코드: 시작할 때 DataManager에서 gun_002 데이터를 가져와 장착합니다.
+        if (shooter != null)
+        {
+            GunData startingGun = DataManager.Instance.GetData<GunData>("Gun", "gun_002");
+            if (startingGun != null)
+            {
+                shooter.EquipGun(startingGun);
+                Debug.Log($"[{gameObject.name}] {startingGun.gunName} 장착 완료!");
+            }
+            else
+            {
+                Debug.LogWarning("DataManager에서 gun_002 데이터를 찾을 수 없습니다.");
+            }
+        }
     }
 
     private void OnMove(InputAction.CallbackContext ctx)
@@ -74,15 +96,40 @@ public class PlayerMovement : MonoBehaviour
         // 2. 회전 처리
         Vector3 lookDir = Vector3.zero;
 
-        // 우측 회전 조이스틱 입력이 있는 경우 우선 처리
+        // 우측 회전 조이스틱 입력이 있는 경우 우선 처리 (발사 방향)
         if (_joystickRotationInput.sqrMagnitude > 0.001f)
         {
             lookDir = new Vector3(_joystickRotationInput.x, 0f, _joystickRotationInput.y);
+
+            // 우측 조이스틱 조작 시 총기 발사
+            if (shooter != null)
+            {
+                if (!_isShooting)
+                {
+                    _isShooting = true;
+                    shooter.SetTrigger(true, lookDir);
+                }
+                else
+                {
+                    shooter.UpdateAimDirection(lookDir);
+                }
+            }
         }
-        // 우측 조이스틱 입력은 없지만 이동 입력이 있는 경우 이동 방향으로 회전
-        else if (combinedInput.sqrMagnitude > 0.001f)
+        else
         {
-            lookDir = new Vector3(combinedInput.x, 0f, combinedInput.y);
+            // 우측 조이스틱 입력을 놓았을 때 총기 발사 중지
+            if (shooter != null && _isShooting)
+            {
+                _isShooting = false;
+                shooter.SetTrigger(false);
+                shooter.Reload();
+            }
+
+            // 우측 조이스틱 입력은 없지만 이동 입력이 있는 경우 이동 방향으로 회전
+            if (combinedInput.sqrMagnitude > 0.001f)
+            {
+                lookDir = new Vector3(combinedInput.x, 0f, combinedInput.y);
+            }
         }
 
         if (lookDir.sqrMagnitude > 0.001f)

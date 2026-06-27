@@ -21,6 +21,29 @@ public class DataManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    private void Start()
+    {
+        // TODO: 나중에 전체 데이터 로드 시점(예: 로딩 화면, 타이틀 화면 등)이 정해지면 
+        // 아래 로직은 Start()에서 제거하고, 외부 흐름 관리자에서 직접 LoadAllInitialData()를 호출해야 합니다.
+        if (categoryDataMap.Count == 0)
+        {
+            LoadAllInitialData();
+        }
+    }
+
+    /// <summary>
+    /// 게임 시작에 필요한 초기 데이터들을 일괄 로드하는 매서드입니다.
+    /// 차후 다른 데이터(적 데이터, 아이템 데이터 등)가 생기면 이곳에 추가하여 한꺼번에 로드할 수 있습니다.
+    /// </summary>
+    public void LoadAllInitialData()
+    {
+        LoadData<GunDataList, GunData>("Gun", "GunData.dat");
+        
+        // 예시: 
+        // LoadData<EnemyDataList, EnemyData>("Enemy", "EnemyData.dat");
+        // LoadData<ItemDataList, ItemData>("Item", "ItemData.dat");
+    }
+
     /// <summary>
     /// 지정된 카테고리의 데이터를 지정된 파일명(.dat)을 통해 에디터의 Data 폴더나 실제 빌드 기기의 저장소에서 찾아 로드합니다.
     /// 사용 예: DataManager.Instance.LoadData<GunDataList, GunData>("Gun", "GunData.dat");
