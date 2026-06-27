@@ -1,0 +1,25 @@
+{
+  "guns": [
+    {
+      "gunId": "gun_001",
+      "gunName": "Pistol",
+      "damage": 10.0,
+      "fireRate": 0.5,
+      "maxAmmo": 15
+    },
+    {
+      "gunId": "gun_002",
+      "gunName": "Assault Rifle",
+      "damage": 25.0,
+      "fireRate": 0.1,
+      "maxAmmo": 30
+    },
+    {
+      "gunId": "gun_003",
+      "gunName": "Sniper",
+      "damage": 100.0,
+      "fireRate": 1.5,
+      "maxAmmo": 5
+    }
+  ]
+}
