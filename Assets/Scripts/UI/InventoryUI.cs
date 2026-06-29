@@ -43,15 +43,16 @@ public class InventoryUI : MonoBehaviour
         for (int i = 0; i < slots.Count && i < PlayerInventory.MaxSlots; i++)
         {
             InventoryItem item = PlayerInventory.Instance.Items[i];
+            bool isSelected = (PlayerInventory.Instance.SelectedSlotIndex == i);
             
             if (item != null && !item.IsEmpty)
             {
                 Sprite iconSprite = LoadSprite(item.Data.uiResource);
-                slots[i].UpdateSlot(item, iconSprite);
+                slots[i].UpdateSlot(item, iconSprite, isSelected);
             }
             else
             {
-                slots[i].UpdateSlot(null, null);
+                slots[i].UpdateSlot(null, null, false);
             }
         }
     }

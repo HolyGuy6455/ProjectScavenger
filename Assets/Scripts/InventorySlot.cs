@@ -10,6 +10,18 @@ public class InventorySlot : MonoBehaviour
 
     public int SlotIndex { get; private set; }
 
+    private RectTransform rectTransform;
+    private float originalY;
+
+    private void Awake()
+    {
+        rectTransform = GetComponent<RectTransform>();
+        if (rectTransform != null)
+        {
+            originalY = rectTransform.anchoredPosition.y;
+        }
+    }
+
     public void Setup(int index)
     {
         SlotIndex = index;
@@ -29,7 +41,7 @@ public class InventorySlot : MonoBehaviour
         }
     }
 
-    public void UpdateSlot(InventoryItem item, Sprite sprite)
+    public void UpdateSlot(InventoryItem item, Sprite sprite, bool isSelected)
     {
         if (item == null || item.IsEmpty)
         {
@@ -42,6 +54,7 @@ public class InventorySlot : MonoBehaviour
             {
                 quantityText.text = "";
             }
+            SetSelected(false);
             return;
         }
 
@@ -54,6 +67,17 @@ public class InventorySlot : MonoBehaviour
         if (quantityText != null)
         {
             UpdateQuantityText(item);
+        }
+        
+        SetSelected(isSelected);
+    }
+
+    private void SetSelected(bool isSelected)
+    {
+        if (rectTransform != null)
+        {
+            float targetY = isSelected ? originalY + 20f : originalY;
+            rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x, targetY);
         }
     }
 

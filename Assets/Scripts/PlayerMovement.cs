@@ -203,7 +203,6 @@ public class PlayerMovement : MonoBehaviour
             {
                 _isShooting = false;
                 shooter.SetTrigger(false);
-                shooter.Reload();
             }
 
             // 우측 조이스틱 입력은 없지만 이동 입력이 있는 경우 이동 방향으로 회전

@@ -26,7 +26,7 @@ public class ItemUsageManager : MonoBehaviour
 
         // 여기에 새로운 아이템 효과(func)가 생길 때마다 추가해주면 됩니다.
         effectDictionary.Add("food", new FoodUsage());
-        // effectDictionary.Add("magazine", new MagazineEffect()); // 탄창 효과는 추후 구현
+        effectDictionary.Add("magazine", new MagazineUsage());
     }
 
     /// <summary>
@@ -47,5 +47,14 @@ public class ItemUsageManager : MonoBehaviour
             Debug.LogWarning($"[ItemUsageManager] 알 수 없는 아이템 효과(func)입니다: {func}");
             return false;
         }
+    }
+
+    public IItemUsage GetUsage(string func)
+    {
+        if (effectDictionary.TryGetValue(func, out IItemUsage effect))
+        {
+            return effect;
+        }
+        return null;
     }
 }

@@ -27,7 +27,10 @@ public class Shooter : MonoBehaviour
     [Header("Current Status (Debug)")]
     [SerializeField] private GunData currentGunData;
     public GunData CurrentGunData => currentGunData;
-    [SerializeField] private int currentAmmo;
+    
+    [SerializeField] private InventoryItem currentMagazine;
+    private int magazineSlotIndex = -1;
+    
     [SerializeField] private bool isReloading;
 
     private float lastFireTime;
@@ -50,16 +53,32 @@ public class Shooter : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 무기 데이터(GunData)를 장착하고 초기화합니다.
-    /// </summary>
     public void EquipGun(GunData newGunData)
     {
         currentGunData = newGunData;
-        currentAmmo = currentGunData.maxAmmo;
         isReloading = false;
         isTriggerPulled = false;
         lastFireTime = 0f;
+    }
+
+    /// <summary>
+    /// 인벤토리에서 탄창을 선택했을 때 장착합니다.
+    /// </summary>
+    public void EquipMagazine(InventoryItem magazine, int slotIndex)
+    {
+        currentMagazine = magazine;
+        magazineSlotIndex = slotIndex;
+        Debug.Log($"{gameObject.name}: 탄창 장착됨. 잔탄: {currentMagazine.Quantity}");
+    }
+
+    /// <summary>
+    /// 탄창 장착을 해제합니다.
+    /// </summary>
+    public void UnequipMagazine()
+    {
+        currentMagazine = null;
+        magazineSlotIndex = -1;
+        Debug.Log($"{gameObject.name}: 탄창 장착 해제됨.");
     }
 
     /// <summary>
@@ -76,7 +95,7 @@ public class Shooter : MonoBehaviour
         }
 
         if (isReloading) return FireResult.Reloading;
-        if (currentAmmo <= 0) return FireResult.NoAmmo;
+        if (currentMagazine == null || currentMagazine.Quantity <= 0) return FireResult.NoAmmo;
 
         if (Time.time - lastFireTime < currentGunData.fireRate) return FireResult.OnCooldown;
 
@@ -115,7 +134,15 @@ public class Shooter : MonoBehaviour
     /// </summary>
     private void PerformShoot(Vector3 direction)
     {
-        currentAmmo--;
+        if (currentMagazine != null)
+        {
+            currentMagazine.Quantity--;
+            if (PlayerInventory.Instance != null && magazineSlotIndex != -1)
+            {
+                PlayerInventory.Instance.NotifyItemChanged(magazineSlotIndex);
+            }
+        }
+        
         lastFireTime = Time.time;
 
         if (bulletPrefab == null)
@@ -141,10 +168,8 @@ public class Shooter : MonoBehaviour
     {
         if (currentGunData == null || isReloading) return;
         
-        if (currentAmmo >= currentGunData.maxAmmo) return;
-
-        // TODO: 실제 게임에서는 코루틴 등을 활용해 재장전 애니메이션 대기 시간을 구현할 수 있습니다.
-        currentAmmo = currentGunData.maxAmmo;
-        Debug.Log($"{gameObject.name}: 재장전 완료! 잔탄: {currentAmmo}");
+        // 탄창 시스템이 적용되었으므로, 예전처럼 자동 재장전되는 로직은 사용하지 않습니다.
+        // 추후 탄약 아이템으로 빈 탄창을 채우는 로직을 구현할 수 있습니다.
+        Debug.Log($"{gameObject.name}: 수동 재장전 기능은 현재 탄창 시스템에 의해 대체되었습니다.");
     }
 }

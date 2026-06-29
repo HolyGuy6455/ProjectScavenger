@@ -9,6 +9,9 @@ public class PlayerInventory : MonoBehaviour
     public InventoryItem[] Items { get; private set; } = new InventoryItem[MaxSlots];
 
     public event Action OnInventoryChanged;
+    public event Action<int> OnSlotSelected;
+
+    public int SelectedSlotIndex { get; private set; } = -1;
 
     private void Awake()
     {
@@ -23,7 +26,8 @@ public class PlayerInventory : MonoBehaviour
     private void Start()
     {
         // 임시로 아이템 지급 (테스트용)
-        AddItem("item_001", 1);
+        AddItem("item_001", 30);
+        AddItem("item_001", 30);
         AddItem("item_002", 3);
     }
 
@@ -118,20 +122,69 @@ public class PlayerInventory : MonoBehaviour
             return;
         }
 
-        // 아이템 사용 효과 실행 (타겟은 플레이어 본인, gameObject 사용)
-        bool success = ItemUsageManager.Instance.ExecuteItemUsage(item, gameObject);
-
-        if (success)
+        IItemUsage usage = ItemUsageManager.Instance.GetUsage(item.Data.func);
+        if (usage == null)
         {
-            item.Quantity--;
-            
-            if (item.Quantity <= 0)
+            Debug.LogWarning($"[PlayerInventory] 알 수 없는 아이템 효과(func)입니다: {item.Data.func}");
+            return;
+        }
+
+        if (usage.UseImmediately)
+        {
+            // 즉시 사용 (예: 감자)
+            bool success = usage.Execute(item, gameObject);
+            if (success)
             {
-                // 다 썼으면 슬롯 비우기
-                Items[index] = null;
+                item.Quantity--;
+                
+                if (item.Quantity <= 0 && usage.IsConsumable)
+                {
+                    Items[index] = null;
+                }
+
+                OnInventoryChanged?.Invoke();
+            }
+        }
+        else
+        {
+            // 선택/장착 (예: 탄창)
+            if (SelectedSlotIndex == index)
+            {
+                // 이미 선택된 슬롯을 클릭하면 장착 해제
+                SelectedSlotIndex = -1;
+                Shooter shooter = GetComponent<Shooter>();
+                if (shooter != null) shooter.UnequipMagazine();
+                Debug.Log("탄창 장착이 해제되었습니다.");
+            }
+            else
+            {
+                // 새 슬롯 장착
+                SelectedSlotIndex = index;
+                usage.Execute(item, gameObject);
             }
 
+            OnSlotSelected?.Invoke(SelectedSlotIndex);
             OnInventoryChanged?.Invoke();
         }
+    }
+
+    /// <summary>
+    /// 외부(예: Shooter)에서 수량을 소모하고 UI를 갱신할 때 호출합니다.
+    /// </summary>
+    public void NotifyItemChanged(int index)
+    {
+        if (index < 0 || index >= MaxSlots) return;
+
+        InventoryItem item = Items[index];
+        if (item != null && item.Quantity <= 0)
+        {
+            IItemUsage usage = ItemUsageManager.Instance?.GetUsage(item.Data.func);
+            if (usage != null && usage.IsConsumable)
+            {
+                Items[index] = null;
+                if (SelectedSlotIndex == index) SelectedSlotIndex = -1;
+            }
+        }
+        OnInventoryChanged?.Invoke();
     }
 }

@@ -3,6 +3,9 @@ using System.Linq;
 
 public class FoodUsage : IItemUsage
 {
+    public bool IsConsumable => true;
+    public bool UseImmediately => true;
+
     public bool Execute(InventoryItem item, GameObject target)
     {
         if (target == null) return false;

@@ -12,5 +12,5 @@ public class InventoryItem
         Quantity = quantity;
     }
 
-    public bool IsEmpty => Data == null || Quantity <= 0;
+    public bool IsEmpty => Data == null;
 }
