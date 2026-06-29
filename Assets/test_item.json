@@ -1,0 +1,34 @@
+{
+    "items": [
+        {
+            "itemId": "item_001",
+            "itemName": "item_stagnag",
+            "uiResource": "item_stagnag.png",
+            "model": "",
+            "maxQuantity": 1,
+            "func": "magazine",
+            "valueList": [
+                {
+                    "key": 1001,
+                    "value": 30,
+                    "subValue": 0
+                }
+            ]
+        },
+        {
+            "itemId": "item_002",
+            "itemName": "item_potato",
+            "uiResource": "item_potato.png",
+            "model": "",
+            "maxQuantity": 7,
+            "func": "food",
+            "valueList": [
+                {
+                    "key": 2001,
+                    "value": 30,
+                    "subValue": 0
+                }
+            ]
+        }
+    ]
+}

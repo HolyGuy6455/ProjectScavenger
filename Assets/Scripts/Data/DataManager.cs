@@ -19,12 +19,9 @@ public class DataManager : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
-    }
 
-    private void Start()
-    {
         // TODO: 나중에 전체 데이터 로드 시점(예: 로딩 화면, 타이틀 화면 등)이 정해지면 
-        // 아래 로직은 Start()에서 제거하고, 외부 흐름 관리자에서 직접 LoadAllInitialData()를 호출해야 합니다.
+        // 아래 로직은 외부 흐름 관리자에서 직접 LoadAllInitialData()를 호출해야 합니다.
         if (categoryDataMap.Count == 0)
         {
             LoadAllInitialData();
@@ -38,10 +35,8 @@ public class DataManager : MonoBehaviour
     public void LoadAllInitialData()
     {
         LoadData<GunDataList, GunData>("Gun", "GunData.dat");
-        
-        // 예시: 
+        LoadData<ItemDataList, ItemData>("Item", "ItemData.dat");
         // LoadData<EnemyDataList, EnemyData>("Enemy", "EnemyData.dat");
-        // LoadData<ItemDataList, ItemData>("Item", "ItemData.dat");
     }
 
     /// <summary>
