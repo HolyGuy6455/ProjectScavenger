@@ -26,6 +26,7 @@ public class Shooter : MonoBehaviour
 
     [Header("Current Status (Debug)")]
     [SerializeField] private GunData currentGunData;
+    public GunData CurrentGunData => currentGunData;
     [SerializeField] private int currentAmmo;
     [SerializeField] private bool isReloading;
 

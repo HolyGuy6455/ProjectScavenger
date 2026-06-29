@@ -10,6 +10,13 @@ public class GunData : IData
     public float fireRate;
     public int maxAmmo;
 
+    // JSON에 값이 없어 0으로 초기화되었을 때 기본값을 반환하도록 프로퍼티 구현
+    public float searchRadius;
+    public float searchAngle;
+
+    public float SearchRadius => searchRadius > 0f ? searchRadius : 15f;
+    public float SearchAngle => searchAngle > 0f ? searchAngle : 90f;
+
     public string GetId()
     {
         return gunId;

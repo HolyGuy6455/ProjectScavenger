@@ -8,8 +8,10 @@ public class CameraFollow : MonoBehaviour
 {
     [SerializeField] private Transform target;
     [SerializeField] private float smoothSpeed = 8f;
+    [SerializeField] private float lookOffsetMultiplier = 3f; // 조이스틱 입력에 따라 카메라가 이동하는 최대 거리
 
     private Vector3 _offset;
+    private PlayerMovement _playerMovement;
 
     private void Start()
     {
@@ -21,7 +23,10 @@ public class CameraFollow : MonoBehaviour
         }
 
         if (target != null)
+        {
             _offset = transform.position - target.position;
+            _playerMovement = target.GetComponent<PlayerMovement>();
+        }
     }
 
     private void LateUpdate()
@@ -29,6 +34,13 @@ public class CameraFollow : MonoBehaviour
         if (target == null) return;
 
         Vector3 desiredPos = target.position + _offset;
+        
+        if (_playerMovement != null)
+        {
+            Vector2 rotInput = _playerMovement.JoystickRotationInput;
+            desiredPos += new Vector3(rotInput.x, 0f, rotInput.y) * lookOffsetMultiplier;
+        }
+
         transform.position = Vector3.Lerp(transform.position, desiredPos, smoothSpeed * Time.deltaTime);
     }
 }

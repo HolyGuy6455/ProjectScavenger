@@ -19,7 +19,9 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 _keyboardInput;
     private Vector2 _joystickInput;
     private Vector2 _joystickRotationInput;
+    public Vector2 JoystickRotationInput => _joystickRotationInput;
     private bool _isShooting = false;
+    private SectorIndicator _sectorIndicator;
 
     private void Awake()
     {
@@ -43,6 +45,12 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
+        // 0. 부채꼴 인디케이터 동적 생성 (바닥과 겹치지 않게 살짝 위인 Y=0.1에 배치)
+        GameObject indicatorObj = new GameObject("SectorIndicator");
+        indicatorObj.transform.SetParent(transform);
+        indicatorObj.transform.localPosition = new Vector3(0f, 0.1f, 0f);
+        _sectorIndicator = indicatorObj.AddComponent<SectorIndicator>();
+
         // 임시 테스트 코드: 시작할 때 DataManager에서 gun_002 데이터를 가져와 장착합니다.
         if (shooter != null)
         {
@@ -80,6 +88,43 @@ public class PlayerMovement : MonoBehaviour
         _joystickRotationInput = input;
     }
 
+    private Transform FindClosestEnemyInSector(Vector3 forwardDir, float radius, float angle)
+    {
+        Transform closestEnemy = null;
+        float minDistance = float.MaxValue;
+
+        // 향후 최적화를 위해 Physics.OverlapSphereNonAlloc 또는 레이어 마스크를 사용할 수 있습니다.
+        Collider[] colliders = Physics.OverlapSphere(_rb.position, radius);
+        
+        foreach (Collider col in colliders)
+        {
+            if (col.CompareTag("Enemy"))
+            {
+                Vector3 dirToTarget = col.transform.position - _rb.position;
+                dirToTarget.y = 0f;
+                float distance = dirToTarget.magnitude;
+
+                if (distance > 0.001f)
+                {
+                    Vector3 dirNormalized = dirToTarget / distance;
+                    float angleToTarget = Vector3.Angle(forwardDir, dirNormalized);
+
+                    // angle은 전체 부채꼴 각도이므로 절반 각도와 비교합니다.
+                    if (angleToTarget <= angle * 0.5f)
+                    {
+                        if (distance < minDistance)
+                        {
+                            minDistance = distance;
+                            closestEnemy = col.transform;
+                        }
+                    }
+                }
+            }
+        }
+
+        return closestEnemy;
+    }
+
     private void FixedUpdate()
     {
         // 1. 이동 처리
@@ -99,24 +144,60 @@ public class PlayerMovement : MonoBehaviour
         // 우측 회전 조이스틱 입력이 있는 경우 우선 처리 (발사 방향)
         if (_joystickRotationInput.sqrMagnitude > 0.001f)
         {
-            lookDir = new Vector3(_joystickRotationInput.x, 0f, _joystickRotationInput.y);
+            Vector3 inputDir = new Vector3(_joystickRotationInput.x, 0f, _joystickRotationInput.y).normalized;
 
-            // 우측 조이스틱 조작 시 총기 발사
-            if (shooter != null)
+            // GunData에서 탐색 범위와 각도를 가져옵니다. 총이 없으면 기본값을 사용합니다.
+            float searchRadius = shooter != null && shooter.CurrentGunData != null ? shooter.CurrentGunData.SearchRadius : 15f;
+            float searchAngle = shooter != null && shooter.CurrentGunData != null ? shooter.CurrentGunData.SearchAngle : 90f;
+
+            // 인디케이터 그리기
+            if (_sectorIndicator != null)
             {
-                if (!_isShooting)
+                _sectorIndicator.DrawSector(searchRadius, searchAngle, inputDir);
+            }
+
+            Transform targetEnemy = FindClosestEnemyInSector(inputDir, searchRadius, searchAngle);
+
+            if (targetEnemy != null)
+            {
+                // 부채꼴 내에 적이 있으면 적을 향해 바라보고 사격
+                Vector3 dirToEnemy = targetEnemy.position - _rb.position;
+                dirToEnemy.y = 0f;
+                lookDir = dirToEnemy.normalized;
+
+                if (shooter != null)
                 {
-                    _isShooting = true;
-                    shooter.SetTrigger(true, lookDir);
+                    if (!_isShooting)
+                    {
+                        _isShooting = true;
+                        shooter.SetTrigger(true, lookDir);
+                    }
+                    else
+                    {
+                        shooter.UpdateAimDirection(lookDir);
+                    }
                 }
-                else
+            }
+            else
+            {
+                // 부채꼴 내에 적이 없으면 조이스틱 방향만 바라보고 사격 중지
+                lookDir = inputDir;
+
+                if (shooter != null && _isShooting)
                 {
-                    shooter.UpdateAimDirection(lookDir);
+                    _isShooting = false;
+                    shooter.SetTrigger(false);
                 }
             }
         }
         else
         {
+            // 우측 조이스틱 입력을 놓았을 때 인디케이터 숨기기
+            if (_sectorIndicator != null)
+            {
+                _sectorIndicator.Hide();
+            }
+
             // 우측 조이스틱 입력을 놓았을 때 총기 발사 중지
             if (shooter != null && _isShooting)
             {
