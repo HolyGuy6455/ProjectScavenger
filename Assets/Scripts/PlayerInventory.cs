@@ -43,7 +43,8 @@ public class PlayerInventory : MonoBehaviour
         {
             if (Items[i] != null && !Items[i].IsEmpty && Items[i].Data.itemId == itemId)
             {
-                int spaceLeft = data.maxQuantity - Items[i].Quantity;
+                int safeMaxQuantity = data.maxQuantity > 0 ? data.maxQuantity : 1;
+                int spaceLeft = safeMaxQuantity - Items[i].Quantity;
                 if (spaceLeft > 0)
                 {
                     int addAmount = Mathf.Min(spaceLeft, remaining);
@@ -99,5 +100,38 @@ public class PlayerInventory : MonoBehaviour
         Items[toIndex] = temp;
 
         OnInventoryChanged?.Invoke();
+    }
+
+    /// <summary>
+    /// 지정된 인덱스의 아이템을 사용합니다.
+    /// </summary>
+    public void UseItem(int index)
+    {
+        if (index < 0 || index >= MaxSlots) return;
+
+        InventoryItem item = Items[index];
+        if (item == null || item.IsEmpty) return;
+
+        if (ItemUsageManager.Instance == null)
+        {
+            Debug.LogError("[PlayerInventory] ItemUsageManager is missing in the scene!");
+            return;
+        }
+
+        // 아이템 사용 효과 실행 (타겟은 플레이어 본인, gameObject 사용)
+        bool success = ItemUsageManager.Instance.ExecuteItemUsage(item, gameObject);
+
+        if (success)
+        {
+            item.Quantity--;
+            
+            if (item.Quantity <= 0)
+            {
+                // 다 썼으면 슬롯 비우기
+                Items[index] = null;
+            }
+
+            OnInventoryChanged?.Invoke();
+        }
     }
 }

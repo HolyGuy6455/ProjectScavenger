@@ -5,8 +5,9 @@
             "itemName": "item_stagnag",
             "uiResource": "item_stagnag.png",
             "model": "",
-            "maxQuantity": 1,
+            "maxQuantity": 30,
             "func": "magazine",
+            "quantityShowType": 2,
             "valueList": [
                 {
                     "key": 1001,
@@ -22,6 +23,7 @@
             "model": "",
             "maxQuantity": 7,
             "func": "food",
+            "quantityShowType": 1,
             "valueList": [
                 {
                     "key": 2001,

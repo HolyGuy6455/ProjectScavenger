@@ -58,7 +58,10 @@ public class ItemInstanceManager : MonoBehaviour
         int remaining = totalQuantity;
         while (remaining > 0)
         {
-            int quantityToCreate = Mathf.Min(remaining, data.maxQuantity);
+            // 데이터 변환이 누락되어 maxQuantity가 0일 경우 무한루프 방지
+            int safeMaxQuantity = data.maxQuantity > 0 ? data.maxQuantity : 1;
+            int quantityToCreate = Mathf.Min(remaining, safeMaxQuantity);
+            
             result.Add(new InventoryItem(data, quantityToCreate));
             remaining -= quantityToCreate;
         }

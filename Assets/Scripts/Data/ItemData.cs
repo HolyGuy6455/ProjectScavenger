@@ -1,6 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum QuantityShowType
+{
+    None = 0,
+    Integer = 1,
+    Fraction = 2
+}
+
 [System.Serializable]
 public class ItemData : IData
 {
@@ -9,6 +16,8 @@ public class ItemData : IData
     public string uiResource;
     public string model;
     public int maxQuantity;
+    public int quantityShowType;
+    public QuantityShowType QuantityShowType => (QuantityShowType)quantityShowType;
     public string func;
     public List<ItemValueData> valueList;
 
