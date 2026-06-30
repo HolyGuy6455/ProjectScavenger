@@ -15,6 +15,9 @@ public class ItemInstanceManager : MonoBehaviour
         Instance = this;
     }
 
+    [Header("Common Field Item Prefab")]
+    public GameObject fieldItemPrefab;
+
     /// <summary>
     /// 지정한 개수(count)만큼 아이템 인스턴스를 생성하여 반환합니다.
     /// 생성된 인스턴스들의 수량(Quantity) 설정은 호출부에서 직접 제어합니다.
@@ -67,5 +70,28 @@ public class ItemInstanceManager : MonoBehaviour
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// 맵(월드) 상에 공용 FieldItem 프리팹을 생성합니다.
+    /// </summary>
+    public void SpawnFieldItem(string itemId, int quantity, Vector3 position)
+    {
+        if (fieldItemPrefab == null)
+        {
+            Debug.LogWarning("[ItemInstanceManager] 공용 fieldItemPrefab이 할당되지 않았습니다.");
+            return;
+        }
+
+        GameObject spawned = Instantiate(fieldItemPrefab, position, Quaternion.identity);
+        FieldItem fieldItem = spawned.GetComponent<FieldItem>();
+        if (fieldItem != null)
+        {
+            fieldItem.Setup(itemId, quantity);
+        }
+        else
+        {
+            Debug.LogWarning($"[ItemInstanceManager] 스폰된 프리팹 '{fieldItemPrefab.name}'에 FieldItem 컴포넌트가 없습니다.");
+        }
     }
 }
