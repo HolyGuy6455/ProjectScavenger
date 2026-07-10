@@ -8,27 +8,19 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     [SerializeField] private Image iconImage;
     [SerializeField] private TextMeshProUGUI quantityText;
     [SerializeField] private Button slotButton;
+    [SerializeField] private Animator animator;
+    [SerializeField] private Image bgImage;
 
     public int SlotIndex { get; private set; }
 
-    private RectTransform rectTransform;
-    private float originalY;
-    private Image bgImage;
-    private Color originalBgColor;
-
     private void Awake()
     {
-        rectTransform = GetComponent<RectTransform>();
-        if (rectTransform != null)
+        // 컴포넌트 누락 여부 검사
+        if (animator == null || bgImage == null || iconImage == null || quantityText == null || slotButton == null)
         {
-            originalY = rectTransform.anchoredPosition.y;
+            Debug.LogWarning($"[InventorySlot] {gameObject.name}의 Inspector에 할당되지 않은 컴포넌트가 있습니다!");
         }
         
-        bgImage = GetComponent<Image>();
-        if (bgImage != null)
-        {
-            originalBgColor = bgImage.color;
-        }
     }
 
     public void Setup(int index)
@@ -83,19 +75,17 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     private void SetSelected(bool isSelected)
     {
-        if (rectTransform != null)
+        if (animator != null)
         {
-            float targetY = isSelected ? originalY + 20f : originalY;
-            rectTransform.anchoredPosition = new Vector2(rectTransform.anchoredPosition.x, targetY);
+            animator.SetBool("IsSelected", isSelected);
         }
     }
 
     public void SetHighlight(bool isHighlighted)
     {
-        if (bgImage != null)
+        if (animator != null)
         {
-            // 하이라이트 시 연두색(밝은 초록) 느낌으로 변경, 아닐 시 원래 색으로 복구
-            bgImage.color = isHighlighted ? new Color(0.8f, 1f, 0.8f, originalBgColor.a) : originalBgColor;
+            animator.SetBool("IsHighlighted", isHighlighted);
         }
     }
 
