@@ -136,6 +136,7 @@ GameObject:
   - component: {fileID: 2579797649231569894}
   - component: {fileID: 921170705562535445}
   - component: {fileID: 273470665313786195}
+  - component: {fileID: 6165863499796765}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -295,6 +296,18 @@ MonoBehaviour:
   onDeathUnityEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &6165863499796765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba93fb69bb17b5c41a602fb0358664eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIBrain
 --- !u!1 &3066881848277116625
 GameObject:
   m_ObjectHideFlags: 0
