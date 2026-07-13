@@ -22,7 +22,7 @@ public class ItemInstanceManager : MonoBehaviour
     /// 지정한 개수(count)만큼 아이템 인스턴스를 생성하여 반환합니다.
     /// 생성된 인스턴스들의 수량(Quantity) 설정은 호출부에서 직접 제어합니다.
     /// </summary>
-    public List<InventoryItem> CreateItemInstances(string itemId, int count)
+    public List<InventoryItem> CreateItemInstances(int itemId, int count)
     {
         List<InventoryItem> result = new List<InventoryItem>();
         ItemData data = DataManager.Instance.GetData<ItemData>("Item", itemId);
@@ -47,7 +47,7 @@ public class ItemInstanceManager : MonoBehaviour
     /// 총 수량(totalQuantity)을 넣으면 최대 중첩 개수(maxQuantity)를 고려해 
     /// 자동으로 분할된 아이템 인스턴스 리스트를 생성하여 반환합니다.
     /// </summary>
-    public List<InventoryItem> CreateItemInstancesByTotalQuantity(string itemId, int totalQuantity)
+    public List<InventoryItem> CreateItemInstancesByTotalQuantity(int itemId, int totalQuantity)
     {
         List<InventoryItem> result = new List<InventoryItem>();
         ItemData data = DataManager.Instance.GetData<ItemData>("Item", itemId);
@@ -75,7 +75,7 @@ public class ItemInstanceManager : MonoBehaviour
     /// <summary>
     /// 맵(월드) 상에 공용 FieldItem 프리팹을 생성합니다.
     /// </summary>
-    public void SpawnFieldItem(string itemId, int quantity, Vector3 position)
+    public void SpawnFieldItem(int itemId, int quantity, Vector3 position)
     {
         if (fieldItemPrefab == null)
         {

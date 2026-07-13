@@ -54,7 +54,7 @@ public class PlayerMovement : MonoBehaviour
         // 임시 테스트 코드: 시작할 때 DataManager에서 gun_002 데이터를 가져와 장착합니다.
         if (shooter != null)
         {
-            GunData startingGun = DataManager.Instance.GetData<GunData>("Gun", "1");
+            GunData startingGun = DataManager.Instance.GetData<GunData>("Gun", 1);
             if (startingGun != null)
             {
                 shooter.EquipGun(startingGun);

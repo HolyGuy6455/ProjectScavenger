@@ -134,6 +134,21 @@ public class DataConverterEditor : EditorWindow
                             }
                             field.SetValue(obj, arr);
                         }
+                        else if (field.FieldType == typeof(ItemAmount[]))
+                        {
+                            var parts = val.Split(new[] { ")," }, System.StringSplitOptions.RemoveEmptyEntries);
+                            ItemAmount[] arr = new ItemAmount[parts.Length];
+                            for (int p = 0; p < parts.Length; p++)
+                            {
+                                string clean = parts[p].Replace("(", "").Replace(")", "").Trim();
+                                var nums = clean.Split(',');
+                                if (nums.Length == 2)
+                                {
+                                    arr[p] = new ItemAmount { itemId = int.Parse(nums[0]), amount = int.Parse(nums[1]) };
+                                }
+                            }
+                            field.SetValue(obj, arr);
+                        }
                     }
                     catch (System.Exception e)
                     {

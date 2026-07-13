@@ -8,7 +8,7 @@ public class DataManager : MonoBehaviour
 
     // 카테고리별로 데이터를 분리하여 저장하는 이중 딕셔너리
     // 구조: <Category, <ID, IData>>
-    private Dictionary<string, Dictionary<string, IData>> categoryDataMap = new Dictionary<string, Dictionary<string, IData>>();
+    private Dictionary<string, Dictionary<int, IData>> categoryDataMap = new Dictionary<string, Dictionary<int, IData>>();
 
     private void Awake()
     {
@@ -105,10 +105,10 @@ public class DataManager : MonoBehaviour
             // 3. 맵 초기화 및 데이터 캐싱
             if (!categoryDataMap.ContainsKey(category))
             {
-                categoryDataMap[category] = new Dictionary<string, IData>();
+                categoryDataMap[category] = new Dictionary<int, IData>();
             }
             
-            Dictionary<string, IData> targetMap = categoryDataMap[category];
+            Dictionary<int, IData> targetMap = categoryDataMap[category];
             targetMap.Clear(); // 새로운 데이터 파일 로드 시 해당 카테고리 데이터 초기화
 
             if (dataList != null && dataList.GetList() != null)
@@ -128,9 +128,9 @@ public class DataManager : MonoBehaviour
 
     /// <summary>
     /// 특정 카테고리와 ID를 가진 데이터를 제네릭 형태로 가져옵니다.
-    /// 사용 예: GunData myGun = DataManager.Instance.GetData<GunData>("Gun", "gun_002");
+    /// 사용 예: GunData myGun = DataManager.Instance.GetData<GunData>("Gun", 2);
     /// </summary>
-    public T GetData<T>(string category, string id) where T : class, IData
+    public T GetData<T>(string category, int id) where T : class, IData
     {
         if (categoryDataMap.TryGetValue(category, out var dataMap))
         {

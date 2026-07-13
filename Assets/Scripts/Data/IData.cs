@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public interface IData
 {
-    string GetId();
+    int GetId();
 }
 
 public interface IDataList<T> where T : IData

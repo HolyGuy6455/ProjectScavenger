@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerInventory : MonoBehaviour
@@ -6,12 +7,23 @@ public class PlayerInventory : MonoBehaviour
     public static PlayerInventory Instance { get; private set; }
 
     public const int MaxSlots = 8;
-    public InventoryItem[] Items { get; private set; } = new InventoryItem[MaxSlots];
+    
+    private Dictionary<int, CharacterInventory> charInventories = new Dictionary<int, CharacterInventory>();
+    private CharacterInventory currentInventory;
+
+    public InventoryItem[] Items => currentInventory?.Items;
 
     public event Action OnInventoryChanged;
     public event Action<int> OnSlotSelected;
 
-    public int SelectedSlotIndex { get; private set; } = -1;
+    public int SelectedSlotIndex 
+    { 
+        get => currentInventory?.SelectedSlotIndex ?? -1; 
+        private set 
+        {
+            if (currentInventory != null) currentInventory.SelectedSlotIndex = value;
+        }
+    }
 
     private void Awake()
     {
@@ -23,15 +35,45 @@ public class PlayerInventory : MonoBehaviour
         Instance = this;
     }
 
-    private void Start()
+    private void OnEnable()
     {
-        // 임시로 아이템 지급 (테스트용)
-        AddItem("item_001", 30);
-        AddItem("item_001", 30);
-        AddItem("item_002", 3);
+        CharSelectorUI.OnCharacterChanged += HandleCharacterChanged;
     }
 
-    public bool AddItemToSlot(string itemId, int totalQuantity, int targetSlotIndex)
+    private void OnDisable()
+    {
+        CharSelectorUI.OnCharacterChanged -= HandleCharacterChanged;
+    }
+
+    private void HandleCharacterChanged(CharData charData)
+    {
+        if (!charInventories.TryGetValue(charData.id, out CharacterInventory inv))
+        {
+            inv = new CharacterInventory(charData.id, MaxSlots);
+            charInventories[charData.id] = inv;
+            
+            // Set current context first so AddItem works properly
+            currentInventory = inv;
+
+            // Initialize given items
+            if (charData.givenItem != null)
+            {
+                foreach (var itemAmount in charData.givenItem)
+                {
+                    AddItem(itemAmount.itemId, itemAmount.amount); 
+                }
+            }
+        }
+        else
+        {
+            currentInventory = inv;
+        }
+
+        OnInventoryChanged?.Invoke();
+        OnSlotSelected?.Invoke(SelectedSlotIndex);
+    }
+
+    public bool AddItemToSlot(int itemId, int totalQuantity, int targetSlotIndex)
     {
         if (targetSlotIndex < 0 || targetSlotIndex >= MaxSlots) 
             return AddItem(itemId, totalQuantity);
@@ -74,7 +116,7 @@ public class PlayerInventory : MonoBehaviour
         return true;
     }
 
-    public bool AddItem(string itemId, int totalQuantity)
+    public bool AddItem(int itemId, int totalQuantity)
     {
         ItemData data = DataManager.Instance.GetData<ItemData>("Item", itemId);
         if (data == null)

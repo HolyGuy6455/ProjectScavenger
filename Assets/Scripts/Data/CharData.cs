@@ -2,16 +2,23 @@ using UnityEngine;
 using System.Collections.Generic;
 
 [System.Serializable]
+public struct ItemAmount
+{
+    public int itemId;
+    public int amount;
+}
+
+[System.Serializable]
 public class CharData : IData
 {
-    public string id;
+    public int id;
     public string name;
     public string resourceSlot;
     public string resourceStand;
     public string gunData;
-    public int[] givenItem;
+    public ItemAmount[] givenItem;
 
-    public string GetId()
+    public int GetId()
     {
         return id;
     }

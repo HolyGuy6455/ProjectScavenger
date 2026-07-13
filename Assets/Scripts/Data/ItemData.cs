@@ -11,7 +11,7 @@ public enum QuantityShowType
 [System.Serializable]
 public class ItemData : IData
 {
-    public string id;
+    public int id;
     public string name;
     public string uiResource;
     public int maxQuantity;
@@ -21,7 +21,7 @@ public class ItemData : IData
     
     public List<ItemValueData> valueList = new List<ItemValueData>();
 
-    public string GetId()
+    public int GetId()
     {
         return id;
     }

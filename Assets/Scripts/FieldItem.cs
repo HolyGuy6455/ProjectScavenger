@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 public class FieldItem : MonoBehaviour
 {
     [Header("Item Info")]
-    public string itemId;
+    public int itemId;
     public int quantity = 1;
 
     private Plane _dragPlane;
@@ -23,7 +23,7 @@ public class FieldItem : MonoBehaviour
         UpdateSprite();
     }
 
-    public void Setup(string newId, int newQuantity)
+    public void Setup(int newId, int newQuantity)
     {
         itemId = newId;
         quantity = newQuantity;
@@ -32,7 +32,7 @@ public class FieldItem : MonoBehaviour
 
     private void UpdateSprite()
     {
-        if (string.IsNullOrEmpty(itemId)) return;
+        if (itemId <= 0) return;
 
         ItemData data = DataManager.Instance.GetData<ItemData>("Item", itemId);
         if (data != null && !string.IsNullOrEmpty(data.uiResource))

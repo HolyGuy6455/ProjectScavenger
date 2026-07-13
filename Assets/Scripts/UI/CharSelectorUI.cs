@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 public class CharSelectorUI : MonoBehaviour
 {
+    public static event System.Action<CharData> OnCharacterChanged;
+
     [SerializeField] private List<CharSelectorSlot> slots = new List<CharSelectorSlot>();
     [SerializeField] private UnityEngine.UI.Image standingImage;
     
@@ -42,6 +44,8 @@ public class CharSelectorUI : MonoBehaviour
     {
         // TODO: 캐릭터 선택 시 실제 인게임 처리 로직 (애니메이션, 모델 교체 등은 아직 미구현)
         Debug.Log($"[CharSelectorUI] 캐릭터가 선택되었습니다: {charData.name}");
+
+        OnCharacterChanged?.Invoke(charData);
 
         if (standingImage != null)
         {

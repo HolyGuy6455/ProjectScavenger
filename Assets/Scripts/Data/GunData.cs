@@ -4,7 +4,7 @@ using System.Collections.Generic;
 [System.Serializable]
 public class GunData : IData
 {
-    public string id;
+    public int id;
     public string gunName;
     public float SearchRadius;
     public float SearchAngle;
@@ -16,7 +16,7 @@ public class GunData : IData
     public float maxSpread;
     public int maxAmmo;
 
-    public string GetId()
+    public int GetId()
     {
         return id;
     }
