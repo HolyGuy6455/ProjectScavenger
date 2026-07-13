@@ -11,19 +11,19 @@ public enum QuantityShowType
 [System.Serializable]
 public class ItemData : IData
 {
-    public string itemId;
-    public string itemName;
+    public string id;
+    public string name;
     public string uiResource;
-    public string model;
     public int maxQuantity;
+    public string func;
     public int quantityShowType;
     public QuantityShowType QuantityShowType => (QuantityShowType)quantityShowType;
-    public string func;
-    public List<ItemValueData> valueList;
+    
+    public List<ItemValueData> valueList = new List<ItemValueData>();
 
     public string GetId()
     {
-        return itemId;
+        return id;
     }
 }
 
@@ -38,7 +38,7 @@ public class ItemValueData
 [System.Serializable]
 public class ItemDataList : IDataList<ItemData>
 {
-    public List<ItemData> items;
+    public List<ItemData> items = new List<ItemData>();
 
     public List<ItemData> GetList()
     {

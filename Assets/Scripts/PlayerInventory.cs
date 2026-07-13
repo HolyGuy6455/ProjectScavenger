@@ -52,7 +52,7 @@ public class PlayerInventory : MonoBehaviour
             remaining -= addAmount;
         }
         // 타겟 슬롯에 같은 아이템이 있는 경우 중첩
-        else if (targetItem.Data.itemId == itemId)
+        else if (targetItem.Data.id == itemId)
         {
             int spaceLeft = safeMaxQuantity - targetItem.Quantity;
             if (spaceLeft > 0)
@@ -88,7 +88,7 @@ public class PlayerInventory : MonoBehaviour
         // 1단계: 이미 존재하는 동일 아이템의 슬롯 중 빈 자리가 있는지 확인하여 보충
         for (int i = 0; i < MaxSlots; i++)
         {
-            if (Items[i] != null && !Items[i].IsEmpty && Items[i].Data.itemId == itemId)
+            if (Items[i] != null && !Items[i].IsEmpty && Items[i].Data.id == itemId)
             {
                 int safeMaxQuantity = data.maxQuantity > 0 ? data.maxQuantity : 1;
                 int spaceLeft = safeMaxQuantity - Items[i].Quantity;
@@ -147,7 +147,7 @@ public class PlayerInventory : MonoBehaviour
         InventoryItem target = Items[toIndex];
 
         // 타겟 슬롯과 소스 슬롯에 같은 종류의 아이템이 있다면 중첩(Stacking)을 시도합니다.
-        if (source != null && !source.IsEmpty && target != null && !target.IsEmpty && source.Data.itemId == target.Data.itemId)
+        if (source != null && !source.IsEmpty && target != null && !target.IsEmpty && source.Data.id == target.Data.id)
         {
             int safeMax = source.Data.maxQuantity > 0 ? source.Data.maxQuantity : 1;
             int spaceLeft = safeMax - target.Quantity;
@@ -272,7 +272,7 @@ public class PlayerInventory : MonoBehaviour
 
         if (ItemInstanceManager.Instance != null)
         {
-            ItemInstanceManager.Instance.SpawnFieldItem(item.Data.itemId, item.Quantity, dropPosition);
+            ItemInstanceManager.Instance.SpawnFieldItem(item.Data.id, item.Quantity, dropPosition);
         }
 
         // 슬롯 비우기

@@ -1,10 +1,11 @@
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using System.Collections.Generic;
 
 public class DataConverterEditor : EditorWindow
 {
-    [MenuItem("Tools/Data/Convert JSON to Binary")]
+    [MenuItem("Tools/Data/Convert TSV to Binary")]
     public static void ShowWindow()
     {
         GetWindow<DataConverterEditor>("Data Converter");
@@ -17,12 +18,17 @@ public class DataConverterEditor : EditorWindow
 
         if (GUILayout.Button("Convert Gun Data"))
         {
-            ConvertGunData();
+            ConvertData<GunDataList, GunData>("Gun", "Scavenger - GunData.tsv");
         }
 
         if (GUILayout.Button("Convert Item Data"))
         {
-            ConvertItemData();
+            ConvertData<ItemDataList, ItemData>("Item", "Scavenger - ItemData.tsv");
+        }
+
+        if (GUILayout.Button("Convert Char Data"))
+        {
+            ConvertData<CharDataList, CharData>("Char", "Scavenger - CharData.tsv");
         }
         
         GUILayout.Space(10);
@@ -33,126 +39,136 @@ public class DataConverterEditor : EditorWindow
         }
     }
 
-    private void ConvertGunData()
-    {
-        // 1. JSON 파일 선택
-        string inputPath = EditorUtility.OpenFilePanel("Select Gun JSON", Application.dataPath, "json");
-        if (string.IsNullOrEmpty(inputPath)) return;
-
-        string jsonContent = File.ReadAllText(inputPath);
-
-        // 2. 파싱 테스트 (JSON 포맷 검증)
-        try
-        {
-            GunDataList testParse = JsonUtility.FromJson<GunDataList>(jsonContent);
-            if (testParse == null || testParse.guns == null || testParse.guns.Count == 0)
-            {
-                Debug.LogWarning("JSON 텍스트가 GunDataList 형태( {\"guns\": [...]} )가 아니거나 데이터가 비어있을 수 있습니다.");
-            }
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"JSON 파싱 에러: {e.Message}\n입력된 파일이 올바른 형식이 아닙니다.");
-            return;
-        }
-
-        // 3. 암호화 진행
-        byte[] encryptedBytes = CryptoUtility.Encrypt(jsonContent);
-
-        // 4. 저장할 경로 지정 (이제 Resources 제약이 없으므로 Data 폴더에 .dat로 저장)
-        string dataPath = Application.dataPath + "/Data";
-        if (!Directory.Exists(dataPath))
-        {
-            Directory.CreateDirectory(dataPath);
-        }
-
-        string savePath = EditorUtility.SaveFilePanel("Save Encrypted Data", dataPath, "GunData", "dat");
-        if (string.IsNullOrEmpty(savePath)) return;
-
-        // 5. 이진 파일 쓰기
-        File.WriteAllBytes(savePath, encryptedBytes);
-        
-        AssetDatabase.Refresh();
-        Debug.Log($"Successfully converted and encrypted GunData to: {savePath}");
-    }
-
-    private void ConvertItemData()
-    {
-        string inputPath = EditorUtility.OpenFilePanel("Select Item JSON", Application.dataPath, "json");
-        if (string.IsNullOrEmpty(inputPath)) return;
-
-        string jsonContent = File.ReadAllText(inputPath);
-
-        try
-        {
-            ItemDataList testParse = JsonUtility.FromJson<ItemDataList>(jsonContent);
-            if (testParse == null || testParse.items == null || testParse.items.Count == 0)
-            {
-                Debug.LogWarning("JSON 텍스트가 ItemDataList 형태가 아니거나 데이터가 비어있을 수 있습니다.");
-            }
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"JSON 파싱 에러: {e.Message}\n입력된 파일이 올바른 형식이 아닙니다.");
-            return;
-        }
-
-        byte[] encryptedBytes = CryptoUtility.Encrypt(jsonContent);
-
-        string dataPath = Application.dataPath + "/Data";
-        if (!Directory.Exists(dataPath))
-        {
-            Directory.CreateDirectory(dataPath);
-        }
-
-        string savePath = EditorUtility.SaveFilePanel("Save Encrypted Data", dataPath, "ItemData", "dat");
-        if (string.IsNullOrEmpty(savePath)) return;
-
-        File.WriteAllBytes(savePath, encryptedBytes);
-        
-        AssetDatabase.Refresh();
-        Debug.Log($"Successfully converted and encrypted ItemData to: {savePath}");
-    }
-
     private void ConvertAllData()
     {
+        ConvertData<GunDataList, GunData>("Gun", "Scavenger - GunData.tsv");
+        ConvertData<ItemDataList, ItemData>("Item", "Scavenger - ItemData.tsv");
+        ConvertData<CharDataList, CharData>("Char", "Scavenger - CharData.tsv");
+        AssetDatabase.Refresh();
+        Debug.Log("Finished Convert All Data operation.");
+    }
+
+    private void ConvertData<TList, TData>(string dataName, string tsvFileName) 
+        where TList : IDataList<TData>, new()
+        where TData : class, IData, new()
+    {
+        string tsvPath = Path.Combine(Application.dataPath, "Data", tsvFileName);
+        if (!File.Exists(tsvPath))
+        {
+            tsvPath = EditorUtility.OpenFilePanel($"Select {dataName} TSV", Application.dataPath + "/Data", "tsv");
+            if (string.IsNullOrEmpty(tsvPath)) return;
+        }
+
+        string tsvContent = File.ReadAllText(tsvPath);
+        TList dataList = new TList();
+        var list = ParseTsv<TData>(tsvContent);
+        
+        // Find the List<TData> field and set it
+        var fields = typeof(TList).GetFields();
+        foreach (var field in fields)
+        {
+            if (field.FieldType == typeof(List<TData>))
+            {
+                field.SetValue(dataList, list);
+                break;
+            }
+        }
+
+        string jsonContent = JsonUtility.ToJson(dataList);
+        byte[] encryptedBytes = CryptoUtility.Encrypt(jsonContent);
+
         string dataPath = Application.dataPath + "/Data";
         if (!Directory.Exists(dataPath))
         {
             Directory.CreateDirectory(dataPath);
         }
 
-        // Convert Gun Data
-        string gunJsonPath = Application.dataPath + "/test_gun.json";
-        if (File.Exists(gunJsonPath))
-        {
-            string jsonContent = File.ReadAllText(gunJsonPath);
-            byte[] encryptedBytes = CryptoUtility.Encrypt(jsonContent);
-            string savePath = dataPath + "/GunData.dat";
-            File.WriteAllBytes(savePath, encryptedBytes);
-            Debug.Log($"Auto-converted GunData to: {savePath}");
-        }
-        else
-        {
-            Debug.LogWarning($"Could not find {gunJsonPath}");
-        }
-
-        // Convert Item Data
-        string itemJsonPath = Application.dataPath + "/test_item.json";
-        if (File.Exists(itemJsonPath))
-        {
-            string jsonContent = File.ReadAllText(itemJsonPath);
-            byte[] encryptedBytes = CryptoUtility.Encrypt(jsonContent);
-            string savePath = dataPath + "/ItemData.dat";
-            File.WriteAllBytes(savePath, encryptedBytes);
-            Debug.Log($"Auto-converted ItemData to: {savePath}");
-        }
-        else
-        {
-            Debug.LogWarning($"Could not find {itemJsonPath}");
-        }
-
+        string savePath = Path.Combine(dataPath, $"{dataName}Data.dat");
+        File.WriteAllBytes(savePath, encryptedBytes);
+        
         AssetDatabase.Refresh();
-        Debug.Log("Finished Convert All Data operation.");
+        Debug.Log($"Successfully converted and encrypted {dataName}Data to: {savePath}");
+    }
+
+    private List<T> ParseTsv<T>(string tsvContent) where T : new()
+    {
+        List<T> list = new List<T>();
+        string[] lines = tsvContent.Split(new[] { '\r', '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
+        if (lines.Length < 2) return list;
+
+        string[] headers = lines[0].Split('\t');
+        for (int i = 1; i < lines.Length; i++)
+        {
+            string[] values = lines[i].Split('\t');
+            T obj = new T();
+            for (int j = 0; j < headers.Length && j < values.Length; j++)
+            {
+                string header = headers[j].Trim();
+                string val = values[j].Trim();
+                if (string.IsNullOrEmpty(val)) continue;
+
+                var field = typeof(T).GetField(header);
+                if (field != null)
+                {
+                    try
+                    {
+                        if (field.FieldType == typeof(int))
+                        {
+                            field.SetValue(obj, int.Parse(val));
+                        }
+                        else if (field.FieldType == typeof(float))
+                        {
+                            field.SetValue(obj, float.Parse(val));
+                        }
+                        else if (field.FieldType == typeof(string))
+                        {
+                            field.SetValue(obj, val);
+                        }
+                        else if (field.FieldType == typeof(int[]))
+                        {
+                            var parts = val.Split(',');
+                            int[] arr = new int[parts.Length];
+                            for (int p = 0; p < parts.Length; p++)
+                            {
+                                arr[p] = int.Parse(parts[p].Trim());
+                            }
+                            field.SetValue(obj, arr);
+                        }
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.LogWarning($"Failed to parse field {header} with value {val} in class {typeof(T).Name}. Error: {e.Message}");
+                    }
+                }
+            }
+
+            // Special handling for ItemData valueList
+            if (obj is ItemData itemData)
+            {
+                for (int v = 1; v <= 5; v++)
+                {
+                    int keyIdx = System.Array.IndexOf(headers, $"value{v}_key");
+                    int valIdx = System.Array.IndexOf(headers, $"value{v}_value");
+                    int subIdx = System.Array.IndexOf(headers, $"value{v}_subvalue");
+
+                    if (keyIdx != -1 && keyIdx < values.Length && !string.IsNullOrEmpty(values[keyIdx].Trim()))
+                    {
+                        ItemValueData ivd = new ItemValueData();
+                        ivd.key = int.Parse(values[keyIdx].Trim());
+                        
+                        if (valIdx != -1 && valIdx < values.Length && !string.IsNullOrEmpty(values[valIdx].Trim()))
+                            ivd.value = int.Parse(values[valIdx].Trim());
+                            
+                        if (subIdx != -1 && subIdx < values.Length && !string.IsNullOrEmpty(values[subIdx].Trim()))
+                            ivd.subValue = int.Parse(values[subIdx].Trim());
+                            
+                        itemData.valueList.Add(ivd);
+                    }
+                }
+            }
+
+            list.Add(obj);
+        }
+        return list;
     }
 }

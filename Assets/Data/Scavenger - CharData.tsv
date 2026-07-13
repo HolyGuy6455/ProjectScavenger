@@ -1,0 +1,5 @@
+id	name	resourceSlot	resourceStand	gunData	givenItem
+1	char_01	char_01_slot.png	char_01_stand.png	1	1,1,2
+2	char_02	char_02_slot.png	char_02_stand.png	2	1,1,2
+3	char_03	char_03_slot.png	char_03_stand.png	3	1,1,2
+4	char_04	char_04_slot.png	char_04_stand.png	4	1,1,2

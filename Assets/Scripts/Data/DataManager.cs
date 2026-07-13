@@ -36,6 +36,7 @@ public class DataManager : MonoBehaviour
     {
         LoadData<GunDataList, GunData>("Gun", "GunData.dat");
         LoadData<ItemDataList, ItemData>("Item", "ItemData.dat");
+        LoadData<CharDataList, CharData>("Char", "CharData.dat");
         // LoadData<EnemyDataList, EnemyData>("Enemy", "EnemyData.dat");
     }
 
@@ -141,5 +142,24 @@ public class DataManager : MonoBehaviour
         
         Debug.LogWarning($"[DataManager] Data not found - Category: {category}, ID: {id}");
         return null;
+    }
+
+    /// <summary>
+    /// 특정 카테고리의 모든 데이터를 리스트 형태로 가져옵니다.
+    /// </summary>
+    public List<T> GetAllData<T>(string category) where T : class, IData
+    {
+        List<T> list = new List<T>();
+        if (categoryDataMap.TryGetValue(category, out var dataMap))
+        {
+            foreach (var data in dataMap.Values)
+            {
+                if (data is T tData)
+                {
+                    list.Add(tData);
+                }
+            }
+        }
+        return list;
     }
 }
