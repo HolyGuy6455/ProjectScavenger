@@ -15,7 +15,7 @@ public class CharData : IData
     public string name;
     public string resourceSlot;
     public string resourceStand;
-    public string gunData;
+    public int gunData;
     public ItemAmount[] givenItem;
 
     public int GetId()

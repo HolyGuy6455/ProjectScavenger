@@ -3,7 +3,7 @@ using UnityEngine;
 public class MagazineUsage : IItemUsage
 {
     public bool IsConsumable => false; // 수량이 0이 되어도 빈 탄창으로 남음
-    public bool UseImmediately => false; // 클릭 시 장착(선택)만 됨
+    public bool UseImmediately => true; // 클릭 시 즉시 사용(탄창 교체)됨
 
     public bool Execute(InventoryItem item, GameObject target)
     {
@@ -16,16 +16,18 @@ public class MagazineUsage : IItemUsage
             return false;
         }
 
-        PlayerInventory inventory = target.GetComponent<PlayerInventory>();
-        if (inventory != null)
+        if (shooter.CurrentGunData == null)
         {
-            shooter.EquipMagazine(item, inventory.SelectedSlotIndex);
+            Debug.LogWarning("[MagazineUsage] Shooter does not have an equipped gun.");
+            return false;
         }
-        else
-        {
-            // 예외 상황: PlayerInventory가 없으면 인덱스 -1로 장착
-            shooter.EquipMagazine(item, -1);
-        }
+
+        // 총기의 탄약과 인벤토리의 탄창 탄약을 맞바꿈
+        int tempAmmo = shooter.CurrentAmmo;
+        shooter.CurrentAmmo = item.Quantity;
+        item.Quantity = tempAmmo;
+
+        Debug.Log($"[MagazineUsage] 탄창 교환 완료. Shooter 잔탄: {shooter.CurrentAmmo}, 인벤토리 탄창 잔탄: {item.Quantity}");
 
         return true;
     }

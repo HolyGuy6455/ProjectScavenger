@@ -15,6 +15,7 @@ public class GunData : IData
     public float spreadPerShot;
     public float maxSpread;
     public int maxAmmo;
+    public string resourceSilhouette;
 
     public int GetId()
     {

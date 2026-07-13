@@ -261,6 +261,7 @@ public class PlayerInventory : MonoBehaviour
         }
         else
         {
+            /*
             // 선택/장착 (예: 탄창)
             if (SelectedSlotIndex == index)
             {
@@ -279,6 +280,7 @@ public class PlayerInventory : MonoBehaviour
 
             OnSlotSelected?.Invoke(SelectedSlotIndex);
             OnInventoryChanged?.Invoke();
+            */
         }
     }
 

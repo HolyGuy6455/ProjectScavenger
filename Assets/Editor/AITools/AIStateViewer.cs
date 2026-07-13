@@ -615,6 +615,8 @@ public class AIStateViewer : EditorWindow
 
     private void OnSelectionChanged()
     {
+        if (inspectorTitle == null) return;
+        
         GameObject selectedObj = Selection.activeGameObject;
         currentBrain = selectedObj != null ? selectedObj.GetComponent<AIBrain>() : null;
         
