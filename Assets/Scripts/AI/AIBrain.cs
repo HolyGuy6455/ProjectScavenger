@@ -32,6 +32,7 @@ public class AIBrain : MonoBehaviour
     {
         if (rootNode != null)
         {
+            rootNode.ResetState();
             rootNode.Evaluate(this);
         }
     }

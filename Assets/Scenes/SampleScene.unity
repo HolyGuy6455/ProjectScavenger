@@ -651,7 +651,6 @@ MonoBehaviour:
     maxAmmo: 0
     searchRadius: 0
     searchAngle: 0
-  currentAmmo: 0
   isReloading: 0
 --- !u!114 &200000010
 MonoBehaviour:
@@ -1866,6 +1865,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aae0e77d6ba758a46b8c5e52d7d192c9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemInstanceManager
+  fieldItemPrefab: {fileID: 0}
 --- !u!224 &1088428195 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 215348706711767921, guid: 2ddc1c763fae8ce4096350d8fa3001c2, type: 3}

@@ -137,6 +137,7 @@ GameObject:
   - component: {fileID: 921170705562535445}
   - component: {fileID: 273470665313786195}
   - component: {fileID: 6165863499796765}
+  - component: {fileID: 987877342655545458}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -308,6 +309,286 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba93fb69bb17b5c41a602fb0358664eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIBrain
+  rootNode:
+    rid: 3558163897100009576
+  blackboard:
+  - rid: 3558163897100009580
+  - rid: 3558163961612599431
+  - rid: 3558163897100009581
+  - rid: 3558163961612599389
+  - rid: 3558163961612599432
+  - rid: 3558163961612599399
+  - rid: 3558163961612599400
+  - rid: 3558163961612599433
+  - rid: 3558163961612599419
+  - rid: 3558163961612599423
+  references:
+    version: 2
+    RefIds:
+    - rid: 3558163897100009576
+      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC120\uD0DD"
+        nodeMemo: 
+        children:
+        - rid: 3558163961612599390
+        - rid: 3558163961612599374
+        - rid: 3558163961612599379
+        - rid: 3558163961612599411
+    - rid: 3558163897100009580
+      type: {class: BTSharedGameObject, ns: , asm: Assembly-CSharp}
+      data:
+        key: MySelf
+        value: {fileID: 1226158920139408715}
+    - rid: 3558163897100009581
+      type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
+      data:
+        key: Target/Dist
+        value: 5
+    - rid: 3558163961612599374
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uBAA9\uD45C\uC9C0\uC810\uC73C\uB85C \uC774\uB3D9"
+        nodeMemo: 
+        children:
+        - rid: 3558163961612599375
+        - rid: 3558163961612599377
+    - rid: 3558163961612599375
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: IsItClose ToTarget
+        nodeMemo: 
+        logic:
+          rid: 3558163961612599376
+    - rid: 3558163961612599376
+      type: {class: BTActDistanceCheck, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Target/Pos
+        mySelfKey: MySelf
+        distanceKey: Target/Dist
+        successIfCloser: 0
+    - rid: 3558163961612599377
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: MoveToTarget
+        nodeMemo: 
+        logic:
+          rid: 3558163961612599378
+    - rid: 3558163961612599378
+      type: {class: BTActMoveTo, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Target/Pos
+        mySelfKey: MySelf
+    - rid: 3558163961612599379
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC2DC\uC791\uC9C0\uC810\uC73C\uB85C \uBCF5\uADC0"
+        nodeMemo: 
+        children:
+        - rid: 3558163961612599380
+        - rid: 3558163961612599437
+    - rid: 3558163961612599380
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: IsItClose ToStart?
+        nodeMemo: 
+        logic:
+          rid: 3558163961612599381
+    - rid: 3558163961612599381
+      type: {class: BTActDistanceCheck, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Start/Pos
+        mySelfKey: MySelf
+        distanceKey: Start/Dist
+        successIfCloser: 0
+    - rid: 3558163961612599389
+      type: {class: BTSharedBoolean, ns: , asm: Assembly-CSharp}
+      data:
+        key: IsInitialized
+        value: 0
+    - rid: 3558163961612599390
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uCD08\uAE30\uD654"
+        nodeMemo: 
+        children:
+        - rid: 3558163961612599391
+        - rid: 3558163961612599393
+        - rid: 3558163961612599434
+        - rid: 3558163961612599420
+        - rid: 3558163961612599395
+    - rid: 3558163961612599391
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: isItInitialized?
+        nodeMemo: 
+        logic:
+          rid: 3558163961612599392
+    - rid: 3558163961612599392
+      type: {class: BTActCheckBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsInitialized
+        successIfTrue: 0
+    - rid: 3558163961612599393
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: SetStartPos
+        nodeMemo: 
+        logic:
+          rid: 3558163961612599394
+    - rid: 3558163961612599394
+      type: {class: BTActCopyPos, ns: , asm: Assembly-CSharp}
+      data:
+        targetObjectKey: MySelf
+        outPositionKey: Start/Pos
+    - rid: 3558163961612599395
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: SetInitailized
+        nodeMemo: 
+        logic:
+          rid: 3558163961612599398
+    - rid: 3558163961612599398
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsInitialized
+        setToValue: 1
+    - rid: 3558163961612599399
+      type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
+      data:
+        key: Start/Dist
+        value: 20
+    - rid: 3558163961612599400
+      type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
+      data:
+        key: Player/InRange
+        value: 10
+    - rid: 3558163961612599411
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uD50C\uB808\uC774\uC5B4 \uCD94\uACA9"
+        nodeMemo: 
+        children:
+        - rid: 3558163961612599426
+        - rid: 3558163961612599428
+        - rid: 3558163961612599442
+    - rid: 3558163961612599419
+      type: {class: BTSharedGameObject, ns: , asm: Assembly-CSharp}
+      data:
+        key: Player/GameObj
+        value: {fileID: 0}
+    - rid: 3558163961612599420
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: SetPlayer
+        nodeMemo: 
+        logic:
+          rid: 3558163961612599425
+    - rid: 3558163961612599423
+      type: {class: BTSharedString, ns: , asm: Assembly-CSharp}
+      data:
+        key: Player/Tag
+        value: Player
+    - rid: 3558163961612599425
+      type: {class: BTActFindGameObject, ns: , asm: Assembly-CSharp}
+      data:
+        findMethod: 0
+        targetStringKey: Player/Tag
+        outGameObjectKey: Player/GameObj
+        findClosest: 0
+        mySelfKey: MySelf
+    - rid: 3558163961612599426
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: Commit PlayerPos
+        nodeMemo: 
+        logic:
+          rid: 3558163961612599427
+    - rid: 3558163961612599427
+      type: {class: BTActCopyPos, ns: , asm: Assembly-CSharp}
+      data:
+        targetObjectKey: Player/GameObj
+        outPositionKey: Player/Pos
+    - rid: 3558163961612599428
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: IsItClose ToPlayer?
+        nodeMemo: 
+        logic:
+          rid: 3558163961612599429
+    - rid: 3558163961612599429
+      type: {class: BTActDistanceCheck, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Player/Pos
+        mySelfKey: MySelf
+        distanceKey: Player/InRange
+        successIfCloser: 1
+    - rid: 3558163961612599431
+      type: {class: BTSharedVector3, ns: , asm: Assembly-CSharp}
+      data:
+        key: Target/Pos
+        value: {x: 0, y: 0, z: 0}
+    - rid: 3558163961612599432
+      type: {class: BTSharedVector3, ns: , asm: Assembly-CSharp}
+      data:
+        key: Start/Pos
+        value: {x: 0, y: 0, z: 0}
+    - rid: 3558163961612599433
+      type: {class: BTSharedVector3, ns: , asm: Assembly-CSharp}
+      data:
+        key: Player/Pos
+        value: {x: 0, y: 0, z: 0}
+    - rid: 3558163961612599434
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: CopyStart ToTarget
+        nodeMemo: 
+        logic:
+          rid: 3558163961612599436
+    - rid: 3558163961612599436
+      type: {class: BTActCopyValue, ns: , asm: Assembly-CSharp}
+      data:
+        sourceKey: Start/Pos
+        targetKey: Target/Pos
+    - rid: 3558163961612599437
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: CopyStart ToTarget
+        nodeMemo: 
+        logic:
+          rid: 3558163961612599438
+    - rid: 3558163961612599438
+      type: {class: BTActCopyValue, ns: , asm: Assembly-CSharp}
+      data:
+        sourceKey: Start/Pos
+        targetKey: Target/Pos
+    - rid: 3558163961612599442
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: BTActCopyValue
+        nodeMemo: 
+        logic:
+          rid: 3558163961612599443
+    - rid: 3558163961612599443
+      type: {class: BTActCopyValue, ns: , asm: Assembly-CSharp}
+      data:
+        sourceKey: Player/Pos
+        targetKey: Target/Pos
+--- !u!114 &987877342655545458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dee19920f0c951e499a1e66156efd787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EntityMovement
+  moveSpeed: 4
+  rotationSpeed: 720
+  stoppingDistance: 0.1
 --- !u!1 &3066881848277116625
 GameObject:
   m_ObjectHideFlags: 0

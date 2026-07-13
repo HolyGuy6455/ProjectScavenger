@@ -15,6 +15,15 @@ public class BTSelector : BTNode
         this.children = children;
     }
 
+    public override void ResetState()
+    {
+        base.ResetState();
+        foreach (var child in children)
+        {
+            if (child != null) child.ResetState();
+        }
+    }
+
     public override NodeState Evaluate(AIBrain brain)
     {
         foreach (BTNode child in children)

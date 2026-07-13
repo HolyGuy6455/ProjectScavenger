@@ -18,10 +18,31 @@ public class AIStateViewer : EditorWindow
     
     // Node Tab Elements
     private Label inspectorTitle;
-    private TextField memoField;
+    private TextField memoField; // Used for Name now
+    private TextField nodeMemoField; // NEW: For longer memos
     private Label childrenCountLabel;
     private PopupField<string> logicDropdown;
     private List<System.Type> logicTypesList = new List<System.Type>();
+    private VisualElement dynamicFieldsContainer;
+
+    // Panning state
+    private bool isDraggingTree = false;
+    private Vector2 dragStartMousePos;
+    private Vector2 dragStartScrollOffset; 
+
+    // Zoom state
+    private float currentZoom = 1.0f;
+    private const float MinZoom = 0.2f;
+    private const float MaxZoom = 3.0f;
+    private bool hasCenteredInitial = false;
+
+    private void CenterViewToRoot()
+    {
+        if (scrollView != null)
+        {
+            scrollView.scrollOffset = new Vector2(5000 - scrollView.layout.width / 2, 5000 - scrollView.layout.height / 2);
+        }
+    }
     
     // Property Tab Elements
     private ScrollView propertyListScroll;
@@ -69,12 +90,82 @@ public class AIStateViewer : EditorWindow
         scrollView = new ScrollView(ScrollViewMode.VerticalAndHorizontal);
         scrollView.style.flexGrow = 1;
         scrollView.contentContainer.style.alignItems = Align.Center;
+        scrollView.contentContainer.style.justifyContent = Justify.Center;
         leftPane.Add(scrollView);
 
         treeContainer = new VisualElement();
         treeContainer.style.alignItems = Align.Center;
-        treeContainer.style.flexGrow = 1;
+        treeContainer.style.justifyContent = Justify.Center;
+        treeContainer.style.width = 10000;
+        treeContainer.style.height = 10000;
         scrollView.Add(treeContainer);
+
+        // Center the scroll view
+        scrollView.RegisterCallback<GeometryChangedEvent>(evt => {
+            if (!hasCenteredInitial && scrollView.layout.width > 0)
+            {
+                CenterViewToRoot();
+                hasCenteredInitial = true;
+            }
+        });
+
+        // Home Key to center view
+        root.RegisterCallback<KeyDownEvent>(evt => {
+            if (evt.keyCode == KeyCode.Home)
+            {
+                CenterViewToRoot();
+                evt.StopPropagation();
+            }
+        });
+
+        // Setup Panning (Drag with Middle Mouse or Alt+Left Mouse)
+        scrollView.RegisterCallback<PointerDownEvent>(evt => {
+            if (evt.button == 2 || (evt.button == 0 && evt.altKey)) 
+            {
+                isDraggingTree = true;
+                dragStartMousePos = evt.position;
+                dragStartScrollOffset = scrollView.scrollOffset;
+                scrollView.CapturePointer(evt.pointerId);
+                evt.StopPropagation();
+            }
+        });
+
+        scrollView.RegisterCallback<PointerMoveEvent>(evt => {
+            if (isDraggingTree && scrollView.HasPointerCapture(evt.pointerId))
+            {
+                Vector2 delta = (Vector2)evt.position - dragStartMousePos;
+                scrollView.scrollOffset = dragStartScrollOffset - delta;
+                evt.StopPropagation();
+            }
+        });
+
+        scrollView.RegisterCallback<PointerUpEvent>(evt => {
+            if (isDraggingTree && scrollView.HasPointerCapture(evt.pointerId))
+            {
+                isDraggingTree = false;
+                scrollView.ReleasePointer(evt.pointerId);
+                evt.StopPropagation();
+            }
+        });
+        
+        // Setup Shift+Scroll for horizontal and Ctrl+Scroll for Zoom
+        scrollView.RegisterCallback<WheelEvent>(evt => {
+            if (evt.ctrlKey || evt.commandKey)
+            {
+                currentZoom -= evt.delta.y * 0.05f;
+                currentZoom = Mathf.Clamp(currentZoom, MinZoom, MaxZoom);
+                treeContainer.style.scale = new StyleScale(new Scale(new Vector3(currentZoom, currentZoom, 1)));
+                treeContainer.style.transformOrigin = new TransformOrigin(Length.Percent(50), Length.Percent(50));
+                
+                if (lineDrawer != null) lineDrawer.MarkDirtyRepaint();
+                evt.StopPropagation();
+            }
+            else if (evt.shiftKey)
+            {
+                scrollView.scrollOffset = new Vector2(scrollView.scrollOffset.x + evt.delta.y * 20f, scrollView.scrollOffset.y);
+                evt.StopPropagation();
+            }
+        });
 
         lineDrawer = new IMGUIContainer(DrawLines);
         lineDrawer.style.position = Position.Absolute;
@@ -112,13 +203,70 @@ public class AIStateViewer : EditorWindow
         nodeTabContent.style.paddingLeft = 10;
         nodeTabContent.style.paddingRight = 10;
 
+        VisualElement headerRow = new VisualElement();
+        headerRow.style.flexDirection = FlexDirection.Row;
+        headerRow.style.justifyContent = Justify.SpaceBetween;
+        headerRow.style.marginBottom = 15;
+
         inspectorTitle = new Label("Node Inspector");
         inspectorTitle.style.fontSize = 16;
         inspectorTitle.style.unityFontStyleAndWeight = FontStyle.Bold;
-        inspectorTitle.style.marginBottom = 15;
-        nodeTabContent.Add(inspectorTitle);
+        headerRow.Add(inspectorTitle);
 
-        memoField = new TextField("Memo (Name)");
+        Button deleteBtn = new Button(() => {
+            if (selectedNode != null && currentBrain != null) {
+                if (selectedNode == currentBrain.rootNode) {
+                    currentBrain.rootNode = null;
+                } else {
+                    BTNode p = FindParent(currentBrain.rootNode, selectedNode);
+                    if (p is BTSequence seq) seq.children.Remove(selectedNode);
+                    else if (p is BTSelector sel) sel.children.Remove(selectedNode);
+                }
+                selectedNode = null;
+                EditorUtility.SetDirty(currentBrain);
+                RebuildTreeUI();
+                UpdateInspector();
+            }
+        });
+        deleteBtn.text = "Delete This Node";
+        deleteBtn.style.backgroundColor = new Color(0.8f, 0.2f, 0.2f);
+        deleteBtn.name = "deleteNodeBtn";
+
+        Button refreshBtn = new Button(() => { UpdateInspector(); });
+        refreshBtn.text = "Refresh";
+        refreshBtn.style.backgroundColor = new Color(0.2f, 0.4f, 0.8f);
+        refreshBtn.style.marginTop = 5;
+        refreshBtn.name = "refreshNodeBtn";
+
+        VisualElement moveBtnContainer = new VisualElement();
+        moveBtnContainer.style.flexDirection = FlexDirection.Row;
+        moveBtnContainer.style.justifyContent = Justify.SpaceBetween;
+        moveBtnContainer.style.marginBottom = 5;
+
+        Button moveUpBtn = new Button(() => { MoveNode(selectedNode, -1); });
+        moveUpBtn.text = "Move Up (↑)";
+        moveUpBtn.name = "moveUpNodeBtn";
+        moveUpBtn.style.flexGrow = 1;
+        
+        Button moveDownBtn = new Button(() => { MoveNode(selectedNode, 1); });
+        moveDownBtn.text = "Move Down (↓)";
+        moveDownBtn.name = "moveDownNodeBtn";
+        moveDownBtn.style.flexGrow = 1;
+
+        moveBtnContainer.Add(moveUpBtn);
+        moveBtnContainer.Add(moveDownBtn);
+
+        VisualElement btnContainer = new VisualElement();
+        btnContainer.style.flexDirection = FlexDirection.Column;
+        btnContainer.Add(moveBtnContainer);
+        btnContainer.Add(deleteBtn);
+        btnContainer.Add(refreshBtn);
+
+        headerRow.Add(btnContainer);
+
+        nodeTabContent.Add(headerRow);
+
+        memoField = new TextField("Node Name");
         memoField.RegisterValueChangedCallback(evt => 
         {
             if (selectedNode != null)
@@ -133,6 +281,18 @@ public class AIStateViewer : EditorWindow
             }
         });
         nodeTabContent.Add(memoField);
+
+        nodeMemoField = new TextField("Memo");
+        nodeMemoField.multiline = true;
+        nodeMemoField.style.minHeight = 60;
+        nodeMemoField.style.whiteSpace = WhiteSpace.Normal;
+        nodeMemoField.RegisterValueChangedCallback(evt => {
+            if (selectedNode != null) {
+                selectedNode.nodeMemo = evt.newValue;
+                if (currentBrain != null) EditorUtility.SetDirty(currentBrain);
+            }
+        });
+        nodeTabContent.Add(nodeMemoField);
 
         childrenCountLabel = new Label("");
         childrenCountLabel.style.marginTop = 10;
@@ -173,9 +333,17 @@ public class AIStateViewer : EditorWindow
                     }
                 }
                 if (currentBrain != null) EditorUtility.SetDirty(currentBrain);
+                
+                // Immediately update inspector to show new dynamic fields
+                UpdateInspector();
             }
         });
         nodeTabContent.Add(logicDropdown);
+        
+        dynamicFieldsContainer = new VisualElement();
+        dynamicFieldsContainer.style.marginTop = 15;
+        nodeTabContent.Add(dynamicFieldsContainer);
+        
         inspectorPanel.Add(nodeTabContent);
 
         // --- PROPERTY TAB CONTENT ---
@@ -243,11 +411,12 @@ public class AIStateViewer : EditorWindow
             row.style.marginBottom = 5;
             row.style.alignItems = Align.Center;
 
-            // 1. Type Dropdown
-            List<string> types = new List<string> { "Numeric", "Boolean", "GameObject" };
+            List<string> types = new List<string> { "Numeric", "Boolean", "GameObject", "String", "Vector3" };
             int currentTypeIndex = 0;
             if (prop is BTSharedBoolean) currentTypeIndex = 1;
             else if (prop is BTSharedGameObject) currentTypeIndex = 2;
+            else if (prop is BTSharedString) currentTypeIndex = 3;
+            else if (prop is BTSharedVector3) currentTypeIndex = 4;
             
             PopupField<string> typeDropdown = new PopupField<string>(types, currentTypeIndex);
             typeDropdown.style.width = 80;
@@ -257,6 +426,8 @@ public class AIStateViewer : EditorWindow
                 if (evt.newValue == "Numeric") newProp = new BTSharedNumeric();
                 else if (evt.newValue == "Boolean") newProp = new BTSharedBoolean();
                 else if (evt.newValue == "GameObject") newProp = new BTSharedGameObject();
+                else if (evt.newValue == "String") newProp = new BTSharedString();
+                else if (evt.newValue == "Vector3") newProp = new BTSharedVector3();
                 
                 newProp.key = ""; // Reset as requested
                 currentBrain.blackboard[index] = newProp;
@@ -268,7 +439,7 @@ public class AIStateViewer : EditorWindow
             // 2. Key TextField
             TextField keyField = new TextField();
             keyField.value = prop.key;
-            keyField.style.width = 60;
+            keyField.style.width = 100;
             keyField.RegisterValueChangedCallback(evt => {
                 currentBrain.blackboard[index].key = evt.newValue;
                 EditorUtility.SetDirty(currentBrain);
@@ -314,6 +485,30 @@ public class AIStateViewer : EditorWindow
                 of.userData = goProp;
                 valueField = of;
             }
+            else if (prop is BTSharedString strProp)
+            {
+                TextField tf = new TextField();
+                tf.value = strProp.value;
+                tf.style.flexGrow = 1;
+                tf.RegisterValueChangedCallback(evt => {
+                    strProp.value = evt.newValue;
+                    EditorUtility.SetDirty(currentBrain);
+                });
+                tf.userData = strProp;
+                valueField = tf;
+            }
+            else if (prop is BTSharedVector3 vecProp)
+            {
+                UnityEngine.UIElements.Vector3Field vf = new UnityEngine.UIElements.Vector3Field();
+                vf.value = vecProp.value;
+                vf.style.flexGrow = 1;
+                vf.RegisterValueChangedCallback(evt => {
+                    vecProp.value = evt.newValue;
+                    EditorUtility.SetDirty(currentBrain);
+                });
+                vf.userData = vecProp;
+                valueField = vf;
+            }
 
             if (valueField != null)
             {
@@ -321,7 +516,34 @@ public class AIStateViewer : EditorWindow
                 row.Add(valueField);
             }
 
-            // 4. Delete Button
+            // 4. Up/Down/Delete Buttons Container
+            VisualElement actionBtnContainer = new VisualElement();
+            actionBtnContainer.style.flexDirection = FlexDirection.Row;
+
+            Button upBtn = new Button(() => {
+                if (index > 0) {
+                    var temp = currentBrain.blackboard[index];
+                    currentBrain.blackboard[index] = currentBrain.blackboard[index - 1];
+                    currentBrain.blackboard[index - 1] = temp;
+                    EditorUtility.SetDirty(currentBrain);
+                    RebuildPropertyUI();
+                }
+            });
+            upBtn.text = "↑";
+            upBtn.style.width = 25;
+            
+            Button downBtn = new Button(() => {
+                if (index < currentBrain.blackboard.Count - 1) {
+                    var temp = currentBrain.blackboard[index];
+                    currentBrain.blackboard[index] = currentBrain.blackboard[index + 1];
+                    currentBrain.blackboard[index + 1] = temp;
+                    EditorUtility.SetDirty(currentBrain);
+                    RebuildPropertyUI();
+                }
+            });
+            downBtn.text = "↓";
+            downBtn.style.width = 25;
+
             Button delBtn = new Button(() => {
                 currentBrain.blackboard.RemoveAt(index);
                 EditorUtility.SetDirty(currentBrain);
@@ -329,7 +551,13 @@ public class AIStateViewer : EditorWindow
             });
             delBtn.text = "X";
             delBtn.style.backgroundColor = new Color(0.6f, 0.2f, 0.2f);
-            row.Add(delBtn);
+            delBtn.style.width = 25;
+
+            actionBtnContainer.Add(upBtn);
+            actionBtnContainer.Add(downBtn);
+            actionBtnContainer.Add(delBtn);
+
+            row.Add(actionBtnContainer);
 
             propertyListScroll.Add(row);
         }
@@ -360,13 +588,13 @@ public class AIStateViewer : EditorWindow
             Vector2 pLocal = lineDrawer.WorldToLocal(parentCenter);
             Vector2 cLocal = lineDrawer.WorldToLocal(childCenter);
             
-            pLocal.y += edge.parent.worldBound.height / 2f;
-            cLocal.y -= edge.child.worldBound.height / 2f;
+            pLocal.x += edge.parent.worldBound.width / 2f;
+            cLocal.x -= edge.child.worldBound.width / 2f;
             
-            float midY = (pLocal.y + cLocal.y) / 2f;
+            float midX = (pLocal.x + cLocal.x) / 2f;
             Vector3 p1 = pLocal;
-            Vector3 p2 = new Vector3(pLocal.x, midY, 0);
-            Vector3 p3 = new Vector3(cLocal.x, midY, 0);
+            Vector3 p2 = new Vector3(midX, pLocal.y, 0);
+            Vector3 p3 = new Vector3(midX, cLocal.y, 0);
             Vector3 p4 = cLocal;
             
             Handles.DrawPolyLine(p1, p2, p3, p4);
@@ -418,6 +646,10 @@ public class AIStateViewer : EditorWindow
                         tg.SetValueWithoutNotify(bln.value);
                     else if (field is ObjectField of && of.userData is BTSharedGameObject go)
                         of.SetValueWithoutNotify(go.value);
+                    else if (field is TextField tf && tf.userData is BTSharedString str)
+                        tf.SetValueWithoutNotify(str.value);
+                    else if (field is UnityEngine.UIElements.Vector3Field vf && vf.userData is BTSharedVector3 vec)
+                        vf.SetValueWithoutNotify(vec.value);
                 }
             }
         }
@@ -450,17 +682,46 @@ public class AIStateViewer : EditorWindow
 
     private void UpdateInspector()
     {
+        if (dynamicFieldsContainer != null) dynamicFieldsContainer.Clear();
+
         if (selectedNode == null)
         {
             inspectorTitle.text = "No Node Selected";
             memoField.style.display = DisplayStyle.None;
+            if (nodeMemoField != null) nodeMemoField.style.display = DisplayStyle.None;
             logicDropdown.style.display = DisplayStyle.None;
             childrenCountLabel.text = "";
+            Button delBtn = nodeTabContent.Q<Button>("deleteNodeBtn");
+            if (delBtn != null) delBtn.style.display = DisplayStyle.None;
+            Button refBtn = nodeTabContent.Q<Button>("refreshNodeBtn");
+            if (refBtn != null) refBtn.style.display = DisplayStyle.None;
+            Button upNodeBtn = nodeTabContent.Q<Button>("moveUpNodeBtn");
+            if (upNodeBtn != null) upNodeBtn.style.display = DisplayStyle.None;
+            Button downNodeBtn = nodeTabContent.Q<Button>("moveDownNodeBtn");
+            if (downNodeBtn != null) downNodeBtn.style.display = DisplayStyle.None;
             return;
         }
 
         memoField.style.display = DisplayStyle.Flex;
         memoField.SetValueWithoutNotify(selectedNode.nodeName);
+
+        if (nodeMemoField != null)
+        {
+            nodeMemoField.style.display = DisplayStyle.Flex;
+            nodeMemoField.SetValueWithoutNotify(selectedNode.nodeMemo);
+        }
+
+        Button delBtn2 = nodeTabContent.Q<Button>("deleteNodeBtn");
+        if (delBtn2 != null) delBtn2.style.display = DisplayStyle.Flex;
+
+        Button refBtn2 = nodeTabContent.Q<Button>("refreshNodeBtn");
+        if (refBtn2 != null) refBtn2.style.display = DisplayStyle.Flex;
+
+        bool hasParent = (currentBrain != null && currentBrain.rootNode != selectedNode && FindParent(currentBrain.rootNode, selectedNode) != null);
+        Button upNodeBtn2 = nodeTabContent.Q<Button>("moveUpNodeBtn");
+        if (upNodeBtn2 != null) upNodeBtn2.style.display = hasParent ? DisplayStyle.Flex : DisplayStyle.None;
+        Button downNodeBtn2 = nodeTabContent.Q<Button>("moveDownNodeBtn");
+        if (downNodeBtn2 != null) downNodeBtn2.style.display = hasParent ? DisplayStyle.Flex : DisplayStyle.None;
 
         if (selectedNode is BTAction act)
         {
@@ -470,6 +731,126 @@ public class AIStateViewer : EditorWindow
             logicDropdown.style.display = DisplayStyle.Flex;
             if (act.logic == null) logicDropdown.SetValueWithoutNotify("None");
             else logicDropdown.SetValueWithoutNotify(act.logic.GetType().Name);
+
+            // Populate dynamic reflection fields for logic
+            if (act.logic != null)
+            {
+                string desc = act.logic.GetDescription(currentBrain);
+                if (!string.IsNullOrEmpty(desc))
+                {
+                    HelpBox descBox = new HelpBox(desc, HelpBoxMessageType.Info);
+                    descBox.style.marginBottom = 10;
+                    descBox.style.marginTop = 10;
+                    dynamicFieldsContainer.Add(descBox);
+                }
+
+                Label logicTitle = new Label("Logic Blackboard Keys");
+                logicTitle.style.unityFontStyleAndWeight = FontStyle.Bold;
+                logicTitle.style.marginBottom = 5;
+                logicTitle.style.color = new Color(0.7f, 0.9f, 0.7f);
+                dynamicFieldsContainer.Add(logicTitle);
+
+                // Collect available keys from blackboard
+                List<string> availableKeys = new List<string> { "" };
+                if (currentBrain != null && currentBrain.blackboard != null)
+                {
+                    foreach (var prop in currentBrain.blackboard)
+                    {
+                        if (!string.IsNullOrEmpty(prop.key))
+                            availableKeys.Add(prop.key);
+                    }
+                }
+
+                System.Reflection.FieldInfo[] fields = act.logic.GetType().GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                foreach (var field in fields)
+                {
+                    if (field.FieldType == typeof(string))
+                    {
+                        string currentValue = (string)field.GetValue(act.logic);
+                        if (currentValue != null && !availableKeys.Contains(currentValue))
+                            availableKeys.Add(currentValue);
+
+                        // Create a custom Dropdown using Button + GenericMenu to support "AAA/BBB" nested paths!
+                        VisualElement fieldRow = new VisualElement();
+                        fieldRow.style.flexDirection = FlexDirection.Row;
+                        fieldRow.style.marginBottom = 2;
+
+                        Label fieldLabel = new Label(field.Name);
+                        fieldLabel.style.width = 145; 
+                        fieldLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
+                        
+                        Button fieldDropdownBtn = new Button();
+                        fieldDropdownBtn.text = string.IsNullOrEmpty(currentValue) ? "(None)" : currentValue;
+                        fieldDropdownBtn.style.flexGrow = 1;
+                        fieldDropdownBtn.style.unityTextAlign = TextAnchor.MiddleLeft;
+                        
+                        fieldDropdownBtn.clicked += () => 
+                        {
+                            GenericMenu menu = new GenericMenu();
+                            foreach(string key in availableKeys)
+                            {
+                                string menuPath = string.IsNullOrEmpty(key) ? "None" : key;
+                                menu.AddItem(new GUIContent(menuPath), key == currentValue, () => 
+                                {
+                                    field.SetValue(act.logic, key);
+                                    fieldDropdownBtn.text = string.IsNullOrEmpty(key) ? "(None)" : key;
+                                    EditorUtility.SetDirty(currentBrain);
+                                    UpdateInspector(); // Refresh description and UI
+                                });
+                            }
+                            menu.ShowAsContext();
+                        };
+
+                        fieldRow.Add(fieldLabel);
+                        fieldRow.Add(fieldDropdownBtn);
+                        dynamicFieldsContainer.Add(fieldRow);
+                    }
+                    else if (field.FieldType == typeof(bool))
+                    {
+                        VisualElement fieldRow = new VisualElement();
+                        fieldRow.style.flexDirection = FlexDirection.Row;
+                        fieldRow.style.marginBottom = 5;
+
+                        Label fieldLabel = new Label(field.Name);
+                        fieldLabel.style.width = 145;
+                        fieldLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
+
+                        Toggle toggleField = new Toggle();
+                        toggleField.value = (bool)field.GetValue(act.logic);
+                        toggleField.RegisterValueChangedCallback(evt => {
+                            field.SetValue(act.logic, evt.newValue);
+                            EditorUtility.SetDirty(currentBrain);
+                            UpdateInspector();
+                        });
+
+                        fieldRow.Add(fieldLabel);
+                        fieldRow.Add(toggleField);
+                        dynamicFieldsContainer.Add(fieldRow);
+                    }
+                    else if (field.FieldType.IsEnum)
+                    {
+                        VisualElement fieldRow = new VisualElement();
+                        fieldRow.style.flexDirection = FlexDirection.Row;
+                        fieldRow.style.marginBottom = 5;
+
+                        Label fieldLabel = new Label(field.Name);
+                        fieldLabel.style.width = 145;
+                        fieldLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
+
+                        UnityEngine.UIElements.EnumField enumField = new UnityEngine.UIElements.EnumField((System.Enum)field.GetValue(act.logic));
+                        enumField.style.flexGrow = 1;
+                        enumField.RegisterValueChangedCallback(evt => {
+                            field.SetValue(act.logic, evt.newValue);
+                            EditorUtility.SetDirty(currentBrain);
+                            UpdateInspector();
+                        });
+
+                        fieldRow.Add(fieldLabel);
+                        fieldRow.Add(enumField);
+                        dynamicFieldsContainer.Add(fieldRow);
+                    }
+                }
+            }
         }
         else if (selectedNode is BTSequence seq)
         {
@@ -515,10 +896,10 @@ public class AIStateViewer : EditorWindow
     private VisualElement DrawNode(BTNode node, AIBrain brain, BTNode parent, int childIndex, VisualElement parentNodeBox)
     {
         VisualElement nodeHierarchy = new VisualElement();
-        nodeHierarchy.style.flexDirection = FlexDirection.Column;
+        nodeHierarchy.style.flexDirection = FlexDirection.Row;
         nodeHierarchy.style.alignItems = Align.Center;
-        nodeHierarchy.style.marginLeft = 10;
-        nodeHierarchy.style.marginRight = 10;
+        nodeHierarchy.style.marginTop = 10;
+        nodeHierarchy.style.marginBottom = 10;
 
         VisualElement nodeBox = new VisualElement();
         nodeBox.style.width = 120; 
@@ -533,7 +914,7 @@ public class AIStateViewer : EditorWindow
         nodeBox.style.borderRightColor = Color.black;
         nodeBox.style.alignItems = Align.Center;
         nodeBox.style.justifyContent = Justify.FlexStart; 
-        nodeBox.style.marginBottom = 40; 
+        nodeBox.style.marginRight = 40; 
         
         if (selectedNode == node)
         {
@@ -589,6 +970,8 @@ public class AIStateViewer : EditorWindow
             nodeBox.RegisterCallback<ContextClickEvent>(evt =>
             {
                 GenericMenu menu = new GenericMenu();
+                menu.AddItem(new GUIContent("Move Up"), false, () => { MoveNode(node, -1); });
+                menu.AddItem(new GUIContent("Move Down"), false, () => { MoveNode(node, 1); });
                 menu.AddItem(new GUIContent("Delete Node"), false, () => 
                 {
                     if (parent is BTSequence seq) seq.children.RemoveAt(childIndex);
@@ -611,7 +994,7 @@ public class AIStateViewer : EditorWindow
         }
 
         VisualElement childrenContainer = new VisualElement();
-        childrenContainer.style.flexDirection = FlexDirection.Row;
+        childrenContainer.style.flexDirection = FlexDirection.Column;
         childrenContainer.style.justifyContent = Justify.Center;
 
         bool hasChildrenList = false;
@@ -641,10 +1024,10 @@ public class AIStateViewer : EditorWindow
             if (!Application.isPlaying)
             {
                 VisualElement plusHierarchy = new VisualElement();
-                plusHierarchy.style.flexDirection = FlexDirection.Column;
+                plusHierarchy.style.flexDirection = FlexDirection.Row;
                 plusHierarchy.style.alignItems = Align.Center;
-                plusHierarchy.style.marginLeft = 5;
-                plusHierarchy.style.marginRight = 5;
+                plusHierarchy.style.marginTop = 5;
+                plusHierarchy.style.marginBottom = 5;
 
                 Button plusBtn = new Button();
                 plusBtn.style.width = 30;
@@ -678,5 +1061,48 @@ public class AIStateViewer : EditorWindow
         }
 
         return nodeHierarchy;
+    }
+
+    private BTNode FindParent(BTNode current, BTNode target)
+    {
+        if (current == null) return null;
+        if (current is BTSequence seq)
+        {
+            if (seq.children.Contains(target)) return current;
+            foreach (var c in seq.children) { var p = FindParent(c, target); if (p != null) return p; }
+        }
+        else if (current is BTSelector sel)
+        {
+            if (sel.children.Contains(target)) return current;
+            foreach (var c in sel.children) { var p = FindParent(c, target); if (p != null) return p; }
+        }
+        return null;
+    }
+
+    private void MoveNode(BTNode node, int offset)
+    {
+        if (node == null || currentBrain == null || currentBrain.rootNode == node) return;
+        BTNode parent = FindParent(currentBrain.rootNode, node);
+        if (parent == null) return;
+
+        List<BTNode> childrenList = null;
+        if (parent is BTSequence seq) childrenList = seq.children;
+        else if (parent is BTSelector sel) childrenList = sel.children;
+
+        if (childrenList != null)
+        {
+            int index = childrenList.IndexOf(node);
+            int newIndex = index + offset;
+            if (newIndex >= 0 && newIndex < childrenList.Count)
+            {
+                var temp = childrenList[index];
+                childrenList[index] = childrenList[newIndex];
+                childrenList[newIndex] = temp;
+
+                EditorUtility.SetDirty(currentBrain);
+                RebuildTreeUI();
+                UpdateInspector();
+            }
+        }
     }
 }
