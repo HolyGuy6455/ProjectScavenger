@@ -33,6 +33,37 @@ public class HealthBarUI : MonoBehaviour
 
     private Camera mainCamera;
     private RectTransform hpBarRectTransform;
+    private bool isInitialized = false;
+
+    /// <summary>
+    /// 외부에서 HealthBar를 동적으로 생성하고 설정할 때 사용합니다.
+    /// </summary>
+    public void Setup(Health newHealth, Transform newTarget, Vector3 newOffset)
+    {
+        if (targetHealth != null && isInitialized)
+        {
+            targetHealth.OnHealthChanged -= UpdateHealthBar;
+        }
+
+        targetHealth = newHealth;
+        targetTransform = newTarget;
+        worldOffset = newOffset;
+
+        if (positionContainer == null && hpBarImage != null)
+        {
+            positionContainer = hpBarImage.rectTransform;
+        }
+        if (hpBarImage != null && hpBarRectTransform == null)
+        {
+            hpBarRectTransform = hpBarImage.rectTransform;
+        }
+
+        if (targetHealth != null && isInitialized)
+        {
+            UpdateHealthBar(targetHealth.CurrentHealth, targetHealth.MaxHealth);
+            targetHealth.OnHealthChanged += UpdateHealthBar;
+        }
+    }
 
     private void Start()
     {
@@ -68,11 +99,13 @@ public class HealthBarUI : MonoBehaviour
         {
             Debug.LogWarning($"[HealthBarUI] {gameObject.name}의 부모 오브젝트 등에서 Health 컴포넌트를 찾을 수 없습니다.");
         }
+
+        isInitialized = true;
     }
 
     private void OnDestroy()
     {
-        if (targetHealth != null)
+        if (targetHealth != null && isInitialized)
         {
             targetHealth.OnHealthChanged -= UpdateHealthBar;
         }
