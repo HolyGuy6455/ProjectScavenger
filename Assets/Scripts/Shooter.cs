@@ -51,6 +51,7 @@ public class Shooter : MonoBehaviour
     private float lastFireTime;
     private bool isTriggerPulled;
     private Vector3 currentAimDirection;
+    private float currentSpread = 0f;
 
     private void Update()
     {
@@ -66,6 +67,12 @@ public class Shooter : MonoBehaviour
                 Debug.Log("발사 실패: 탄창이 비었습니다.");
             }
         }
+        else if (currentSpread > 0f)
+        {
+            float recoveryRate = currentGunData != null ? currentGunData.spreadRecoveryRate : 1f;
+            currentSpread -= recoveryRate * Time.deltaTime;
+            if (currentSpread < 0f) currentSpread = 0f;
+        }
     }
 
     public void EquipGun(GunData newGunData)
@@ -75,6 +82,7 @@ public class Shooter : MonoBehaviour
         isReloading = false;
         isTriggerPulled = false;
         lastFireTime = 0f;
+        currentSpread = 0f;
         
         OnWeaponChanged?.Invoke(currentGunData);
     }
@@ -167,11 +175,46 @@ public class Shooter : MonoBehaviour
         direction.Normalize();
         if (direction == Vector3.zero) direction = transform.forward;
 
-        Vector3 spawnPosition = firePoint != null ? firePoint.position : transform.position;
-        Quaternion spawnRotation = Quaternion.LookRotation(direction);
+        // 탄퍼짐 적용 (현재 currentSpread를 기반으로 랜덤 각도 추가)
+        float randomSpread = UnityEngine.Random.Range(-currentSpread * 0.5f, currentSpread * 0.5f);
+        direction = Quaternion.Euler(0, randomSpread, 0) * direction;
 
-        Bullet newBullet = Instantiate(bulletPrefab, spawnPosition, spawnRotation);
-        newBullet.Initialize(direction, gameObject);
+        // 발사 후 탄퍼짐 증가
+        currentSpread += currentGunData.spreadPerShot;
+        if (currentSpread > currentGunData.maxSpread)
+        {
+            currentSpread = currentGunData.maxSpread;
+        }
+
+        Vector3 spawnPosition = firePoint != null ? firePoint.position : transform.position;
+        
+        int shots = currentGunData.bulletsPerShot > 0 ? currentGunData.bulletsPerShot : 1;
+        float degree = currentGunData.bulletDegree;
+
+        if (shots == 1)
+        {
+            Quaternion spawnRotation = Quaternion.LookRotation(direction);
+            Bullet newBullet = Instantiate(bulletPrefab, spawnPosition, spawnRotation);
+            newBullet.Initialize(direction, gameObject);
+        }
+        else
+        {
+            // 여러 발 발사 (산탄총)
+            float startAngle = -degree / 2f;
+            float angleStep = degree / (shots - 1);
+
+            for (int i = 0; i < shots; i++)
+            {
+                float currentAngle = startAngle + (angleStep * i);
+                
+                // 기준 방향을 Y축 기준으로 회전시킵니다.
+                Vector3 rotatedDir = Quaternion.Euler(0, currentAngle, 0) * direction;
+                
+                Quaternion spawnRotation = Quaternion.LookRotation(rotatedDir);
+                Bullet newBullet = Instantiate(bulletPrefab, spawnPosition, spawnRotation);
+                newBullet.Initialize(rotatedDir, gameObject);
+            }
+        }
     }
 
     /// <summary>

@@ -14,6 +14,7 @@ public class GunData : IData
     public float fireRate;
     public float spreadPerShot;
     public float maxSpread;
+    public float spreadRecoveryRate = 1f;
     public int maxAmmo;
     public string resourceSilhouette;
 
