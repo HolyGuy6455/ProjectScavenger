@@ -14,6 +14,9 @@ public class PlayerMovement : MonoBehaviour
     [Header("Combat")]
     [SerializeField] private Shooter shooter;
 
+    [Header("Animation")]
+    [SerializeField] private Animator _animator;
+
     private Rigidbody _rb;
     private PlayerInputActions _inputActions;
     private Vector2 _keyboardInput;
@@ -22,6 +25,8 @@ public class PlayerMovement : MonoBehaviour
     public Vector2 JoystickRotationInput => _joystickRotationInput;
     private bool _isShooting = false;
     private SectorIndicator _sectorIndicator;
+
+    private string _currentAnimState = "Standing@loop";
 
     private void Awake()
     {
@@ -133,6 +138,16 @@ public class PlayerMovement : MonoBehaviour
         if (combinedInput.sqrMagnitude > 1f)
         {
             combinedInput.Normalize();
+        }
+
+        if (_animator != null)
+        {
+            string targetAnim = combinedInput.magnitude > 0.1f ? "Running@loop" : "Standing@loop";
+            if (_currentAnimState != targetAnim)
+            {
+                _animator.CrossFade(targetAnim, 0.1f);
+                _currentAnimState = targetAnim;
+            }
         }
 
         Vector3 moveDir = new Vector3(combinedInput.x, 0f, combinedInput.y);
