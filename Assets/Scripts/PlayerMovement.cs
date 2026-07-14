@@ -145,48 +145,90 @@ public class PlayerMovement : MonoBehaviour
         if (_joystickRotationInput.sqrMagnitude > 0.001f)
         {
             Vector3 inputDir = new Vector3(_joystickRotationInput.x, 0f, _joystickRotationInput.y).normalized;
+            float inputMag = Mathf.Clamp01(_joystickRotationInput.magnitude);
 
             // GunData에서 탐색 범위와 각도를 가져옵니다. 총이 없으면 기본값을 사용합니다.
-            float searchRadius = shooter != null && shooter.CurrentGunData != null ? shooter.CurrentGunData.SearchRadius : 15f;
-            float searchAngle = shooter != null && shooter.CurrentGunData != null ? shooter.CurrentGunData.SearchAngle : 90f;
-
-            // 인디케이터 그리기
-            if (_sectorIndicator != null)
-            {
-                _sectorIndicator.DrawSector(searchRadius, searchAngle, inputDir);
+            float searchRadius = 15f;
+            float searchAngle = 90f;
+            int shotType = 1;
+            float explosionRadius = 5f;
+            if (shooter != null && shooter.CurrentGunData != null) {
+                searchRadius = shooter.CurrentGunData.SearchRadius;
+                searchAngle = shooter.CurrentGunData.SearchAngle;
+                shotType = shooter.CurrentGunData.shotType;
+                explosionRadius = shooter.CurrentGunData.ExplosionRadius;
             }
 
-            Transform targetEnemy = FindClosestEnemyInSector(inputDir, searchRadius, searchAngle);
-
-            if (targetEnemy != null)
+            if (shotType == 1 || shotType == 0) // 직사형 (기본값)
             {
-                // 부채꼴 내에 적이 있으면 적을 향해 바라보고 사격
-                Vector3 dirToEnemy = targetEnemy.position - _rb.position;
-                dirToEnemy.y = 0f;
-                lookDir = dirToEnemy.normalized;
+                // 인디케이터 그리기
+                if (_sectorIndicator != null)
+                {
+                    _sectorIndicator.transform.localPosition = new Vector3(0f, 0.1f, 0f);
+                    _sectorIndicator.DrawSector(searchRadius, searchAngle, inputDir);
+                }
+
+                Transform targetEnemy = FindClosestEnemyInSector(inputDir, searchRadius, searchAngle);
+
+                if (targetEnemy != null)
+                {
+                    // 부채꼴 내에 적이 있으면 적을 향해 바라보고 사격
+                    Vector3 dirToEnemy = targetEnemy.position - _rb.position;
+                    dirToEnemy.y = 0f;
+                    lookDir = dirToEnemy.normalized;
+
+                    if (shooter != null)
+                    {
+                        if (!_isShooting)
+                        {
+                            _isShooting = true;
+                            shooter.SetTrigger(true, lookDir);
+                        }
+                        else
+                        {
+                            shooter.UpdateAimDirection(lookDir);
+                        }
+                    }
+                }
+                else
+                {
+                    // 부채꼴 내에 적이 없으면 조이스틱 방향만 바라보고 사격 중지
+                    lookDir = inputDir;
+
+                    if (shooter != null && _isShooting)
+                    {
+                        _isShooting = false;
+                        shooter.SetTrigger(false);
+                    }
+                }
+            }
+            else if (shotType == 2) // 포물선형
+            {
+                // 포물선 조준: 플레이어 중심에서 스틱 방향으로 (스틱 입력량 * 최대 사거리)만큼 떨어진 위치
+                Vector3 targetPosition = _rb.position + (inputDir * searchRadius * inputMag);
+                targetPosition.y = 0f;
+
+                if (_sectorIndicator != null)
+                {
+                    Vector3 localPos = transform.InverseTransformPoint(targetPosition);
+                    localPos.y = 0.1f;
+                    _sectorIndicator.transform.localPosition = localPos;
+                    _sectorIndicator.DrawCircle(explosionRadius);
+                }
+
+                lookDir = inputDir; // 캐릭터는 입력 방향을 바라봄
 
                 if (shooter != null)
                 {
                     if (!_isShooting)
                     {
                         _isShooting = true;
-                        shooter.SetTrigger(true, lookDir);
+                        shooter.SetTrigger(true, lookDir, targetPosition);
                     }
                     else
                     {
-                        shooter.UpdateAimDirection(lookDir);
+                        shooter.UpdateAimDirection(lookDir, targetPosition);
                     }
-                }
-            }
-            else
-            {
-                // 부채꼴 내에 적이 없으면 조이스틱 방향만 바라보고 사격 중지
-                lookDir = inputDir;
-
-                if (shooter != null && _isShooting)
-                {
-                    _isShooting = false;
-                    shooter.SetTrigger(false);
                 }
             }
         }

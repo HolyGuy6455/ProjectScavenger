@@ -70,6 +70,15 @@ public class SectorIndicator : MonoBehaviour
     }
 
     /// <summary>
+    /// 원 형태의 범위를 그립니다.
+    /// </summary>
+    public void DrawCircle(float radius)
+    {
+        // 360도 부채꼴은 곧 원입니다.
+        DrawSector(radius, 360f, Vector3.forward);
+    }
+
+    /// <summary>
     /// 인디케이터를 숨깁니다.
     /// </summary>
     public void Hide()

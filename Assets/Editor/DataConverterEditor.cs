@@ -106,6 +106,7 @@ public class DataConverterEditor : EditorWindow
                 string header = headers[j].Trim();
                 string val = values[j].Trim();
                 if (string.IsNullOrEmpty(val)) continue;
+                if (header.StartsWith("#")) continue;
 
                 var field = typeof(T).GetField(header);
                 if (field != null)

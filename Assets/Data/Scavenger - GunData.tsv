@@ -1,5 +1,5 @@
-id	gunName	SearchRadius	SearchAngle	damage	bulletsPerShot	bulletDegree	fireRate	spreadPerShot	maxSpread	maxAmmo	resourceSilhouette
-1	MAC-10	20	120	10	1	0	0.1	5	20	30	gun_silhouette_MAC10.png
-2	SIG556	40	60	30	1	0	0.5	3	9	30	gun_silhouette_SIG556.png
-3	Model 870	20	120	30	6	15	0.5	10	10	7	gun_silhouette_M870.png
-4	MGL-140	20	120	150	1	0	2	5	5	6	gun_silhouette_MGL140.png
+id	gunName	shotType	#shotType	SearchRadius	SearchAngle	ExplosionRadius	damage	bulletsPerShot	bulletDegree	fireRate	spreadPerShot	maxSpread	spreadRecoveryRate	maxAmmo	resourceSilhouette
+1	MAC-10	1	직사	10	120	0	10	1	0	0.1	5	20	20	30	gun_silhouette_MAC10.png
+2	SIG556	1	직사	20	30	0	30	1	0	0.5	3	9	9	30	gun_silhouette_SIG556.png
+3	Model 870	1	직사	10	120	0	10	6	15	0.5	10	10	5	7	gun_silhouette_M870.png
+4	MGL-140	2	폭발	15	0	5	50	1	0	2	5	5	5	6	gun_silhouette_MGL140.png

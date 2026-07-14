@@ -51,6 +51,7 @@ public class Shooter : MonoBehaviour
     private float lastFireTime;
     private bool isTriggerPulled;
     private Vector3 currentAimDirection;
+    private Vector3 currentTargetPosition;
     private float currentSpread = 0f;
 
     private void Update()
@@ -58,7 +59,7 @@ public class Shooter : MonoBehaviour
         // 연사 모드일 때, 방아쇠가 당겨져 있다면 계속 발사 시도
         if (isTriggerPulled)
         {
-            FireResult fireResult = TryShoot(currentAimDirection);
+            FireResult fireResult = TryShoot(currentAimDirection, currentTargetPosition);
             if (fireResult == FireResult.OnCooldown) {
                 float remainingTime = lastFireTime + currentGunData.fireRate - Time.time;
                 Debug.Log("발사 실패: 쿨타임중. 남은시간 : " + remainingTime);
@@ -114,7 +115,7 @@ public class Shooter : MonoBehaviour
     /// </summary>
     /// <param name="direction">총알이 날아갈 방향</param>
     /// <returns>발사 결과 상태 (UI나 사운드 재생 시 활용)</returns>
-    public FireResult TryShoot(Vector3 direction)
+    public FireResult TryShoot(Vector3 direction, Vector3 targetPosition = default)
     {
         if (currentGunData == null)
         {
@@ -128,7 +129,7 @@ public class Shooter : MonoBehaviour
         if (Time.time - lastFireTime < currentGunData.fireRate) return FireResult.OnCooldown;
 
         // 조건이 모두 맞으면 실제 발사 수행
-        PerformShoot(direction);
+        PerformShoot(direction, targetPosition);
         return FireResult.Success;
     }
 
@@ -138,29 +139,31 @@ public class Shooter : MonoBehaviour
     /// </summary>
     /// <param name="isPulled">true면 방아쇠 당김(발사 시작), false면 방아쇠 놓음(발사 중지)</param>
     /// <param name="direction">조준하는 방향</param>
-    public void SetTrigger(bool isPulled, Vector3 direction = default)
+    public void SetTrigger(bool isPulled, Vector3 direction = default, Vector3 targetPosition = default)
     {
         isTriggerPulled = isPulled;
         if (isPulled)
         {
             currentAimDirection = direction;
+            currentTargetPosition = targetPosition;
             // 방아쇠를 당기는 즉시 한 발 발사 시도
-            TryShoot(currentAimDirection);
+            TryShoot(currentAimDirection, currentTargetPosition);
         }
     }
 
     /// <summary>
     /// 연사 중 마우스 커서나 조이스틱 방향이 바뀔 때 조준 방향을 갱신해줍니다.
     /// </summary>
-    public void UpdateAimDirection(Vector3 direction)
+    public void UpdateAimDirection(Vector3 direction, Vector3 targetPosition = default)
     {
         currentAimDirection = direction;
+        currentTargetPosition = targetPosition;
     }
 
     /// <summary>
     /// 실제 총알을 생성하고 잔탄/시간 상태를 갱신하는 내부 메서드
     /// </summary>
-    private void PerformShoot(Vector3 direction)
+    private void PerformShoot(Vector3 direction, Vector3 targetPosition)
     {
         CurrentAmmo--;
         
@@ -195,7 +198,15 @@ public class Shooter : MonoBehaviour
         {
             Quaternion spawnRotation = Quaternion.LookRotation(direction);
             Bullet newBullet = Instantiate(bulletPrefab, spawnPosition, spawnRotation);
-            newBullet.Initialize(direction, gameObject);
+            
+            if (currentGunData.shotType == 2)
+            {
+                newBullet.InitializeParabola(targetPosition, gameObject, currentGunData.ExplosionRadius);
+            }
+            else
+            {
+                newBullet.Initialize(direction, gameObject);
+            }
         }
         else
         {
@@ -212,7 +223,15 @@ public class Shooter : MonoBehaviour
                 
                 Quaternion spawnRotation = Quaternion.LookRotation(rotatedDir);
                 Bullet newBullet = Instantiate(bulletPrefab, spawnPosition, spawnRotation);
-                newBullet.Initialize(rotatedDir, gameObject);
+                
+                if (currentGunData.shotType == 2)
+                {
+                    newBullet.InitializeParabola(targetPosition, gameObject, currentGunData.ExplosionRadius);
+                }
+                else
+                {
+                    newBullet.Initialize(rotatedDir, gameObject);
+                }
             }
         }
     }
