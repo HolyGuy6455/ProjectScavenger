@@ -176,32 +176,40 @@ public class PlayerMovement : MonoBehaviour
 
             if (shotType == 1 || shotType == 0) // 직사형 (기본값)
             {
+                float scaledSearchRadius = searchRadius * inputMag;
+
                 // 인디케이터 그리기
                 if (_sectorIndicator != null)
                 {
                     _sectorIndicator.transform.localPosition = new Vector3(0f, 0.1f, 0f);
-                    _sectorIndicator.DrawSector(searchRadius, searchAngle, inputDir);
+                    _sectorIndicator.DrawSector(scaledSearchRadius, searchAngle, inputDir);
                 }
 
-                Transform targetEnemy = FindClosestEnemyInSector(inputDir, searchRadius, searchAngle);
+                Transform targetEnemy = FindClosestEnemyInSector(inputDir, scaledSearchRadius, searchAngle);
 
                 if (targetEnemy != null)
                 {
                     // 부채꼴 내에 적이 있으면 적을 향해 바라보고 사격
                     Vector3 dirToEnemy = targetEnemy.position - _rb.position;
-                    dirToEnemy.y = 0f;
-                    lookDir = dirToEnemy.normalized;
+                    
+                    // 캐릭터의 회전(lookDir)은 상하로 꺾이지 않도록 수평만 적용
+                    Vector3 flatDir = dirToEnemy;
+                    flatDir.y = 0f;
+                    lookDir = flatDir.normalized;
+
+                    // 실제 총알이 날아갈 방향은 높이차까지 포함한 3D 방향
+                    Vector3 aimDir = dirToEnemy.normalized;
 
                     if (shooter != null)
                     {
                         if (!_isShooting)
                         {
                             _isShooting = true;
-                            shooter.SetTrigger(true, lookDir);
+                            shooter.SetTrigger(true, aimDir);
                         }
                         else
                         {
-                            shooter.UpdateAimDirection(lookDir);
+                            shooter.UpdateAimDirection(aimDir);
                         }
                     }
                 }
@@ -221,12 +229,25 @@ public class PlayerMovement : MonoBehaviour
             {
                 // 포물선 조준: 플레이어 중심에서 스틱 방향으로 (스틱 입력량 * 최대 사거리)만큼 떨어진 위치
                 Vector3 targetPosition = _rb.position + (inputDir * searchRadius * inputMag);
-                targetPosition.y = 0f;
+                
+                // 지형의 높낮이를 고려하여 위에서 아래로 Raycast를 쏘아 바닥의 실제 Y좌표를 찾습니다.
+                Vector3 rayOrigin = targetPosition;
+                rayOrigin.y += 10f; // 플레이어 위치보다 충분히 높은 곳에서 아래로 탐색
+                
+                if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, 20f))
+                {
+                    targetPosition.y = hit.point.y;
+                }
+                else
+                {
+                    // 바닥을 찾지 못했다면(예: 허공) 플레이어의 발밑 높이로 대체
+                    targetPosition.y = _rb.position.y;
+                }
 
                 if (_sectorIndicator != null)
                 {
                     Vector3 localPos = transform.InverseTransformPoint(targetPosition);
-                    localPos.y = 0.1f;
+                    localPos.y += 0.1f; // 바닥 높이보다 살짝 띄워서 인디케이터 표시
                     _sectorIndicator.transform.localPosition = localPos;
                     _sectorIndicator.DrawCircle(explosionRadius);
                 }

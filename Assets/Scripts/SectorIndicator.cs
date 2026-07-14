@@ -6,6 +6,7 @@ public class SectorIndicator : MonoBehaviour
     [SerializeField] private int segments = 30; // 부채꼴을 그릴 때 사용할 폴리곤 갯수 (클수록 부드러움)
     private Mesh _mesh;
     private MeshRenderer _meshRenderer;
+    private float _lastAngle = -1f;
 
     private void Awake()
     {
@@ -35,6 +36,17 @@ public class SectorIndicator : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
         }
 
+        // 스케일로 반지름 조절 (매 프레임 메쉬 재생성 방지)
+        transform.localScale = new Vector3(radius, 1f, radius);
+
+        // 각도가 이전과 동일하다면 메쉬 재생성 생략
+        if (Mathf.Approximately(_lastAngle, angle))
+        {
+            return;
+        }
+
+        _lastAngle = angle;
+
         int verticesCount = segments + 2;
         Vector3[] vertices = new Vector3[verticesCount];
         int[] triangles = new int[segments * 3];
@@ -45,14 +57,14 @@ public class SectorIndicator : MonoBehaviour
         float halfAngle = angle * 0.5f;
         float angleStep = angle / segments;
 
-        // 원호 부분 정점 계산
+        // 원호 부분 정점 계산 (반지름 1 기준)
         for (int i = 0; i <= segments; i++)
         {
             float currentAngle = -halfAngle + (angleStep * i);
             float rad = currentAngle * Mathf.Deg2Rad;
 
             // X, Z 평면 상의 좌표 (Y는 0)
-            vertices[i + 1] = new Vector3(Mathf.Sin(rad), 0, Mathf.Cos(rad)) * radius;
+            vertices[i + 1] = new Vector3(Mathf.Sin(rad), 0, Mathf.Cos(rad));
         }
 
         // 삼각형 인덱스 구성
@@ -84,6 +96,5 @@ public class SectorIndicator : MonoBehaviour
     public void Hide()
     {
         _meshRenderer.enabled = false;
-        _mesh.Clear();
     }
 }

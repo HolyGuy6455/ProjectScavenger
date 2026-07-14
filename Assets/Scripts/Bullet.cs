@@ -18,6 +18,13 @@ public class Bullet : MonoBehaviour
     [Tooltip("관통 여부 (true면 충돌해도 파괴되지 않습니다)")]
     [SerializeField] private bool canPierce = false;
 
+    [Header("Effects")]
+    [Tooltip("총알 피격 시 생성할 파티클 프리팹")]
+    [SerializeField] private GameObject hitEffectPrefab;
+    
+    [Tooltip("유탄 폭발 시 생성할 파티클 프리팹")]
+    [SerializeField] private GameObject explosionEffectPrefab;
+
     private Vector3 moveDirection;
     private GameObject attacker;
     private bool isInitialized = false;
@@ -115,6 +122,13 @@ public class Bullet : MonoBehaviour
     {
         if (isParabola)
         {
+            // 폭발 파티클 생성
+            if (explosionEffectPrefab != null)
+            {
+                GameObject effect = Instantiate(explosionEffectPrefab, hitPoint, Quaternion.LookRotation(hitNormal));
+                Destroy(effect, 2f); // 2초 후 자동 파괴
+            }
+
             // 포물선(폭발)형 무기: OverlapSphere를 사용하여 광역 데미지 처리
             Collider[] colliders = Physics.OverlapSphere(hitPoint, explosionRadius);
             foreach (Collider col in colliders)
@@ -133,6 +147,13 @@ public class Bullet : MonoBehaviour
         }
         else
         {
+            // 피격 파티클 생성
+            if (hitEffectPrefab != null)
+            {
+                GameObject effect = Instantiate(hitEffectPrefab, hitPoint, Quaternion.LookRotation(hitNormal));
+                Destroy(effect, 2f); // 2초 후 자동 파괴
+            }
+
             // 기존 직사형 무기: 단일 타겟 데미지 처리
             if (target != null)
             {
