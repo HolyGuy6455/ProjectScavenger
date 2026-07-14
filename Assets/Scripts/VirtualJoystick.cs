@@ -5,6 +5,8 @@ using UnityEngine.UI;
 /// <summary>
 /// 모바일 가상 조이스틱 스크립트
 /// UI 드래그 입력을 감지하여 PlayerMovement 스크립트에 입력 값을 전달합니다.
+/// 평상시엔 숨겨져 있다가 터치 시 해당 위치에 조이스틱이 나타나며, 
+/// 화면 왼쪽은 이동용, 오른쪽은 조준/회전용으로 작동합니다.
 /// </summary>
 public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler, IPointerUpHandler
 {
@@ -20,13 +22,80 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
     [SerializeField] private float dragRange = 100f;
 
     private Vector2 _inputVector;
+    private CanvasGroup _visualGroup;
 
     private void Start()
     {
-        // 배경 이미지 RectTransform 자동 할당 시도
+        RectTransform myRect = GetComponent<RectTransform>();
+        Image myImage = GetComponent<Image>();
+
+        // 1. 조이스틱 배경 이미지가 자신일 경우, 시각적 요소를 분리하여 자식으로 만듭니다.
+        // 터치 영역은 화면 절반을 차지하도록 하고, 시각적 요소는 터치한 곳으로 이동시키기 위함입니다.
+        if (myImage != null && (joystickBackground == null || joystickBackground == myRect))
+        {
+            GameObject visBgObj = new GameObject("VisualBackground");
+            RectTransform visRect = visBgObj.AddComponent<RectTransform>();
+            visBgObj.transform.SetParent(transform, false);
+            
+            Image visImage = visBgObj.AddComponent<Image>();
+            visImage.sprite = myImage.sprite;
+            visImage.color = myImage.color;
+            visImage.material = myImage.material;
+            visImage.raycastTarget = false;
+
+            visRect.sizeDelta = myRect.sizeDelta;
+            visRect.anchoredPosition = Vector2.zero;
+
+            // 원래의 Image는 터치 영역으로만 동작하도록 투명하게 만듭니다.
+            myImage.color = new Color(0, 0, 0, 0);
+
+            // 핸들이 있다면 새로 만든 시각적 배경의 자식으로 이동
+            if (joystickHandle != null)
+            {
+                joystickHandle.SetParent(visRect, false);
+            }
+
+            joystickBackground = visRect;
+        }
+
         if (joystickBackground == null)
         {
             joystickBackground = GetComponent<RectTransform>();
+        }
+
+        // 2. 터치 영역을 화면 절반으로 확장
+        if (myRect != null)
+        {
+            if (joystickType == JoystickType.Movement)
+            {
+                // 왼쪽 절반 (이동용)
+                myRect.anchorMin = new Vector2(0, 0);
+                myRect.anchorMax = new Vector2(0.5f, 1);
+            }
+            else
+            {
+                // 오른쪽 절반 (조준/회전용)
+                myRect.anchorMin = new Vector2(0.5f, 0);
+                myRect.anchorMax = new Vector2(1, 1);
+            }
+            
+            // 여백 0, 사이즈 0으로 두어 anchor 영역에 꽉 차게 설정
+            myRect.offsetMin = Vector2.zero;
+            myRect.offsetMax = Vector2.zero;
+            myRect.anchoredPosition = Vector2.zero;
+            myRect.sizeDelta = Vector2.zero;
+        }
+
+        // 3. 평상시 숨기기를 위한 CanvasGroup 추가
+        if (joystickBackground != null)
+        {
+            _visualGroup = joystickBackground.gameObject.GetComponent<CanvasGroup>();
+            if (_visualGroup == null)
+            {
+                _visualGroup = joystickBackground.gameObject.AddComponent<CanvasGroup>();
+            }
+            _visualGroup.alpha = 0f; // 초기 상태 숨김
+            _visualGroup.blocksRaycasts = false;
         }
 
         // 씬 내 PlayerMovement 자동 검색 및 할당 시도
@@ -44,6 +113,26 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        // 터치한 위치로 조이스틱 배경 이동
+        if (joystickBackground != null)
+        {
+            Vector2 localPos;
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                GetComponent<RectTransform>(), 
+                eventData.position, 
+                eventData.pressEventCamera, 
+                out localPos))
+            {
+                joystickBackground.localPosition = new Vector3(localPos.x, localPos.y, 0f);
+            }
+        }
+
+        // 터치 시 조이스틱 표시
+        if (_visualGroup != null)
+        {
+            _visualGroup.alpha = 1f;
+        }
+
         OnDrag(eventData);
     }
 
@@ -93,6 +182,12 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        // 터치 뗄 때 조이스틱 숨김
+        if (_visualGroup != null)
+        {
+            _visualGroup.alpha = 0f;
+        }
+
         // 핸들 위치 중앙 원위치
         if (joystickHandle != null)
         {
