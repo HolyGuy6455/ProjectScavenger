@@ -134,9 +134,9 @@ public class Bullet : MonoBehaviour
             foreach (Collider col in colliders)
             {
                 // 발사자는 데미지를 받지 않도록 예외 처리
-                if (col.gameObject == attacker) continue;
+                if (col.transform.root.gameObject == attacker) continue;
 
-                IDamageable damageable = col.GetComponent<IDamageable>();
+                IDamageable damageable = col.GetComponentInParent<IDamageable>();
                 if (damageable != null)
                 {
                     // 거리에 따른 데미지 감소 로직 등을 추후 추가할 수 있습니다.
@@ -157,7 +157,7 @@ public class Bullet : MonoBehaviour
             // 기존 직사형 무기: 단일 타겟 데미지 처리
             if (target != null)
             {
-                IDamageable damageable = target.GetComponent<IDamageable>();
+                IDamageable damageable = target.GetComponentInParent<IDamageable>();
                 
                 if (damageable != null)
                 {
@@ -182,7 +182,7 @@ public class Bullet : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         // 이미 발사자가 자신이 쏜 총알에 맞는 것 방지 (원한다면 레이어 설정으로도 가능)
-        if (other.gameObject == attacker) return;
+        if (other.transform.root.gameObject == attacker) return;
 
         HitTarget(other.gameObject, transform.position, -moveDirection);
     }

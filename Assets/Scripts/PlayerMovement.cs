@@ -96,14 +96,19 @@ public class PlayerMovement : MonoBehaviour
     private Transform FindClosestEnemyInSector(Vector3 forwardDir, float radius, float angle)
     {
         Transform closestEnemy = null;
-        float minDistance = float.MaxValue;
+        Transform closestObstacle = null;
+        float minEnemyDistance = float.MaxValue;
+        float minObstacleDistance = float.MaxValue;
 
         // 향후 최적화를 위해 Physics.OverlapSphereNonAlloc 또는 레이어 마스크를 사용할 수 있습니다.
         Collider[] colliders = Physics.OverlapSphere(_rb.position, radius);
         
+        // 레이캐스트 시작 위치 (바닥 충돌 방지 및 허리춤 높이)
+        Vector3 rayOrigin = _rb.position + Vector3.up * 0.5f;
+
         foreach (Collider col in colliders)
         {
-            if (col.CompareTag("Enemy"))
+            if (col.CompareTag("Enemy") || col.CompareTag("Obstacle"))
             {
                 Vector3 dirToTarget = col.transform.position - _rb.position;
                 dirToTarget.y = 0f;
@@ -117,17 +122,60 @@ public class PlayerMovement : MonoBehaviour
                     // angle은 전체 부채꼴 각도이므로 절반 각도와 비교합니다.
                     if (angleToTarget <= angle * 0.5f)
                     {
-                        if (distance < minDistance)
+                        bool isBlocked = false;
+                        
+                        // 중심점을 향해 레이캐스트를 쏴서 시야(Line of Sight) 검사
+                        Vector3 targetPos = col.bounds.center;
+                        Vector3 rayDir = (targetPos - rayOrigin).normalized;
+                        float rayDist = Vector3.Distance(rayOrigin, targetPos);
+
+                        if (Physics.Raycast(rayOrigin, rayDir, out RaycastHit hit, rayDist))
                         {
-                            minDistance = distance;
-                            closestEnemy = col.transform;
+                            // 맞은 대상이 타겟 본인이나 플레이어 자신이 아닐 경우
+                            if (hit.collider != col && hit.collider.transform.root != this.transform.root)
+                            {
+                                // GetComponentInParent를 사용하면 맞은 콜라이더의 부모를 거슬러 올라가며 컴포넌트를 찾습니다.
+                                // IDamageable(체력)이 있다면 적이거나 파괴 가능한 엄폐물이므로 타겟팅 허용!
+                                if (hit.collider.GetComponentInParent<IDamageable>() != null)
+                                {
+                                    isBlocked = false;
+                                }
+                                else
+                                {
+                                    // 데미지를 입지 않는 무적 벽이나 지형에 가려진 경우
+                                    isBlocked = true;
+                                }
+                            }
+                        }
+
+                        if (!isBlocked)
+                        {
+                            if (col.CompareTag("Enemy"))
+                            {
+                                if (distance < minEnemyDistance)
+                                {
+                                    minEnemyDistance = distance;
+                                    closestEnemy = col.transform;
+                                }
+                            }
+                            else if (col.CompareTag("Obstacle"))
+                            {
+                                if (distance < minObstacleDistance)
+                                {
+                                    minObstacleDistance = distance;
+                                    closestObstacle = col.transform;
+                                }
+                            }
                         }
                     }
                 }
             }
         }
 
-        return closestEnemy;
+        Debug.Log($"[PlayerMovement] 가장 가까운 적: {closestEnemy}");
+        Debug.Log($"[PlayerMovement] 가장 가까운 장애물: {closestObstacle}");
+
+        return closestEnemy != null ? closestEnemy : closestObstacle;
     }
 
     private void FixedUpdate()
