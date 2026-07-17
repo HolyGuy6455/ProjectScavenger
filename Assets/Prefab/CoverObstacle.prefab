@@ -159,5 +159,5 @@ MonoBehaviour:
   targetHealth: {fileID: 7316570633528948631}
   targetTransform: {fileID: 3416170517489997766}
   worldOffset: {x: 0, y: 2, z: 0}
-  useCustomColor: 0
-  barColor: {r: 1, g: 1, b: 0, a: 1}
+  useCustomColor: 1
+  barColor: {r: 1, g: 1, b: 0.5801887, a: 1}

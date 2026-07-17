@@ -22,6 +22,11 @@ public class HealthBarSpawner : MonoBehaviour
     [Tooltip("추적할 위치의 추가 오프셋입니다.")]
     [SerializeField] private Vector3 worldOffset = new Vector3(0f, 2f, 0f);
 
+    [Header("Color Settings")]
+    [Tooltip("HealthBar의 색상을 지정합니다. 체크하면 아래 색상으로 변경됩니다.")]
+    [SerializeField] private bool useCustomColor = false;
+    [SerializeField] private Color barColor = Color.red;
+
     private GameObject spawnedUI;
 
     private void Start()
@@ -69,6 +74,10 @@ public class HealthBarSpawner : MonoBehaviour
         if (healthBarUI != null)
         {
             healthBarUI.Setup(targetHealth, targetTransform, worldOffset);
+            if (useCustomColor)
+            {
+                healthBarUI.SetColor(barColor);
+            }
         }
         else
         {

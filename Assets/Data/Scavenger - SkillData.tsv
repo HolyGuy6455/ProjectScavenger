@@ -1,0 +1,11 @@
+id	name	resourceIcon	func1	#스킬func설명	func2		cooltime
+1	mac-10 재장전	skill_reload_normal	5	재장전		_	20
+2	전력질주	skill_reload_sprint		_		_	0
+3	Sig556 재장전	skill_reload_normal	5	재장전		_	20
+4	Sig556 연발/단발 전환		4	다음 무기로 전환		_	
+5	벅샷 장전	skill_reload_buckshot	5	재장전	1	무기 1로 전환	0.5
+6	슬러그탄 장전	skill_reload_slugshot	5	재장전	2	무기 2로 전환	0.5
+7	지점 사수			_		_	
+8	방패 (자동)			_		_	
+9	MGL 일반 유탄 장전	skill_reload_granade	5	재장전	1	무기 1로 전환	0.5
+10	MGL 발화 유탄 장전		5	재장전	2	무기 2로 전환	0.5

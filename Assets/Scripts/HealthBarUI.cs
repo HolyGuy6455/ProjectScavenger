@@ -154,4 +154,15 @@ public class HealthBarUI : MonoBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// HP 바의 색상을 외부에서 변경할 수 있도록 합니다.
+    /// </summary>
+    public void SetColor(Color color)
+    {
+        if (hpBarImage != null)
+        {
+            hpBarImage.color = color;
+        }
+    }
 }
