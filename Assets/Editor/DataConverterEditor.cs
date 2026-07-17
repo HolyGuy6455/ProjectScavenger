@@ -30,6 +30,16 @@ public class DataConverterEditor : EditorWindow
         {
             ConvertData<CharDataList, CharData>("Char", "Scavenger - CharData.tsv");
         }
+
+        if (GUILayout.Button("Convert Skill Data"))
+        {
+            ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - SkillData.tsv");
+        }
+
+        if (GUILayout.Button("Convert Ultimate Skill Data"))
+        {
+            ConvertData<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "Scavenger - UltimateSkillData.tsv");
+        }
         
         GUILayout.Space(10);
 
@@ -44,6 +54,8 @@ public class DataConverterEditor : EditorWindow
         ConvertData<GunDataList, GunData>("Gun", "Scavenger - GunData.tsv");
         ConvertData<ItemDataList, ItemData>("Item", "Scavenger - ItemData.tsv");
         ConvertData<CharDataList, CharData>("Char", "Scavenger - CharData.tsv");
+        ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - SkillData.tsv");
+        ConvertData<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "Scavenger - UltimateSkillData.tsv");
         AssetDatabase.Refresh();
         Debug.Log("Finished Convert All Data operation.");
     }
@@ -115,7 +127,8 @@ public class DataConverterEditor : EditorWindow
                     {
                         if (field.FieldType == typeof(int))
                         {
-                            field.SetValue(obj, int.Parse(val));
+                            if (val == "_") field.SetValue(obj, 0);
+                            else field.SetValue(obj, int.Parse(val));
                         }
                         else if (field.FieldType == typeof(float))
                         {
@@ -154,31 +167,6 @@ public class DataConverterEditor : EditorWindow
                     catch (System.Exception e)
                     {
                         Debug.LogWarning($"Failed to parse field {header} with value {val} in class {typeof(T).Name}. Error: {e.Message}");
-                    }
-                }
-            }
-
-            // Special handling for ItemData valueList
-            if (obj is ItemData itemData)
-            {
-                for (int v = 1; v <= 5; v++)
-                {
-                    int keyIdx = System.Array.IndexOf(headers, $"value{v}_key");
-                    int valIdx = System.Array.IndexOf(headers, $"value{v}_value");
-                    int subIdx = System.Array.IndexOf(headers, $"value{v}_subvalue");
-
-                    if (keyIdx != -1 && keyIdx < values.Length && !string.IsNullOrEmpty(values[keyIdx].Trim()))
-                    {
-                        ItemValueData ivd = new ItemValueData();
-                        ivd.key = int.Parse(values[keyIdx].Trim());
-                        
-                        if (valIdx != -1 && valIdx < values.Length && !string.IsNullOrEmpty(values[valIdx].Trim()))
-                            ivd.value = int.Parse(values[valIdx].Trim());
-                            
-                        if (subIdx != -1 && subIdx < values.Length && !string.IsNullOrEmpty(values[subIdx].Trim()))
-                            ivd.subValue = int.Parse(values[subIdx].Trim());
-                            
-                        itemData.valueList.Add(ivd);
                     }
                 }
             }

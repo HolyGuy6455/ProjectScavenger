@@ -37,6 +37,8 @@ public class DataManager : MonoBehaviour
         LoadData<GunDataList, GunData>("Gun", "GunData.dat");
         LoadData<ItemDataList, ItemData>("Item", "ItemData.dat");
         LoadData<CharDataList, CharData>("Char", "CharData.dat");
+        LoadData<SkillDataList, SkillData>("Skill", "SkillData.dat");
+        LoadData<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "UltimateSkillData.dat");
         // LoadData<EnemyDataList, EnemyData>("Enemy", "EnemyData.dat");
     }
 

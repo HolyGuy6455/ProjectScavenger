@@ -55,21 +55,6 @@ public class PlayerMovement : MonoBehaviour
         indicatorObj.transform.SetParent(transform);
         indicatorObj.transform.localPosition = new Vector3(0f, 0.1f, 0f);
         _sectorIndicator = indicatorObj.AddComponent<SectorIndicator>();
-
-        // 임시 테스트 코드: 시작할 때 DataManager에서 gun_002 데이터를 가져와 장착합니다.
-        if (shooter != null)
-        {
-            GunData startingGun = DataManager.Instance.GetData<GunData>("Gun", 1);
-            if (startingGun != null)
-            {
-                shooter.EquipGun(startingGun);
-                Debug.Log($"[{gameObject.name}] {startingGun.gunName} 장착 완료!");
-            }
-            else
-            {
-                Debug.LogWarning("DataManager에서 gun_002 데이터를 찾을 수 없습니다.");
-            }
-        }
     }
 
     private void OnMove(InputAction.CallbackContext ctx)
