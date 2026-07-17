@@ -4,12 +4,31 @@ using UnityEngine.InputSystem;
 
 public class PlayerSkillController : MonoBehaviour
 {
+    public static PlayerSkillController Instance { get; private set; }
+
     private Dictionary<int, CharacterSkillState> charSkillStates = new Dictionary<int, CharacterSkillState>();
     private CharData currentCharData;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
 
     private void Start()
     {
         InitializeSkillStates();
+    }
+
+    public CharacterSkillState GetSkillState(int charId)
+    {
+        if (charSkillStates.Count == 0) InitializeSkillStates();
+        if (charSkillStates.TryGetValue(charId, out CharacterSkillState state)) return state;
+        return null;
     }
 
     private void InitializeSkillStates()
@@ -61,7 +80,7 @@ public class PlayerSkillController : MonoBehaviour
         }
     }
 
-    private void TryUseSkill(int skillSlotIndex)
+    public void TryUseSkill(int skillSlotIndex)
     {
         if (!charSkillStates.TryGetValue(currentCharData.id, out CharacterSkillState state)) return;
 
