@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[System.Obsolete("이 클래스는 더 이상 사용되지 않습니다. 스킬 기반 재장전 시스템으로 대체될 예정입니다.", false)]
 public class MagazineUsage : IItemUsage
 {
     public bool IsConsumable => false; // 수량이 0이 되어도 빈 탄창으로 남음

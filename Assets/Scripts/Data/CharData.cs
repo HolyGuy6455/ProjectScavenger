@@ -15,8 +15,11 @@ public class CharData : IData
     public string name;
     public string resourceSlot;
     public string resourceStand;
-    public int gunData;
+    public int gun1st;
+    public int gun2nd;
     public ItemAmount[] givenItem;
+    public int[] skill;
+    public int ultimateSkill;
 
     public int GetId()
     {

@@ -6,7 +6,7 @@ public class ItemUsageManager : MonoBehaviour
     public static ItemUsageManager Instance { get; private set; }
 
     // func 이름과 효과 구현체를 매핑하는 딕셔너리
-    private Dictionary<string, IItemUsage> effectDictionary;
+    private Dictionary<int, IItemUsage> effectDictionary;
 
     private void Awake()
     {
@@ -22,11 +22,11 @@ public class ItemUsageManager : MonoBehaviour
 
     private void InitializeEffects()
     {
-        effectDictionary = new Dictionary<string, IItemUsage>();
+        effectDictionary = new Dictionary<int, IItemUsage>();
 
         // 여기에 새로운 아이템 효과(func)가 생길 때마다 추가해주면 됩니다.
-        effectDictionary.Add("food", new FoodUsage());
-        effectDictionary.Add("magazine", new MagazineUsage());
+        effectDictionary.Add(1, new AmmoUsage());
+        effectDictionary.Add(2, new FoodUsage());
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class ItemUsageManager : MonoBehaviour
     {
         if (item == null || item.IsEmpty) return false;
 
-        string func = item.Data.func;
+        int func = item.Data.func;
         
         if (effectDictionary.TryGetValue(func, out IItemUsage effect))
         {
@@ -49,7 +49,7 @@ public class ItemUsageManager : MonoBehaviour
         }
     }
 
-    public IItemUsage GetUsage(string func)
+    public IItemUsage GetUsage(int func)
     {
         if (effectDictionary.TryGetValue(func, out IItemUsage effect))
         {
