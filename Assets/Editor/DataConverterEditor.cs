@@ -138,6 +138,11 @@ public class DataConverterEditor : EditorWindow
                         {
                             field.SetValue(obj, val);
                         }
+                        else if (field.FieldType.IsEnum)
+                        {
+                            if (val == "_") field.SetValue(obj, System.Enum.ToObject(field.FieldType, 0));
+                            else field.SetValue(obj, System.Enum.ToObject(field.FieldType, int.Parse(val)));
+                        }
                         else if (field.FieldType == typeof(int[]))
                         {
                             var parts = val.Split(',');

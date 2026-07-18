@@ -13,6 +13,9 @@ public class WeaponUI : MonoBehaviour
     
     [Tooltip("현재 무기의 실루엣을 표시할 이미지")]
     [SerializeField] private Image weaponImage;
+    
+    [Tooltip("재장전 중임을 표시할 아이콘 이미지")]
+    [SerializeField] private Image reloadIcon;
 
     [Header("Settings")]
     [Tooltip("실루엣 리소스가 들어있는 Resources 하위 폴더 경로")]
@@ -40,6 +43,18 @@ public class WeaponUI : MonoBehaviour
         {
             shooter.OnAmmoChanged -= HandleAmmoChanged;
             shooter.OnWeaponChanged -= HandleWeaponChanged;
+        }
+    }
+
+    private void Update()
+    {
+        if (reloadIcon != null && PlayerSkillController.Instance != null)
+        {
+            bool isReloading = PlayerSkillController.Instance.IsReloading();
+            if (reloadIcon.gameObject.activeSelf != isReloading)
+            {
+                reloadIcon.gameObject.SetActive(isReloading);
+            }
         }
     }
 

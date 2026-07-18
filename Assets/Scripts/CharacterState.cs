@@ -5,11 +5,19 @@ public class SkillInstance
 {
     public int skillId;
     public float currentCooldown;
+    public bool isToggledOn;
+    public bool isCharging;
+    public bool isContinuousRunning;
+    public float continuousTimer;
 
     public SkillInstance(int id)
     {
         skillId = id;
         currentCooldown = 0f;
+        isToggledOn = false;
+        isCharging = false;
+        isContinuousRunning = false;
+        continuousTimer = 0f;
     }
 
     public SkillData Data => skillId > 0 && DataManager.Instance != null ? DataManager.Instance.GetData<SkillData>("Skill", skillId) : null;
@@ -62,13 +70,16 @@ public class UltimateSkillInstance
 }
 
 [System.Serializable]
-public class CharacterSkillState
+public class CharacterState
 {
     public int charId;
     public SkillInstance[] normalSkills;
     public UltimateSkillInstance ultimateSkill;
+    
+    public int lastGunId;
+    public System.Collections.Generic.Dictionary<int, int> gunAmmo = new System.Collections.Generic.Dictionary<int, int>();
 
-    public CharacterSkillState(CharData charData)
+    public CharacterState(CharData charData)
     {
         charId = charData.id;
         

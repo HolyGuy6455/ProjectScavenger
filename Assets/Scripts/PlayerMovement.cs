@@ -189,8 +189,10 @@ public class PlayerMovement : MonoBehaviour
         // 2. 회전 처리
         Vector3 lookDir = Vector3.zero;
 
-        // 우측 회전 조이스틱 입력이 있는 경우 우선 처리 (발사 방향)
-        if (_joystickRotationInput.sqrMagnitude > 0.001f)
+        bool isReloading = PlayerSkillController.Instance != null && PlayerSkillController.Instance.IsReloading();
+
+        // 우측 회전 조이스틱 입력이 있는 경우 우선 처리 (발사 방향), 단 장전 중이 아닐 때만
+        if (_joystickRotationInput.sqrMagnitude > 0.001f && !isReloading)
         {
             Vector3 inputDir = new Vector3(_joystickRotationInput.x, 0f, _joystickRotationInput.y).normalized;
             float inputMag = Mathf.Clamp01(_joystickRotationInput.magnitude);

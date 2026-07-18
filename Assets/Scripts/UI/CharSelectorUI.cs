@@ -47,21 +47,6 @@ public class CharSelectorUI : MonoBehaviour
 
         OnCharacterChanged?.Invoke(charData);
 
-        // 캐릭터에 지정된 1번 총기 세팅
-        if (DataManager.Instance != null)
-        {
-            GunData assignedGun = DataManager.Instance.GetData<GunData>("Gun", charData.gun1st);
-            if (assignedGun != null)
-            {
-                Shooter playerShooter = FindObjectOfType<Shooter>();
-                if (playerShooter != null)
-                {
-                    playerShooter.EquipGun(assignedGun);
-                    Debug.Log($"[CharSelectorUI] {charData.name}에게 {assignedGun.gunName}이(가) 장착되었습니다.");
-                }
-            }
-        }
-
         if (standingImage != null)
         {
             Sprite standSprite = LoadSprite(charData.resourceStand);

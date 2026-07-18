@@ -6,6 +6,7 @@ public class GunData : IData
 {
     public int id;
     public string gunName;
+    public int gunGroup;
     public int shotType;
     public float SearchRadius;
     public float SearchAngle;

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 public class SkillSlot : MonoBehaviour
@@ -9,21 +10,42 @@ public class SkillSlot : MonoBehaviour
 
     private SkillInstance currentSkill;
     private int slotIndex;
+    private Sprite normalSprite;
+    private Sprite toggledSprite;
 
     private void Awake()
     {
         Button btn = GetComponentInChildren<Button>();
         if (btn != null)
         {
-            btn.onClick.AddListener(OnButtonClicked);
+            EventTrigger trigger = btn.gameObject.GetComponent<EventTrigger>();
+            if (trigger == null) trigger = btn.gameObject.AddComponent<EventTrigger>();
+
+            EventTrigger.Entry downEntry = new EventTrigger.Entry();
+            downEntry.eventID = EventTriggerType.PointerDown;
+            downEntry.callback.AddListener((data) => { OnPointerDown(); });
+            trigger.triggers.Add(downEntry);
+
+            EventTrigger.Entry upEntry = new EventTrigger.Entry();
+            upEntry.eventID = EventTriggerType.PointerUp;
+            upEntry.callback.AddListener((data) => { OnPointerUp(); });
+            trigger.triggers.Add(upEntry);
         }
     }
 
-    private void OnButtonClicked()
+    private void OnPointerDown()
     {
         if (PlayerSkillController.Instance != null && currentSkill != null && currentSkill.skillId != 0)
         {
-            PlayerSkillController.Instance.TryUseSkill(slotIndex);
+            PlayerSkillController.Instance.OnSkillPointerDown(slotIndex);
+        }
+    }
+
+    private void OnPointerUp()
+    {
+        if (PlayerSkillController.Instance != null && currentSkill != null && currentSkill.skillId != 0)
+        {
+            PlayerSkillController.Instance.OnSkillPointerUp(slotIndex);
         }
     }
 
@@ -41,21 +63,29 @@ public class SkillSlot : MonoBehaviour
         icon.enabled = true;
         
         SkillData data = skill.Data;
-        Sprite loadedSprite = null;
+        normalSprite = null;
+        toggledSprite = null;
 
-        if (data != null && !string.IsNullOrEmpty(data.resourceIcon))
+        if (data != null)
         {
-            string nameWithoutExt = System.IO.Path.GetFileNameWithoutExtension(data.resourceIcon);
-            loadedSprite = Resources.Load<Sprite>(nameWithoutExt);
+            if (!string.IsNullOrEmpty(data.resourceIcon))
+            {
+                string name1 = System.IO.Path.GetFileNameWithoutExtension(data.resourceIcon);
+                normalSprite = Resources.Load<Sprite>(name1);
+            }
+            if (!string.IsNullOrEmpty(data.resourceIcon2))
+            {
+                string name2 = System.IO.Path.GetFileNameWithoutExtension(data.resourceIcon2);
+                toggledSprite = Resources.Load<Sprite>(name2);
+            }
         }
 
-        if (loadedSprite != null)
+        if (normalSprite != null)
         {
-            icon.sprite = loadedSprite;
+            icon.sprite = normalSprite;
         }
         else
         {
-            // 리소스가 없거나 실패한 경우 디폴트 이미지 세팅
             icon.sprite = Resources.Load<Sprite>("skill_reload_nothing");
         }
     }
@@ -63,6 +93,19 @@ public class SkillSlot : MonoBehaviour
     private void Update()
     {
         if (currentSkill == null || currentSkill.skillId == 0) return;
+
+        if (currentSkill.isToggledOn && toggledSprite != null)
+        {
+            icon.sprite = toggledSprite;
+        }
+        else if (normalSprite != null)
+        {
+            icon.sprite = normalSprite;
+        }
+        else
+        {
+            icon.sprite = Resources.Load<Sprite>("skill_reload_nothing");
+        }
 
         float cd = currentSkill.currentCooldown;
         if (cd > 0f)

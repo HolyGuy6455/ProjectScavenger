@@ -23,7 +23,7 @@ public class SkillPanel : MonoBehaviour
             return;
         }
 
-        CharacterSkillState state = PlayerSkillController.Instance.GetSkillState(charData.id);
+        CharacterState state = PlayerSkillController.Instance.GetSkillState(charData.id);
         
         if (state == null || state.normalSkills == null)
         {

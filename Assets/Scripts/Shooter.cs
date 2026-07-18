@@ -246,4 +246,15 @@ public class Shooter : MonoBehaviour
         CurrentAmmo = currentGunData.maxAmmo;
         Debug.Log($"{gameObject.name}: 재장전 완료. 잔탄: {currentAmmo}");
     }
+
+    /// <summary>
+    /// 지정된 수량만큼 재장전합니다. (샷건 등 1발씩 장전용)
+    /// </summary>
+    public void ReloadAmount(int amount)
+    {
+        if (currentGunData == null || isReloading) return;
+        
+        CurrentAmmo = Mathf.Min(CurrentAmmo + amount, currentGunData.maxAmmo);
+        Debug.Log($"{gameObject.name}: {amount}발 재장전 완료. 잔탄: {currentAmmo}");
+    }
 }
