@@ -6,6 +6,7 @@ public class CharSelectorSlot : MonoBehaviour
 {
     [SerializeField] private Image iconImage;
     [SerializeField] private Button slotButton;
+    [SerializeField] private PartyCharacterHealthBar healthBar;
 
     private CharData _charData;
     public event Action<CharData> OnSlotClickedEvent;
@@ -13,6 +14,12 @@ public class CharSelectorSlot : MonoBehaviour
     public void Setup(CharData data, Sprite iconSprite)
     {
         _charData = data;
+        
+        if (healthBar != null)
+        {
+            healthBar.SetupCharacter(data.id);
+        }
+
         
         if (iconImage != null)
         {

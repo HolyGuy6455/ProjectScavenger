@@ -60,6 +60,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharSelectorSlot
   iconImage: {fileID: 4325665658363798177}
   slotButton: {fileID: 5230509492664832398}
+  healthBar: {fileID: 5357445800644022784}
 --- !u!1 &5787695791940519609
 GameObject:
   m_ObjectHideFlags: 0
@@ -352,8 +353,29 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4891483080001246480, guid: 15ccd5586b0187a40a1a4dd9b7986d52, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5357445800644022784}
   m_SourcePrefab: {fileID: 100100000, guid: 15ccd5586b0187a40a1a4dd9b7986d52, type: 3}
+--- !u!1 &4172270379464428223 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4891483080001246480, guid: 15ccd5586b0187a40a1a4dd9b7986d52, type: 3}
+  m_PrefabInstance: {fileID: 8792407716972879791}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5357445800644022784
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4172270379464428223}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 143e706f85c3ca84b8143731f1c2e755, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PartyCharacterHealthBar
+  charId: 0
 --- !u!4 &5889559043535353877 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3152241025629513658, guid: 15ccd5586b0187a40a1a4dd9b7986d52, type: 3}

@@ -76,12 +76,18 @@ public class CharacterState
     public SkillInstance[] normalSkills;
     public UltimateSkillInstance ultimateSkill;
     
+    public float currentHealth;
+    public float maxHealth;
+    
     public int lastGunId;
     public System.Collections.Generic.Dictionary<int, int> gunAmmo = new System.Collections.Generic.Dictionary<int, int>();
 
     public CharacterState(CharData charData)
     {
         charId = charData.id;
+        
+        currentHealth = 100f;
+        maxHealth = 100f;
         
         normalSkills = new SkillInstance[charData.skill != null ? charData.skill.Length : 0];
         for (int i = 0; i < normalSkills.Length; i++)

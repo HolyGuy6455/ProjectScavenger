@@ -136,7 +136,7 @@ public class HealthBarUI : MonoBehaviour
         }
     }
 
-    private void UpdateHealthBar(float currentHealth, float maxHealth)
+    public void UpdateHealthBar(float currentHealth, float maxHealth)
     {
         if (hpBarImage == null) return;
 

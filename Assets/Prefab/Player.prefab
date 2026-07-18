@@ -14,7 +14,9 @@ GameObject:
   - component: {fileID: 269122440633132477}
   - component: {fileID: 8742655143381150552}
   - component: {fileID: 2723993384535749444}
+  - component: {fileID: 9111897637999721377}
   - component: {fileID: 6880503327177877134}
+  - component: {fileID: 1698462064478171986}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -145,6 +147,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6eeca44400e7fe74d8ff00da050dd235, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInventory
+--- !u!114 &9111897637999721377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2760713653355842673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f261eda91aee6745adfe1694c86c463, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillController
 --- !u!114 &6880503327177877134
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,6 +176,7 @@ MonoBehaviour:
   currentGunData:
     id: 0
     gunName: 
+    gunGroup: 0
     shotType: 0
     SearchRadius: 0
     SearchAngle: 0
@@ -177,6 +192,25 @@ MonoBehaviour:
     resourceSilhouette: 
   currentAmmo: 0
   isReloading: 0
+--- !u!114 &1698462064478171986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2760713653355842673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 905f14e2cba7d204792077dcc4567a00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthBarSpawner
+  healthBarPrefab: {fileID: 4891483080001246480, guid: 15ccd5586b0187a40a1a4dd9b7986d52, type: 3}
+  parentTransform: {fileID: 0}
+  targetHealth: {fileID: 269122440633132477}
+  targetTransform: {fileID: 6942228983306488926}
+  worldOffset: {x: 0, y: 2, z: 0}
+  useCustomColor: 1
+  barColor: {r: 0.4745098, g: 0.5764706, b: 1, a: 1}
 --- !u!1 &4400775269835697234
 GameObject:
   m_ObjectHideFlags: 0
@@ -276,11 +310,33 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 11400002, guid: 13a16f60da4245c45a865b2136ba272c, type: 3}
+    - {fileID: 11400000, guid: 13a16f60da4245c45a865b2136ba272c, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 100264, guid: 13a16f60da4245c45a865b2136ba272c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5770356824960379365}
   m_SourcePrefab: {fileID: 100100000, guid: 13a16f60da4245c45a865b2136ba272c, type: 3}
+--- !u!1 &100585873515127419 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100264, guid: 13a16f60da4245c45a865b2136ba272c, type: 3}
+  m_PrefabInstance: {fileID: 100585873515161043}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5770356824960379365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100585873515127419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c980939eb07cca5469aca1b13d800c95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UnityChanEventCatcher
 --- !u!4 &100585873515298395 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400264, guid: 13a16f60da4245c45a865b2136ba272c, type: 3}

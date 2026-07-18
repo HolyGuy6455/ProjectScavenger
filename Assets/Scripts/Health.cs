@@ -107,6 +107,19 @@ public class Health : MonoBehaviour, IDamageable
     }
 
     /// <summary>
+    /// 강제로 체력과 최대 체력을 설정합니다. (캐릭터 스위칭 등에서 사용)
+    /// </summary>
+    public void SetHealth(float hp, float maxHp)
+    {
+        maxHealth = maxHp;
+        CurrentHealth = Mathf.Clamp(hp, 0f, maxHealth);
+        IsDead = CurrentHealth <= 0;
+
+        OnHealthChanged?.Invoke(CurrentHealth, maxHealth);
+        onHealthChangedUnityEvent?.Invoke(CurrentHealth, maxHealth);
+    }
+
+    /// <summary>
     /// 사망 처리를 수행합니다.
     /// </summary>
     private void Die(DamageInfo damageInfo)
