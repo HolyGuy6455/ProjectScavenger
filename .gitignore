@@ -54,3 +54,7 @@ wsl_debug_proxy.ps1
 
 # 개인 VSCode 설정
 .vscode/
+
+# 데이터 파일
+*.tsv
+*.tsv.meta
