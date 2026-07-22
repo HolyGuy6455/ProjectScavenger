@@ -1,9 +1,11 @@
+using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
 /// 발사된 총알의 이동 및 충돌 처리를 담당하는 컴포넌트입니다.
+/// 멀티플레이어 환경에서는 오직 서버만이 이동 및 충돌 판정을 수행합니다.
 /// </summary>
-public class Bullet : MonoBehaviour
+public class Bullet : NetworkBehaviour
 {
     [Header("Bullet Settings")]
     [Tooltip("총알의 이동 속도")]
@@ -73,6 +75,7 @@ public class Bullet : MonoBehaviour
 
     private void Update()
     {
+        if (!IsServer) return; // 오직 서버에서만 이동 및 충돌 연산
         if (!isInitialized) return;
 
         if (isParabola)
@@ -120,16 +123,13 @@ public class Bullet : MonoBehaviour
 
     private void HitTarget(GameObject target, Vector3 hitPoint, Vector3 hitNormal)
     {
+        if (!IsServer) return;
+
+        // 클라이언트들에게 피격/폭발 이펙트 재생 명령
+        SpawnHitEffectClientRpc(hitPoint, hitNormal, isParabola);
+
         if (isParabola)
         {
-            // 폭발 파티클 생성
-            if (explosionEffectPrefab != null)
-            {
-                GameObject effect = Instantiate(explosionEffectPrefab, hitPoint, Quaternion.LookRotation(hitNormal));
-                Destroy(effect, 2f); // 2초 후 자동 파괴
-            }
-
-            // 포물선(폭발)형 무기: OverlapSphere를 사용하여 광역 데미지 처리
             Collider[] colliders = Physics.OverlapSphere(hitPoint, explosionRadius);
             foreach (Collider col in colliders)
             {
@@ -147,13 +147,6 @@ public class Bullet : MonoBehaviour
         }
         else
         {
-            // 피격 파티클 생성
-            if (hitEffectPrefab != null)
-            {
-                GameObject effect = Instantiate(hitEffectPrefab, hitPoint, Quaternion.LookRotation(hitNormal));
-                Destroy(effect, 2f); // 2초 후 자동 파괴
-            }
-
             // 기존 직사형 무기: 단일 타겟 데미지 처리
             if (target != null)
             {
@@ -168,10 +161,20 @@ public class Bullet : MonoBehaviour
         }
 
         // 관통 총알이 아니라면 충돌 후 총알 파괴
-        // 포물선 폭발은 아직 구현 전이므로 도착 즉시 파괴
         if (!canPierce || isParabola)
         {
-            Destroy(gameObject);
+            GetComponent<NetworkObject>()?.Despawn();
+        }
+    }
+
+    [ClientRpc]
+    private void SpawnHitEffectClientRpc(Vector3 position, Vector3 normal, bool explosion)
+    {
+        GameObject prefab = explosion ? explosionEffectPrefab : hitEffectPrefab;
+        if (prefab != null)
+        {
+            GameObject effect = Instantiate(prefab, position, Quaternion.LookRotation(normal));
+            Destroy(effect, 2f);
         }
     }
 
@@ -181,6 +184,8 @@ public class Bullet : MonoBehaviour
     /// </summary>
     private void OnTriggerEnter(Collider other)
     {
+        if (!IsServer) return;
+
         // 이미 발사자가 자신이 쏜 총알에 맞는 것 방지 (원한다면 레이어 설정으로도 가능)
         if (other.transform.root.gameObject == attacker) return;
 

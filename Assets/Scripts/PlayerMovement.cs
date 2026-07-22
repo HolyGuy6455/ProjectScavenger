@@ -1,12 +1,13 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.Netcode;
 
 /// <summary>
 /// 쿼터뷰 캐릭터 이동 스크립트
 /// Unity Input System을 통해 키보드(WASD/화살표), 게임패드(XInput), 안드로이드 가상 조이스틱을 지원합니다.
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float rotationSpeed = 720f;
@@ -27,34 +28,59 @@ public class PlayerMovement : MonoBehaviour
     private SectorIndicator _sectorIndicator;
 
     private string _currentAnimState = "Standing@loop";
+    
+    // 네트워크 동기화를 위한 변수 (오너가 쓰고 모두가 읽음)
+    private NetworkVariable<bool> _netIsRunning = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
+        // Awake에서는 InputSystem을 미리 생성해둡니다.
         _inputActions = new PlayerInputActions();
     }
 
-    private void OnEnable()
+    public override void OnNetworkSpawn()
     {
-        _inputActions.Player.Enable();
-        _inputActions.Player.Move.performed += OnMove;
-        _inputActions.Player.Move.canceled += OnMove;
+        base.OnNetworkSpawn();
+        
+        // 내 캐릭터일 때만 입력을 활성화합니다.
+        if (IsOwner)
+        {
+            _inputActions.Player.Enable();
+            _inputActions.Player.Move.performed += OnMove;
+            _inputActions.Player.Move.canceled += OnMove;
+            
+            // 내 캐릭터일 때만 인디케이터 생성
+            GameObject indicatorObj = new GameObject("SectorIndicator");
+            indicatorObj.transform.SetParent(transform);
+            indicatorObj.transform.localPosition = new Vector3(0f, 0.1f, 0f);
+            _sectorIndicator = indicatorObj.AddComponent<SectorIndicator>();
+        }
     }
 
-    private void OnDisable()
+    public override void OnNetworkDespawn()
     {
-        _inputActions.Player.Move.performed -= OnMove;
-        _inputActions.Player.Move.canceled -= OnMove;
-        _inputActions.Player.Disable();
+        base.OnNetworkDespawn();
+        if (IsOwner)
+        {
+            _inputActions.Player.Move.performed -= OnMove;
+            _inputActions.Player.Move.canceled -= OnMove;
+            _inputActions.Player.Disable();
+        }
     }
 
-    private void Start()
+    private void Update()
     {
-        // 0. 부채꼴 인디케이터 동적 생성 (바닥과 겹치지 않게 살짝 위인 Y=0.1에 배치)
-        GameObject indicatorObj = new GameObject("SectorIndicator");
-        indicatorObj.transform.SetParent(transform);
-        indicatorObj.transform.localPosition = new Vector3(0f, 0.1f, 0f);
-        _sectorIndicator = indicatorObj.AddComponent<SectorIndicator>();
+        // 애니메이션은 모든 클라이언트에서 동일하게 재생되어야 하므로 IsOwner 체크 밖에서 처리
+        if (_animator != null)
+        {
+            string targetAnim = _netIsRunning.Value ? "Running@loop" : "Standing@loop";
+            if (_currentAnimState != targetAnim)
+            {
+                _animator.CrossFade(targetAnim, 0.1f);
+                _currentAnimState = targetAnim;
+            }
+        }
     }
 
     private void OnMove(InputAction.CallbackContext ctx)
@@ -165,6 +191,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!IsOwner) return; // 위치 이동과 물리 연산, 입력 처리는 로컬 오너만 수행합니다.
+
         // 1. 이동 처리
         // 키보드 입력과 조이스틱 입력을 합산한 후, 최대 크기가 1을 넘지 않도록 제한합니다.
         Vector2 combinedInput = _keyboardInput + _joystickInput;
@@ -173,15 +201,8 @@ public class PlayerMovement : MonoBehaviour
             combinedInput.Normalize();
         }
 
-        if (_animator != null)
-        {
-            string targetAnim = combinedInput.magnitude > 0.1f ? "Running@loop" : "Standing@loop";
-            if (_currentAnimState != targetAnim)
-            {
-                _animator.CrossFade(targetAnim, 0.1f);
-                _currentAnimState = targetAnim;
-            }
-        }
+        // 애니메이션 동기화 변수 업데이트
+        _netIsRunning.Value = combinedInput.magnitude > 0.1f;
 
         Vector3 moveDir = new Vector3(combinedInput.x, 0f, combinedInput.y);
         _rb.MovePosition(_rb.position + moveDir * (moveSpeed * Time.fixedDeltaTime));

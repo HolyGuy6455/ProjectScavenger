@@ -89,13 +89,15 @@ public class DataConverterEditor : EditorWindow
         string jsonContent = JsonUtility.ToJson(dataList);
         byte[] encryptedBytes = CryptoUtility.Encrypt(jsonContent);
 
-        string dataPath = Application.dataPath + "/Data";
+        // 출력 경로는 Resources/Data 로 변경
+        string dataPath = Application.dataPath + "/Resources/Data";
         if (!Directory.Exists(dataPath))
         {
             Directory.CreateDirectory(dataPath);
         }
 
-        string savePath = Path.Combine(dataPath, $"{dataName}Data.dat");
+        // 확장자를 .bytes 로 변경
+        string savePath = Path.Combine(dataPath, $"{dataName}Data.bytes");
         File.WriteAllBytes(savePath, encryptedBytes);
         
         AssetDatabase.Refresh();

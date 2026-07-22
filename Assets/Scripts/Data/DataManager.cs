@@ -34,12 +34,13 @@ public class DataManager : MonoBehaviour
     /// </summary>
     public void LoadAllInitialData()
     {
-        LoadData<GunDataList, GunData>("Gun", "GunData.dat");
-        LoadData<ItemDataList, ItemData>("Item", "ItemData.dat");
-        LoadData<CharDataList, CharData>("Char", "CharData.dat");
-        LoadData<SkillDataList, SkillData>("Skill", "SkillData.dat");
-        LoadData<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "UltimateSkillData.dat");
-        // LoadData<EnemyDataList, EnemyData>("Enemy", "EnemyData.dat");
+        // 파일 확장자를 .bytes로 변경했습니다 (Resources Load를 위함)
+        LoadData<GunDataList, GunData>("Gun", "GunData.bytes");
+        LoadData<ItemDataList, ItemData>("Item", "ItemData.bytes");
+        LoadData<CharDataList, CharData>("Char", "CharData.bytes");
+        LoadData<SkillDataList, SkillData>("Skill", "SkillData.bytes");
+        LoadData<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "UltimateSkillData.bytes");
+        // LoadData<EnemyDataList, EnemyData>("Enemy", "EnemyData.bytes");
     }
 
     /// <summary>
@@ -53,43 +54,26 @@ public class DataManager : MonoBehaviour
         // 1순위: 기기에 다운로드 받은 파일이 있는지 확인 (패치 적용 시)
         string persistentPath = Path.Combine(Application.persistentDataPath, fileName);
         
-        // 2순위: 유니티 에디터 로컬 환경의 Data 폴더
-        string editorDataPath = Path.Combine(Application.dataPath, "Data", fileName);
-
-        string targetPath = string.Empty;
-
         if (File.Exists(persistentPath))
         {
-            targetPath = persistentPath;
-        }
-        else if (File.Exists(editorDataPath))
-        {
-            targetPath = editorDataPath;
+            byte[] encryptedBytes = File.ReadAllBytes(persistentPath);
+            ParseEncryptedData<TList, TData>(category, encryptedBytes);
         }
         else
         {
-            Debug.LogError($"[DataManager] '{fileName}'을 찾을 수 없습니다.\n확인한 경로:\n1. {persistentPath}\n2. {editorDataPath}");
-            return;
+            // 2순위: Resources/Data 폴더에서 로드 (안드로이드 APK 내부 파일도 동기적으로 읽을 수 있음)
+            string resourceName = "Data/" + Path.GetFileNameWithoutExtension(fileName);
+            TextAsset textAsset = Resources.Load<TextAsset>(resourceName);
+            
+            if (textAsset != null)
+            {
+                ParseEncryptedData<TList, TData>(category, textAsset.bytes);
+            }
+            else
+            {
+                Debug.LogError($"[DataManager] '{fileName}'을 찾을 수 없습니다.\n확인한 경로:\n1. {persistentPath}\n2. Resources/{resourceName}");
+            }
         }
-
-        LoadDataFromFile<TList, TData>(category, targetPath);
-    }
-
-    /// <summary>
-    /// 파일 절대 경로를 통해 데이터를 로드하고 특정 카테고리에 매핑합니다.
-    /// </summary>
-    public void LoadDataFromFile<TList, TData>(string category, string filePath)
-        where TList : IDataList<TData>
-        where TData : class, IData
-    {
-        if (!File.Exists(filePath))
-        {
-            Debug.LogError($"[DataManager] Data file not found at: {filePath}");
-            return;
-        }
-
-        byte[] encryptedBytes = File.ReadAllBytes(filePath);
-        ParseEncryptedData<TList, TData>(category, encryptedBytes);
     }
 
     private void ParseEncryptedData<TList, TData>(string category, byte[] encryptedBytes)

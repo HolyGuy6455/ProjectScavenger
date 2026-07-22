@@ -12,11 +12,14 @@ GameObject:
   - component: {fileID: 8970405504350108327}
   - component: {fileID: 8138947274489544938}
   - component: {fileID: 269122440633132477}
+  - component: {fileID: 7650701027514237683}
   - component: {fileID: 8742655143381150552}
   - component: {fileID: 2723993384535749444}
   - component: {fileID: 9111897637999721377}
   - component: {fileID: 6880503327177877134}
   - component: {fileID: 1698462064478171986}
+  - component: {fileID: 7917902695277357669}
+  - component: {fileID: 1224847714417122198}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -119,6 +122,27 @@ MonoBehaviour:
   onDeathUnityEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7650701027514237683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2760713653355842673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 4203239840
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!114 &8742655143381150552
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -211,6 +235,49 @@ MonoBehaviour:
   worldOffset: {x: 0, y: 2, z: 0}
   useCustomColor: 1
   barColor: {r: 0.4745098, g: 0.5764706, b: 1, a: 1}
+--- !u!114 &7917902695277357669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2760713653355842673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c48cd05c255ae974897b1d6a7eb790b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Utils.ClientNetworkTransform
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
+--- !u!114 &1224847714417122198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2760713653355842673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Components::Unity.Netcode.Components.NetworkRigidbody
 --- !u!1 &4400775269835697234
 GameObject:
   m_ObjectHideFlags: 0
