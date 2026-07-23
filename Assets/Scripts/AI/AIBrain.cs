@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class AIBrain : MonoBehaviour
+public class AIBrain : NetworkBehaviour
 {
     [SerializeReference]
     public BTNode rootNode;
@@ -29,7 +30,9 @@ public class AIBrain : MonoBehaviour
     }
 
     private void Update()
-    {
+    { 
+        if (!IsServer) return; // 서버에서만 AI 로직 실행
+
         if (rootNode != null)
         {
             rootNode.ResetState();

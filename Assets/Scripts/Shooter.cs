@@ -45,6 +45,11 @@ public class Shooter : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        if (IsServer && currentGunData != null)
+        {
+            CurrentAmmo = currentGunData.maxAmmo;
+        }
+
         NetworkCurrentAmmo.OnValueChanged += (oldValue, newValue) =>
         {
             if (currentGunData != null)
@@ -100,7 +105,8 @@ public class Shooter : NetworkBehaviour
         if (IsServer) CurrentAmmo = currentGunData.maxAmmo;
         isReloading = false;
         isTriggerPulled = false;
-        lastFireTime = 0f;
+        clientLastFireTime = 0f;
+        serverLastFireTime = 0f;
         currentSpread = 0f;
         
         OnWeaponChanged?.Invoke(currentGunData);
@@ -128,6 +134,9 @@ public class Shooter : NetworkBehaviour
     }
     */
 
+    private float clientLastFireTime;
+    private float serverLastFireTime;
+
     /// <summary>
     /// 단발 사격을 시도하거나 수동으로 한 발씩 발사할 때 호출합니다.
     /// </summary>
@@ -138,10 +147,10 @@ public class Shooter : NetworkBehaviour
         if (currentGunData == null) return;
         if (isReloading) return;
         if (CurrentAmmo <= 0) return;
-        if (Time.time - lastFireTime < currentGunData.fireRate) return;
+        if (Time.time - clientLastFireTime < currentGunData.fireRate) return;
 
         // 로컬 쿨타임 갱신 (클라이언트 측에서 쿨타임을 관리하여 연속 요청 방지)
-        lastFireTime = Time.time;
+        clientLastFireTime = Time.time;
 
         // 서버에 실제 발사(탄환 생성 및 물리 처리)를 요청
         CmdShootServerRpc(direction, targetPosition);
@@ -151,7 +160,7 @@ public class Shooter : NetworkBehaviour
     private void CmdShootServerRpc(Vector3 direction, Vector3 targetPosition)
     {
         // 서버 측에서 한 번 더 검증 (해킹 방지)
-        if (currentGunData == null || isReloading || CurrentAmmo <= 0 || Time.time - lastFireTime < currentGunData.fireRate)
+        if (currentGunData == null || isReloading || CurrentAmmo <= 0 || Time.time - serverLastFireTime < currentGunData.fireRate)
             return;
 
         PerformShoot(direction, targetPosition);
@@ -192,7 +201,7 @@ public class Shooter : NetworkBehaviour
         if (!IsServer) return;
 
         CurrentAmmo--;
-        lastFireTime = Time.time;
+        serverLastFireTime = Time.time;
 
         if (bulletPrefab == null) return;
 
