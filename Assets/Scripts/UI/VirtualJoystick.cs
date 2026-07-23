@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 /// <summary>
 /// 모바일 가상 조이스틱 스크립트
-/// UI 드래그 입력을 감지하여 PlayerMovement 스크립트에 입력 값을 전달합니다.
+/// UI 드래그 입력을 감지하여 PlayerController 스크립트에 입력 값을 전달합니다.
 /// 평상시엔 숨겨져 있다가 터치 시 해당 위치에 조이스틱이 나타나며, 
 /// 화면 왼쪽은 이동용, 오른쪽은 조준/회전용으로 작동합니다.
 /// </summary>
@@ -21,7 +21,7 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
 
     [Header("Settings")]
     [SerializeField] private JoystickType joystickType = JoystickType.Movement;
-    [SerializeField] private PlayerMovement playerMovement;
+    [SerializeField] private PlayerController playerMovement;
     [SerializeField] private float dragRange = 100f;
 
     private Vector2 _inputVector;
@@ -36,7 +36,7 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
         {
             if (Unity.Netcode.NetworkManager.Singleton.LocalClient != null && Unity.Netcode.NetworkManager.Singleton.LocalClient.PlayerObject != null)
             {
-                var pm = Unity.Netcode.NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerMovement>();
+                var pm = Unity.Netcode.NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerController>();
                 if (pm != null)
                 {
                     SetPlayer(pm);
@@ -137,7 +137,7 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
         }
     }
 
-    public void SetPlayer(PlayerMovement newPlayer)
+    public void SetPlayer(PlayerController newPlayer)
     {
         playerMovement = newPlayer;
     }

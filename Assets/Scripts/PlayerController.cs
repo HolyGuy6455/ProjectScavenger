@@ -7,7 +7,7 @@ using Unity.Netcode;
 /// Unity Input System을 통해 키보드(WASD/화살표), 게임패드(XInput), 안드로이드 가상 조이스틱을 지원합니다.
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerMovement : NetworkBehaviour
+public class PlayerController : NetworkBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float rotationSpeed = 720f;
@@ -43,7 +43,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         base.OnNetworkSpawn();
         
-        Debug.Log($"[PlayerMovement] OnNetworkSpawn 호출됨! (OwnerClientId: {OwnerClientId}, IsServer: {IsServer}, IsOwner: {IsOwner})");
+        Debug.Log($"[PlayerController] OnNetworkSpawn 호출됨! (OwnerClientId: {OwnerClientId}, IsServer: {IsServer}, IsOwner: {IsOwner})");
 
         GameObject spawnObj = GameObject.Find("PlayerSpawnPosition");
         if (spawnObj != null)
