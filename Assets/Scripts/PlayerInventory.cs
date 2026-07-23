@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerInventory : MonoBehaviour
+public class PlayerInventory : NetworkBehaviour
 {
     public static PlayerInventory Instance { get; private set; }
 
@@ -25,14 +26,18 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
-    private void Awake()
+    public override void OnNetworkSpawn()
     {
-        if (Instance != null && Instance != this)
+        base.OnNetworkSpawn();
+        // 멀티플레이어 환경에서는 내 캐릭터(IsOwner)의 인벤토리만 Instance로 등록하여 로컬 UI가 참조하도록 합니다.
+        if (IsOwner)
         {
-            Destroy(gameObject);
-            return;
+            if (Instance != null && Instance != this)
+            {
+                Debug.LogWarning("[PlayerInventory] 로컬 플레이어 인벤토리가 이미 존재하여 기존 Instance를 덮어씁니다.");
+            }
+            Instance = this;
         }
-        Instance = this;
     }
 
     private void OnEnable()

@@ -9,24 +9,34 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] private Transform target;
     [SerializeField] private float smoothSpeed = 8f;
     [SerializeField] private float lookOffsetMultiplier = 3f; // 조이스틱 입력에 따라 카메라가 이동하는 최대 거리
+    [SerializeField] private Transform playerOffsetPosition; // 인스펙터에서 직접 할당할 수 있는 오프셋 기준 오브젝트
 
     private Vector3 _offset;
     private PlayerMovement _playerMovement;
 
     private void Start()
     {
-        if (target == null)
-        {
-            var player = GameObject.FindWithTag("Player");
-            if (player != null)
-                target = player.transform;
-        }
-
+        // 씬에서 무조건 태그로 찾지 않고, 외부에서 SetTarget()을 호출해주길 기다립니다.
         if (target != null)
         {
-            _offset = transform.position - target.position;
-            _playerMovement = target.GetComponent<PlayerMovement>();
+            SetTarget(target);
         }
+    }
+
+    public void SetTarget(Transform newTarget)
+    {
+        target = newTarget;
+        
+        if (playerOffsetPosition != null)
+        {
+            _offset = transform.position - playerOffsetPosition.position;
+        }
+        else
+        {
+            _offset = transform.position - target.position;
+        }
+        
+        _playerMovement = target.GetComponent<PlayerMovement>();
     }
 
     private void LateUpdate()

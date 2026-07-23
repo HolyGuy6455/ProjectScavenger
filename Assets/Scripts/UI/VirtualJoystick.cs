@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 /// <summary>
 /// 모바일 가상 조이스틱 스크립트
@@ -10,6 +11,8 @@ using UnityEngine.UI;
 /// </summary>
 public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler, IPointerUpHandler
 {
+    public static List<VirtualJoystick> AllJoysticks = new List<VirtualJoystick>();
+
     public enum JoystickType { Movement, Rotation }
 
     [Header("UI References")]
@@ -23,6 +26,29 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
 
     private Vector2 _inputVector;
     private CanvasGroup _visualGroup;
+
+    private void OnEnable()
+    {
+        if (!AllJoysticks.Contains(this)) AllJoysticks.Add(this);
+        
+        // UI가 늦게 켜졌을 경우, 이미 스폰된 내 캐릭터(로컬 플레이어)가 있다면 즉시 연결합니다.
+        if (Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsListening)
+        {
+            if (Unity.Netcode.NetworkManager.Singleton.LocalClient != null && Unity.Netcode.NetworkManager.Singleton.LocalClient.PlayerObject != null)
+            {
+                var pm = Unity.Netcode.NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<PlayerMovement>();
+                if (pm != null)
+                {
+                    SetPlayer(pm);
+                }
+            }
+        }
+    }
+
+    private void OnDisable()
+    {
+        AllJoysticks.Remove(this);
+    }
 
     private void Start()
     {
@@ -98,10 +124,10 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
             _visualGroup.blocksRaycasts = false;
         }
 
-        // 씬 내 PlayerMovement 자동 검색 및 할당 시도
-        if (playerMovement == null)
+        // 씬에서 무조건 찾지 않고 외부에서 SetPlayer를 통해 연결해주기를 기다립니다.
+        if (playerMovement != null)
         {
-            playerMovement = Object.FindAnyObjectByType<PlayerMovement>();
+            SetPlayer(playerMovement);
         }
 
         // 핸들 위치 중앙 정렬
@@ -109,6 +135,11 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
         {
             joystickHandle.anchoredPosition = Vector2.zero;
         }
+    }
+
+    public void SetPlayer(PlayerMovement newPlayer)
+    {
+        playerMovement = newPlayer;
     }
 
     public void OnPointerDown(PointerEventData eventData)

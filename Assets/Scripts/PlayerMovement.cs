@@ -43,6 +43,33 @@ public class PlayerMovement : NetworkBehaviour
     {
         base.OnNetworkSpawn();
         
+        Debug.Log($"[PlayerMovement] OnNetworkSpawn 호출됨! (OwnerClientId: {OwnerClientId}, IsServer: {IsServer}, IsOwner: {IsOwner})");
+
+        GameObject spawnObj = GameObject.Find("PlayerSpawnPosition");
+        if (spawnObj != null)
+        {
+            var nt = GetComponent<Unity.Netcode.Components.NetworkTransform>();
+            Vector3 spawnPos = spawnObj.transform.position;
+            
+            // 플레이어들이 겹치지 않게 클라이언트 ID를 기반으로 약간의 X축 간격을 줍니다.
+            spawnPos.x += (OwnerClientId * 1.5f);
+            
+            // NetworkTransform의 권한(서버 권한 or 클라이언트 권한)을 가진 쪽에서만 텔레포트를 실행합니다.
+            bool hasAuthority = (nt != null) ? nt.CanCommitToTransform : IsServer;
+
+            if (hasAuthority)
+            {
+                if (nt != null) 
+                {
+                    nt.Teleport(spawnPos, transform.rotation, transform.localScale);
+                }
+                else 
+                {
+                    transform.position = spawnPos;
+                }
+            }
+        }
+        
         // 내 캐릭터일 때만 입력을 활성화합니다.
         if (IsOwner)
         {
@@ -55,6 +82,22 @@ public class PlayerMovement : NetworkBehaviour
             indicatorObj.transform.SetParent(transform);
             indicatorObj.transform.localPosition = new Vector3(0f, 0.1f, 0f);
             _sectorIndicator = indicatorObj.AddComponent<SectorIndicator>();
+
+            // 동적으로 스폰된 로컬 플레이어에 카메라 연동
+            var camFollow = FindAnyObjectByType<CameraFollow>();
+            if (camFollow != null)
+            {
+                camFollow.SetTarget(this.transform);
+            }
+
+            // 동적으로 스폰된 로컬 플레이어에 UI 조이스틱 연동
+            foreach (var joystick in VirtualJoystick.AllJoysticks) 
+            {
+                if (joystick != null)
+                {
+                    joystick.SetPlayer(this);
+                }
+            }
         }
     }
 

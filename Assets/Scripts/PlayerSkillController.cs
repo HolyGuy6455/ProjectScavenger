@@ -1,8 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
+using Unity.Netcode;
 
-public class PlayerSkillController : MonoBehaviour
+public class PlayerSkillController : NetworkBehaviour
 {
     public static PlayerSkillController Instance { get; private set; }
 
@@ -10,14 +11,19 @@ public class PlayerSkillController : MonoBehaviour
     private CharData currentCharData;
     private Shooter cachedShooter;
 
-    private void Awake()
+    public override void OnNetworkSpawn()
     {
-        if (Instance != null && Instance != this)
+        base.OnNetworkSpawn();
+        
+        // 멀티플레이어 환경에서는 내 캐릭터(IsOwner)의 스킬 컨트롤러만 Instance로 등록합니다.
+        if (IsOwner)
         {
-            Destroy(gameObject);
-            return;
+            if (Instance != null && Instance != this)
+            {
+                Debug.LogWarning("[PlayerSkillController] 로컬 플레이어 스킬 컨트롤러가 이미 존재하여 덮어씁니다.");
+            }
+            Instance = this;
         }
-        Instance = this;
     }
 
     private void Start()
