@@ -23,6 +23,11 @@ public class PlayerSkillController : NetworkBehaviour
                 Debug.LogWarning("[PlayerSkillController] 로컬 플레이어 스킬 컨트롤러가 이미 존재하여 덮어씁니다.");
             }
             Instance = this;
+
+            if (CharSelectorUI.CurrentCharData != null)
+            {
+                HandleCharacterChanged(CharSelectorUI.CurrentCharData);
+            }
         }
     }
 

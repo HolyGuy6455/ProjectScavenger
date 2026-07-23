@@ -98,6 +98,13 @@ public class PlayerController : NetworkBehaviour
                     joystick.SetPlayer(this);
                 }
             }
+            
+            // 동적으로 스폰된 로컬 플레이어에 무기 UI 연동
+            var weaponUI = FindAnyObjectByType<WeaponUI>(FindObjectsInactive.Include);
+            if (weaponUI != null)
+            {
+                weaponUI.SetShooter(shooter); 
+            }
         }
     }
 
@@ -226,8 +233,8 @@ public class PlayerController : NetworkBehaviour
             }
         }
 
-        Debug.Log($"[PlayerMovement] 가장 가까운 적: {closestEnemy}");
-        Debug.Log($"[PlayerMovement] 가장 가까운 장애물: {closestObstacle}");
+        Debug.Log($"[PlayerController] 가장 가까운 적: {closestEnemy}");
+        Debug.Log($"[PlayerController] 가장 가까운 장애물: {closestObstacle}");
 
         return closestEnemy != null ? closestEnemy : closestObstacle;
     }

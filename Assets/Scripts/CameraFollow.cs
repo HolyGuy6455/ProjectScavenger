@@ -12,7 +12,7 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] private Transform playerOffsetPosition; // 인스펙터에서 직접 할당할 수 있는 오프셋 기준 오브젝트
 
     private Vector3 _offset;
-    private PlayerController _playerMovement;
+    private PlayerController _playerController;
 
     private void Start()
     {
@@ -36,7 +36,7 @@ public class CameraFollow : MonoBehaviour
             _offset = transform.position - target.position;
         }
         
-        _playerMovement = target.GetComponent<PlayerController>();
+        _playerController = target.GetComponent<PlayerController>();
     }
 
     private void LateUpdate()
@@ -45,9 +45,9 @@ public class CameraFollow : MonoBehaviour
 
         Vector3 desiredPos = target.position + _offset;
         
-        if (_playerMovement != null)
+        if (_playerController != null)
         {
-            Vector2 rotInput = _playerMovement.JoystickRotationInput;
+            Vector2 rotInput = _playerController.JoystickRotationInput;
             desiredPos += new Vector3(rotInput.x, 0f, rotInput.y) * lookOffsetMultiplier;
         }
 

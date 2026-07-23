@@ -23,6 +23,15 @@ public class WeaponUI : MonoBehaviour
 
     private void OnEnable()
     {
+        // 동적 스폰 대응: 로컬 플레이어 찾기
+        if (shooter == null && Unity.Netcode.NetworkManager.Singleton != null && Unity.Netcode.NetworkManager.Singleton.IsListening)
+        {
+            if (Unity.Netcode.NetworkManager.Singleton.LocalClient != null && Unity.Netcode.NetworkManager.Singleton.LocalClient.PlayerObject != null)
+            {
+                shooter = Unity.Netcode.NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<Shooter>();
+            }
+        }
+
         if (shooter != null)
         {
             shooter.OnAmmoChanged += HandleAmmoChanged;
@@ -43,6 +52,29 @@ public class WeaponUI : MonoBehaviour
         {
             shooter.OnAmmoChanged -= HandleAmmoChanged;
             shooter.OnWeaponChanged -= HandleWeaponChanged;
+        }
+    }
+
+    public void SetShooter(Shooter newShooter)
+    {
+        if (shooter != null)
+        {
+            shooter.OnAmmoChanged -= HandleAmmoChanged;
+            shooter.OnWeaponChanged -= HandleWeaponChanged;
+        }
+
+        shooter = newShooter;
+
+        if (shooter != null)
+        {
+            shooter.OnAmmoChanged += HandleAmmoChanged;
+            shooter.OnWeaponChanged += HandleWeaponChanged;
+            
+            if (shooter.CurrentGunData != null)
+            {
+                HandleWeaponChanged(shooter.CurrentGunData);
+                HandleAmmoChanged(shooter.CurrentAmmo, shooter.CurrentGunData.maxAmmo);
+            }
         }
     }
 

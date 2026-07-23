@@ -21,7 +21,7 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
 
     [Header("Settings")]
     [SerializeField] private JoystickType joystickType = JoystickType.Movement;
-    [SerializeField] private PlayerController playerMovement;
+    [SerializeField] private PlayerController playerController;
     [SerializeField] private float dragRange = 100f;
 
     private Vector2 _inputVector;
@@ -125,9 +125,9 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
         }
 
         // 씬에서 무조건 찾지 않고 외부에서 SetPlayer를 통해 연결해주기를 기다립니다.
-        if (playerMovement != null)
+        if (playerController != null)
         {
-            SetPlayer(playerMovement);
+            SetPlayer(playerController);
         }
 
         // 핸들 위치 중앙 정렬
@@ -139,7 +139,7 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
 
     public void SetPlayer(PlayerController newPlayer)
     {
-        playerMovement = newPlayer;
+        playerController = newPlayer;
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -197,15 +197,15 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
             _inputVector = pos / maxDrag;
 
             // 캐릭터에 입력 값 주입
-            if (playerMovement != null)
+            if (playerController != null)
             {
                 if (joystickType == JoystickType.Movement)
                 {
-                    playerMovement.SetMoveInput(_inputVector);
+                    playerController.SetMoveInput(_inputVector);
                 }
                 else
                 {
-                    playerMovement.SetRotationInput(_inputVector);
+                    playerController.SetRotationInput(_inputVector);
                 }
             }
         }
@@ -228,15 +228,15 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
         _inputVector = Vector2.zero;
 
         // 입력 해제
-        if (playerMovement != null)
+        if (playerController != null)
         {
             if (joystickType == JoystickType.Movement)
             {
-                playerMovement.SetMoveInput(Vector2.zero);
+                playerController.SetMoveInput(Vector2.zero);
             }
             else
             {
-                playerMovement.SetRotationInput(Vector2.zero);
+                playerController.SetRotationInput(Vector2.zero);
             }
         }
     }

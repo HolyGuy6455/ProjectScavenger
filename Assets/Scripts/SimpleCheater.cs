@@ -15,7 +15,7 @@ public class SimpleCheater : MonoBehaviour
         // 인스펙터에서 플레이어를 수동으로 할당하지 않았다면 씬에서 자동으로 찾습니다.
         if (playerHealth == null)
         {
-            PlayerMovement player = FindObjectOfType<PlayerMovement>();
+            PlayerController player = FindObjectOfType<PlayerController>();
             if (player != null)
             {
                 playerHealth = player.GetComponent<Health>();

@@ -168,7 +168,7 @@ public class Shooter : NetworkBehaviour
 
     /// <summary>
     /// 연사(Full-Auto) 기능을 위해 방아쇠를 당기거나 놓습니다.
-    /// PlayerMovement나 Input 시스템에서 호출하기 좋습니다.
+    /// PlayerController나 Input 시스템에서 호출하기 좋습니다.
     /// </summary>
     /// <param name="isPulled">true면 방아쇠 당김(발사 시작), false면 방아쇠 놓음(발사 중지)</param>
     /// <param name="direction">조준하는 방향</param>
