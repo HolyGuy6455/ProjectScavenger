@@ -172,6 +172,24 @@ public class Health : NetworkBehaviour, IDamageable
         onDeathUnityEvent?.Invoke(clientInfo);
     }
 
+    public virtual void PlayDeathAnimation()
+    {
+        Animator animator = GetComponent<Animator>();
+        if (animator != null)
+        {
+            animator.SetBool("IsDeath", true);
+        }
+    }
+
+    public virtual void DeathAnimationDone()
+    {
+        if (IsServer)
+        {
+            GetComponent<NetworkObject>()?.Despawn();
+        }
+        Destroy(gameObject);
+    }
+
     private void OnValidate()
     {
         if (maxHealth < 0) maxHealth = 0;
