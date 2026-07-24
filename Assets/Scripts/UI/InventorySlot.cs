@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -178,7 +179,28 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
             _dragGhost = null;
 
             // UI 바깥(월드)에 드롭되었는지 확인
-            if (eventData.pointerCurrentRaycast.gameObject == null) 
+            // VirtualJoystick 같은 패드 UI는 무시해야 하므로 RaycastAll을 사용
+            bool isOverUI = false;
+            InventorySlot targetSlot = null;
+
+            List<RaycastResult> results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(eventData, results);
+
+            foreach (var result in results)
+            {
+                // 조이스틱 관련 UI는 무시 (터치 영역 본체이므로 GetComponent 사용)
+                if (result.gameObject.GetComponent<VirtualJoystick>() != null)
+                {
+                    continue;
+                }
+
+                // 무시 목록을 통과한 유효한 UI 오브젝트 발견
+                isOverUI = true;
+                targetSlot = result.gameObject.GetComponentInParent<InventorySlot>();
+                break;
+            }
+
+            if (!isOverUI) 
             {
                 if (Camera.main != null && PlayerInventory.Instance != null)
                 {
@@ -197,7 +219,6 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
             else
             {
                 // UI 요소 위에 드롭됨 (다른 슬롯인지 확인)
-                InventorySlot targetSlot = eventData.pointerCurrentRaycast.gameObject.GetComponentInParent<InventorySlot>();
                 if (targetSlot != null && targetSlot.SlotIndex != this.SlotIndex)
                 {
                     PlayerInventory.Instance.MoveItem(this.SlotIndex, targetSlot.SlotIndex);
