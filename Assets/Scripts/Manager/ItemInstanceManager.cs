@@ -75,12 +75,12 @@ public class ItemInstanceManager : MonoBehaviour
     /// <summary>
     /// 맵(월드) 상에 공용 FieldItem 프리팹을 생성합니다.
     /// </summary>
-    public void SpawnFieldItem(int itemId, int quantity, Vector3 position)
+    public GameObject SpawnFieldItem(int itemId, int quantity, Vector3 position)
     {
         if (fieldItemPrefab == null)
         {
             Debug.LogWarning("[ItemInstanceManager] 공용 fieldItemPrefab이 할당되지 않았습니다.");
-            return;
+            return null;
         }
 
         GameObject spawned = Instantiate(fieldItemPrefab, position, Quaternion.identity);
@@ -93,5 +93,7 @@ public class ItemInstanceManager : MonoBehaviour
         {
             Debug.LogWarning($"[ItemInstanceManager] 스폰된 프리팹 '{fieldItemPrefab.name}'에 FieldItem 컴포넌트가 없습니다.");
         }
+        
+        return spawned;
     }
 }

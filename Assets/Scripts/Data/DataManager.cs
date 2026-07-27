@@ -40,7 +40,9 @@ public class DataManager : MonoBehaviour
         LoadData<CharDataList, CharData>("Char", "CharData.bytes");
         LoadData<SkillDataList, SkillData>("Skill", "SkillData.bytes");
         LoadData<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "UltimateSkillData.bytes");
-        // LoadData<EnemyDataList, EnemyData>("Enemy", "EnemyData.bytes");
+        LoadData<LootDataList, LootData>("Loot", "LootData.bytes");
+        LoadData<EnemyDataList, EnemyData>("Enemy", "EnemyData.bytes");
+        LoadData<ObstacleDataList, ObstacleData>("Obstacle", "ObstacleData.bytes");
     }
 
     /// <summary>

@@ -46,6 +46,16 @@ public class DataConverterEditor : EditorWindow
             ConvertData<LootDataList, LootData>("Loot", "Scavenger - Loot.tsv");
         }
         
+        if (GUILayout.Button("Convert Enemy Data"))
+        {
+            ConvertData<EnemyDataList, EnemyData>("Enemy", "Scavenger - Enemy.tsv");
+        }
+        
+        if (GUILayout.Button("Convert Obstacle Data"))
+        {
+            ConvertData<ObstacleDataList, ObstacleData>("Obstacle", "Scavenger - Obstacle.tsv");
+        }
+        
         GUILayout.Space(10);
 
         if (GUILayout.Button("Convert All Data"))
@@ -62,6 +72,8 @@ public class DataConverterEditor : EditorWindow
         ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - Skill.tsv");
         ConvertData<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "Scavenger - UltimateSkill.tsv");
         ConvertData<LootDataList, LootData>("Loot", "Scavenger - Loot.tsv");
+        ConvertData<EnemyDataList, EnemyData>("Enemy", "Scavenger - Enemy.tsv");
+        ConvertData<ObstacleDataList, ObstacleData>("Obstacle", "Scavenger - Obstacle.tsv");
         AssetDatabase.Refresh();
         Debug.Log("Finished Convert All Data operation.");
     }
