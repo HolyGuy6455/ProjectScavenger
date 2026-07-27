@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PanelToggleButton : MonoBehaviour
+public class InventoryOrSkillPanelToggleManager : MonoBehaviour
 {
     [Header("Panels")]
     [SerializeField] private GameObject skillPanel;
@@ -14,8 +14,20 @@ public class PanelToggleButton : MonoBehaviour
 
     private Button button;
 
+    public static InventoryOrSkillPanelToggleManager Instance { get; private set; }
+
+    public bool IsInventoryActive => inventoryPanel != null && inventoryPanel.activeInHierarchy;
+    public bool IsSkillActive => skillPanel != null && skillPanel.activeInHierarchy;
+
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
         button = GetComponent<Button>();
         if (button != null)
         {

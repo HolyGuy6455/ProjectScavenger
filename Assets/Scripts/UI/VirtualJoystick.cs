@@ -26,6 +26,9 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
 
     private Vector2 _inputVector;
     private CanvasGroup _visualGroup;
+    
+    // 현재 조이스틱을 조작 중인 터치(손가락)의 고유 ID를 기억합니다.
+    private int _activePointerId = int.MinValue;
 
     private void OnEnable()
     {
@@ -144,6 +147,29 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        // 이미 조이스틱을 조작 중인 손가락이 있다면 새로운 터치는 무시합니다.
+        if (_activePointerId != int.MinValue) return;
+
+        // 1. 인벤토리가 켜져 있을 때만 화면 터치 위치에서 3D 공간으로 Raycast하여 아이템(FieldItem) 클릭을 확인
+        if (InventoryOrSkillPanelToggleManager.Instance != null && InventoryOrSkillPanelToggleManager.Instance.IsInventoryActive)
+        {
+            if (Camera.main != null)
+            {
+                Ray ray = Camera.main.ScreenPointToRay(eventData.position);
+                if (Physics.Raycast(ray, out RaycastHit hit))
+                {
+                    if (hit.collider.GetComponentInParent<FieldItem>() != null)
+                    {
+                        // 아이템을 클릭했다면 조이스틱을 활성화하지 않고 무시합니다.
+                        return;
+                    }
+                }
+            }
+        }
+
+        // 이 터치를 조이스틱 조작용으로 등록합니다.
+        _activePointerId = eventData.pointerId;
+
         // 터치한 위치로 조이스틱 배경 이동
         if (joystickBackground != null)
         {
@@ -169,6 +195,9 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
 
     public void OnDrag(PointerEventData eventData)
     {
+        // 이 조이스틱을 활성화시킨 손가락이 아니면 무시합니다.
+        if (eventData.pointerId != _activePointerId) return;
+
         if (joystickBackground == null || joystickHandle == null) return;
 
         Vector2 pos;
@@ -213,6 +242,12 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        // 이 조이스틱을 조작하던 손가락이 아니면 무시합니다.
+        if (eventData.pointerId != _activePointerId) return;
+
+        // 추적 초기화
+        _activePointerId = int.MinValue;
+
         // 터치 뗄 때 조이스틱 숨김
         if (_visualGroup != null)
         {

@@ -12,6 +12,12 @@ public class FieldItem : MonoBehaviour
     private Vector3 _offset;
     private bool _isDragging = false;
     
+    // 짧은 탭(클릭) 판정을 위한 변수
+    private float _pressTime;
+    private Vector2 _pressPosition;
+    private const float SHORT_CLICK_TIME = 0.25f; // 0.25초 이내
+    private const float SHORT_CLICK_DIST = 10f; // 10 픽셀 이내 이동
+    
     // 현재 마우스가 올라가 있는 슬롯을 기억하기 위한 변수
     private InventorySlot _currentlyHoveredSlot;
     
@@ -82,6 +88,22 @@ public class FieldItem : MonoBehaviour
         // Input System (New)를 사용할 경우 Mouse.current를 통해 입력을 받습니다.
         if (UnityEngine.InputSystem.Mouse.current == null) return;
 
+        // 인벤토리가 켜져 있을 때만 필드 아이템과 상호작용(드래그) 할 수 있게 합니다.
+        if (InventoryOrSkillPanelToggleManager.Instance != null && !InventoryOrSkillPanelToggleManager.Instance.IsInventoryActive)
+        {
+            // 드래그 중이었다면 강제 종료
+            if (_isDragging)
+            {
+                _isDragging = false;
+                if (_currentlyHoveredSlot != null)
+                {
+                    _currentlyHoveredSlot.SetHighlight(false);
+                    _currentlyHoveredSlot = null;
+                }
+            }
+            return;
+        }
+
         Vector2 mousePos = UnityEngine.InputSystem.Mouse.current.position.ReadValue();
         Ray ray = Camera.main.ScreenPointToRay(mousePos);
 
@@ -94,6 +116,8 @@ public class FieldItem : MonoBehaviour
                 if (hit.collider.gameObject == gameObject)
                 {
                     _isDragging = true;
+                    _pressTime = Time.time;
+                    _pressPosition = mousePos;
                     _dragPlane = new Plane(Vector3.up, new Vector3(0, transform.position.y, 0));
                     
                     if (_dragPlane.Raycast(ray, out float distance))
@@ -127,6 +151,17 @@ public class FieldItem : MonoBehaviour
                 if (_currentlyHoveredSlot != null)
                 {
                     _currentlyHoveredSlot.SetHighlight(false);
+                    _currentlyHoveredSlot = null;
+                }
+
+                // 짧은 클릭(탭)인지 검사합니다.
+                bool isShortClick = (Time.time - _pressTime) <= SHORT_CLICK_TIME && 
+                                  Vector2.Distance(mousePos, _pressPosition) <= SHORT_CLICK_DIST;
+
+                if (isShortClick)
+                {
+                    TryPickup(-1); // 자동 인벤토리 습득
+                    return;
                 }
 
                 // 마우스를 놓은 위치에 UI 요소(InventorySlot)가 있는지 확인합니다.
