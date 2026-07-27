@@ -203,6 +203,7 @@ public class DataConverterEditor : EditorWindow
                 }
                 else
                 {
+                    bool isMatched = false;
                     int underscoreIndex = header.LastIndexOf('_');
                     if (underscoreIndex > 0 && underscoreIndex < header.Length - 1)
                     {
@@ -213,6 +214,7 @@ public class DataConverterEditor : EditorWindow
                             var arrayField = typeof(T).GetField(arrayName);
                             if (arrayField != null && arrayField.FieldType.IsArray)
                             {
+                                isMatched = true;
                                 var array = (System.Array)arrayField.GetValue(obj);
                                 if (array != null && index - 1 >= 0 && index - 1 < array.Length)
                                 {
@@ -249,6 +251,11 @@ public class DataConverterEditor : EditorWindow
                                 }
                             }
                         }
+                    }
+
+                    if (!isMatched)
+                    {
+                        Debug.LogWarning($"[DataConverter] '{header}' 컬럼을 클래스 '{typeof(T).Name}'의 어떤 필드와도 매칭할 수 없어 버려집니다. 변수명이나 데이터 구조를 확인하세요.");
                     }
                 }
             }
