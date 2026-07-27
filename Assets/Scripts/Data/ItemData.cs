@@ -15,8 +15,8 @@ public class ItemData : IData
     public string name;
     public string uiResource;
     public int maxQuantity;
-    public int func;
-    public int value1;
+    public int[] func;
+    public int[] value;
     public int quantityShowType;
     public QuantityShowType QuantityShowType => (QuantityShowType)quantityShowType;
 

@@ -56,7 +56,20 @@ public class PlayerSkillController : NetworkBehaviour
             SkillData data = skill.Data;
             if (data == null) continue;
 
-            if (data.func1 == 5 || data.func2 == 5 || data.func1 == 6 || data.func2 == 6)
+            bool hasReloadFunc = false;
+            if (data.func != null)
+            {
+                foreach (int f in data.func)
+                {
+                    if (f == 5 || f == 6)
+                    {
+                        hasReloadFunc = true;
+                        break;
+                    }
+                }
+            }
+
+            if (hasReloadFunc)
             {
                 if (data.activeType == SkillActiveType.Continuous)
                 {
@@ -111,7 +124,7 @@ public class PlayerSkillController : NetworkBehaviour
             CharacterState newState = GetSkillState(charData.id);
             if (newState != null)
             {
-                int gunToEquip = newState.lastGunId > 0 ? newState.lastGunId : charData.gun1st;
+                int gunToEquip = newState.lastGunId > 0 ? newState.lastGunId : charData.GetGunId(0);
                 
                 GunData assignedGun = DataManager.Instance.GetData<GunData>("Gun", gunToEquip);
                 if (assignedGun != null)
@@ -173,8 +186,7 @@ public class PlayerSkillController : NetworkBehaviour
 
                         if (CheckCanExecuteAllFuncs(skill.Data))
                         {
-                            if (skill.Data.func1 != 0) ExecuteSkillFunc(skill.Data.func1, GetShooter());
-                            if (skill.Data.func2 != 0) ExecuteSkillFunc(skill.Data.func2, GetShooter());
+                            ExecuteAllFuncs(skill.Data.func, GetShooter());
 
                             // 실행 직후 조건을 다시 확인하여 (예: 장전 완료) 더 이상 실행할 필요 없으면 즉시 종료
                             if (!CheckCanExecuteAllFuncs(skill.Data))
@@ -216,26 +228,22 @@ public class PlayerSkillController : NetworkBehaviour
         switch (data.activeType)
         {
             case SkillActiveType.Instant:
-                ExecuteSkillFunc(data.func1, GetShooter());
-                ExecuteSkillFunc(data.func2, GetShooter());
+                ExecuteAllFuncs(data.func, GetShooter());
                 skill.currentCooldown = data.cooltime;
                 break;
             case SkillActiveType.Charge:
                 skill.isCharging = true;
-                ExecuteSkillFunc(data.func1, GetShooter());
-                ExecuteSkillFunc(data.func2, GetShooter());
+                ExecuteAllFuncs(data.func, GetShooter());
                 break;
             case SkillActiveType.Toggle:
                 skill.isToggledOn = !skill.isToggledOn;
                 if (skill.isToggledOn)
                 {
-                    ExecuteSkillFunc(data.func1, GetShooter());
-                    ExecuteSkillFunc(data.func2, GetShooter());
+                    ExecuteAllFuncs(data.func, GetShooter());
                 }
                 else
                 {
-                    ExecuteSkillFunc(data.offFunc1, GetShooter());
-                    ExecuteSkillFunc(data.offFunc2, GetShooter());
+                    ExecuteAllFuncs(data.offFunc, GetShooter());
                 }
                 skill.currentCooldown = data.cooltime; // 토글 시마다 쿨타임 시작
                 break;
@@ -250,8 +258,7 @@ public class PlayerSkillController : NetworkBehaviour
                 }
                 break;
             default: // 하위 호환
-                ExecuteSkillFunc(data.func1, GetShooter());
-                ExecuteSkillFunc(data.func2, GetShooter());
+                ExecuteAllFuncs(data.func, GetShooter());
                 skill.currentCooldown = data.cooltime;
                 break;
         }
@@ -283,13 +290,13 @@ public class PlayerSkillController : NetworkBehaviour
         switch (funcCode)
         {
             case 1: // 무기 1로 전환
-                SwitchWeapon(playerShooter, currentCharData.gun1st);
+                SwitchWeapon(playerShooter, currentCharData.GetGunId(0));
                 break;
             case 2: // 무기 2로 전환
-                SwitchWeapon(playerShooter, currentCharData.gun2nd);
+                SwitchWeapon(playerShooter, currentCharData.GetGunId(1));
                 break;
             case 3: // 무기 3으로 전환
-                Debug.LogWarning("[PlayerSkillController] 무기 3으로 전환 기능은 아직 데이터 구조가 지원하지 않습니다.");
+                SwitchWeapon(playerShooter, currentCharData.GetGunId(3));
                 break;
             case 4: // 다음 무기로 전환 (1번 <-> 2번)
                 ToggleWeapon(playerShooter);
@@ -303,15 +310,32 @@ public class PlayerSkillController : NetworkBehaviour
         }
     }
 
+    private void ExecuteAllFuncs(int[] funcs, Shooter playerShooter)
+    {
+        if (funcs == null) return;
+        foreach (int f in funcs)
+        {
+            if (f != 0) ExecuteSkillFunc(f, playerShooter);
+        }
+    }
+
     private bool CheckCanExecuteAllFuncs(SkillData data)
     {
-        if (data.func1 == 0 && data.func2 == 0) return false;
+        if (data.func == null || data.func.Length == 0) return false;
+        
+        bool hasAnyFunc = false;
 
-        bool canExec1 = data.func1 != 0 ? CanExecuteSkillFunc(data.func1) : true;
-        bool canExec2 = data.func2 != 0 ? CanExecuteSkillFunc(data.func2) : true;
+        foreach (int f in data.func)
+        {
+            if (f != 0)
+            {
+                hasAnyFunc = true;
+                if (!CanExecuteSkillFunc(f)) return false;
+            }
+        }
 
         // 하나라도 실행 불가능한 조건이 되면 전체 스킬이 멈추도록(AND) 처리
-        return canExec1 && canExec2;
+        return hasAnyFunc;
     }
 
     private bool CanExecuteSkillFunc(int funcCode)
@@ -367,12 +391,42 @@ public class PlayerSkillController : NetworkBehaviour
 
     private void ToggleWeapon(Shooter playerShooter)
     {
-        if (playerShooter == null || playerShooter.CurrentGunData == null) return;
+        if (playerShooter == null || playerShooter.CurrentGunData == null || currentCharData.gun == null || currentCharData.gun.Length == 0) return;
 
         int currentGunId = playerShooter.CurrentGunData.id;
-        int nextGunId = (currentGunId == currentCharData.gun1st) ? currentCharData.gun2nd : currentCharData.gun1st;
+        int nextGunId = 0;
 
-        if (nextGunId > 0)
+        for (int i = 0; i < currentCharData.gun.Length; i++)
+        {
+            if (currentCharData.gun[i] == currentGunId)
+            {
+                // Find next non-zero gun
+                for (int j = 1; j <= currentCharData.gun.Length; j++)
+                {
+                    int checkIndex = (i + j) % currentCharData.gun.Length;
+                    if (currentCharData.gun[checkIndex] != 0)
+                    {
+                        nextGunId = currentCharData.gun[checkIndex];
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
+        if (nextGunId == 0) // Fallback
+        {
+            foreach (int g in currentCharData.gun)
+            {
+                if (g != 0)
+                {
+                    nextGunId = g;
+                    break;
+                }
+            }
+        }
+
+        if (nextGunId > 0 && nextGunId != currentGunId)
         {
             SwitchWeapon(playerShooter, nextGunId);
         }

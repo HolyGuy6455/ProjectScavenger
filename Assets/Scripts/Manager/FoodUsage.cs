@@ -23,8 +23,21 @@ public class FoodUsage : IItemUsage
             return false;
         }
 
-        // item.Data.value1에서 체력 회복량 추출
-        int healAmount = item.Data.value1;
+        // item.Data.value에서 체력 회복량 추출 (func == 2 인 인덱스 찾기)
+        int healAmount = 0;
+        if (item.Data.func != null && item.Data.value != null)
+        {
+            for (int i = 0; i < item.Data.func.Length; i++)
+            {
+                if (item.Data.func[i] == 2)
+                {
+                    if (i < item.Data.value.Length)
+                    {
+                        healAmount += item.Data.value[i];
+                    }
+                }
+            }
+        }
 
         if (healAmount <= 0)
         {

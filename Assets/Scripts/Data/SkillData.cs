@@ -18,10 +18,8 @@ public class SkillData : IData
     public string name;
     public string resourceIcon;
     public string resourceIcon2;
-    public int func1;
-    public int func2;
-    public int offFunc1;
-    public int offFunc2;
+    public int[] func;
+    public int[] offFunc;
     public float cooltime;
     public float duration;
     public SkillActiveType activeType;

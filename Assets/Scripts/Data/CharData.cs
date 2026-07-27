@@ -1,12 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-[System.Serializable]
-public struct ItemAmount
-{
-    public int itemId;
-    public int amount;
-}
+
 
 [System.Serializable]
 public class CharData : IData
@@ -15,15 +10,20 @@ public class CharData : IData
     public string name;
     public string resourceSlot;
     public string resourceStand;
-    public int gun1st;
-    public int gun2nd;
-    public ItemAmount[] givenItem;
+    public int[] gun;
+    public int[] item;
+    public int[] itemAmount;
     public int[] skill;
     public int ultimateSkill;
 
     public int GetId()
     {
         return id;
+    }
+
+    public int GetGunId(int index = 0)
+    {
+        return gun != null && gun.Length > index ? gun[index] : 0;
     }
 }
 

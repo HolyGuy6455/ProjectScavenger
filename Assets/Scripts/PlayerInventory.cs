@@ -61,11 +61,15 @@ public class PlayerInventory : NetworkBehaviour
             currentInventory = inv;
 
             // Initialize given items
-            if (charData.givenItem != null)
+            if (charData.item != null && charData.itemAmount != null)
             {
-                foreach (var itemAmount in charData.givenItem)
+                for (int i = 0; i < charData.item.Length; i++)
                 {
-                    AddItem(itemAmount.itemId, itemAmount.amount); 
+                    if (charData.item[i] != 0)
+                    {
+                        int amount = i < charData.itemAmount.Length ? charData.itemAmount[i] : 1;
+                        AddItem(charData.item[i], amount); 
+                    }
                 }
             }
         }
@@ -241,51 +245,75 @@ public class PlayerInventory : NetworkBehaviour
             return;
         }
 
-        IItemUsage usage = ItemUsageManager.Instance.GetUsage(item.Data.func);
-        if (usage == null)
+        bool anySuccess = false;
+        bool anyConsumable = false;
+        bool hasUsages = false;
+
+        if (item.Data.func != null)
         {
-            Debug.LogWarning($"[PlayerInventory] 알 수 없는 아이템 효과(func)입니다: {item.Data.func}");
+            foreach (int func in item.Data.func)
+            {
+                if (func == 0) continue;
+                hasUsages = true;
+
+                IItemUsage usage = ItemUsageManager.Instance.GetUsage(func);
+                if (usage == null)
+                {
+                    Debug.LogWarning($"[PlayerInventory] 알 수 없는 아이템 효과(func)입니다: {func}");
+                    continue;
+                }
+
+                if (usage.UseImmediately)
+                {
+                    // 즉시 사용 (예: 감자)
+                    bool success = usage.Execute(item, gameObject);
+                    if (success)
+                    {
+                        anySuccess = true;
+                        if (usage.IsConsumable) anyConsumable = true;
+                    }
+                }
+                else
+                {
+                    /*
+                    // 선택/장착 (예: 탄창)
+                    if (SelectedSlotIndex == index)
+                    {
+                        // 이미 선택된 슬롯을 클릭하면 장착 해제
+                        SelectedSlotIndex = -1;
+                        Shooter shooter = GetComponent<Shooter>();
+                        if (shooter != null) shooter.UnequipMagazine();
+                        Debug.Log("탄창 장착이 해제되었습니다.");
+                    }
+                    else
+                    {
+                        // 새 슬롯 장착
+                        SelectedSlotIndex = index;
+                        usage.Execute(item, gameObject);
+                    }
+
+                    OnSlotSelected?.Invoke(SelectedSlotIndex);
+                    OnInventoryChanged?.Invoke();
+                    */
+                }
+            }
+        }
+
+        if (!hasUsages)
+        {
             return;
         }
 
-        if (usage.UseImmediately)
+        if (anySuccess)
         {
-            // 즉시 사용 (예: 감자)
-            bool success = usage.Execute(item, gameObject);
-            if (success)
+            item.Quantity--;
+            
+            if (item.Quantity <= 0 && anyConsumable)
             {
-                item.Quantity--;
-                
-                if (item.Quantity <= 0 && usage.IsConsumable)
-                {
-                    Items[index] = null;
-                }
-
-                OnInventoryChanged?.Invoke();
-            }
-        }
-        else
-        {
-            /*
-            // 선택/장착 (예: 탄창)
-            if (SelectedSlotIndex == index)
-            {
-                // 이미 선택된 슬롯을 클릭하면 장착 해제
-                SelectedSlotIndex = -1;
-                Shooter shooter = GetComponent<Shooter>();
-                if (shooter != null) shooter.UnequipMagazine();
-                Debug.Log("탄창 장착이 해제되었습니다.");
-            }
-            else
-            {
-                // 새 슬롯 장착
-                SelectedSlotIndex = index;
-                usage.Execute(item, gameObject);
+                Items[index] = null;
             }
 
-            OnSlotSelected?.Invoke(SelectedSlotIndex);
             OnInventoryChanged?.Invoke();
-            */
         }
     }
 
@@ -299,8 +327,22 @@ public class PlayerInventory : NetworkBehaviour
         InventoryItem item = Items[index];
         if (item != null && item.Quantity <= 0)
         {
-            IItemUsage usage = ItemUsageManager.Instance?.GetUsage(item.Data.func);
-            if (usage != null && usage.IsConsumable)
+            bool isConsumable = false;
+            if (item.Data.func != null)
+            {
+                foreach (int func in item.Data.func)
+                {
+                    if (func == 0) continue;
+                    IItemUsage usage = ItemUsageManager.Instance?.GetUsage(func);
+                    if (usage != null && usage.IsConsumable)
+                    {
+                        isConsumable = true;
+                        break;
+                    }
+                }
+            }
+
+            if (isConsumable)
             {
                 Items[index] = null;
                 if (SelectedSlotIndex == index) SelectedSlotIndex = -1;

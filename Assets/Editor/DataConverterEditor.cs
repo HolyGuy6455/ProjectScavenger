@@ -18,27 +18,32 @@ public class DataConverterEditor : EditorWindow
 
         if (GUILayout.Button("Convert Gun Data"))
         {
-            ConvertData<GunDataList, GunData>("Gun", "Scavenger - GunData.tsv");
+            ConvertData<GunDataList, GunData>("Gun", "Scavenger - Gun.tsv");
         }
 
         if (GUILayout.Button("Convert Item Data"))
         {
-            ConvertData<ItemDataList, ItemData>("Item", "Scavenger - ItemData.tsv");
+            ConvertData<ItemDataList, ItemData>("Item", "Scavenger - Item.tsv");
         }
 
         if (GUILayout.Button("Convert Char Data"))
         {
-            ConvertData<CharDataList, CharData>("Char", "Scavenger - CharData.tsv");
+            ConvertData<CharDataList, CharData>("Char", "Scavenger - Char.tsv");
         }
 
         if (GUILayout.Button("Convert Skill Data"))
         {
-            ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - SkillData.tsv");
+            ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - Skill.tsv");
         }
 
         if (GUILayout.Button("Convert Ultimate Skill Data"))
         {
-            ConvertData<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "Scavenger - UltimateSkillData.tsv");
+            ConvertData<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "Scavenger - UltimateSkill.tsv");
+        }
+
+        if (GUILayout.Button("Convert Loot Data"))
+        {
+            ConvertData<LootDataList, LootData>("Loot", "Scavenger - Loot.tsv");
         }
         
         GUILayout.Space(10);
@@ -51,11 +56,12 @@ public class DataConverterEditor : EditorWindow
 
     private void ConvertAllData()
     {
-        ConvertData<GunDataList, GunData>("Gun", "Scavenger - GunData.tsv");
-        ConvertData<ItemDataList, ItemData>("Item", "Scavenger - ItemData.tsv");
-        ConvertData<CharDataList, CharData>("Char", "Scavenger - CharData.tsv");
-        ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - SkillData.tsv");
-        ConvertData<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "Scavenger - UltimateSkillData.tsv");
+        ConvertData<GunDataList, GunData>("Gun", "Scavenger - Gun.tsv");
+        ConvertData<ItemDataList, ItemData>("Item", "Scavenger - Item.tsv");
+        ConvertData<CharDataList, CharData>("Char", "Scavenger - Char.tsv");
+        ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - Skill.tsv");
+        ConvertData<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "Scavenger - UltimateSkill.tsv");
+        ConvertData<LootDataList, LootData>("Loot", "Scavenger - Loot.tsv");
         AssetDatabase.Refresh();
         Debug.Log("Finished Convert All Data operation.");
     }
@@ -111,10 +117,44 @@ public class DataConverterEditor : EditorWindow
         if (lines.Length < 2) return list;
 
         string[] headers = lines[0].Split('\t');
+
+        Dictionary<string, int> arraySizes = new Dictionary<string, int>();
+        for (int j = 0; j < headers.Length; j++)
+        {
+            string header = headers[j].Trim();
+            if (header.StartsWith("#")) continue;
+
+            int underscoreIndex = header.LastIndexOf('_');
+            if (underscoreIndex > 0 && underscoreIndex < header.Length - 1)
+            {
+                string arrayName = header.Substring(0, underscoreIndex);
+                string indexStr = header.Substring(underscoreIndex + 1);
+                if (int.TryParse(indexStr, out int index))
+                {
+                    if (!arraySizes.ContainsKey(arrayName) || arraySizes[arrayName] < index)
+                    {
+                        arraySizes[arrayName] = index;
+                    }
+                }
+            }
+        }
+
         for (int i = 1; i < lines.Length; i++)
         {
             string[] values = lines[i].Split('\t');
             T obj = new T();
+
+            foreach (var kvp in arraySizes)
+            {
+                var field = typeof(T).GetField(kvp.Key);
+                if (field != null && field.FieldType.IsArray)
+                {
+                    var elementType = field.FieldType.GetElementType();
+                    var array = System.Array.CreateInstance(elementType, kvp.Value);
+                    field.SetValue(obj, array);
+                }
+            }
+
             for (int j = 0; j < headers.Length && j < values.Length; j++)
             {
                 string header = headers[j].Trim();
@@ -155,25 +195,60 @@ public class DataConverterEditor : EditorWindow
                             }
                             field.SetValue(obj, arr);
                         }
-                        else if (field.FieldType == typeof(ItemAmount[]))
-                        {
-                            var parts = val.Split(new[] { ")," }, System.StringSplitOptions.RemoveEmptyEntries);
-                            ItemAmount[] arr = new ItemAmount[parts.Length];
-                            for (int p = 0; p < parts.Length; p++)
-                            {
-                                string clean = parts[p].Replace("(", "").Replace(")", "").Trim();
-                                var nums = clean.Split(',');
-                                if (nums.Length == 2)
-                                {
-                                    arr[p] = new ItemAmount { itemId = int.Parse(nums[0]), amount = int.Parse(nums[1]) };
-                                }
-                            }
-                            field.SetValue(obj, arr);
-                        }
                     }
                     catch (System.Exception e)
                     {
                         Debug.LogWarning($"Failed to parse field {header} with value {val} in class {typeof(T).Name}. Error: {e.Message}");
+                    }
+                }
+                else
+                {
+                    int underscoreIndex = header.LastIndexOf('_');
+                    if (underscoreIndex > 0 && underscoreIndex < header.Length - 1)
+                    {
+                        string arrayName = header.Substring(0, underscoreIndex);
+                        string indexStr = header.Substring(underscoreIndex + 1);
+                        if (int.TryParse(indexStr, out int index))
+                        {
+                            var arrayField = typeof(T).GetField(arrayName);
+                            if (arrayField != null && arrayField.FieldType.IsArray)
+                            {
+                                var array = (System.Array)arrayField.GetValue(obj);
+                                if (array != null && index - 1 >= 0 && index - 1 < array.Length)
+                                {
+                                    var elementType = arrayField.FieldType.GetElementType();
+                                    try
+                                    {
+                                        object parsedValue = null;
+                                        if (elementType == typeof(int))
+                                        {
+                                            parsedValue = val == "_" ? 0 : int.Parse(val);
+                                        }
+                                        else if (elementType == typeof(float))
+                                        {
+                                            parsedValue = float.Parse(val);
+                                        }
+                                        else if (elementType == typeof(string))
+                                        {
+                                            parsedValue = val;
+                                        }
+                                        else if (elementType.IsEnum)
+                                        {
+                                            parsedValue = val == "_" ? System.Enum.ToObject(elementType, 0) : System.Enum.ToObject(elementType, int.Parse(val));
+                                        }
+
+                                        if (parsedValue != null)
+                                        {
+                                            array.SetValue(parsedValue, index - 1);
+                                        }
+                                    }
+                                    catch (System.Exception e)
+                                    {
+                                        Debug.LogWarning($"Failed to parse array element {header} with value {val} in class {typeof(T).Name}. Error: {e.Message}");
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }

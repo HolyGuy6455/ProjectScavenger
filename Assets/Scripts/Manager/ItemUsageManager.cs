@@ -36,17 +36,29 @@ public class ItemUsageManager : MonoBehaviour
     {
         if (item == null || item.IsEmpty) return false;
 
-        int func = item.Data.func;
+        bool anySuccess = false;
         
-        if (effectDictionary.TryGetValue(func, out IItemUsage effect))
+        if (item.Data.func != null)
         {
-            return effect.Execute(item, target);
+            foreach (int func in item.Data.func)
+            {
+                if (func == 0) continue;
+                
+                if (effectDictionary.TryGetValue(func, out IItemUsage effect))
+                {
+                    if (effect.Execute(item, target))
+                    {
+                        anySuccess = true;
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"[ItemUsageManager] 알 수 없는 아이템 효과(func)입니다: {func}");
+                }
+            }
         }
-        else
-        {
-            Debug.LogWarning($"[ItemUsageManager] 알 수 없는 아이템 효과(func)입니다: {func}");
-            return false;
-        }
+        
+        return anySuccess;
     }
 
     public IItemUsage GetUsage(int func)
