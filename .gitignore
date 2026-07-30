@@ -58,3 +58,6 @@ wsl_debug_proxy.ps1
 # 데이터 파일
 *.tsv
 *.tsv.meta
+
+# Android Build Temp Files
+.utmp/
