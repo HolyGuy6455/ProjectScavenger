@@ -543,7 +543,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 332ee524ff1ec464497e4c57aa22ebc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.Network.NetworkAuthManager
-  serverUrl: http://localhost:5000
+  serverUrl: http://3.35.53.203:5000
 --- !u!4 &1228738454
 Transform:
   m_ObjectHideFlags: 0

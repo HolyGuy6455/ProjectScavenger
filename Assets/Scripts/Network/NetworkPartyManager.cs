@@ -9,9 +9,15 @@ namespace Scavenger.Network
     [Serializable]
     public class UserInfo
     {
-        public string connectionId { get; set; }
-        public string username { get; set; }
-        public string partyId { get; set; }
+        public string connectionId;
+        public string username;
+        public string partyId;
+    }
+
+    [System.Serializable]
+    public class UserInfoListWrapper
+    {
+        public List<UserInfo> items;
     }
 
     public class NetworkPartyManager : MonoBehaviour
@@ -59,6 +65,7 @@ namespace Scavenger.Network
 
         private async void HandleLoginComplete(bool success)
         {
+            Debug.Log($"[Party] 로그인 완료 이벤트 수신 (성공 여부: {success})");
             if (success)
             {
                 await ConnectToPartyHub();
@@ -67,7 +74,7 @@ namespace Scavenger.Network
 
         private async Task ConnectToPartyHub()
         {
-            string url = "http://localhost:5000/partyHub";
+            string url = NetworkAuthManager.Instance.ServerUrl + "/partyHub";
 
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl(url, options =>
@@ -76,14 +83,33 @@ namespace Scavenger.Network
                 })
                 .Build();
 
-            // 서버에서 "UpdateOnlineUsers" 브로드캐스트가 올 때 실행됨
-            _hubConnection.On<List<UserInfo>>("UpdateOnlineUsers", (users) =>
+            // 디버깅 및 안전한 파싱: 원시 데이터로 받아서 Unity JsonUtility로 직접 파싱
+            _hubConnection.On<object>("UpdateOnlineUsers", (rawData) =>
             {
-                // 유니티 메인 쓰레드에서 실행되도록 처리
                 UnityMainThreadDispatcher.Enqueue(() =>
                 {
-                    OnlineUsers = users;
-                    OnOnlineUsersUpdated?.Invoke();
+                    try
+                    {
+                        string rawString = rawData?.ToString();
+                        // JsonUtility는 최상위 배열을 지원하지 않으므로 Wrapper 형태로 감싸서 파싱
+                        string wrappedJson = $"{{\"items\":{rawString}}}";
+                        var wrapper = JsonUtility.FromJson<UserInfoListWrapper>(wrappedJson);
+                        
+                        var users = wrapper?.items ?? new List<UserInfo>();
+
+                        Debug.Log($"[Party] JsonUtility 파싱 완료! 총 {users.Count}명");
+                        if (users.Count > 0)
+                        {
+                            Debug.Log($"[Party] 첫 번째 유저 정보 - Name: {users[0].username}, ConnID: {users[0].connectionId}");
+                        }
+                        
+                        OnlineUsers = users;
+                        OnOnlineUsersUpdated?.Invoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"[Party] JSON 파싱 에러: {ex.Message}");
+                    }
                 });
             });
 
@@ -108,12 +134,13 @@ namespace Scavenger.Network
 
             try
             {
+                Debug.Log($"[Party] 파티 허브({url})에 연결 시도 중...");
                 await _hubConnection.StartAsync();
-                Debug.Log("[Party] 파티 허브 접속 성공!");
+                Debug.Log("[Party] 파티 허브(서버)에 연결 성공!");
             }
             catch (Exception ex)
             {
-                Debug.LogError($"[Party] 파티 허브 접속 실패: {ex.Message}");
+                Debug.LogError($"[Party] 파티 허브 연결 실패!!! 상세 에러: {ex.ToString()}");
             }
         }
 

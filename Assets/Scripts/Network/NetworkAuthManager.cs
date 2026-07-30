@@ -11,7 +11,23 @@ namespace Scavenger.Network
         public static NetworkAuthManager Instance { get; private set; }
 
         [Header("Server Settings")]
-        [SerializeField] private string serverUrl = "http://localhost:5000";
+        public string ServerUrl { get; private set; }
+
+        private void LoadServerConfig()
+        {
+            var textAsset = Resources.Load<TextAsset>("ServerConfig");
+            if (textAsset != null)
+            {
+                var config = JsonUtility.FromJson<ServerConfigInfo>(textAsset.text);
+                ServerUrl = config.ServerUrl;
+                Debug.Log($"[Auth] 서버 주소를 불러왔습니다: {ServerUrl}");
+            }
+            else
+            {
+                ServerUrl = "http://localhost:5000"; // fallback
+                Debug.LogWarning($"[Auth] ServerConfig.json 파일을 찾을 수 없어 기본값({ServerUrl})을 사용합니다.");
+            }
+        }
 
         // 발급받은 JWT 토큰
         public string AuthToken { get; private set; }
@@ -24,6 +40,8 @@ namespace Scavenger.Network
 
         private void Awake()
         {
+            LoadServerConfig();
+            
             if (Instance == null)
             {
                 Instance = this;
@@ -72,7 +90,7 @@ namespace Scavenger.Network
 
         private IEnumerator SendLoginRequest(string deviceId)
         {
-            string url = $"{serverUrl}/api/auth/guest-login";
+            string url = $"{ServerUrl}/api/auth/guest-login";
             string jsonBody = $"{{\"deviceId\": \"{deviceId}\"}}";
 
             using (UnityWebRequest request = new UnityWebRequest(url, "POST"))

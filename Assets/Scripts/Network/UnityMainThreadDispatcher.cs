@@ -38,6 +38,11 @@ namespace Scavenger.Network
                 throw new ArgumentNullException(nameof(action));
             }
             
+            if (_instance == null)
+            {
+                Debug.LogWarning("[UnityMainThreadDispatcher] 씬에 Dispatcher가 없어서 큐가 실행되지 않을 수 있습니다! 씬에 스크립트를 추가해주세요.");
+            }
+            
             _executionQueue.Enqueue(action);
         }
     }

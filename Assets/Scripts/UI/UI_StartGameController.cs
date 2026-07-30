@@ -53,8 +53,8 @@ namespace Scavenger.UI
             PlayerPrefs.SetInt("TargetServerPort", port);
             PlayerPrefs.Save();
 
-            // 로딩 씬으로 넘어감
-            SceneManager.LoadScene("LoadingScene");
+            // 로딩 씬으로 넘어감 (인텐트 지정)
+            Scavenger.Core.SceneTransitionManager.LoadSceneWithIntent(Scavenger.Core.LoadingIntent.EnterInGame);
         }
     }
 }
