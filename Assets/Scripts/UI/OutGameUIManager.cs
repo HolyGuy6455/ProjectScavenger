@@ -5,6 +5,7 @@ namespace Scavenger.UI
 {
     public enum OutGamePanelType
     {
+        Login,
         MainLobby,
         ReadyToBattle,
         FriendParty,
@@ -19,10 +20,14 @@ namespace Scavenger.UI
         [SerializeField] private Transform canvasTransform;
 
         [Header("Panel Prefabs")]
+        [SerializeField] private GameObject loginPanelPrefab;
         [SerializeField] private GameObject mainLobbyPanelPrefab;
         [SerializeField] private GameObject readyToBattlePanelPrefab;
         [SerializeField] private GameObject friendPartyPanelPrefab;
         [SerializeField] private GameObject characterSelectPanelPrefab;
+
+        [Header("Persistent UI")]
+        [SerializeField] private GameObject persistentPartyListUI; // 파티 리스트 패널
 
         // 현재 떠 있는 패널 객체
         private GameObject currentPanelInstance;
@@ -41,8 +46,8 @@ namespace Scavenger.UI
 
         private void Start()
         {
-            // 아웃게임 씬이 시작되면 기본적으로 메인 로비 화면을 띄웁니다.
-            ShowPanel(OutGamePanelType.MainLobby);
+            // 아웃게임 씬이 시작되면 기본적으로 로그인 화면을 먼저 띄웁니다.
+            ShowPanel(OutGamePanelType.Login);
         }
 
         public void ShowPanel(OutGamePanelType panelType)
@@ -55,8 +60,17 @@ namespace Scavenger.UI
 
             GameObject prefabToLoad = null;
 
+            // 로딩(로그인) 화면에서는 파티 리스트를 숨기고, 나머지는 켭니다.
+            if (persistentPartyListUI != null)
+            {
+                persistentPartyListUI.SetActive(panelType != OutGamePanelType.Login);
+            }
+
             switch (panelType)
             {
+                case OutGamePanelType.Login:
+                    prefabToLoad = loginPanelPrefab;
+                    break;
                 case OutGamePanelType.MainLobby:
                     prefabToLoad = mainLobbyPanelPrefab;
                     break;

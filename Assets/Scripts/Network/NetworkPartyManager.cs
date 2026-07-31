@@ -114,12 +114,22 @@ namespace Scavenger.Network
             });
 
             // 서버에서 "UpdatePartyMembers" 브로드캐스트가 올 때 실행됨
-            _hubConnection.On<List<UserInfo>>("UpdatePartyMembers", (members) =>
+            _hubConnection.On<object>("UpdatePartyMembers", (rawData) =>
             {
                 UnityMainThreadDispatcher.Enqueue(() =>
                 {
-                    PartyMembers = members;
-                    OnPartyMembersUpdated?.Invoke();
+                    try
+                    {
+                        string rawString = rawData?.ToString();
+                        string wrappedJson = $"{{\"items\":{rawString}}}";
+                        var wrapper = JsonUtility.FromJson<UserInfoListWrapper>(wrappedJson);
+                        PartyMembers = wrapper?.items ?? new List<UserInfo>();
+                        OnPartyMembersUpdated?.Invoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"[Party] 파티 멤버 파싱 에러: {ex.Message}");
+                    }
                 });
             });
 
@@ -174,6 +184,23 @@ namespace Scavenger.Network
                 catch (Exception ex)
                 {
                     Debug.LogError($"[Party] 게임 시작 실패: {ex.Message}");
+                }
+            }
+        }
+
+        // 파티를 떠날 때 호출하는 함수
+        public async void LeaveParty()
+        {
+            if (_hubConnection != null && _hubConnection.State == HubConnectionState.Connected)
+            {
+                try
+                {
+                    await _hubConnection.InvokeAsync("LeaveParty");
+                    Debug.Log("[Party] 파티 떠나기 요청 완료");
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"[Party] 파티 떠나기 실패: {ex.Message}");
                 }
             }
         }
