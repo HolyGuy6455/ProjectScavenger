@@ -15,6 +15,36 @@ namespace Scavenger.UI
 
         private void Start()
         {
+            if (transform.root != null)
+            {
+                DontDestroyOnLoad(transform.root.gameObject);
+            }
+
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            StartCoroutine(StartupCleanupRoutine());
+        }
+
+        private void OnDestroy()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            // 서버가 Additive로 Stage001을 열어주면 클라이언트도 로드가 끝납니다.
+            // 그때 로딩 화면을 파괴하여 빈 화면이 보이지 않도록 합니다.
+            if (scene.name == "Stage001")
+            {
+                Destroy(transform.root.gameObject);
+            }
+        }
+
+        private System.Collections.IEnumerator StartupCleanupRoutine()
+        {
+            // 로딩 씬에 진입하자마자 이전 씬(메인화면이든 인게임이든)에서 남긴 쓰레기 메모리를 싹 비웁니다.
+            System.GC.Collect();
+            yield return Resources.UnloadUnusedAssets();
+
             ExecuteIntent();
         }
 
@@ -107,6 +137,15 @@ namespace Scavenger.UI
             if (NetworkManager.Singleton.StartHost())
             {
                 Debug.Log("[NGO] 호스트 모드(싱글플레이어) 구동 성공. InGameScene으로 동기화합니다.");
+                
+                NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += (sceneName, loadSceneMode, clientsCompleted, clientsTimedOut) =>
+                {
+                    if (sceneName == "InGameScene" && NetworkManager.Singleton.IsServer)
+                    {
+                        NetworkManager.Singleton.SceneManager.LoadScene("Stage001", UnityEngine.SceneManagement.LoadSceneMode.Additive);
+                    }
+                };
+
                 NetworkManager.Singleton.SceneManager.LoadScene("InGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
             }
             else
@@ -118,7 +157,12 @@ namespace Scavenger.UI
 
         private void ReturnToLobby()
         {
-            if (statusText != null) statusText.text = "Returning to Lobby...";
+            StartCoroutine(ReturnToLobbyRoutine());
+        }
+
+        private System.Collections.IEnumerator ReturnToLobbyRoutine()
+        {
+            if (statusText != null) statusText.text = "Returning to Lobby...\nCleaning up resources...";
             
             // 혹시라도 네트워크가 연결되어 있다면 종료
             if (NetworkManager.Singleton != null && (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsServer))
@@ -126,12 +170,12 @@ namespace Scavenger.UI
                 NetworkManager.Singleton.Shutdown();
             }
 
-            // 약간의 딜레이 후 아웃게임 씬으로 복귀
-            Invoke(nameof(LoadOutgameScene), 1f);
-        }
+            // 무거운 리소스 해제 및 가비지 컬렉터 강제 실행
+            System.GC.Collect();
+            yield return Resources.UnloadUnusedAssets();
 
-        private void LoadOutgameScene()
-        {
+            // 짧은 대기 후 아웃게임 씬으로 복귀
+            yield return new WaitForSeconds(0.5f);
             SceneManager.LoadScene("OutgameScene");
         }
     }
