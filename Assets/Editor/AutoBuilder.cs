@@ -11,12 +11,14 @@ namespace Scavenger.Editor
             "Assets/Scenes/OutgameScene.unity",
             "Assets/Scenes/LoadingScene.unity",
             "Assets/Scenes/ServerBootScene.unity",
-            "Assets/Scenes/IngameScene.unity"
+            "Assets/Scenes/IngameScene.unity",
+            "Assets/Scenes/Stage001.unity"
         };
 
         private static readonly string[] ServerScenes = {
             "Assets/Scenes/ServerBootScene.unity",
-            "Assets/Scenes/IngameScene.unity"
+            "Assets/Scenes/IngameScene.unity",
+            "Assets/Scenes/Stage001.unity"
         };
 
         [MenuItem("Build/1. Build Windows Client")]

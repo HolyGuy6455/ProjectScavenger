@@ -7,10 +7,15 @@ namespace Scavenger.Network
 {
     public class DedicatedServerBootstrapper : MonoBehaviour
     {
+        private float _serverStartupTime;
+        private bool _hasAnyClientConnected = false;
+        private const float EMPTY_SERVER_TIMEOUT = 60f; // 60초 대기
+
         private void Start()
         {
             if (IsDedicatedServer())
             {
+                DontDestroyOnLoad(gameObject);
                 StartAsServer();
             }
         }
@@ -49,11 +54,57 @@ namespace Scavenger.Network
             if (NetworkManager.Singleton.StartServer())
             {
                 Debug.Log("[NGO] 전용 서버 구동 성공. InGameScene으로 동기화합니다.");
-                NetworkManager.Singleton.SceneManager.LoadScene("InGameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
+                
+                NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+                _serverStartupTime = Time.realtimeSinceStartup;
+
+                // NGO 씬 동기화 이벤트가 완전히 끝나야 다음 씬(Stage001)을 불러올 수 있습니다.
+                NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += (sceneName, loadSceneMode, clientsCompleted, clientsTimedOut) =>
+                {
+                    Debug.Log($"[NGO-DEBUG] OnLoadEventCompleted! sceneName: {sceneName}");
+                    if (sceneName != null && sceneName.Equals("IngameScene", System.StringComparison.OrdinalIgnoreCase))
+                    {
+                        Debug.Log("[NGO-DEBUG] NGO 내부 씬 로드 완료 감지! Stage001을 Additive로 얹습니다.");
+                        NetworkManager.Singleton.SceneManager.LoadScene("Stage001", UnityEngine.SceneManagement.LoadSceneMode.Additive);
+                    }
+                };
+
+                NetworkManager.Singleton.SceneManager.LoadScene("IngameScene", UnityEngine.SceneManagement.LoadSceneMode.Single);
             }
             else
             {
                 Debug.LogError("[NGO] 서버 구동 실패.");
+            }
+        }
+
+        private void OnClientConnected(ulong clientId)
+        {
+            _hasAnyClientConnected = true;
+            Debug.Log($"[NGO] 클라이언트 접속 완료. ClientID: {clientId}");
+        }
+
+        private void Update()
+        {
+            if (!IsDedicatedServer() || NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer) 
+                return;
+
+            if (!_hasAnyClientConnected)
+            {
+                // 1. 처음 구동 후 60초 동안 아무도 접속하지 않으면 자동 종료
+                if (Time.realtimeSinceStartup - _serverStartupTime > EMPTY_SERVER_TIMEOUT)
+                {
+                    Debug.Log("[NGO] 60초 내에 접속한 클라이언트가 없어 데디케이티드 서버를 자동 종료합니다.");
+                    Application.Quit();
+                }
+            }
+            else
+            {
+                // 2. 한 명이라도 접속했었는데, 현재 접속자가 0명이 되면 자동 종료
+                if (NetworkManager.Singleton.ConnectedClientsIds.Count == 0)
+                {
+                    Debug.Log("[NGO] 모든 클라이언트가 퇴장하여 데디케이티드 서버를 자동 종료합니다.");
+                    Application.Quit();
+                }
             }
         }
     }
