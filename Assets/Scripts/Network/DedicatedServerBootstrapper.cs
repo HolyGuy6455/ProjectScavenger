@@ -55,17 +55,34 @@ namespace Scavenger.Network
             {
                 Debug.Log("[NGO] 전용 서버 구동 성공. InGameScene으로 동기화합니다.");
                 
+                // NGO가 Addressable 씬(Stage001)을 클라이언트에게 동기화하려다 해시를 찾지 못해 터지는 것을 방지합니다.
+                NetworkManager.Singleton.SceneManager.VerifySceneBeforeLoading = (sceneIndex, sceneName, loadSceneMode) =>
+                {
+                    if (sceneName != null && sceneName.Contains("Stage001")) return false;
+                    return true;
+                };
+                
                 NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
                 _serverStartupTime = Time.realtimeSinceStartup;
 
-                // NGO 씬 동기화 이벤트가 완전히 끝나야 다음 씬(Stage001)을 불러올 수 있습니다.
                 NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += (sceneName, loadSceneMode, clientsCompleted, clientsTimedOut) =>
                 {
                     Debug.Log($"[NGO-DEBUG] OnLoadEventCompleted! sceneName: {sceneName}");
                     if (sceneName != null && sceneName.Equals("IngameScene", System.StringComparison.OrdinalIgnoreCase))
                     {
-                        Debug.Log("[NGO-DEBUG] NGO 내부 씬 로드 완료 감지! Stage001을 Additive로 얹습니다.");
-                        NetworkManager.Singleton.SceneManager.LoadScene("Stage001", UnityEngine.SceneManagement.LoadSceneMode.Additive);
+                        Debug.Log("[NGO-DEBUG] NGO 내부 씬 로드 완료 감지! Addressables를 통해 Stage001을 로드합니다.");
+                        UnityEngine.AddressableAssets.Addressables.LoadSceneAsync("Stage001", UnityEngine.SceneManagement.LoadSceneMode.Additive).Completed += handle =>
+                        {
+                            if (handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
+                            {
+                                Debug.Log("[Bootstrapper] Stage001 맵 로드 성공! 몬스터/엄폐물 동적 스폰을 시작합니다.");
+                                Scavenger.Core.MapSpawner.SpawnMapObjects();
+                            }
+                            else
+                            {
+                                Debug.LogError("[Bootstrapper] Stage001 맵 로드 실패!");
+                            }
+                        };
                     }
                 };
 

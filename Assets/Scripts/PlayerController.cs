@@ -45,29 +45,9 @@ public class PlayerController : NetworkBehaviour
         
         Debug.Log($"[PlayerController] OnNetworkSpawn 호출됨! (OwnerClientId: {OwnerClientId}, IsServer: {IsServer}, IsOwner: {IsOwner})");
 
-        GameObject spawnObj = GameObject.Find("PlayerSpawnPosition");
-        if (spawnObj != null)
+        if (IsOwner || IsServer)
         {
-            var nt = GetComponent<Unity.Netcode.Components.NetworkTransform>();
-            Vector3 spawnPos = spawnObj.transform.position;
-            
-            // 플레이어들이 겹치지 않게 클라이언트 ID를 기반으로 약간의 X축 간격을 줍니다.
-            spawnPos.x += (OwnerClientId * 1.5f);
-            
-            // NetworkTransform의 권한(서버 권한 or 클라이언트 권한)을 가진 쪽에서만 텔레포트를 실행합니다.
-            bool hasAuthority = (nt != null) ? nt.CanCommitToTransform : IsServer;
-
-            if (hasAuthority)
-            {
-                if (nt != null) 
-                {
-                    nt.Teleport(spawnPos, transform.rotation, transform.localScale);
-                }
-                else 
-                {
-                    transform.position = spawnPos;
-                }
-            }
+            StartCoroutine(WaitAndTeleportRoutine());
         }
         
         // 내 캐릭터일 때만 입력을 활성화합니다.
@@ -116,6 +96,41 @@ public class PlayerController : NetworkBehaviour
             _inputActions.Player.Move.performed -= OnMove;
             _inputActions.Player.Move.canceled -= OnMove;
             _inputActions.Player.Disable();
+        }
+    }
+
+    private System.Collections.IEnumerator WaitAndTeleportRoutine()
+    {
+        var nt = GetComponent<Unity.Netcode.Components.NetworkTransform>();
+        bool hasAuthority = (nt != null) ? nt.CanCommitToTransform : IsServer;
+
+        if (hasAuthority)
+        {
+            // 맵이 로드되기 전까지 허공에서 떨어지지 않게 물리 고정
+            if (_rb != null) _rb.isKinematic = true;
+
+            GameObject spawnObj = null;
+            while (spawnObj == null)
+            {
+                spawnObj = GameObject.Find("PlayerSpawnPosition");
+                yield return null;
+            }
+
+            Vector3 spawnPos = spawnObj.transform.position;
+            // 플레이어들이 겹치지 않게 클라이언트 ID를 기반으로 약간의 X축 간격을 줍니다.
+            spawnPos.x += (OwnerClientId * 1.5f);
+
+            if (nt != null) 
+            {
+                nt.Teleport(spawnPos, transform.rotation, transform.localScale);
+            }
+            else 
+            {
+                transform.position = spawnPos;
+            }
+
+            // 물리 복구
+            if (_rb != null) _rb.isKinematic = false;
         }
     }
 
