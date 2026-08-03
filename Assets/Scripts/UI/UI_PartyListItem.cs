@@ -7,6 +7,7 @@ namespace Scavenger.UI
     public class UI_PartyListItem : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI usernameText;
+        [SerializeField] private UnityEngine.UI.Image readyIcon;
 
         public void Initialize(UserInfo user)
         {
@@ -21,6 +22,11 @@ namespace Scavenger.UI
                 {
                     usernameText.text = user.username;
                 }
+            }
+
+            if (readyIcon != null)
+            {
+                readyIcon.gameObject.SetActive(user.isReady);
             }
         }
     }

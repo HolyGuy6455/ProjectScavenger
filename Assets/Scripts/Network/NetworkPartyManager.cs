@@ -12,6 +12,7 @@ namespace Scavenger.Network
         public string connectionId;
         public string username;
         public string partyId;
+        public bool isReady;
     }
 
     [System.Serializable]
@@ -32,6 +33,7 @@ namespace Scavenger.Network
         public event Action OnOnlineUsersUpdated;
         public event Action OnPartyMembersUpdated;
         public event Action<string, int> OnGameStartBroadcasted;
+        public event Action OnHostGameStartBroadcasted;
 
         private void Awake()
         {
@@ -142,6 +144,15 @@ namespace Scavenger.Network
                 });
             });
 
+            // 서버에서 "OnHostGameStart" 브로드캐스트가 올 때 실행됨
+            _hubConnection.On("OnHostGameStart", () =>
+            {
+                UnityMainThreadDispatcher.Enqueue(() =>
+                {
+                    OnHostGameStartBroadcasted?.Invoke();
+                });
+            });
+
             try
             {
                 Debug.Log($"[Party] 파티 허브({url})에 연결 시도 중...");
@@ -171,19 +182,19 @@ namespace Scavenger.Network
             }
         }
 
-        // 파티원이 게임 시작을 누를 때 호출하는 함수
-        public async void StartGame()
+        // 파티원이 레디 버튼을 누를 때 호출하는 함수
+        public async void SendReadyState(bool isReady)
         {
             if (_hubConnection != null && _hubConnection.State == HubConnectionState.Connected)
             {
                 try
                 {
-                    await _hubConnection.InvokeAsync("StartGame");
-                    Debug.Log("[Party] 게임 시작 요청 완료");
+                    await _hubConnection.InvokeAsync("SetReady", isReady);
+                    Debug.Log($"[Party] 레디 상태 전송 완료: {isReady}");
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError($"[Party] 게임 시작 실패: {ex.Message}");
+                    Debug.LogError($"[Party] 레디 상태 전송 실패: {ex.Message}");
                 }
             }
         }

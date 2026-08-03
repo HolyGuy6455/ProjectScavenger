@@ -22,6 +22,7 @@ namespace Scavenger.UI
             if (NetworkPartyManager.Instance != null)
             {
                 NetworkPartyManager.Instance.OnGameStartBroadcasted += HandleGameStart;
+                NetworkPartyManager.Instance.OnHostGameStartBroadcasted += HandleHostGameStart;
             }
         }
 
@@ -30,17 +31,35 @@ namespace Scavenger.UI
             if (NetworkPartyManager.Instance != null)
             {
                 NetworkPartyManager.Instance.OnGameStartBroadcasted -= HandleGameStart;
+                NetworkPartyManager.Instance.OnHostGameStartBroadcasted -= HandleHostGameStart;
             }
         }
+
+        private bool _isReady = false;
 
         private void OnStartGameClicked()
         {
             if (NetworkPartyManager.Instance != null)
             {
-                // 이 버튼을 누른 사람이 파티장이 아니어도 일단 무조건 시작되도록 (간이 버전)
-                Debug.Log("[Match] 서버에 게임 시작을 요청합니다...");
-                startGameButton.interactable = false;
-                NetworkPartyManager.Instance.StartGame();
+                _isReady = !_isReady;
+                NetworkPartyManager.Instance.SendReadyState(_isReady);
+
+                // Update button text if it has one
+                var textComponent = startGameButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+                if (textComponent != null)
+                {
+                    textComponent.text = _isReady ? "Cancel Ready" : "Ready";
+                }
+                else
+                {
+                    var textMesh = startGameButton.GetComponentInChildren<UnityEngine.UI.Text>();
+                    if (textMesh != null)
+                    {
+                        textMesh.text = _isReady ? "Cancel Ready" : "Ready";
+                    }
+                }
+                
+                Debug.Log($"[Match] 레디 상태 변경됨: {_isReady}");
             }
         }
 
@@ -55,6 +74,14 @@ namespace Scavenger.UI
 
             // 로딩 씬으로 넘어감 (인텐트 지정)
             Scavenger.Core.SceneTransitionManager.LoadSceneWithIntent(Scavenger.Core.LoadingIntent.EnterInGame);
+        }
+
+        private void HandleHostGameStart()
+        {
+            Debug.Log($"[Match] 서버로부터 로컬 호스트 게임 시작 신호를 받았습니다!");
+            
+            // 로컬 호스트 모드로 로딩 씬 진입
+            Scavenger.Core.SceneTransitionManager.LoadSceneWithIntent(Scavenger.Core.LoadingIntent.StartSingleplayerHost);
         }
     }
 }
