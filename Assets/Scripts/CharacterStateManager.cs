@@ -26,6 +26,8 @@ public class CharacterStateManager : MonoBehaviour
     private int currentCharId = -1;
 
     public event System.Action<int, float, float> OnCharacterHealthChanged;
+    public event System.Action<int, float, float> OnCharacterHungerChanged;
+    public event System.Action<int, float, float> OnCharacterThirstChanged;
 
 
     private void Awake()
@@ -75,6 +77,12 @@ public class CharacterStateManager : MonoBehaviour
             {
                 playerHealth.SetHealth(newState.currentHealth, newState.maxHealth);
             }
+        }
+        
+        if (charStates.TryGetValue(currentCharId, out CharacterState state))
+        {
+            OnCharacterHungerChanged?.Invoke(currentCharId, state.currentHunger, state.maxHunger);
+            OnCharacterThirstChanged?.Invoke(currentCharId, state.currentThirst, state.maxThirst);
         }
     }
 
@@ -150,5 +158,33 @@ public class CharacterStateManager : MonoBehaviour
                 state.UpdateAllCooldowns(dt);
             }
         }
+    }
+
+    public void ModifyHunger(int charId, float amount)
+    {
+        if (charStates.TryGetValue(charId, out CharacterState state))
+        {
+            state.currentHunger = Mathf.Clamp(state.currentHunger + amount, 0, state.maxHunger);
+            OnCharacterHungerChanged?.Invoke(charId, state.currentHunger, state.maxHunger);
+        }
+    }
+
+    public void ModifyThirst(int charId, float amount)
+    {
+        if (charStates.TryGetValue(charId, out CharacterState state))
+        {
+            state.currentThirst = Mathf.Clamp(state.currentThirst + amount, 0, state.maxThirst);
+            OnCharacterThirstChanged?.Invoke(charId, state.currentThirst, state.maxThirst);
+        }
+    }
+
+    public void ModifyCurrentCharacterHunger(float amount)
+    {
+        if (currentCharId > 0) ModifyHunger(currentCharId, amount);
+    }
+
+    public void ModifyCurrentCharacterThirst(float amount)
+    {
+        if (currentCharId > 0) ModifyThirst(currentCharId, amount);
     }
 }
