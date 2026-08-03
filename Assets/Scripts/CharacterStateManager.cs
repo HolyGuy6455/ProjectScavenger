@@ -24,6 +24,7 @@ public class CharacterStateManager : MonoBehaviour
     private Dictionary<int, CharacterState> charStates = new Dictionary<int, CharacterState>();
     private Health playerHealth;
     private int currentCharId = -1;
+    public int CurrentCharId => currentCharId;
 
     public event System.Action<int, float, float> OnCharacterHealthChanged;
     public event System.Action<int, float, float> OnCharacterHungerChanged;
@@ -156,6 +157,25 @@ public class CharacterStateManager : MonoBehaviour
             if (state != null)
             {
                 state.UpdateAllCooldowns(dt);
+                
+                // 생존 스탯(배고픔, 체력) 업데이트
+                bool statsChanged = state.UpdateSurvivalStats(dt);
+                if (statsChanged)
+                {
+                    // 해당 캐릭터가 현재 조종 중인 캐릭터라면 UI 및 플레이어 컴포넌트 동기화
+                    if (statePair.Key == currentCharId)
+                    {
+                        if (playerHealth != null)
+                        {
+                            // Health(네트워크 컴포넌트)에 로컬 state 체력을 덮어씌웁니다. 
+                            // 단, SetHealth는 기본적으로 서버에서만 동작합니다.
+                            playerHealth.SetHealth(state.currentHealth, state.maxHealth);
+                        }
+                        
+                        OnCharacterHungerChanged?.Invoke(currentCharId, state.currentHunger, state.maxHunger);
+                        OnCharacterHealthChanged?.Invoke(currentCharId, state.currentHealth, state.maxHealth);
+                    }
+                }
             }
         }
     }

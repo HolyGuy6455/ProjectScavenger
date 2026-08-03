@@ -22,6 +22,7 @@ public class SkillData : IData
     public int[] offFunc;
     public float cooltime;
     public float duration;
+    public float thirst = 5f;
     public SkillActiveType activeType;
 
     public int GetId()
