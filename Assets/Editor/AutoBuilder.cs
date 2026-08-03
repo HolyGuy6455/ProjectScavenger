@@ -25,6 +25,9 @@ namespace Scavenger.Editor
             string buildPath = "Builds/Windows/ScavengerClient.exe";
             EnsureDirectoryExists(buildPath);
 
+            EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
+
+
             var buildPlayerOptions = new BuildPlayerOptions
             {
                 scenes = ClientScenes,
@@ -44,6 +47,9 @@ namespace Scavenger.Editor
         {
             string buildPath = "Builds/Android/ScavengerClient.apk";
             EnsureDirectoryExists(buildPath);
+
+            EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android);
+
 
             var buildPlayerOptions = new BuildPlayerOptions
             {
@@ -65,6 +71,9 @@ namespace Scavenger.Editor
             // 백엔드가 직접 실행할 수 있도록 상위 폴더의 ScavengerServer 안으로 바로 빌드합니다. (윈도우/맥 공통 호환을 위해 상대 경로 사용)
             string buildPath = "../ScavengerServer/LinuxServer/linuxBuild.x86_64";
             EnsureDirectoryExists(buildPath);
+
+            EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneLinux64);
+
 
             var buildPlayerOptions = new BuildPlayerOptions
             {
