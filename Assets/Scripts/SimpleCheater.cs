@@ -42,4 +42,38 @@ public class SimpleCheater : MonoBehaviour
             Debug.LogWarning("[Cheat] 씬에서 플레이어의 Health 컴포넌트를 찾지 못했습니다.");
         }
     }
+
+    /// <summary>
+    /// 플레이어를 스폰 포인트(PlayerSpawnPosition)로 강제 텔레포트 시킵니다.
+    /// 디버그 UI 버튼의 OnClick()에 이 메서드를 연결하세요.
+    /// </summary>
+    public void TeleportToSpawnPoint()
+    {
+        if (playerHealth == null)
+        {
+            Debug.LogWarning("[Cheat] 씬에서 플레이어의 Health 컴포넌트를 찾지 못했습니다.");
+            return;
+        }
+
+        GameObject spawnObj = GameObject.Find("PlayerSpawnPosition");
+        if (spawnObj == null)
+        {
+            Debug.LogWarning("[Cheat] 씬에서 'PlayerSpawnPosition' 오브젝트를 찾지 못했습니다.");
+            return;
+        }
+
+        var nt = playerHealth.GetComponent<Unity.Netcode.Components.NetworkTransform>();
+        if (nt != null)
+        {
+            // 네트워크 환경이라면 NetworkTransform.Teleport를 사용합니다.
+            nt.Teleport(spawnObj.transform.position, playerHealth.transform.rotation, playerHealth.transform.localScale);
+        }
+        else
+        {
+            // 싱글플레이나 권한 문제 등으로 NetworkTransform이 없으면 직접 이동
+            playerHealth.transform.position = spawnObj.transform.position;
+        }
+
+        Debug.Log($"[Cheat] 플레이어를 스폰 포인트({spawnObj.transform.position})로 텔레포트했습니다.");
+    }
 }
