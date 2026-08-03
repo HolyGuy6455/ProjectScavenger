@@ -25,7 +25,7 @@ public class ItemUsageManager : MonoBehaviour
         effectDictionary = new Dictionary<int, IItemUsage>();
 
         // 여기에 새로운 아이템 효과(func)가 생길 때마다 추가해주면 됩니다.
-        effectDictionary.Add(1, new AmmoUsage());
+        effectDictionary.Add(1, new DrinkUsage());
         effectDictionary.Add(2, new FoodUsage());
     }
 
