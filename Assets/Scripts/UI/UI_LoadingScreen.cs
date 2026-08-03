@@ -31,9 +31,10 @@ namespace Scavenger.UI
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
-            // 서버가 Additive로 Stage001을 열어주면 클라이언트도 로드가 끝납니다.
+            // 서버가 Additive로 맵을 열어주면 클라이언트도 로드가 끝납니다.
             // 그때 로딩 화면을 파괴하여 빈 화면이 보이지 않도록 합니다.
-            if (scene.name == "Stage001")
+            string expectedMap = PlayerPrefs.GetString("SelectedMap", "Stage001");
+            if (scene.name == expectedMap)
             {
                 Destroy(transform.root.gameObject);
             }
@@ -112,7 +113,8 @@ namespace Scavenger.UI
                 {
                     NetworkManager.Singleton.SceneManager.VerifySceneBeforeLoading = (sceneIndex, sceneName, loadSceneMode) =>
                     {
-                        if (sceneName.Contains("Stage001")) return false;
+                        string expectedMap = PlayerPrefs.GetString("SelectedMap", "Stage001");
+                        if (sceneName.Contains(expectedMap)) return false;
                         return true;
                     };
                 }
@@ -128,10 +130,11 @@ namespace Scavenger.UI
                     if (NetworkManager.Singleton.IsConnectedClient)
                     {
                         if (statusText != null) statusText.text = "Connected! Loading Map via Addressables...";
-                        Debug.Log("[NGO] 서버 접속 및 IngameScene 동기화 완료! Addressables로 Stage001 로드 시작...");
+                        string mapToLoad = PlayerPrefs.GetString("SelectedMap", "Stage001");
+                        Debug.Log($"[NGO] 서버 접속 및 IngameScene 동기화 완료! Addressables로 {mapToLoad} 로드 시작...");
                         
                         // 접속이 완료되었다는 것은 IngameScene 로드가 끝났음을 의미하므로 바로 맵을 로드합니다.
-                        UnityEngine.AddressableAssets.Addressables.LoadSceneAsync("Stage001", LoadSceneMode.Additive);
+                        UnityEngine.AddressableAssets.Addressables.LoadSceneAsync(mapToLoad, LoadSceneMode.Additive);
                         yield break;
                     }
                     waitTime -= Time.deltaTime;
@@ -155,9 +158,10 @@ namespace Scavenger.UI
             {
                 Debug.Log("[NGO] 호스트 모드(싱글플레이어) 구동 성공. InGameScene으로 동기화합니다.");
                 
+                string mapToLoad = PlayerPrefs.GetString("SelectedMap", "Stage001");
                 NetworkManager.Singleton.SceneManager.VerifySceneBeforeLoading = (sceneIndex, sceneName, loadSceneMode) =>
                 {
-                    if (sceneName != null && sceneName.Contains("Stage001")) return false;
+                    if (sceneName != null && sceneName.Contains(mapToLoad)) return false;
                     return true;
                 };
                 
@@ -165,8 +169,8 @@ namespace Scavenger.UI
                 {
                     if (sceneName != null && sceneName.Equals("InGameScene", System.StringComparison.OrdinalIgnoreCase) && NetworkManager.Singleton.IsServer)
                     {
-                        Debug.Log("[NGO-DEBUG] 싱글플레이어 내부 씬 로드 완료! Addressables를 통해 Stage001을 얹습니다.");
-                        UnityEngine.AddressableAssets.Addressables.LoadSceneAsync("Stage001", LoadSceneMode.Additive).Completed += handle =>
+                        Debug.Log($"[NGO-DEBUG] 싱글플레이어 내부 씬 로드 완료! Addressables를 통해 {mapToLoad}을(를) 얹습니다.");
+                        UnityEngine.AddressableAssets.Addressables.LoadSceneAsync(mapToLoad, LoadSceneMode.Additive).Completed += handle =>
                         {
                             if (handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
                             {

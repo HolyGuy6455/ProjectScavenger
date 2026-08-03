@@ -63,28 +63,8 @@ public class PlayerController : NetworkBehaviour
             indicatorObj.transform.localPosition = new Vector3(0f, 0.1f, 0f);
             _sectorIndicator = indicatorObj.AddComponent<SectorIndicator>();
 
-            // 동적으로 스폰된 로컬 플레이어에 카메라 연동
-            var camFollow = FindAnyObjectByType<CameraFollow>();
-            if (camFollow != null)
-            {
-                camFollow.SetTarget(this.transform);
-            }
-
-            // 동적으로 스폰된 로컬 플레이어에 UI 조이스틱 연동
-            foreach (var joystick in VirtualJoystick.AllJoysticks) 
-            {
-                if (joystick != null)
-                {
-                    joystick.SetPlayer(this);
-                }
-            }
-            
-            // 동적으로 스폰된 로컬 플레이어에 무기 UI 연동
-            var weaponUI = FindAnyObjectByType<WeaponUI>(FindObjectsInactive.Include);
-            if (weaponUI != null)
-            {
-                weaponUI.SetShooter(shooter); 
-            }
+            // UI 및 카메라 연동은 맵/씬이 로드될 때까지 대기한 후 진행합니다.
+            StartCoroutine(WaitAndLinkUIRoutine());
         }
     }
 
@@ -99,23 +79,52 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    private System.Collections.IEnumerator WaitAndLinkUIRoutine()
+    {
+        // 카메라나 UI 컴포넌트가 씬에 로드될 때까지 대기합니다 (InGameScene 로딩 대기)
+        CameraFollow camFollow = null;
+        while (camFollow == null)
+        {
+            camFollow = FindAnyObjectByType<CameraFollow>();
+            yield return null;
+        }
+
+        camFollow.SetTarget(this.transform);
+
+        foreach (var joystick in VirtualJoystick.AllJoysticks) 
+        {
+            if (joystick != null)
+            {
+                joystick.SetPlayer(this);
+            }
+        }
+        
+        var weaponUI = FindAnyObjectByType<WeaponUI>(FindObjectsInactive.Include);
+        if (weaponUI != null)
+        {
+            weaponUI.SetShooter(shooter); 
+        }
+    }
+
     private System.Collections.IEnumerator WaitAndTeleportRoutine()
     {
+        // 맵이 로드되기 전까지 허공에서 떨어지지 않게 물리 고정
+        if (_rb != null) _rb.isKinematic = true;
+
+        GameObject spawnObj = null;
+        while (spawnObj == null)
+        {
+            spawnObj = GameObject.Find("PlayerSpawnPosition");
+            yield return null;
+        }
+
+        // 스폰 위치를 찾은 후(씬 로드 완료 및 프레임 경과 후)에 권한을 확인합니다.
+        // OnNetworkSpawn 직후에는 NetworkTransform이 초기화되지 않아 CanCommitToTransform이 false로 반환될 수 있습니다.
         var nt = GetComponent<Unity.Netcode.Components.NetworkTransform>();
         bool hasAuthority = (nt != null) ? nt.CanCommitToTransform : IsServer;
 
         if (hasAuthority)
         {
-            // 맵이 로드되기 전까지 허공에서 떨어지지 않게 물리 고정
-            if (_rb != null) _rb.isKinematic = true;
-
-            GameObject spawnObj = null;
-            while (spawnObj == null)
-            {
-                spawnObj = GameObject.Find("PlayerSpawnPosition");
-                yield return null;
-            }
-
             Vector3 spawnPos = spawnObj.transform.position;
             // 플레이어들이 겹치지 않게 클라이언트 ID를 기반으로 약간의 X축 간격을 줍니다.
             spawnPos.x += (OwnerClientId * 1.5f);
@@ -128,10 +137,10 @@ public class PlayerController : NetworkBehaviour
             {
                 transform.position = spawnPos;
             }
-
-            // 물리 복구
-            if (_rb != null) _rb.isKinematic = false;
         }
+
+        // 물리 복구
+        if (_rb != null) _rb.isKinematic = false;
     }
 
     private void Update()
