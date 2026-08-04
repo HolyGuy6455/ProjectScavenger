@@ -40,7 +40,7 @@ public class PartyCharacterHealthBar : MonoBehaviour
             var state = CharacterStateManager.Instance.GetState(charId);
             if (state != null && healthBarUI != null)
             {
-                healthBarUI.UpdateHealthBar(state.currentHealth, state.maxHealth);
+                healthBarUI.UpdateGuage(state.currentHealth, state.maxHealth);
             }
             
             CharacterStateManager.Instance.OnCharacterHealthChanged += HandleHealthChanged;
@@ -60,7 +60,7 @@ public class PartyCharacterHealthBar : MonoBehaviour
     {
         if (changedCharId == this.charId && healthBarUI != null)
         {
-            healthBarUI.UpdateHealthBar(currentHealth, maxHealth);
+            healthBarUI.UpdateGuage(currentHealth, maxHealth);
         }
     }
 }

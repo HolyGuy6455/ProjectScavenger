@@ -213,7 +213,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 905f14e2cba7d204792077dcc4567a00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthBarSpawner
-  healthBarPrefab: {fileID: 4891483080001246480, guid: 15ccd5586b0187a40a1a4dd9b7986d52, type: 3}
+  healthBarPrefab: {fileID: 4891483080001246480, guid: 0977d689f837f9e4fa1b0ab55cc36be0, type: 3}
   parentTransform: {fileID: 0}
   targetHealth: {fileID: 273470665313786195}
   targetTransform: {fileID: 2642994461546607760}

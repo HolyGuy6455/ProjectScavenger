@@ -7,6 +7,7 @@ public class SkillSlot : MonoBehaviour
 {
     [SerializeField] private Image icon;
     [SerializeField] private TextMeshProUGUI cooltimeCounter;
+    [SerializeField] private GuageBarUI guageBar;
 
     private SkillInstance currentSkill;
     private int slotIndex;
@@ -108,6 +109,21 @@ public class SkillSlot : MonoBehaviour
         }
 
         float cd = currentSkill.currentCooldown;
+        if (guageBar != null)
+        {
+            float currentRemain = currentSkill.remainAmount;
+            float maxRemain = currentSkill.Data != null ? currentSkill.Data.remain : 1f;
+            
+            if (maxRemain > 0f)
+            {
+                guageBar.UpdateGuage(currentRemain, maxRemain);
+            }
+            else
+            {
+                guageBar.UpdateGuage(0f, 1f);
+            }
+        }
+
         if (cd > 0f)
         {
             if (cooltimeCounter != null) cooltimeCounter.gameObject.SetActive(true);

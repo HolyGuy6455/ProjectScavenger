@@ -57,16 +57,9 @@ public class PlayerSkillController : NetworkBehaviour
             if (data == null) continue;
 
             bool hasReloadFunc = false;
-            if (data.func != null)
+            if (data.offFunction == 5 || data.offFunction == 6)
             {
-                foreach (int f in data.func)
-                {
-                    if (f == 5 || f == 6)
-                    {
-                        hasReloadFunc = true;
-                        break;
-                    }
-                }
+                hasReloadFunc = true;
             }
 
             if (hasReloadFunc)
@@ -179,29 +172,10 @@ public class PlayerSkillController : NetworkBehaviour
 
                 if (skill.isContinuousRunning)
                 {
-                    skill.continuousTimer += Time.deltaTime;
-                    if (skill.continuousTimer >= skill.Data.duration)
-                    {
-                        skill.continuousTimer = 0f;
-
-                        if (CheckCanExecuteAllFuncs(skill.Data))
-                        {
-                            ExecuteAllFuncs(skill.Data.func, GetShooter());
-
-                            // 실행 직후 조건을 다시 확인하여 (예: 장전 완료) 더 이상 실행할 필요 없으면 즉시 종료
-                            if (!CheckCanExecuteAllFuncs(skill.Data))
-                            {
-                                skill.isContinuousRunning = false;
-                                skill.currentCooldown = skill.Data.cooltime;
-                            }
-                        }
-                        else
-                        {
-                            skill.isContinuousRunning = false;
-                            skill.currentCooldown = skill.Data.cooltime; // 종료 후 쿨타임 시작
-                        }
-                    }
+                    skill.UpdateContinuous(Time.deltaTime, GetShooter());
                 }
+                
+                skill.UpdateInstant(GetShooter());
             }
         }
     }
@@ -216,52 +190,7 @@ public class PlayerSkillController : NetworkBehaviour
         SkillInstance skill = state.normalSkills[skillSlotIndex];
         if (skill == null || skill.skillId == 0) return;
         
-        SkillData data = skill.Data;
-        if (data == null || data.activeType == SkillActiveType.Passive) return;
-
-        if (skill.currentCooldown > 0f && data.activeType != SkillActiveType.Toggle) 
-        {
-            Debug.Log($"[PlayerSkillController] 쿨타임 중입니다: {skill.currentCooldown:F1}초 남음");
-            return;
-        }
-
-        switch (data.activeType)
-        {
-            case SkillActiveType.Instant:
-                ExecuteAllFuncs(data.func, GetShooter());
-                skill.currentCooldown = data.cooltime;
-                break;
-            case SkillActiveType.Charge:
-                skill.isCharging = true;
-                ExecuteAllFuncs(data.func, GetShooter());
-                break;
-            case SkillActiveType.Toggle:
-                skill.isToggledOn = !skill.isToggledOn;
-                if (skill.isToggledOn)
-                {
-                    ExecuteAllFuncs(data.func, GetShooter());
-                }
-                else
-                {
-                    ExecuteAllFuncs(data.offFunc, GetShooter());
-                }
-                skill.currentCooldown = data.cooltime; // 토글 시마다 쿨타임 시작
-                break;
-            case SkillActiveType.Continuous:
-                if (!skill.isContinuousRunning)
-                {
-                    if (CheckCanExecuteAllFuncs(data))
-                    {
-                        skill.isContinuousRunning = true;
-                        skill.continuousTimer = data.duration; // 즉시 1회 발동시키기 위함
-                    }
-                }
-                break;
-            default: // 하위 호환
-                ExecuteAllFuncs(data.func, GetShooter());
-                skill.currentCooldown = data.cooltime;
-                break;
-        }
+        skill.Use(state, GetShooter());
     }
 
     public void OnSkillPointerUp(int skillSlotIndex)
@@ -274,86 +203,7 @@ public class PlayerSkillController : NetworkBehaviour
         SkillInstance skill = state.normalSkills[skillSlotIndex];
         if (skill == null || skill.skillId == 0) return;
 
-        SkillData data = skill.Data;
-        if (data != null && data.activeType == SkillActiveType.Charge)
-        {
-            if (skill.isCharging)
-            {
-                skill.isCharging = false;
-                skill.currentCooldown = data.cooltime; // 손을 뗐을 때 쿨타임 시작
-            }
-        }
-    }
-
-    private void ExecuteSkillFunc(int funcCode, Shooter playerShooter)
-    {
-        switch (funcCode)
-        {
-            case 1: // 무기 1로 전환
-                SwitchWeapon(playerShooter, currentCharData.GetGunId(0));
-                break;
-            case 2: // 무기 2로 전환
-                SwitchWeapon(playerShooter, currentCharData.GetGunId(1));
-                break;
-            case 3: // 무기 3으로 전환
-                SwitchWeapon(playerShooter, currentCharData.GetGunId(3));
-                break;
-            case 4: // 다음 무기로 전환 (1번 <-> 2번)
-                ToggleWeapon(playerShooter);
-                break;
-            case 5: // 재장전 (전체)
-                if (playerShooter != null) playerShooter.Reload();
-                break;
-            case 6: // 1발 재장전
-                if (playerShooter != null) playerShooter.ReloadAmount(1);
-                break;
-        }
-    }
-
-    private void ExecuteAllFuncs(int[] funcs, Shooter playerShooter)
-    {
-        if (funcs == null) return;
-        foreach (int f in funcs)
-        {
-            if (f != 0) ExecuteSkillFunc(f, playerShooter);
-        }
-    }
-
-    private bool CheckCanExecuteAllFuncs(SkillData data)
-    {
-        if (data.func == null || data.func.Length == 0) return false;
-        
-        bool hasAnyFunc = false;
-
-        foreach (int f in data.func)
-        {
-            if (f != 0)
-            {
-                hasAnyFunc = true;
-                if (!CanExecuteSkillFunc(f)) return false;
-            }
-        }
-
-        // 하나라도 실행 불가능한 조건이 되면 전체 스킬이 멈추도록(AND) 처리
-        return hasAnyFunc;
-    }
-
-    private bool CanExecuteSkillFunc(int funcCode)
-    {
-        if (funcCode == 0) return false;
-        
-        Shooter playerShooter = GetShooter();
-        if (playerShooter == null) return false;
-
-        switch (funcCode)
-        {
-            case 5: // 재장전 (전체)
-            case 6: // 재장전 (1발)
-                return playerShooter.CurrentGunData != null && playerShooter.CurrentAmmo < playerShooter.CurrentGunData.maxAmmo;
-            default:
-                // 무기 교체 등은 항상 발동 가능
-                return true;
-        }
+        skill.ReleaseUse(GetShooter());
     }
 
     private void SwitchWeapon(Shooter playerShooter, int gunId)

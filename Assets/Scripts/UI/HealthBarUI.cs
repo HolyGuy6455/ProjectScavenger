@@ -1,73 +1,37 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
-/// Screen Space - Overlay Canvas 하위의 UI 요소를 
-/// 3D 월드 상의 타겟 위치(몬스터 머리 위 등)에 맞추어 화면 좌표로 추적 배치하는 컴포넌트입니다.
+/// GuageBarUI를 상속받아 체력(Health) 컴포넌트의 변경을 구독하고 UI를 자동 업데이트하는 클래스입니다.
 /// </summary>
-public class HealthBarUI : MonoBehaviour
+public class HealthBarUI : GuageBarUI
 {
-    [Header("References")]
+    [Header("Health References")]
     [Tooltip("체력 정보를 읽어올 Health 컴포넌트입니다.")]
     [SerializeField] private Health targetHealth;
-
-    [Tooltip("위치를 조정할 UI의 RectTransform입니다.")]
-    [SerializeField] private RectTransform positionContainer;
     
-    [Tooltip("크기(게이지)를 조정할 UI Image 컴포넌트입니다.")]
-    [SerializeField] private Image hpBarImage;
+    private bool isHealthInitialized = false;
 
-    [Header("Screen Space Offset")]
-    [Tooltip("추적할 3D 월드 오브젝트의 Transform입니다. 비워둘 경우 부모 오브젝트의 Transform을 사용합니다.")]
-    [SerializeField] private Transform targetTransform;
-
-    [Tooltip("타겟의 3D 월드 좌표 기준 오프셋입니다 (예: 머리 위 높이 Y축 값).")]
-    [SerializeField] private Vector3 worldOffset = new Vector3(0f, 2f, 0f);
-
-    [Header("Gauge Type Settings")]
-    [Tooltip("True이면 Image의 Fill Amount를 사용하고, False이면 RectTransform의 가로 너비(Width)를 직접 조정합니다.")]
-    [SerializeField] private bool useFillAmount = true;
-
-    [Tooltip("너비(Width)를 직접 조정할 때 기준이 되는 최대 너비입니다.")]
-    [SerializeField] private float maxBarWidth = 100f;
-
-    private Camera mainCamera;
-    private RectTransform hpBarRectTransform;
-    private bool isInitialized = false;
-
-    /// <summary>
-    /// 외부에서 HealthBar를 동적으로 생성하고 설정할 때 사용합니다.
-    /// </summary>
     public void Setup(Health newHealth, Transform newTarget, Vector3 newOffset)
     {
-        if (targetHealth != null && isInitialized)
+        if (targetHealth != null && isHealthInitialized)
         {
-            targetHealth.OnHealthChanged -= UpdateHealthBar;
+            targetHealth.OnHealthChanged -= OnHealthChanged;
         }
 
         targetHealth = newHealth;
-        targetTransform = newTarget;
-        worldOffset = newOffset;
+        base.Setup(newTarget, newOffset);
 
-        if (positionContainer == null && hpBarImage != null)
+        if (targetHealth != null)
         {
-            positionContainer = hpBarImage.rectTransform;
-        }
-        if (hpBarImage != null && hpBarRectTransform == null)
-        {
-            hpBarRectTransform = hpBarImage.rectTransform;
-        }
-
-        if (targetHealth != null && isInitialized)
-        {
-            UpdateHealthBar(targetHealth.CurrentHealth, targetHealth.MaxHealth);
-            targetHealth.OnHealthChanged += UpdateHealthBar;
+            OnHealthChanged(targetHealth.CurrentHealth, targetHealth.MaxHealth);
+            targetHealth.OnHealthChanged += OnHealthChanged;
+            isHealthInitialized = true;
         }
     }
 
-    private void Start()
+    protected override void Start()
     {
-        mainCamera = Camera.main;
+        base.Start();
 
         // 타겟 설정 자동화
         if (targetHealth == null)
@@ -75,94 +39,33 @@ public class HealthBarUI : MonoBehaviour
             targetHealth = GetComponentInParent<Health>();
         }
 
-        if (targetTransform == null && targetHealth != null)
-        {
-            targetTransform = targetHealth.transform;
-        }
-
-        if (positionContainer == null && hpBarImage != null)
-        {
-            positionContainer = hpBarImage.rectTransform;
-        }
-
-        if (hpBarImage != null)
-        {
-            hpBarRectTransform = hpBarImage.rectTransform;
-        }
-
         if (targetHealth != null)
         {
-            UpdateHealthBar(targetHealth.CurrentHealth, targetHealth.MaxHealth);
-            targetHealth.OnHealthChanged += UpdateHealthBar;
+            if (targetTransform == null)
+            {
+                targetTransform = targetHealth.transform;
+            }
+
+            OnHealthChanged(targetHealth.CurrentHealth, targetHealth.MaxHealth);
+            targetHealth.OnHealthChanged += OnHealthChanged;
+            isHealthInitialized = true;
         }
         else
         {
             Debug.LogWarning($"[HealthBarUI] {gameObject.name}의 부모 오브젝트 등에서 Health 컴포넌트를 찾을 수 없습니다.");
         }
-
-        isInitialized = true;
     }
 
-    private void OnDestroy()
+    protected virtual void OnDestroy()
     {
-        if (targetHealth != null && isInitialized)
+        if (targetHealth != null && isHealthInitialized)
         {
-            targetHealth.OnHealthChanged -= UpdateHealthBar;
-        }
-    }
-
-    private void LateUpdate()
-    {
-        // 3D 월드 좌표를 2D 화면 픽셀 좌표로 변환하여 UI 요소의 위치를 업데이트
-        if (mainCamera != null && targetTransform != null && positionContainer != null)
-        {
-            Vector3 worldPosition = targetTransform.position + worldOffset;
-            Vector3 screenPosition = mainCamera.WorldToScreenPoint(worldPosition);
-
-            // 카메라 뒤쪽에 있는 경우 UI를 비활성화하거나 화면 밖으로 숨김
-            if (screenPosition.z < 0)
-            {
-                if (positionContainer.gameObject.activeSelf)
-                    positionContainer.gameObject.SetActive(false);
-            }
-            else
-            {
-                if (!positionContainer.gameObject.activeSelf)
-                    positionContainer.gameObject.SetActive(true);
-
-                // Overlay Canvas 모드에서는 스크린 좌표를 RectTransform의 position에 직접 대입하여 추적 가능
-                positionContainer.position = screenPosition;
-            }
+            targetHealth.OnHealthChanged -= OnHealthChanged;
         }
     }
 
-    public void UpdateHealthBar(float currentHealth, float maxHealth)
+    private void OnHealthChanged(float currentHealth, float maxHealth)
     {
-        if (hpBarImage == null) return;
-
-        float percentage = maxHealth > 0 ? Mathf.Clamp01(currentHealth / maxHealth) : 0f;
-
-        if (useFillAmount)
-        {
-            hpBarImage.fillAmount = percentage;
-        }
-        else
-        {
-            if (hpBarRectTransform != null)
-            {
-                hpBarRectTransform.sizeDelta = new Vector2(percentage * maxBarWidth, hpBarRectTransform.sizeDelta.y);
-            }
-        }
-    }
-
-    /// <summary>
-    /// HP 바의 색상을 외부에서 변경할 수 있도록 합니다.
-    /// </summary>
-    public void SetColor(Color color)
-    {
-        if (hpBarImage != null)
-        {
-            hpBarImage.color = color;
-        }
+        UpdateGuage(currentHealth, maxHealth);
     }
 }

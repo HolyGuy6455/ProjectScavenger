@@ -11,6 +11,14 @@ public enum SkillActiveType
     Passive = 5
 }
 
+public enum RemainCostType
+{
+    None = 0,
+    OneByOne = 1,
+    Ammo = 2,
+    Infinity = 3
+}
+
 [System.Serializable]
 public class SkillData : IData
 {
@@ -18,12 +26,16 @@ public class SkillData : IData
     public string name;
     public string resourceIcon;
     public string resourceIcon2;
-    public int[] func;
-    public int[] offFunc;
+    public int onFunction;
+    public float onFunctionValue;
+    public int offFunction;
+    public float offFunctionValue;
     public float cooltime;
     public float duration;
-    public float thirst = 5f;
     public SkillActiveType activeType;
+    public float thirst;
+    public int remain;
+    public RemainCostType remainCostType;
 
     public int GetId()
     {
