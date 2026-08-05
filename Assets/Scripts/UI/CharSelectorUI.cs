@@ -3,8 +3,7 @@ using System.Collections.Generic;
 
 public class CharSelectorUI : MonoBehaviour
 {
-    public static CharData CurrentCharData { get; private set; }
-    public static event System.Action<CharData> OnCharacterChanged;
+
 
     [SerializeField] private List<CharSelectorSlot> slots = new List<CharSelectorSlot>();
     [SerializeField] private UnityEngine.UI.Image standingImage;
@@ -12,6 +11,29 @@ public class CharSelectorUI : MonoBehaviour
     private void Start()
     {
         InitializeUI();
+    }
+
+    private void OnEnable()
+    {
+        // Start보다 늦게 등록될 수 있으므로 예외처리
+        if (CharacterStateManager.Instance != null)
+            CharacterStateManager.Instance.OnCharacterChanged += UpdateUIOnCharacterChange;
+    }
+
+    private void OnDisable()
+    {
+        if (CharacterStateManager.Instance != null)
+            CharacterStateManager.Instance.OnCharacterChanged -= UpdateUIOnCharacterChange;
+    }
+
+    private void UpdateUIOnCharacterChange(CharData charData)
+    {
+        if (standingImage != null)
+        {
+            Sprite standSprite = LoadSprite(charData.resourceStand);
+            standingImage.sprite = standSprite;
+            standingImage.enabled = standSprite != null;
+        }
     }
 
     private void InitializeUI()
@@ -43,18 +65,8 @@ public class CharSelectorUI : MonoBehaviour
 
     private void HandleCharacterSelected(CharData charData)
     {
-        // TODO: 캐릭터 선택 시 실제 인게임 처리 로직 (애니메이션, 모델 교체 등은 아직 미구현)
         Debug.Log($"[CharSelectorUI] 캐릭터가 선택되었습니다: {charData.name}");
-        CurrentCharData = charData;
-
-        OnCharacterChanged?.Invoke(charData);
-
-        if (standingImage != null)
-        {
-            Sprite standSprite = LoadSprite(charData.resourceStand);
-            standingImage.sprite = standSprite;
-            standingImage.enabled = standSprite != null;
-        }
+        CharacterStateManager.Instance.ChangeCharacter(charData.id);
     }
 
     private void OnDestroy()

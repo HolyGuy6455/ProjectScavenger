@@ -25,6 +25,9 @@ public class CharacterStateManager : MonoBehaviour
     private Health playerHealth;
     private int currentCharId = -1;
     public int CurrentCharId => currentCharId;
+    
+    public CharData CurrentCharData { get; private set; }
+    public event System.Action<CharData> OnCharacterChanged;
 
     public event System.Action<int, float, float> OnCharacterHealthChanged;
     public event System.Action<int, float, float> OnCharacterHungerChanged;
@@ -35,7 +38,7 @@ public class CharacterStateManager : MonoBehaviour
     {
         if (_instance != null && _instance != this)
         {
-            Destroy(gameObject);
+            Destroy(this);
             return;
         }
         _instance = this;
@@ -48,14 +51,15 @@ public class CharacterStateManager : MonoBehaviour
         ConnectPlayerHealth();
     }
 
-    private void OnEnable()
+    public void ChangeCharacter(int id)
     {
-        CharSelectorUI.OnCharacterChanged += HandleCharacterChanged;
-    }
+        if (DataManager.Instance == null) return;
+        CharData data = DataManager.Instance.GetData<CharData>("Char", id);
+        if (data == null) return;
 
-    private void OnDisable()
-    {
-        CharSelectorUI.OnCharacterChanged -= HandleCharacterChanged;
+        CurrentCharData = data;
+        HandleCharacterChanged(data);
+        OnCharacterChanged?.Invoke(data);
     }
 
     private void HandleCharacterChanged(CharData charData)

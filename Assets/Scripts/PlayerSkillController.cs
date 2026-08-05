@@ -24,9 +24,9 @@ public class PlayerSkillController : NetworkBehaviour
             }
             Instance = this;
 
-            if (CharSelectorUI.CurrentCharData != null)
+            if (CharacterStateManager.Instance.CurrentCharData != null)
             {
-                HandleCharacterChanged(CharSelectorUI.CurrentCharData);
+                HandleCharacterChanged(CharacterStateManager.Instance.CurrentCharData);
             }
         }
     }
@@ -84,12 +84,12 @@ public class PlayerSkillController : NetworkBehaviour
 
     private void OnEnable()
     {
-        CharSelectorUI.OnCharacterChanged += HandleCharacterChanged;
+        CharacterStateManager.Instance.OnCharacterChanged += HandleCharacterChanged;
     }
 
     private void OnDisable()
     {
-        CharSelectorUI.OnCharacterChanged -= HandleCharacterChanged;
+        CharacterStateManager.Instance.OnCharacterChanged -= HandleCharacterChanged;
     }
 
     private void HandleCharacterChanged(CharData charData)
@@ -150,17 +150,17 @@ public class PlayerSkillController : NetworkBehaviour
         var keyboard = Keyboard.current;
         if (keyboard != null)
         {
-            if (keyboard.digit1Key.wasPressedThisFrame) OnSkillPointerDown(0);
-            if (keyboard.digit1Key.wasReleasedThisFrame) OnSkillPointerUp(0);
+            if (keyboard.eKey.wasPressedThisFrame) OnSkillPointerDown(0);
+            if (keyboard.eKey.wasReleasedThisFrame) OnSkillPointerUp(0);
             
-            if (keyboard.digit2Key.wasPressedThisFrame) OnSkillPointerDown(1);
-            if (keyboard.digit2Key.wasReleasedThisFrame) OnSkillPointerUp(1);
+            if (keyboard.rKey.wasPressedThisFrame) OnSkillPointerDown(1);
+            if (keyboard.rKey.wasReleasedThisFrame) OnSkillPointerUp(1);
             
-            if (keyboard.digit3Key.wasPressedThisFrame) OnSkillPointerDown(2);
-            if (keyboard.digit3Key.wasReleasedThisFrame) OnSkillPointerUp(2);
+            if (keyboard.fKey.wasPressedThisFrame) OnSkillPointerDown(2);
+            if (keyboard.fKey.wasReleasedThisFrame) OnSkillPointerUp(2);
             
-            if (keyboard.digit4Key.wasPressedThisFrame) OnSkillPointerDown(3);
-            if (keyboard.digit4Key.wasReleasedThisFrame) OnSkillPointerUp(3);
+            if (keyboard.vKey.wasPressedThisFrame) OnSkillPointerDown(3);
+            if (keyboard.vKey.wasReleasedThisFrame) OnSkillPointerUp(3);
         }
 
         // 현재 캐릭터의 Continuous 스킬 로직만 처리 (쿨타임 감소는 CharacterStateManager가 일괄 처리함)

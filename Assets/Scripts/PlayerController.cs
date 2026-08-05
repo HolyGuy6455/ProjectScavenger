@@ -27,10 +27,17 @@ public class PlayerController : NetworkBehaviour
     private bool _isShooting = false;
     private SectorIndicator _sectorIndicator;
 
-    private string _currentAnimState = "Standing@loop";
+    private string _currentAnimState = "Idle";
     
     // 네트워크 동기화를 위한 변수 (오너가 쓰고 모두가 읽음)
     private NetworkVariable<bool> _netIsRunning = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    
+    // 캐릭터 동적 교체를 위한 변수
+    private NetworkVariable<int> _activeSlotIndex = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    private GameObject[] _characterModels = new GameObject[4];
+    
+    // 임시 덱(Squad) 데이터. 나중에 네트워크 변수로 동기화하거나 로비에서 받아오도록 수정 예정입니다.
+    private int[] _squadCharIds = new int[4] { 1, 2, 3, 4 };
 
     private void Awake()
     {
@@ -49,10 +56,34 @@ public class PlayerController : NetworkBehaviour
         {
             StartCoroutine(WaitAndTeleportRoutine());
         }
+
+        // --- 캐릭터 사전 로드 및 렌더링 세팅 ---
+        for (int i = 0; i < 4; i++)
+        {
+            int charId = _squadCharIds[i];
+            // charId가 1이면 "char01", 10이면 "char10" 형태가 되도록 00 포맷 사용
+            GameObject prefab = Resources.Load<GameObject>($"Prefabs/Characters/char{charId:D2}");
+            if (prefab != null)
+            {
+                _characterModels[i] = Instantiate(prefab, transform);
+                _characterModels[i].SetActive(false); // 일단 모두 끄기
+            }
+            else
+            {
+                Debug.LogWarning($"[PlayerController] 캐릭터 프리팹을 찾을 수 없습니다: Resources/Prefabs/Characters/char{charId:D2}");
+            }
+        }
+
+        _activeSlotIndex.OnValueChanged += OnActiveSlotChanged;
+        // 스폰 시 최초 렌더링 동기화
+        OnActiveSlotChanged(-1, _activeSlotIndex.Value);
+        // -----------------------------------------------------------
         
         // 내 캐릭터일 때만 입력을 활성화합니다.
         if (IsOwner)
         {
+            CharacterStateManager.Instance.OnCharacterChanged += HandleCharacterChangedUI;
+
             _inputActions.Player.Enable();
             _inputActions.Player.Move.performed += OnMove;
             _inputActions.Player.Move.canceled += OnMove;
@@ -71,11 +102,57 @@ public class PlayerController : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();
+        
+        _activeSlotIndex.OnValueChanged -= OnActiveSlotChanged;
+
         if (IsOwner)
         {
+            CharacterStateManager.Instance.OnCharacterChanged -= HandleCharacterChangedUI;
+
             _inputActions.Player.Move.performed -= OnMove;
             _inputActions.Player.Move.canceled -= OnMove;
             _inputActions.Player.Disable();
+        }
+    }
+
+    private void HandleCharacterChangedUI(CharData charData)
+    {
+        // 덱 배열에서 이 캐릭터 ID가 몇 번 슬롯에 있는지 찾습니다.
+        int slotIndex = System.Array.IndexOf(_squadCharIds, charData.id);
+        if (slotIndex >= 0)
+        {
+            ChangeCharacterSlotServerRpc(slotIndex);
+        }
+    }
+
+    private void OnActiveSlotChanged(int previousValue, int newValue)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            if (_characterModels[i] != null)
+            {
+                bool isActive = (i == newValue);
+                _characterModels[i].SetActive(isActive);
+                
+                if (isActive)
+                {
+                    _animator = _characterModels[i].GetComponent<Animator>();
+                    if (_animator != null)
+                    {
+                        string targetAnim = _netIsRunning.Value ? "Run" : "Idle";
+                        _animator.Play(targetAnim); // 즉시 상태 동기화
+                    }
+                }
+            }
+        }
+    }
+
+    [ServerRpc]
+    private void ChangeCharacterSlotServerRpc(int slotIndex)
+    {
+        if (slotIndex >= 0 && slotIndex < 4)
+        {
+            _activeSlotIndex.Value = slotIndex;
         }
     }
 
@@ -145,13 +222,25 @@ public class PlayerController : NetworkBehaviour
 
     private void Update()
     {
+        if (IsOwner)
+        {
+            // 테스트용 캐릭터 스왑 (숫자키 1~4)
+            if (Keyboard.current != null)
+            {
+                if (Keyboard.current.digit1Key.wasPressedThisFrame) CharacterStateManager.Instance.ChangeCharacter(_squadCharIds[0]);
+                if (Keyboard.current.digit2Key.wasPressedThisFrame) CharacterStateManager.Instance.ChangeCharacter(_squadCharIds[1]);
+                if (Keyboard.current.digit3Key.wasPressedThisFrame) CharacterStateManager.Instance.ChangeCharacter(_squadCharIds[2]);
+                if (Keyboard.current.digit4Key.wasPressedThisFrame) CharacterStateManager.Instance.ChangeCharacter(_squadCharIds[3]);
+            }
+        }
+
         // 애니메이션은 모든 클라이언트에서 동일하게 재생되어야 하므로 IsOwner 체크 밖에서 처리
         if (_animator != null)
         {
-            string targetAnim = _netIsRunning.Value ? "Running@loop" : "Standing@loop";
+            string targetAnim = _netIsRunning.Value ? "Run" : "Idle";
             if (_currentAnimState != targetAnim)
             {
-                _animator.CrossFade(targetAnim, 0.1f);
+                _animator.CrossFadeInFixedTime(targetAnim, 0.1f);
                 _currentAnimState = targetAnim;
             }
         }

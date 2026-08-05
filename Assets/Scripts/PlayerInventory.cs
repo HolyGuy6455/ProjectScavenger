@@ -42,12 +42,12 @@ public class PlayerInventory : NetworkBehaviour
 
     private void OnEnable()
     {
-        CharSelectorUI.OnCharacterChanged += HandleCharacterChanged;
+        CharacterStateManager.Instance.OnCharacterChanged += HandleCharacterChanged;
     }
 
     private void OnDisable()
     {
-        CharSelectorUI.OnCharacterChanged -= HandleCharacterChanged;
+        CharacterStateManager.Instance.OnCharacterChanged -= HandleCharacterChanged;
     }
 
     private void HandleCharacterChanged(CharData charData)
