@@ -122,15 +122,16 @@ public class PlayerSkillController : NetworkBehaviour
                 GunData assignedGun = DataManager.Instance.GetData<GunData>("Gun", gunToEquip);
                 if (assignedGun != null)
                 {
-                    playerShooter.EquipGun(assignedGun);
-                    newState.lastGunId = gunToEquip; // 초기화 시 기록
-
-                    // 3. 잔탄 복원 (없으면 EquipGun에서 설정된 maxAmmo 유지)
+                    // 3. 잔탄 복원 (없으면 EquipGun 내부에서 maxAmmo로 설정됨)
                     int ammoGroup = assignedGun.gunGroup > 0 ? assignedGun.gunGroup : assignedGun.id;
-                    if (newState.gunAmmo.TryGetValue(ammoGroup, out int savedAmmo))
+                    int savedAmmo = -1;
+                    if (newState.gunAmmo.TryGetValue(ammoGroup, out int val))
                     {
-                        playerShooter.CurrentAmmo = savedAmmo;
+                        savedAmmo = val;
                     }
+
+                    playerShooter.EquipGun(assignedGun, savedAmmo);
+                    newState.lastGunId = gunToEquip; // 초기화 시 기록
                 }
             }
         }
@@ -222,17 +223,22 @@ public class PlayerSkillController : NetworkBehaviour
                 state.gunAmmo[oldAmmoGroup] = playerShooter.CurrentAmmo;
             }
 
-            if (playerShooter != null) playerShooter.EquipGun(newGun);
-            
-            // 새 무기 상태 업데이트 및 잔탄 복원
+            int restoredAmmo = -1;
             if (state != null)
             {
-                state.lastGunId = gunId;
                 int newAmmoGroup = newGun.gunGroup > 0 ? newGun.gunGroup : newGun.id;
                 if (state.gunAmmo.TryGetValue(newAmmoGroup, out int savedAmmo))
                 {
-                    if (playerShooter != null) playerShooter.CurrentAmmo = savedAmmo;
+                    restoredAmmo = savedAmmo;
                 }
+            }
+
+            if (playerShooter != null) playerShooter.EquipGun(newGun, restoredAmmo);
+            
+            // 새 무기 상태 업데이트
+            if (state != null)
+            {
+                state.lastGunId = gunId;
             }
             
             Debug.Log($"[PlayerSkillController] 무기 전환: {newGun.gunName}");

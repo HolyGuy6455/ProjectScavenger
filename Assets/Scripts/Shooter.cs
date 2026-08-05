@@ -76,33 +76,40 @@ public class Shooter : NetworkBehaviour
         }
     }
 
-    public void EquipGun(GunData newGunData)
+    public void EquipGun(GunData newGunData, int restoredAmmo = -1)
     {
         if (newGunData == null) return;
 
-        ApplyGunData(newGunData);
+        ApplyGunData(newGunData, restoredAmmo);
 
         // 클라이언트에서 호출한 경우 서버에도 장착 사실을 알림
         if (!IsServer && IsOwner)
         {
-            CmdEquipGunServerRpc(newGunData.id);
+            CmdEquipGunServerRpc(newGunData.id, restoredAmmo);
         }
     }
 
     [ServerRpc]
-    private void CmdEquipGunServerRpc(int gunId)
+    private void CmdEquipGunServerRpc(int gunId, int restoredAmmo)
     {
         GunData serverGunData = DataManager.Instance.GetData<GunData>("Gun", gunId);
+        
         if (serverGunData != null)
         {
-            ApplyGunData(serverGunData);
+            ApplyGunData(serverGunData, restoredAmmo);
         }
     }
 
-    private void ApplyGunData(GunData newGunData)
+    private void ApplyGunData(GunData newGunData, int restoredAmmo = -1)
     {
         currentGunData = newGunData;
-        if (IsServer) CurrentAmmo = currentGunData.maxAmmo;
+        
+        if (IsServer) 
+        {
+            int targetAmmo = restoredAmmo >= 0 ? restoredAmmo : currentGunData.maxAmmo;
+            CurrentAmmo = targetAmmo;
+        }
+
         isReloading = false;
         isTriggerPulled = false;
         clientLastFireTime = 0f;
@@ -280,7 +287,10 @@ public class Shooter : NetworkBehaviour
     [ServerRpc]
     private void CmdReloadServerRpc()
     {
-        CurrentAmmo = currentGunData.maxAmmo;
+        if (currentGunData != null)
+        {
+            CurrentAmmo = currentGunData.maxAmmo;
+        }
     }
 
     /// <summary>
