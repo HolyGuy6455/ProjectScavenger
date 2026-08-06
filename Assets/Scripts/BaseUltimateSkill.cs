@@ -11,6 +11,9 @@ public abstract class BaseUltimateSkill : MonoBehaviour
     [Tooltip("시네마틱 연출 시간 (카메라가 복귀하기 전 대기 시간)")]
     [SerializeField] protected float cinematicDuration = 2.0f;
 
+    [Tooltip("궁극기 발동 시 재생할 애니메이션 상태 이름 (비워두면 재생하지 않음)")]
+    [SerializeField] protected string ultimateAnimStateName = "Ultimate";
+
     protected UltimateSkillData currentData;
 
     protected virtual void Awake()
@@ -43,6 +46,14 @@ public abstract class BaseUltimateSkill : MonoBehaviour
     public virtual void OnClientExecute(UltimateSkillData data, bool isOwner)
     {
         currentData = data;
+        
+        // 애니메이션 재생
+        Animator anim = GetComponent<Animator>();
+        if (anim != null && !string.IsNullOrEmpty(ultimateAnimStateName))
+        {
+            anim.Play(ultimateAnimStateName, 0, 0f);
+        }
+
         StartCoroutine(UltimateSequenceRoutine(isOwner));
     }
 
