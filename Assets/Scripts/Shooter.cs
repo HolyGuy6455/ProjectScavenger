@@ -186,8 +186,18 @@ public class Shooter : NetworkBehaviour
         {
             currentAimDirection = direction;
             currentTargetPosition = targetPosition;
-            // 방아쇠를 당기는 즉시 한 발 발사 시도
-            TryShoot(currentAimDirection, currentTargetPosition);
+
+            if (currentGunData != null && currentGunData.shotType == 2)
+            {
+                // 포물선 무기(수류탄 등)는 조준할 시간을 벌어주기 위해 첫 발사에 딜레이(fireRate)를 줍니다.
+                // clientLastFireTime을 현재 시간으로 덮어씌워서, 쿨타임이 한 바퀴 돌아야 쏴지도록 속입니다.
+                clientLastFireTime = Time.time;
+            }
+            else
+            {
+                // 방아쇠를 당기는 즉시 한 발 발사 시도 (직사형 등)
+                TryShoot(currentAimDirection, currentTargetPosition);
+            }
         }
     }
 

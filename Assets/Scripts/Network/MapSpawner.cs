@@ -26,6 +26,7 @@ namespace Scavenger.Core
                 if (prefab != null)
                 {
                     var go = Object.Instantiate(prefab, sp.transform.position, sp.transform.rotation);
+                    UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(go, sp.gameObject.scene);
                     var no = go.GetComponent<NetworkObject>();
                     if (no != null)
                     {

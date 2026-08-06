@@ -147,22 +147,25 @@ public class PlayerSkillController : NetworkBehaviour
     {
         if (currentCharData == null) return;
 
-        var keyboard = Keyboard.current;
-        if (keyboard != null)
+        if (IsOwner)
         {
-            if (keyboard.qKey.wasPressedThisFrame) OnUltimateSkillPointerDown();
-            
-            if (keyboard.eKey.wasPressedThisFrame) OnSkillPointerDown(0);
-            if (keyboard.eKey.wasReleasedThisFrame) OnSkillPointerUp(0);
-            
-            if (keyboard.rKey.wasPressedThisFrame) OnSkillPointerDown(1);
-            if (keyboard.rKey.wasReleasedThisFrame) OnSkillPointerUp(1);
-            
-            if (keyboard.fKey.wasPressedThisFrame) OnSkillPointerDown(2);
-            if (keyboard.fKey.wasReleasedThisFrame) OnSkillPointerUp(2);
-            
-            if (keyboard.vKey.wasPressedThisFrame) OnSkillPointerDown(3);
-            if (keyboard.vKey.wasReleasedThisFrame) OnSkillPointerUp(3);
+            var keyboard = Keyboard.current;
+            if (keyboard != null)
+            {
+                if (keyboard.qKey.wasPressedThisFrame) OnUltimateSkillPointerDown();
+                
+                if (keyboard.eKey.wasPressedThisFrame) OnSkillPointerDown(0);
+                if (keyboard.eKey.wasReleasedThisFrame) OnSkillPointerUp(0);
+                
+                if (keyboard.rKey.wasPressedThisFrame) OnSkillPointerDown(1);
+                if (keyboard.rKey.wasReleasedThisFrame) OnSkillPointerUp(1);
+                
+                if (keyboard.fKey.wasPressedThisFrame) OnSkillPointerDown(2);
+                if (keyboard.fKey.wasReleasedThisFrame) OnSkillPointerUp(2);
+                
+                if (keyboard.vKey.wasPressedThisFrame) OnSkillPointerDown(3);
+                if (keyboard.vKey.wasReleasedThisFrame) OnSkillPointerUp(3);
+            }
         }
 
         // 현재 캐릭터의 Continuous 스킬 로직만 처리 (쿨타임 감소는 CharacterStateManager가 일괄 처리함)
@@ -194,6 +197,8 @@ public class PlayerSkillController : NetworkBehaviour
 
         if (ultimateSkill.IsReady)
         {
+            // 클라이언트(나)의 로컬 쿨타임을 먼저 시작시킵니다.
+            ultimateSkill.Use(); 
             CmdUseUltimateServerRpc();
         }
         else
@@ -205,20 +210,10 @@ public class PlayerSkillController : NetworkBehaviour
     [ServerRpc]
     private void CmdUseUltimateServerRpc()
     {
-        if (currentCharData == null) return;
-        CharacterState state = GetSkillState(currentCharData.id);
-        if (state == null) return;
-
-        UltimateSkillInstance ultimateSkill = state.ultimateSkill;
-        if (ultimateSkill == null || ultimateSkill.ultimateSkillId == 0) return;
-
-        // 서버 쿨타임 검증
-        if (ultimateSkill.IsReady)
-        {
-            ultimateSkill.Use(); // 서버 쿨타임 시작
-
-            RpcPlayUltimateClientRpc();
-        }
+        // 서버(데디케이티드 서버)에는 UI가 없으므로 currentCharData나 CharacterStateManager가 
+        // 클라이언트와 동일하게 세팅되어 있지 않습니다.
+        // 클라이언트에서 쿨타임 검증을 마치고 보냈으므로, 여기서는 모든 클라이언트에게 연출을 지시합니다.
+        RpcPlayUltimateClientRpc();
     }
 
     [ClientRpc]
