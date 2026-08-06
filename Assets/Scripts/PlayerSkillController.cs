@@ -150,6 +150,8 @@ public class PlayerSkillController : NetworkBehaviour
         var keyboard = Keyboard.current;
         if (keyboard != null)
         {
+            if (keyboard.qKey.wasPressedThisFrame) OnUltimateSkillPointerDown();
+            
             if (keyboard.eKey.wasPressedThisFrame) OnSkillPointerDown(0);
             if (keyboard.eKey.wasReleasedThisFrame) OnSkillPointerUp(0);
             
@@ -177,6 +179,95 @@ public class PlayerSkillController : NetworkBehaviour
                 }
                 
                 skill.UpdateInstant(GetShooter());
+            }
+        }
+    }
+
+    public void OnUltimateSkillPointerDown()
+    {
+        if (currentCharData == null) return;
+        CharacterState state = GetSkillState(currentCharData.id);
+        if (state == null) return;
+
+        UltimateSkillInstance ultimateSkill = state.ultimateSkill;
+        if (ultimateSkill == null || ultimateSkill.ultimateSkillId == 0) return;
+
+        if (ultimateSkill.IsReady)
+        {
+            CmdUseUltimateServerRpc();
+        }
+        else
+        {
+            Debug.Log($"[PlayerSkillController] 궁극기 쿨타임 중입니다: {ultimateSkill.currentCooldown:F1}초 남음");
+        }
+    }
+
+    [ServerRpc]
+    private void CmdUseUltimateServerRpc()
+    {
+        if (currentCharData == null) return;
+        CharacterState state = GetSkillState(currentCharData.id);
+        if (state == null) return;
+
+        UltimateSkillInstance ultimateSkill = state.ultimateSkill;
+        if (ultimateSkill == null || ultimateSkill.ultimateSkillId == 0) return;
+
+        // 서버 쿨타임 검증
+        if (ultimateSkill.IsReady)
+        {
+            ultimateSkill.Use(); // 서버 쿨타임 시작
+
+            RpcPlayUltimateClientRpc();
+        }
+    }
+
+    [ClientRpc]
+    private void RpcPlayUltimateClientRpc()
+    {
+        // 서버가 쿨타임을 시작했으므로 클라이언트도 쿨타임을 시작시킵니다 (로컬 예측/동기화)
+        if (currentCharData != null)
+        {
+            CharacterState state = GetSkillState(currentCharData.id);
+            if (state != null && state.ultimateSkill != null)
+            {
+                state.ultimateSkill.Use();
+            }
+        }
+
+        var playerController = GetComponent<PlayerController>();
+        if (playerController != null)
+        {
+            BaseUltimateSkill activeUlt = playerController.GetActiveUltimateSkill();
+            if (activeUlt != null)
+            {
+                var data = DataManager.Instance.GetData<UltimateSkillData>("UltimateSkill", currentCharData.ultimateSkill);
+                activeUlt.OnClientExecute(data, IsOwner);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 애니메이션 이벤트에서 호출되는 함수입니다.
+    /// </summary>
+    public void OnUltimateAnimationEvent(int eventId)
+    {
+        if (IsOwner)
+        {
+            CmdExecuteUltimateActionServerRpc(eventId);
+        }
+    }
+
+    [ServerRpc]
+    private void CmdExecuteUltimateActionServerRpc(int eventId)
+    {
+        var playerController = GetComponent<PlayerController>();
+        if (playerController != null)
+        {
+            BaseUltimateSkill activeUlt = playerController.GetActiveUltimateSkill();
+            if (activeUlt != null && currentCharData != null)
+            {
+                var data = DataManager.Instance.GetData<UltimateSkillData>("UltimateSkill", currentCharData.ultimateSkill);
+                activeUlt.OnServerExecute(data, eventId);
             }
         }
     }

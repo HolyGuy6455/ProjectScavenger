@@ -4,24 +4,33 @@ using UnityEngine;
 public class UltimateSkillInstance
 {
     public int ultimateSkillId;
+    public float currentCooldown;
 
     public UltimateSkillInstance(int id)
     {
         ultimateSkillId = id;
+        currentCooldown = 0f;
     }
 
     public UltimateSkillData Data => ultimateSkillId > 0 && DataManager.Instance != null ? DataManager.Instance.GetData<UltimateSkillData>("UltimateSkill", ultimateSkillId) : null;
 
-    // TODO: 궁극기 쿨타임/게이지 로직은 나중에 추가
-    public bool IsReady => true;
+    public bool IsReady => currentCooldown <= 0f;
 
     public void Use()
     {
-        // TODO: 궁극기 사용 로직
+        var data = Data;
+        if (data != null)
+        {
+            currentCooldown = data.cooldown;
+        }
     }
 
     public void UpdateCooldown(float deltaTime)
     {
-        // TODO: 궁극기 쿨타임 업데이트
+        if (currentCooldown > 0f)
+        {
+            currentCooldown -= deltaTime;
+            if (currentCooldown < 0f) currentCooldown = 0f;
+        }
     }
 }

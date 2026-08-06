@@ -515,4 +515,18 @@ public class PlayerController : NetworkBehaviour
             _rb.MoveRotation(Quaternion.RotateTowards(_rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
         }
     }
+
+    public BaseUltimateSkill GetActiveUltimateSkill()
+    {
+        int activeIndex = _activeSlotIndex.Value;
+        if (activeIndex >= 0 && activeIndex < _characterModels.Length)
+        {
+            GameObject activeModel = _characterModels[activeIndex];
+            if (activeModel != null)
+            {
+                return activeModel.GetComponent<BaseUltimateSkill>();
+            }
+        }
+        return null;
+    }
 }
