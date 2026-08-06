@@ -34,6 +34,8 @@ public class PlayerController : NetworkBehaviour
     
     // 캐릭터 동적 교체를 위한 변수
     private NetworkVariable<int> _activeSlotIndex = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public int ActiveSlotIndex => _activeSlotIndex.Value;
+    
     private GameObject[] _characterModels = new GameObject[4];
     
     // 임시 덱(Squad) 데이터. 나중에 네트워크 변수로 동기화하거나 로비에서 받아오도록 수정 예정입니다.

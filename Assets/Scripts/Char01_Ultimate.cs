@@ -11,7 +11,7 @@ public class Char01_Ultimate : BaseUltimateSkill
         switch (eventId)
         {
             case 0:
-                Debug.Log($"[Char01_Ultimate] (서버) 기본 이벤트 실행! 데미지 계수: {data.value1}");
+                Debug.Log($"[Char01_Ultimate] (서버) 기본 이벤트 실행! 데미지 계수: {data.value_1}");
                 // TODO: 기본 스폰/데미지 처리 로직
                 break;
             case 1:

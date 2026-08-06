@@ -10,9 +10,12 @@ public class UltimateSkillData : IData
     // 밸런스 데이터
     public float cooldown;
     public float duration;
-    public float cost;
-    public float value1;
-    public float value2;
+    public string resourceIcon;
+    public float thirst;
+    public float remain;
+    public int remainCostType;
+    public float value_1;
+    public float value_2;
 
     public int GetId()
     {

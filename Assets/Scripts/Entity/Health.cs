@@ -111,6 +111,23 @@ public class Health : NetworkBehaviour, IDamageable
         if (IsDead) return;
         if (amount <= 0) return;
 
+        // BuffController가 있다면 힐량 증폭 배율을 적용
+        BuffController buffController = GetComponent<BuffController>();
+        if (buffController != null)
+        {
+            // 이 Health 컴포넌트가 부착된 엔티티가 플레이어라면,
+            // 현재 활성화된 슬롯의 인덱스를 알아야 하지만, Health 컴포넌트 입장에서는 범용적으로 
+            // 0번 슬롯(기본)을 참조하거나 PlayerController를 통해 활성 슬롯을 가져옵니다.
+            int activeSlot = 0;
+            PlayerController pc = GetComponent<PlayerController>();
+            if (pc != null)
+            {
+                activeSlot = pc.ActiveSlotIndex;
+            }
+            float multiplier = buffController.GetTotalHealMultiplier(activeSlot);
+            amount *= multiplier;
+        }
+
         CurrentHealth += amount;
         if (CurrentHealth > maxHealth)
         {
