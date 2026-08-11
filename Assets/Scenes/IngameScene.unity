@@ -3521,6 +3521,9 @@ GameObject:
   - component: {fileID: 940697207}
   - component: {fileID: 940697206}
   - component: {fileID: 940697208}
+  - component: {fileID: 940697209}
+  - component: {fileID: 940697210}
+  - component: {fileID: 940697211}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -3592,6 +3595,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 939483c3d5be6ed40a4b0b06b52650f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterStateManager
+--- !u!114 &940697209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 940697202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5a05561a06020f4a901db73ac8b685b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.Manager.GameFlowManager
+--- !u!114 &940697210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 940697202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f7c6dffe80755e44b2abb1d0e4c1f2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.Network.NetworkGameResultSender
+--- !u!114 &940697211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 940697202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70407d9c59d435e43a7c589fa608eb64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_SystemActions
 --- !u!1 &1060167864
 GameObject:
   m_ObjectHideFlags: 0
