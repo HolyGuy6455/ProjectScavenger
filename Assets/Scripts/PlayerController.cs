@@ -216,6 +216,15 @@ public class PlayerController : NetworkBehaviour
             {
                 transform.position = spawnPos;
             }
+
+            // NetworkTransform의 Teleport만 호출할 경우, 물리 엔진 업데이트 주기(FixedUpdate)와
+            // 맞물려 Rigidbody의 position이 과거 위치로 인식되어 다시 원래 자리로 되돌아가는 현상(Snap-back)이 발생할 수 있습니다.
+            // 이를 방지하기 위해 Rigidbody의 position과 velocity를 명시적으로 갱신합니다.
+            if (_rb != null)
+            {
+                _rb.position = spawnPos;
+                _rb.linearVelocity = Vector3.zero;
+            }
         }
 
         // 물리 복구

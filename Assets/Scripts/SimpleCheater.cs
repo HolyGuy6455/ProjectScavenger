@@ -74,6 +74,17 @@ public class SimpleCheater : MonoBehaviour
             playerHealth.transform.position = spawnObj.transform.position;
         }
 
+        // NetworkTransform의 Teleport만 호출할 경우, 물리 엔진(Rigidbody)이 변경된 transform.position을
+        // 즉각 반영하지 못해 FixedUpdate에서 과거 위치를 기준으로 연산하게 되고, 
+        // 결과적으로 원래 자리로 되돌아가면서 바닥을 뚫고 떨어지는 현상이 발생할 수 있습니다.
+        // 이를 방지하기 위해 Rigidbody의 position도 명시적으로 변경해줍니다.
+        var rb = playerHealth.GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.position = spawnObj.transform.position;
+            rb.linearVelocity = Vector3.zero;
+        }
+
         Debug.Log($"[Cheat] 플레이어를 스폰 포인트({spawnObj.transform.position})로 텔레포트했습니다.");
     }
 }
