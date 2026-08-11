@@ -28,6 +28,7 @@ namespace Scavenger.UI
                 // 기본 맵 초기화
                 mapDropdown.options.Clear();
                 mapDropdown.options.Add(new TMP_Dropdown.OptionData("Stage001"));
+                mapDropdown.options.Add(new TMP_Dropdown.OptionData("Stage002"));
                 // 나중에 맵이 추가되면 여기에 추가할 수 있습니다.
             }
         }

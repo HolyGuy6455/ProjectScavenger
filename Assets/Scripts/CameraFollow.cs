@@ -13,6 +13,7 @@ public class CameraFollow : MonoBehaviour
 
     private Vector3 _offset;
     private PlayerController _playerController;
+    private System.Collections.Generic.HashSet<Scavenger.Environment.ObscurableCeiling> obscuredCeilings = new System.Collections.Generic.HashSet<Scavenger.Environment.ObscurableCeiling>();
 
     private void Start()
     {
@@ -52,5 +53,40 @@ public class CameraFollow : MonoBehaviour
         }
 
         transform.position = Vector3.Lerp(transform.position, desiredPos, smoothSpeed * Time.deltaTime);
+        
+        HandleOcclusion();
+    }
+
+    private void HandleOcclusion()
+    {
+        if (target == null) return;
+        
+        Vector3 camPos = transform.position;
+        Vector3 playerPos = target.position + Vector3.up * 1.5f; // Aim at chest/head
+        Vector3 dir = playerPos - camPos;
+        float dist = dir.magnitude;
+        
+        RaycastHit[] hits = Physics.RaycastAll(camPos, dir.normalized, dist);
+        System.Collections.Generic.HashSet<Scavenger.Environment.ObscurableCeiling> currentHits = new System.Collections.Generic.HashSet<Scavenger.Environment.ObscurableCeiling>();
+        
+        foreach (var hit in hits)
+        {
+            var oc = hit.collider.GetComponent<Scavenger.Environment.ObscurableCeiling>();
+            if (oc != null)
+            {
+                currentHits.Add(oc);
+                oc.SetObscured(true);
+            }
+        }
+        
+        foreach (var oc in obscuredCeilings)
+        {
+            if (!currentHits.Contains(oc) && oc != null)
+            {
+                oc.SetObscured(false);
+            }
+        }
+        
+        obscuredCeilings = currentHits;
     }
 }
