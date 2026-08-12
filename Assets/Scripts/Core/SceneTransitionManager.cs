@@ -9,6 +9,7 @@ namespace Scavenger.Core
         EnterInGame,
         ReturnToLobby,
         StartSingleplayerHost,
+        ReturnToIngameTest,
         // 나중에 EnterDungeon 등 추가 가능
     }
 

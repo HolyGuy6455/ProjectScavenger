@@ -65,6 +65,9 @@ namespace Scavenger.UI
                 case LoadingIntent.StartSingleplayerHost:
                     StartSingleplayerHost();
                     break;
+                case LoadingIntent.ReturnToIngameTest:
+                    ReturnToTestScene();
+                    break;
                 default:
                     Debug.LogWarning("정의되지 않거나 None인 인텐트입니다. 기본적으로 로비로 돌려보냅니다.");
                     ReturnToLobby();
@@ -212,6 +215,27 @@ namespace Scavenger.UI
             // 짧은 대기 후 아웃게임 씬으로 복귀
             yield return new WaitForSeconds(0.5f);
             SceneManager.LoadScene("OutgameScene");
+        }
+
+        private void ReturnToTestScene()
+        {
+            StartCoroutine(ReturnToTestSceneRoutine());
+        }
+
+        private System.Collections.IEnumerator ReturnToTestSceneRoutine()
+        {
+            if (statusText != null) statusText.text = "Returning to Test Scene...\nCleaning up resources...";
+            
+            if (NetworkManager.Singleton != null && (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsServer))
+            {
+                NetworkManager.Singleton.Shutdown();
+            }
+
+            System.GC.Collect();
+            yield return Resources.UnloadUnusedAssets();
+
+            yield return new WaitForSeconds(0.5f);
+            SceneManager.LoadScene("IngameTestScene");
         }
     }
 }

@@ -30,9 +30,16 @@ namespace Scavenger.UI
                 NetworkManager.Singleton.Shutdown();
             }
 
-            // 아웃게임 씬으로 강제 전환 대신, 인텐트를 담아 로딩 씬으로 이동
-            // 추후 이 로딩 씬에서 무거운 리소스 해제 등의 작업을 수행할 수 있습니다.
-            Scavenger.Core.SceneTransitionManager.LoadSceneWithIntent(Scavenger.Core.LoadingIntent.ReturnToLobby);
+            // 로그인을 안 한 상태라면(테스트 씬을 통해 진입) IngameTestScene으로 돌아감
+            if (Scavenger.Network.NetworkAuthManager.Instance == null || 
+                string.IsNullOrEmpty(Scavenger.Network.NetworkAuthManager.Instance.AuthToken))
+            {
+                Scavenger.Core.SceneTransitionManager.LoadSceneWithIntent(Scavenger.Core.LoadingIntent.ReturnToIngameTest);
+            }
+            else
+            {
+                Scavenger.Core.SceneTransitionManager.LoadSceneWithIntent(Scavenger.Core.LoadingIntent.ReturnToLobby);
+            }
         }
 
         /// <summary>
