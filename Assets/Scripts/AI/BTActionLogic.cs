@@ -20,5 +20,7 @@ public abstract class BTActionLogic
         return key;
     }
 
+    public virtual void ResetState() { }
+
     public abstract NodeState Evaluate(AIBrain brain);
 }

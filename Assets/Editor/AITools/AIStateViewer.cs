@@ -829,6 +829,29 @@ public class AIStateViewer : EditorWindow
                         fieldRow.Add(toggleField);
                         dynamicFieldsContainer.Add(fieldRow);
                     }
+                    else if (field.FieldType == typeof(float))
+                    {
+                        VisualElement fieldRow = new VisualElement();
+                        fieldRow.style.flexDirection = FlexDirection.Row;
+                        fieldRow.style.marginBottom = 5;
+
+                        Label fieldLabel = new Label(field.Name);
+                        fieldLabel.style.width = 145;
+                        fieldLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
+
+                        UnityEngine.UIElements.FloatField floatField = new UnityEngine.UIElements.FloatField();
+                        floatField.value = (float)field.GetValue(act.logic);
+                        floatField.style.flexGrow = 1;
+                        floatField.RegisterValueChangedCallback(evt => {
+                            field.SetValue(act.logic, evt.newValue);
+                            EditorUtility.SetDirty(currentBrain);
+                            UpdateInspector();
+                        });
+
+                        fieldRow.Add(fieldLabel);
+                        fieldRow.Add(floatField);
+                        dynamicFieldsContainer.Add(fieldRow);
+                    }
                     else if (field.FieldType.IsEnum)
                     {
                         VisualElement fieldRow = new VisualElement();

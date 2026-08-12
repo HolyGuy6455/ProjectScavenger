@@ -80,7 +80,17 @@ namespace Scavenger.UI
             }
             else
             {
-                Debug.LogWarning("[TestScene] NetworkAuthManager.Instance 가 null입니다. 기본 주소(http://localhost:5000)를 사용합니다. Test 씬에서 직접 시작한 경우 발생할 수 있습니다.");
+                // NetworkAuthManager가 씬에 없다면 Resources에서 직접 설정값을 읽어옵니다.
+                var textAsset = Resources.Load<TextAsset>("ServerConfig");
+                if (textAsset != null)
+                {
+                    var config = JsonUtility.FromJson<Scavenger.Network.ServerConfigInfo>(textAsset.text);
+                    if (config != null && !string.IsNullOrEmpty(config.ServerUrl))
+                    {
+                        serverUrl = config.ServerUrl;
+                    }
+                }
+                Debug.Log($"[TestScene] NetworkAuthManager가 없습니다. ServerConfig.json에서 주소({serverUrl})를 로드합니다.");
             }
 
             string url = serverUrl + "/api/debug/spawn-dedicated";

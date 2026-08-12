@@ -200,21 +200,7 @@ namespace Scavenger.UI
 
         private System.Collections.IEnumerator ReturnToLobbyRoutine()
         {
-            if (statusText != null) statusText.text = "Returning to Lobby...\nCleaning up resources...";
-            
-            // 혹시라도 네트워크가 연결되어 있다면 종료
-            if (NetworkManager.Singleton != null && (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsServer))
-            {
-                NetworkManager.Singleton.Shutdown();
-            }
-
-            // 무거운 리소스 해제 및 가비지 컬렉터 강제 실행
-            System.GC.Collect();
-            yield return Resources.UnloadUnusedAssets();
-
-            // 짧은 대기 후 아웃게임 씬으로 복귀
-            yield return new WaitForSeconds(0.5f);
-            SceneManager.LoadScene("OutgameScene");
+            yield return StartCoroutine(CleanupAndLoadScene("OutgameScene"));
         }
 
         private void ReturnToTestScene()
@@ -224,18 +210,49 @@ namespace Scavenger.UI
 
         private System.Collections.IEnumerator ReturnToTestSceneRoutine()
         {
-            if (statusText != null) statusText.text = "Returning to Test Scene...\nCleaning up resources...";
+            yield return StartCoroutine(CleanupAndLoadScene("IngameTestScene"));
+        }
+
+        private System.Collections.IEnumerator CleanupAndLoadScene(string targetSceneName)
+        {
+            if (statusText != null) statusText.text = $"Returning to {targetSceneName}...\nCleaning up resources...";
             
+            // 네트워크 셧다운
             if (NetworkManager.Singleton != null && (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsServer))
             {
                 NetworkManager.Singleton.Shutdown();
             }
 
+            // 셧다운이 처리될 약간의 시간을 줌
+            yield return new WaitForSeconds(0.1f);
+
+            // DontDestroyOnLoad로 남아서 다음 게임에 영향을 주거나 중복을 유발하는 매니저들을 강제 파괴
+            if (NetworkManager.Singleton != null)
+            {
+                Destroy(NetworkManager.Singleton.gameObject);
+            }
+            
+            if (CharacterStateManager.Instance != null)
+            {
+                Destroy(CharacterStateManager.Instance.gameObject);
+            }
+
+            if (Scavenger.Manager.GameFlowManager.Instance != null)
+            {
+                Destroy(Scavenger.Manager.GameFlowManager.Instance.gameObject);
+            }
+
+            // 기타 불필요한 메모리 해제
             System.GC.Collect();
             yield return Resources.UnloadUnusedAssets();
 
-            yield return new WaitForSeconds(0.5f);
-            SceneManager.LoadScene("IngameTestScene");
+            yield return new WaitForSeconds(0.4f);
+            
+            // 목표 씬 로드
+            SceneManager.LoadScene(targetSceneName);
+
+            // 로딩 화면 자기 자신도 파괴 (Test 씬 등에 이미 배치되어 있을 경우 중복 방지)
+            Destroy(transform.root.gameObject);
         }
     }
 }

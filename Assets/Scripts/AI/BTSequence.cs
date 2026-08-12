@@ -26,8 +26,6 @@ public class BTSequence : BTNode
 
     public override NodeState Evaluate(AIBrain brain)
     {
-        bool anyChildIsRunning = false;
-
         foreach (BTNode child in children)
         {
             switch (child.Evaluate(brain))
@@ -38,15 +36,15 @@ public class BTSequence : BTNode
                 case NodeState.SUCCESS:
                     continue;
                 case NodeState.RUNNING:
-                    anyChildIsRunning = true;
-                    continue;
+                    state = NodeState.RUNNING;
+                    return state;
                 default:
                     state = NodeState.SUCCESS;
                     return state;
             }
         }
 
-        state = anyChildIsRunning ? NodeState.RUNNING : NodeState.SUCCESS;
+        state = NodeState.SUCCESS;
         return state;
     }
 }

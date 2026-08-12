@@ -13,6 +13,12 @@ namespace Scavenger.Core
 
             foreach (var sp in spawnPoints)
             {
+                // [임시 처리] 적 스폰 포인트일 경우, 다른 몹을 무시하고 무조건 멧돼지(Animal_Boar)를 소환합니다.
+                if (sp.spawnType == NetworkSpawnPoint.SpawnType.Enemy)
+                {
+                    sp.prefabName = "Animal_Boar";
+                }
+
                 GameObject prefab = null;
                 foreach (var networkPrefab in NetworkManager.Singleton.NetworkConfig.Prefabs.Prefabs)
                 {

@@ -10,6 +10,11 @@ public class EntityMovement : MonoBehaviour
     private Rigidbody _rb;
     private Vector3 _targetPosition;
     private bool _isMoving = false;
+    
+    // 방향 기반 이동 (스킬용)
+    private bool _isMovingInDirection = false;
+    private Vector3 _moveDirection;
+    private float _customSpeed;
 
     private void Awake()
     {
@@ -25,6 +30,18 @@ public class EntityMovement : MonoBehaviour
     {
         _targetPosition = targetPos;
         _isMoving = true;
+        _isMovingInDirection = false;
+    }
+
+    /// <summary>
+    /// 목표물이 아닌 특정 방향으로 지정된 속도로 이동시킵니다. (돌진 스킬 등에 사용)
+    /// </summary>
+    public void MoveInDirection(Vector3 direction, float speed)
+    {
+        _moveDirection = direction.normalized;
+        _customSpeed = speed;
+        _isMovingInDirection = true;
+        _isMoving = false;
     }
 
     /// <summary>
@@ -33,12 +50,28 @@ public class EntityMovement : MonoBehaviour
     public void Stop()
     {
         _isMoving = false;
+        _isMovingInDirection = false;
         _rb.linearVelocity = Vector3.zero;
         _rb.angularVelocity = Vector3.zero;
     }
 
     private void FixedUpdate()
     {
+        if (_isMovingInDirection)
+        {
+            Vector3 mDir = _moveDirection;
+            mDir.y = 0f;
+            
+            _rb.MovePosition(_rb.position + mDir * (_customSpeed * Time.fixedDeltaTime));
+            
+            if (mDir.sqrMagnitude > 0.001f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(mDir);
+                _rb.rotation = Quaternion.RotateTowards(_rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
+            }
+            return;
+        }
+
         if (!_isMoving) return;
 
         Vector3 dir = _targetPosition - _rb.position;

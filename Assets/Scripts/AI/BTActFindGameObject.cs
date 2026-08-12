@@ -16,6 +16,8 @@ public class BTActFindGameObject : BTActionLogic
     
     public bool findClosest = false;
     public string mySelfKey = "";
+    
+    public bool returnRunningIfNotFound = true;
 
     public override string GetDescription(AIBrain brain)
     {
@@ -23,8 +25,9 @@ public class BTActFindGameObject : BTActionLogic
         string targetStr = GetKeyValueString<BTSharedString>(brain, targetStringKey);
         
         string closestStr = findClosest ? $"\n('{mySelfKey}'에서 가장 가까운 오브젝트 우선선택)" : "";
+        string waitStr = returnRunningIfNotFound ? "\n(찾을 때까지 대기합니다)" : "";
         
-        return $"{methodStr}가 {targetStr}인 게임 오브젝트를 찾아 '{outGameObjectKey}'에 저장합니다. {closestStr}";
+        return $"{methodStr}가 {targetStr}인 게임 오브젝트를 찾아 '{outGameObjectKey}'에 저장합니다. {closestStr}{waitStr}";
     }
 
     public override NodeState Evaluate(AIBrain brain)
@@ -49,7 +52,7 @@ public class BTActFindGameObject : BTActionLogic
                 foundObjs = GameObject.FindGameObjectsWithTag(searchStr);
             } catch (UnityException) {
                 // Occurs if the tag is not defined
-                return NodeState.FAILURE;
+                return returnRunningIfNotFound ? NodeState.RUNNING : NodeState.FAILURE;
             }
         }
         else
@@ -62,7 +65,7 @@ public class BTActFindGameObject : BTActionLogic
         if (foundObjs == null || foundObjs.Length == 0)
         {
             outGoProp.value = null;
-            return NodeState.FAILURE;
+            return returnRunningIfNotFound ? NodeState.RUNNING : NodeState.FAILURE;
         }
 
         if (findClosest)

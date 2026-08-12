@@ -35,7 +35,6 @@ public class AIBrain : NetworkBehaviour
 
         if (rootNode != null)
         {
-            rootNode.ResetState();
             rootNode.Evaluate(this);
         }
     }

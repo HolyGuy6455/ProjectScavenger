@@ -2055,7 +2055,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1978879476}
   - component: {fileID: 1978879475}
-  - component: {fileID: 1978879477}
   m_Layer: 0
   m_Name: TestSceneConstroller
   m_TagString: Untagged
@@ -2093,18 +2092,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1978879477
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1978879474}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 332ee524ff1ec464497e4c57aa22ebc3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.Network.NetworkAuthManager
 --- !u!1 &2038743375
 GameObject:
   m_ObjectHideFlags: 0
