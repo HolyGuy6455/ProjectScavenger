@@ -56,6 +56,11 @@ public class DataConverterEditor : EditorWindow
             ConvertData<ObstacleDataList, ObstacleData>("Obstacle", "Scavenger - Obstacle.tsv");
         }
         
+        if (GUILayout.Button("Convert MobGroup Data (JSON -> Bytes)"))
+        {
+            ConvertMobGroupData();
+        }
+        
         GUILayout.Space(10);
 
         if (GUILayout.Button("Convert All Data"))
@@ -74,8 +79,53 @@ public class DataConverterEditor : EditorWindow
         ConvertData<LootDataList, LootData>("Loot", "Scavenger - Loot.tsv");
         ConvertData<EnemyDataList, EnemyData>("Enemy", "Scavenger - Enemy.tsv");
         ConvertData<ObstacleDataList, ObstacleData>("Obstacle", "Scavenger - Obstacle.tsv");
+        ConvertMobGroupData();
         AssetDatabase.Refresh();
         Debug.Log("Finished Convert All Data operation.");
+    }
+
+    private void ConvertMobGroupData()
+    {
+        string folderPath = Application.dataPath + "/GameData/MobGroups/";
+        if (!Directory.Exists(folderPath))
+        {
+            Debug.LogWarning($"[DataConverter] Mob Groups Folder not found: {folderPath}");
+            return;
+        }
+
+        string[] files = Directory.GetFiles(folderPath, "*.json");
+        MobGroupDataList dataList = new MobGroupDataList();
+        
+        foreach (string file in files)
+        {
+            try
+            {
+                string json = File.ReadAllText(file);
+                MobGroupData data = JsonUtility.FromJson<MobGroupData>(json);
+                if (data != null)
+                {
+                    dataList.Groups.Add(data);
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[DataConverter] Failed to load mob group {file}: {e.Message}");
+            }
+        }
+
+        string jsonContent = JsonUtility.ToJson(dataList);
+        byte[] encryptedBytes = CryptoUtility.Encrypt(jsonContent);
+
+        string dataPath = Application.dataPath + "/Resources_moved/Data";
+        if (!Directory.Exists(dataPath))
+        {
+            Directory.CreateDirectory(dataPath);
+        }
+
+        string savePath = Path.Combine(dataPath, "MobGroupData.bytes");
+        File.WriteAllBytes(savePath, encryptedBytes);
+        
+        Debug.Log($"Successfully converted {dataList.Groups.Count} Mob Groups to: {savePath}");
     }
 
     private void ConvertData<TList, TData>(string dataName, string tsvFileName) 

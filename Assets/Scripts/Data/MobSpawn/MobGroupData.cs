@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
+public class MobGroupDataList
+{
+    public List<MobGroupData> Groups = new List<MobGroupData>();
+}
+
+[Serializable]
 public class MobGroupData
 {
     public string GroupID;

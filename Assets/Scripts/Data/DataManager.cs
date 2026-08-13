@@ -53,43 +53,47 @@ public class DataManager : MonoBehaviour
         yield return StartCoroutine(LoadDataAsync<EnemyDataList, EnemyData>("Enemy", "EnemyData"));
         yield return StartCoroutine(LoadDataAsync<ObstacleDataList, ObstacleData>("Obstacle", "ObstacleData"));
 
-        // 몹 그룹 데이터 로드 (현재는 에디터 편의상 폴더 직독 방식 유지. 추후 어드레서블 라벨 단위 로드로 변경 추천)
-        LoadAllMobGroups(Application.dataPath + "/GameData/MobGroups/");
+        // 몹 그룹 데이터 로드 (하나로 합쳐진 어드레서블 'MobGroupData' 파일 사용)
+        yield return StartCoroutine(LoadMobGroupsAsync());
 
         IsDataLoaded = true;
         Debug.Log("[DataManager] All Initial Data Loaded Successfully via Addressables.");
     }
 
     /// <summary>
-    /// 지정된 폴더에 있는 모든 JSON 몹 그룹 데이터를 로드합니다.
+    /// 어드레서블 "MobGroupData" 파일을 비동기로 로드하고 복호화하여 파싱합니다.
     /// </summary>
-    public void LoadAllMobGroups(string folderPath)
+    public IEnumerator LoadMobGroupsAsync()
     {
         allMobGroups.Clear();
-        if (!Directory.Exists(folderPath))
-        {
-            Debug.LogWarning($"[DataManager] Mob Groups Folder not found: {folderPath}");
-            return;
-        }
+        
+        var handle = Addressables.LoadAssetAsync<TextAsset>("MobGroupData");
+        yield return handle;
 
-        string[] files = Directory.GetFiles(folderPath, "*.json");
-        foreach (string file in files)
+        if (handle.Status == AsyncOperationStatus.Succeeded && handle.Result != null)
         {
             try
             {
-                string json = File.ReadAllText(file);
-                MobGroupData data = JsonUtility.FromJson<MobGroupData>(json);
-                if (data != null)
+                string decryptedJson = CryptoUtility.Decrypt(handle.Result.bytes);
+                MobGroupDataList dataList = JsonUtility.FromJson<MobGroupDataList>(decryptedJson);
+                
+                if (dataList != null && dataList.Groups != null)
                 {
-                    allMobGroups.Add(data);
+                    allMobGroups = dataList.Groups;
+                    Debug.Log($"[DataManager] Successfully loaded {allMobGroups.Count} Mob Groups from Addressables.");
                 }
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"[DataManager] Failed to load mob group {file}: {e.Message}");
+                Debug.LogError($"[DataManager] Failed to parse MobGroupData: {e.Message}");
             }
         }
-        Debug.Log($"[DataManager] Successfully loaded {allMobGroups.Count} Mob Groups from JSON.");
+        else
+        {
+            Debug.LogWarning($"[DataManager] Failed to load MobGroupData via Addressables.");
+        }
+
+        Addressables.Release(handle);
     }
 
     /// <summary>

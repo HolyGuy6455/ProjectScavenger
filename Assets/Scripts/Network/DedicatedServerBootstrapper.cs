@@ -16,7 +16,7 @@ namespace Scavenger.Network
             if (IsDedicatedServer())
             {
                 DontDestroyOnLoad(gameObject);
-                StartAsServer();
+                StartCoroutine(StartAsServerRoutine());
             }
         }
 
@@ -27,10 +27,14 @@ namespace Scavenger.Network
             return args.Contains("-server");
         }
 
-        private void StartAsServer()
+        private System.Collections.IEnumerator StartAsServerRoutine()
         {
             Debug.Log("[NGO] 초기화 중... 데디케이티드 서버 전용 씬 부팅");
             
+            // DataManager가 모두 로드될 때까지 대기 (서버는 로딩씬을 거치지 않으므로 여기서 대기 필수)
+            yield return new WaitUntil(() => DataManager.Instance != null && DataManager.Instance.IsDataLoaded);
+            Debug.Log("[NGO] DataManager 데이터 비동기 로드 완료 확인.");
+
             // 포트 파싱 (-port 7777)
             string[] args = System.Environment.GetCommandLineArgs();
             int port = 7777; // 기본값
