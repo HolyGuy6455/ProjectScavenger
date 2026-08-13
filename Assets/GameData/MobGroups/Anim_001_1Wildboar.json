@@ -1,0 +1,22 @@
+{
+    "GroupID": "Anim_001_1Wildboar",
+    "Memo": "",
+    "Category": 1,
+    "DangerLevel": 2,
+    "AreaSize": 5.0,
+    "SpawnInfos": [
+        {
+            "MobID": "Animal_Boar",
+            "LocalPosition": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "LocalEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        }
+    ]
+}

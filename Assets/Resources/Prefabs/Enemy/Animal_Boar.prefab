@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: -2828825535598470214}
   - component: {fileID: 1877874696352170484}
   - component: {fileID: 8129919451694431373}
+  - component: {fileID: 6806687160027039604}
   m_Layer: 7
   m_Name: Animal_Boar
   m_TagString: Enemy
@@ -115,7 +116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1879745670
+  GlobalObjectIdHash: 1680206486
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -757,7 +758,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e2d3c79cf9b0b44c8a4cb773395bb65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootDropper
-  lootTableId: 2
 --- !u!114 &1877874696352170484
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -790,6 +790,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e460bbecbd7a2c4bb17698d73b58e32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimator
+--- !u!114 &6806687160027039604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 935df63b07486184694625ec2484a3c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyController
 --- !u!1001 &8017058706133763299
 PrefabInstance:
   m_ObjectHideFlags: 0

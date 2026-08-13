@@ -13,10 +13,10 @@ namespace Scavenger.Core
 
             foreach (var sp in spawnPoints)
             {
-                // [임시 처리] 적 스폰 포인트일 경우, 다른 몹을 무시하고 무조건 멧돼지(Animal_Boar)를 소환합니다.
+                // [기존 몹 소환 무시] 기존의 Enemy 스폰 포인트는 무시합니다. (새로운 MobSpawner가 담당)
                 if (sp.spawnType == NetworkSpawnPoint.SpawnType.Enemy)
                 {
-                    sp.prefabName = "Animal_Boar";
+                    continue;
                 }
 
                 GameObject prefab = null;
@@ -46,6 +46,14 @@ namespace Scavenger.Core
                 }
             }
             Debug.Log($"[MapSpawner] Successfully dynamically spawned {spawnedCount} map objects.");
+
+            // [신규 몹 스포너 작동]
+            var mobSpawners = Object.FindObjectsByType<MobSpawner>(FindObjectsSortMode.None);
+            foreach (var spawner in mobSpawners)
+            {
+                spawner.SpawnMobs();
+            }
+            Debug.Log($"[MapSpawner] Successfully triggered {mobSpawners.Length} MobSpawners.");
         }
     }
 }

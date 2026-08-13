@@ -1,7 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
-
+using System.Linq;
+using System.Collections;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 public class DataManager : MonoBehaviour
 {
     public static DataManager Instance { get; private set; }
@@ -9,6 +12,11 @@ public class DataManager : MonoBehaviour
     // 카테고리별로 데이터를 분리하여 저장하는 이중 딕셔너리
     // 구조: <Category, <ID, IData>>
     private Dictionary<string, Dictionary<int, IData>> categoryDataMap = new Dictionary<string, Dictionary<int, IData>>();
+
+    // 몹 스폰 그룹 데이터 리스트 (JSON)
+    private List<MobGroupData> allMobGroups = new List<MobGroupData>();
+
+    public bool IsDataLoaded { get; private set; } = false;
 
     private void Awake()
     {
@@ -21,61 +29,116 @@ public class DataManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         // TODO: 나중에 전체 데이터 로드 시점(예: 로딩 화면, 타이틀 화면 등)이 정해지면 
-        // 아래 로직은 외부 흐름 관리자에서 직접 LoadAllInitialData()를 호출해야 합니다.
+        // 아래 로직은 외부 흐름 관리자에서 직접 호출해야 합니다.
         if (categoryDataMap.Count == 0)
         {
-            LoadAllInitialData();
+            StartCoroutine(LoadAllInitialDataAsync());
         }
     }
 
     /// <summary>
-    /// 게임 시작에 필요한 초기 데이터들을 일괄 로드하는 매서드입니다.
-    /// 차후 다른 데이터(적 데이터, 아이템 데이터 등)가 생기면 이곳에 추가하여 한꺼번에 로드할 수 있습니다.
+    /// 게임 시작에 필요한 초기 데이터들을 일괄 비동기 로드하는 매서드입니다.
     /// </summary>
-    public void LoadAllInitialData()
+    public IEnumerator LoadAllInitialDataAsync()
     {
-        // 파일 확장자를 .bytes로 변경했습니다 (Resources Load를 위함)
-        LoadData<GunDataList, GunData>("Gun", "GunData.bytes");
-        LoadData<ItemDataList, ItemData>("Item", "ItemData.bytes");
-        LoadData<CharDataList, CharData>("Char", "CharData.bytes");
-        LoadData<SkillDataList, SkillData>("Skill", "SkillData.bytes");
-        LoadData<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "UltimateSkillData.bytes");
-        LoadData<LootDataList, LootData>("Loot", "LootData.bytes");
-        LoadData<EnemyDataList, EnemyData>("Enemy", "EnemyData.bytes");
-        LoadData<ObstacleDataList, ObstacleData>("Obstacle", "ObstacleData.bytes");
+        IsDataLoaded = false;
+
+        // 어드레서블 주소(Address)는 에디터에서 세팅한 주소(보통 확장자가 빠진 이름)를 사용합니다.
+        yield return StartCoroutine(LoadDataAsync<GunDataList, GunData>("Gun", "GunData"));
+        yield return StartCoroutine(LoadDataAsync<ItemDataList, ItemData>("Item", "ItemData"));
+        yield return StartCoroutine(LoadDataAsync<CharDataList, CharData>("Char", "CharData"));
+        yield return StartCoroutine(LoadDataAsync<SkillDataList, SkillData>("Skill", "SkillData"));
+        yield return StartCoroutine(LoadDataAsync<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "UltimateSkillData"));
+        yield return StartCoroutine(LoadDataAsync<LootDataList, LootData>("Loot", "LootData"));
+        yield return StartCoroutine(LoadDataAsync<EnemyDataList, EnemyData>("Enemy", "EnemyData"));
+        yield return StartCoroutine(LoadDataAsync<ObstacleDataList, ObstacleData>("Obstacle", "ObstacleData"));
+
+        // 몹 그룹 데이터 로드 (현재는 에디터 편의상 폴더 직독 방식 유지. 추후 어드레서블 라벨 단위 로드로 변경 추천)
+        LoadAllMobGroups(Application.dataPath + "/GameData/MobGroups/");
+
+        IsDataLoaded = true;
+        Debug.Log("[DataManager] All Initial Data Loaded Successfully via Addressables.");
     }
 
     /// <summary>
-    /// 지정된 카테고리의 데이터를 지정된 파일명(.dat)을 통해 에디터의 Data 폴더나 실제 빌드 기기의 저장소에서 찾아 로드합니다.
-    /// 사용 예: DataManager.Instance.LoadData<GunDataList, GunData>("Gun", "GunData.dat");
+    /// 지정된 폴더에 있는 모든 JSON 몹 그룹 데이터를 로드합니다.
     /// </summary>
-    public void LoadData<TList, TData>(string category, string fileName) 
+    public void LoadAllMobGroups(string folderPath)
+    {
+        allMobGroups.Clear();
+        if (!Directory.Exists(folderPath))
+        {
+            Debug.LogWarning($"[DataManager] Mob Groups Folder not found: {folderPath}");
+            return;
+        }
+
+        string[] files = Directory.GetFiles(folderPath, "*.json");
+        foreach (string file in files)
+        {
+            try
+            {
+                string json = File.ReadAllText(file);
+                MobGroupData data = JsonUtility.FromJson<MobGroupData>(json);
+                if (data != null)
+                {
+                    allMobGroups.Add(data);
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[DataManager] Failed to load mob group {file}: {e.Message}");
+            }
+        }
+        Debug.Log($"[DataManager] Successfully loaded {allMobGroups.Count} Mob Groups from JSON.");
+    }
+
+    /// <summary>
+    /// 조건에 맞는 몹 그룹 중 하나를 무작위로 뽑아서 반환합니다.
+    /// </summary>
+    public MobGroupData GetRandomMatchingGroup(MobCategory allowedCategories, int maxDangerLevel, float maxAreaSize)
+    {
+        if (allMobGroups.Count == 0)
+        {
+            Debug.LogWarning("[DataManager] No mob groups loaded!");
+            return null;
+        }
+
+        var validGroups = allMobGroups.Where(g => 
+            (g.Category & allowedCategories) != 0 &&
+            g.DangerLevel <= maxDangerLevel &&
+            g.AreaSize <= maxAreaSize
+        ).ToList();
+
+        if (validGroups.Count == 0)
+        {
+            Debug.LogWarning($"[DataManager] No mob group matches criteria: Category={allowedCategories}, Danger<={maxDangerLevel}, Size<={maxAreaSize}");
+            return null;
+        }
+
+        int randomIndex = Random.Range(0, validGroups.Count);
+        return validGroups[randomIndex];
+    }
+
+    /// <summary>
+    /// 어드레서블을 이용해 데이터를 비동기 로드합니다.
+    /// </summary>
+    public IEnumerator LoadDataAsync<TList, TData>(string category, string address) 
         where TList : IDataList<TData> 
         where TData : class, IData
     {
-        // 1순위: 기기에 다운로드 받은 파일이 있는지 확인 (패치 적용 시)
-        string persistentPath = Path.Combine(Application.persistentDataPath, fileName);
-        
-        if (File.Exists(persistentPath))
+        var handle = Addressables.LoadAssetAsync<TextAsset>(address);
+        yield return handle;
+
+        if (handle.Status == AsyncOperationStatus.Succeeded && handle.Result != null)
         {
-            byte[] encryptedBytes = File.ReadAllBytes(persistentPath);
-            ParseEncryptedData<TList, TData>(category, encryptedBytes);
+            ParseEncryptedData<TList, TData>(category, handle.Result.bytes);
         }
         else
         {
-            // 2순위: Resources/Data 폴더에서 로드 (안드로이드 APK 내부 파일도 동기적으로 읽을 수 있음)
-            string resourceName = "Data/" + Path.GetFileNameWithoutExtension(fileName);
-            TextAsset textAsset = Resources.Load<TextAsset>(resourceName);
-            
-            if (textAsset != null)
-            {
-                ParseEncryptedData<TList, TData>(category, textAsset.bytes);
-            }
-            else
-            {
-                Debug.LogError($"[DataManager] '{fileName}'을 찾을 수 없습니다.\n확인한 경로:\n1. {persistentPath}\n2. Resources/{resourceName}");
-            }
+            Debug.LogError($"[DataManager] Addressable load failed for address: {address}");
         }
+
+        Addressables.Release(handle);
     }
 
     private void ParseEncryptedData<TList, TData>(string category, byte[] encryptedBytes)

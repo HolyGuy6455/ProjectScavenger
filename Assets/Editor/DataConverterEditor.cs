@@ -107,8 +107,8 @@ public class DataConverterEditor : EditorWindow
         string jsonContent = JsonUtility.ToJson(dataList);
         byte[] encryptedBytes = CryptoUtility.Encrypt(jsonContent);
 
-        // 출력 경로는 Resources/Data 로 변경
-        string dataPath = Application.dataPath + "/Resources/Data";
+        // 출력 경로는 Resources_moved/Data 로 변경
+        string dataPath = Application.dataPath + "/Resources_moved/Data";
         if (!Directory.Exists(dataPath))
         {
             Directory.CreateDirectory(dataPath);

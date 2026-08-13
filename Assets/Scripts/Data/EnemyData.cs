@@ -7,7 +7,6 @@ public class EnemyData : IData
     public int id;
     public int hp;
     public int lootTable;
-    public int gun;
     public string prefabName;
 
     public int GetId()

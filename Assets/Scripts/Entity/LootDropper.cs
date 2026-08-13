@@ -7,8 +7,7 @@ using Unity.Netcode;
 [RequireComponent(typeof(Health))]
 public class LootDropper : NetworkBehaviour
 {
-    [Tooltip("파괴 시 드롭할 아이템 테이블 ID")]
-    public int lootTableId;
+    private ILootTableProvider lootProvider;
 
     public override void OnNetworkSpawn()
     {
@@ -17,22 +16,19 @@ public class LootDropper : NetworkBehaviour
             var health = GetComponent<Health>();
             health.OnDeath -= HandleDeath;
             health.OnDeath += HandleDeath;
-        }
-    }
 
-    /// <summary>
-    /// 외부(예: EnemySpawner 등)에서 런타임에 룻 테이블 ID를 주입할 때 사용합니다.
-    /// </summary>
-    public void SetLootTable(int id)
-    {
-        lootTableId = id;
+            lootProvider = GetComponent<ILootTableProvider>();
+        }
     }
 
     private void HandleDeath(DamageInfo info)
     {
-        if (!IsServer || lootTableId <= 0) return;
+        if (!IsServer) return;
 
-        LootData lootData = DataManager.Instance.GetData<LootData>("Loot", lootTableId);
+        int tableId = lootProvider != null ? lootProvider.GetLootTableId() : 0;
+        if (tableId <= 0) return;
+
+        LootData lootData = DataManager.Instance.GetData<LootData>("Loot", tableId);
         if (lootData == null) return;
 
         if (lootData.item != null && lootData.chance != null)

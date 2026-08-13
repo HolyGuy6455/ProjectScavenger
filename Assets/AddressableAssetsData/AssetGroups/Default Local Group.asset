@@ -15,6 +15,31 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 9d84af8eebae3504f81c9aca4d0a5031
   m_SerializeEntries:
+  - m_GUID: 0fdec1cf71be6dd4185a7b4e738b5829
+    m_Address: ItemData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1c73cc3fca305a248a17601d2870822f
+    m_Address: CharData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1feb50a42830db84da6f0ed773c6a4bb
+    m_Address: SkillData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 21ab4398afbd02941afe0742394205ee
+    m_Address: UltimateSkillData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 543351cc98223d94e9cb166d46768396
+    m_Address: GunData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5bb378b52c37dc14480c9016c2ab77e7
     m_Address: Stage002
     m_ReadOnly: 0
@@ -22,6 +47,21 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c93c1d49b4fe5f6478aae34f92b91e58
     m_Address: Stage001
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e4362fef288307f4ba9117e89889db3e
+    m_Address: EnemyData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e6692ef05ccae6946b8aeb2e5880b094
+    m_Address: LootData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f08f5548147589847b29931ff29b581d
+    m_Address: ObstacleData
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
