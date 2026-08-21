@@ -10,6 +10,12 @@ namespace Scavenger.UI
         [SerializeField] private Button startButton;
         [SerializeField] private Button startDedicatedButton;
         [SerializeField] private TMP_Dropdown mapDropdown; // 나중을 위해 추가
+        
+        [Header("임시 캐릭터 테스트용")]
+        [SerializeField] private TMP_InputField char1Input;
+        [SerializeField] private TMP_InputField char2Input;
+        [SerializeField] private TMP_InputField char3Input;
+        [SerializeField] private TMP_InputField char4Input;
 
         private void Start()
         {
@@ -43,6 +49,17 @@ namespace Scavenger.UI
 
             // 맵 이름을 PlayerPrefs에 저장하여 UI_LoadingScreen에서 사용할 수 있도록 함
             PlayerPrefs.SetString("SelectedMap", selectedMap);
+            
+            // 임시 테스트용 가짜 MatchToken 생성 로직
+            int c1 = 1, c2 = 2, c3 = 3, c4 = 4; // 입력 안했을 때 기본 테스트용 번호 (10~13)
+            if (char1Input != null && int.TryParse(char1Input.text, out int p1)) c1 = p1;
+            if (char2Input != null && int.TryParse(char2Input.text, out int p2)) c2 = p2;
+            if (char3Input != null && int.TryParse(char3Input.text, out int p3)) c3 = p3;
+            if (char4Input != null && int.TryParse(char4Input.text, out int p4)) c4 = p4;
+
+            string fakeMatchToken = $"[{{\"selectedCharIds\":[{c1},{c2},{c3},{c4}]}}]";
+            PlayerPrefs.SetString("MatchToken", fakeMatchToken);
+            
             PlayerPrefs.Save();
 
             Debug.Log($"[TestScene] 싱글플레이어 호스트로 시작합니다. 선택된 맵: {selectedMap}");
@@ -65,6 +82,17 @@ namespace Scavenger.UI
             }
 
             PlayerPrefs.SetString("SelectedMap", selectedMap);
+
+            // 임시 테스트용 가짜 MatchToken 생성 로직
+            int c1 = 10, c2 = 11, c3 = 12, c4 = 13;
+            if (char1Input != null && int.TryParse(char1Input.text, out int p1)) c1 = p1;
+            if (char2Input != null && int.TryParse(char2Input.text, out int p2)) c2 = p2;
+            if (char3Input != null && int.TryParse(char3Input.text, out int p3)) c3 = p3;
+            if (char4Input != null && int.TryParse(char4Input.text, out int p4)) c4 = p4;
+
+            string fakeMatchToken = $"[{{\"selectedCharIds\":[{c1},{c2},{c3},{c4}]}}]";
+            PlayerPrefs.SetString("MatchToken", fakeMatchToken);
+
             PlayerPrefs.Save();
 
             Debug.Log($"[TestScene] 싱글플레이어 데디케이티드 서버로 시작 요청...");

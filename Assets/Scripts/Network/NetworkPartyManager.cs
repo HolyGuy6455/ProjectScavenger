@@ -13,6 +13,7 @@ namespace Scavenger.Network
         public string username;
         public string partyId;
         public bool isReady;
+        public List<int> selectedCharIds;
     }
 
     [System.Serializable]
@@ -32,8 +33,8 @@ namespace Scavenger.Network
 
         public event Action OnOnlineUsersUpdated;
         public event Action OnPartyMembersUpdated;
-        public event Action<string, int> OnGameStartBroadcasted;
-        public event Action OnHostGameStartBroadcasted;
+        public event Action<string, int, string> OnGameStartBroadcasted;
+        public event Action<string> OnHostGameStartBroadcasted;
 
         private void Awake()
         {
@@ -136,20 +137,20 @@ namespace Scavenger.Network
             });
 
             // 서버에서 "OnGameStart" 브로드캐스트가 올 때 실행됨
-            _hubConnection.On<string, int>("OnGameStart", (ip, port) =>
+            _hubConnection.On<string, int, string>("OnGameStart", (ip, port, matchToken) =>
             {
                 UnityMainThreadDispatcher.Enqueue(() =>
                 {
-                    OnGameStartBroadcasted?.Invoke(ip, port);
+                    OnGameStartBroadcasted?.Invoke(ip, port, matchToken);
                 });
             });
 
             // 서버에서 "OnHostGameStart" 브로드캐스트가 올 때 실행됨
-            _hubConnection.On("OnHostGameStart", () =>
+            _hubConnection.On<string>("OnHostGameStart", (matchToken) =>
             {
                 UnityMainThreadDispatcher.Enqueue(() =>
                 {
-                    OnHostGameStartBroadcasted?.Invoke();
+                    OnHostGameStartBroadcasted?.Invoke(matchToken);
                 });
             });
 
@@ -212,6 +213,23 @@ namespace Scavenger.Network
                 catch (Exception ex)
                 {
                     Debug.LogError($"[Party] 파티 떠나기 실패: {ex.Message}");
+                }
+            }
+        }
+
+        // 선택한 4개의 캐릭터를 서버로 전송하는 함수
+        public async void SendSelectedCharacters(List<int> charIds)
+        {
+            if (_hubConnection != null && _hubConnection.State == HubConnectionState.Connected)
+            {
+                try
+                {
+                    await _hubConnection.InvokeAsync("SelectCharacters", charIds);
+                    Debug.Log($"[Party] 캐릭터 선택 정보 전송 완료");
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"[Party] 캐릭터 선택 전송 실패: {ex.Message}");
                 }
             }
         }

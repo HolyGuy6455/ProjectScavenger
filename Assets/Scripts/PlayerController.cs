@@ -38,8 +38,44 @@ public class PlayerController : NetworkBehaviour
     
     private GameObject[] _characterModels = new GameObject[4];
     
-    // 임시 덱(Squad) 데이터. 나중에 네트워크 변수로 동기화하거나 로비에서 받아오도록 수정 예정입니다.
-    private int[] _squadCharIds = new int[4] { 1, 2, 3, 4 };
+    public struct CharacterDeckData : INetworkSerializable, System.IEquatable<CharacterDeckData>
+    {
+        public int char1;
+        public int char2;
+        public int char3;
+        public int char4;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref char1);
+            serializer.SerializeValue(ref char2);
+            serializer.SerializeValue(ref char3);
+            serializer.SerializeValue(ref char4);
+        }
+
+        public bool Equals(CharacterDeckData other)
+        {
+            return char1 == other.char1 && char2 == other.char2 && char3 == other.char3 && char4 == other.char4;
+        }
+
+        public int GetCharId(int index)
+        {
+            switch (index)
+            {
+                case 0: return char1;
+                case 1: return char2;
+                case 2: return char3;
+                case 3: return char4;
+                default: return 0;
+            }
+        }
+    }
+
+    // Owner 권한으로 작성하여, 클라이언트가 자신의 MatchToken을 기반으로 직접 세팅하도록 합니다.
+    private NetworkVariable<CharacterDeckData> _netSquadCharIds = new NetworkVariable<CharacterDeckData>(
+        new CharacterDeckData { char1 = 1, char2 = 2, char3 = 3, char4 = 4 }, 
+        NetworkVariableReadPermission.Everyone, 
+        NetworkVariableWritePermission.Owner);
 
     private void Awake()
     {
@@ -59,26 +95,16 @@ public class PlayerController : NetworkBehaviour
             StartCoroutine(WaitAndTeleportRoutine());
         }
 
-        // --- 캐릭터 사전 로드 및 렌더링 세팅 ---
-        for (int i = 0; i < 4; i++)
+        _activeSlotIndex.OnValueChanged += OnActiveSlotChanged;
+        _netSquadCharIds.OnValueChanged += OnSquadCharIdsChanged;
+
+        if (IsOwner)
         {
-            int charId = _squadCharIds[i];
-            // charId가 1이면 "char01", 10이면 "char10" 형태가 되도록 00 포맷 사용
-            GameObject prefab = Resources.Load<GameObject>($"Prefabs/Characters/char{charId:D2}");
-            if (prefab != null)
-            {
-                _characterModels[i] = Instantiate(prefab, transform);
-                _characterModels[i].SetActive(false); // 일단 모두 끄기
-            }
-            else
-            {
-                Debug.LogWarning($"[PlayerController] 캐릭터 프리팹을 찾을 수 없습니다: Resources/Prefabs/Characters/char{charId:D2}");
-            }
+            LoadMatchTokenToSquad();
         }
 
-        _activeSlotIndex.OnValueChanged += OnActiveSlotChanged;
-        // 스폰 시 최초 렌더링 동기화
-        OnActiveSlotChanged(-1, _activeSlotIndex.Value);
+        // 스폰 시 최초 렌더링 동기화 시도 (이미 값이 세팅되어 있을 경우 대비)
+        LoadCharacterModels(_netSquadCharIds.Value);
         // -----------------------------------------------------------
         
         // 내 캐릭터일 때만 입력을 활성화합니다.
@@ -106,6 +132,7 @@ public class PlayerController : NetworkBehaviour
         base.OnNetworkDespawn();
         
         _activeSlotIndex.OnValueChanged -= OnActiveSlotChanged;
+        _netSquadCharIds.OnValueChanged -= OnSquadCharIdsChanged;
 
         if (IsOwner)
         {
@@ -120,11 +147,95 @@ public class PlayerController : NetworkBehaviour
     private void HandleCharacterChangedUI(CharData charData)
     {
         // 덱 배열에서 이 캐릭터 ID가 몇 번 슬롯에 있는지 찾습니다.
-        int slotIndex = System.Array.IndexOf(_squadCharIds, charData.id);
+        int slotIndex = -1;
+        for (int i = 0; i < 4; i++)
+        {
+            if (_netSquadCharIds.Value.GetCharId(i) == charData.id)
+            {
+                slotIndex = i;
+                break;
+            }
+        }
+        
         if (slotIndex >= 0)
         {
             ChangeCharacterSlotServerRpc(slotIndex);
         }
+    }
+
+private void LoadMatchTokenToSquad()
+    {
+        string matchToken = PlayerPrefs.GetString("MatchToken", "");
+        if (!string.IsNullOrEmpty(matchToken))
+        {
+            try
+            {
+                string wrappedJson = $"{{\"items\":{matchToken}}}";
+                var wrapper = JsonUtility.FromJson<Scavenger.Network.UserInfoListWrapper>(wrappedJson);
+                
+                if (wrapper != null && wrapper.items != null && wrapper.items.Count > 0)
+                {
+                    // 지금은 멀티플레이 테스트를 위해 호스트의 정보를 첫번째 아이템에서 가져옵니다.
+                    // 향후에는 connectionId 또는 username으로 내 UserInfo를 정확히 찾아야 합니다.
+                    var myInfo = wrapper.items[0]; 
+                    if (myInfo.selectedCharIds != null && myInfo.selectedCharIds.Count >= 4)
+                    {
+                        var newDeck = new CharacterDeckData
+                        {
+                            char1 = myInfo.selectedCharIds[0],
+                            char2 = myInfo.selectedCharIds[1],
+                            char3 = myInfo.selectedCharIds[2],
+                            char4 = myInfo.selectedCharIds[3]
+                        };
+                        _netSquadCharIds.Value = newDeck;
+                        Debug.Log($"[PlayerController] MatchToken에서 캐릭터 덱 로드 성공: {newDeck.char1}, {newDeck.char2}, {newDeck.char3}, {newDeck.char4}");
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[PlayerController] MatchToken 파싱 실패: {ex.Message}");
+            }
+        }
+    }
+
+    private void OnSquadCharIdsChanged(CharacterDeckData previousValue, CharacterDeckData newValue)
+    {
+        LoadCharacterModels(newValue);
+    }
+
+    private void LoadCharacterModels(CharacterDeckData deckData)
+    {
+        // 기존 모델 파괴
+        for (int i = 0; i < 4; i++)
+        {
+            if (_characterModels[i] != null)
+            {
+                Destroy(_characterModels[i]);
+                _characterModels[i] = null;
+            }
+        }
+
+        // 새로운 모델 생성
+        for (int i = 0; i < 4; i++)
+        {
+            int charId = deckData.GetCharId(i);
+            if (charId <= 0) continue;
+
+            GameObject prefab = Resources.Load<GameObject>($"Prefabs/Characters/char{charId:D3}");
+            if (prefab != null)
+            {
+                _characterModels[i] = Instantiate(prefab, transform);
+                _characterModels[i].SetActive(false); // 일단 모두 끄기
+            }
+            else
+            {
+                Debug.LogWarning($"[PlayerController] 캐릭터 프리팹을 찾을 수 없습니다: Resources/Prefabs/Characters/char{charId:D3}");
+            }
+        }
+
+        // 새 모델이 생성되었으므로 현재 활성 슬롯에 맞게 다시 활성화
+        OnActiveSlotChanged(-1, _activeSlotIndex.Value);
     }
 
     private void OnActiveSlotChanged(int previousValue, int newValue)
@@ -238,10 +349,10 @@ public class PlayerController : NetworkBehaviour
             // 테스트용 캐릭터 스왑 (숫자키 1~4)
             if (Keyboard.current != null)
             {
-                if (Keyboard.current.digit1Key.wasPressedThisFrame) CharacterStateManager.Instance.ChangeCharacter(_squadCharIds[0]);
-                if (Keyboard.current.digit2Key.wasPressedThisFrame) CharacterStateManager.Instance.ChangeCharacter(_squadCharIds[1]);
-                if (Keyboard.current.digit3Key.wasPressedThisFrame) CharacterStateManager.Instance.ChangeCharacter(_squadCharIds[2]);
-                if (Keyboard.current.digit4Key.wasPressedThisFrame) CharacterStateManager.Instance.ChangeCharacter(_squadCharIds[3]);
+                if (Keyboard.current.digit1Key.wasPressedThisFrame) CharacterStateManager.Instance.ChangeCharacter(_netSquadCharIds.Value.char1);
+                if (Keyboard.current.digit2Key.wasPressedThisFrame) CharacterStateManager.Instance.ChangeCharacter(_netSquadCharIds.Value.char2);
+                if (Keyboard.current.digit3Key.wasPressedThisFrame) CharacterStateManager.Instance.ChangeCharacter(_netSquadCharIds.Value.char3);
+                if (Keyboard.current.digit4Key.wasPressedThisFrame) CharacterStateManager.Instance.ChangeCharacter(_netSquadCharIds.Value.char4);
             }
         }
 
