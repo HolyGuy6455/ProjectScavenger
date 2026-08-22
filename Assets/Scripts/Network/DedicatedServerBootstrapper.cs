@@ -55,6 +55,9 @@ namespace Scavenger.Network
             }
 
             // 서버 구동
+            NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
+            NetworkManager.Singleton.ConnectionApprovalCallback = OnConnectionApproval;
+
             if (NetworkManager.Singleton.StartServer())
             {
                 Debug.Log("[NGO] 전용 서버 구동 성공. InGameScene으로 동기화합니다.");
@@ -96,6 +99,63 @@ namespace Scavenger.Network
             {
                 Debug.LogError("[NGO] 서버 구동 실패.");
             }
+        }
+
+
+        private void OnConnectionApproval(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+        {
+            if (request.Payload != null && request.Payload.Length > 0)
+            {
+                try
+                {
+                    string payloadStr = System.Text.Encoding.UTF8.GetString(request.Payload);
+                    Scavenger.Network.UserInfo userInfo = null;
+                    
+                    // 백엔드 파스칼케이스(PascalCase) 이슈 우회
+                    payloadStr = payloadStr.Replace("\"SelectedCharIds\"", "\"selectedCharIds\"");
+                    
+                    if (payloadStr.Trim().StartsWith("["))
+                    {
+                        string wrapped = $"{{\"items\":{payloadStr}}}";
+                        var wrapper = JsonUtility.FromJson<Scavenger.Network.UserInfoListWrapper>(wrapped);
+                        if (wrapper != null && wrapper.items != null && wrapper.items.Count > 0)
+                            userInfo = wrapper.items[0];
+                    }
+                    else
+                    {
+                        userInfo = JsonUtility.FromJson<Scavenger.Network.UserInfo>(payloadStr);
+                    }
+                    
+                    if (userInfo != null && userInfo.selectedCharIds != null && userInfo.selectedCharIds.Count >= 4)
+                    {
+                        var deck = new PlayerController.CharacterDeckData
+                        {
+                            char1 = userInfo.selectedCharIds[0],
+                            char2 = userInfo.selectedCharIds[1],
+                            char3 = userInfo.selectedCharIds[2],
+                            char4 = userInfo.selectedCharIds[3]
+                        };
+                        PlayerController.PendingClientDecks[request.ClientNetworkId] = deck;
+                        Debug.Log($"[NGO] Connection Approval 성공! ClientID: {request.ClientNetworkId}, Deck: {deck.char1}, {deck.char2}, {deck.char3}, {deck.char4}");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"[NGO] Connection Payload 파싱 실패 (데이터 불충분): {payloadStr}");
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"[NGO] Connection Payload 파싱 중 에러: {ex.Message}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[NGO] 클라이언트가 Connection Payload를 보내지 않았습니다. ClientID: {request.ClientNetworkId}");
+            }
+
+            // 테스트 환경이므로 일단 무조건 승인 및 플레이어 오브젝트 생성 허용
+            response.Approved = true;
+            response.CreatePlayerObject = true;
         }
 
         private void OnClientConnected(ulong clientId)

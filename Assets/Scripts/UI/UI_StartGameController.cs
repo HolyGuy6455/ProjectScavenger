@@ -65,7 +65,7 @@ namespace Scavenger.UI
 
         private void HandleGameStart(string ip, int port, string matchToken)
         {
-            Debug.Log($"[Match] 서버로부터 게임 시작 신호를 받았습니다! 접속 대상: {ip}:{port}");
+            Debug.Log($"[DEBUG-TRACE] [UI_StartGameController] 서버로부터 HandleGameStart 수신! ip:{ip} port:{port} matchToken: {matchToken}");
             
             // TODO: ip와 port 정보를 저장해두고 인게임 씬에서 Netcode(NGO)로 접속 시도해야 함
             PlayerPrefs.SetString("TargetServerIP", ip);
@@ -79,7 +79,7 @@ namespace Scavenger.UI
 
         private void HandleHostGameStart(string matchToken)
         {
-            Debug.Log($"[Match] 서버로부터 로컬 호스트 게임 시작 신호를 받았습니다!");
+            Debug.Log($"[DEBUG-TRACE] [UI_StartGameController] 서버로부터 HandleHostGameStart 수신! matchToken: {matchToken}");
             
             PlayerPrefs.SetString("MatchToken", matchToken);
             PlayerPrefs.Save();

@@ -81,6 +81,14 @@ namespace Scavenger.UI
             {
                 Scavenger.Network.NetworkPartyManager.Instance.SendSelectedCharacters(selectedList);
             }
+            
+            // [임시 코드] 다음 주 데디서버-백엔드 연동 전까지 로컬 테스트를 위해 PlayerPrefs에 강제 저장
+            if (selectedList.Count >= 4)
+            {
+                string matchToken = $"{{\"selectedCharIds\":[{selectedList[0]},{selectedList[1]},{selectedList[2]},{selectedList[3]}]}}";
+                PlayerPrefs.SetString("MatchToken", matchToken);
+                Debug.Log($"[UI_CharacterDeckPanel] 로컬 테스트용 MatchToken 갱신 완료: {matchToken}");
+            }
             else
             {
                 Debug.LogWarning("[UI_CharacterDeckPanel] NetworkPartyManager 인스턴스가 없어 전송할 수 없습니다.");

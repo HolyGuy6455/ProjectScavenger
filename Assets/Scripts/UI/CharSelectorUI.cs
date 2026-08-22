@@ -38,14 +38,35 @@ public class CharSelectorUI : MonoBehaviour
 
     private void InitializeUI()
     {
+        StartCoroutine(WaitAndInitializeUIRoutine());
+    }
+
+    private System.Collections.IEnumerator WaitAndInitializeUIRoutine()
+    {
         if (DataManager.Instance == null)
         {
             Debug.LogWarning("[CharSelectorUI] DataManager is not initialized.");
-            return;
+            yield break;
         }
 
-        // DataManager에서 모든 Char 데이터를 가져옴
-        List<CharData> charDatas = DataManager.Instance.GetAllData<CharData>("Char");
+        // 로컬 플레이어가 네트워크에 스폰될 때까지 대기
+        while (PlayerController.LocalInstance == null)
+        {
+            yield return null;
+        }
+
+        var deck = PlayerController.LocalInstance.GetLocalDeck();
+        List<CharData> charDatas = new List<CharData>();
+
+        for (int i = 0; i < 4; i++)
+        {
+            int charId = deck.GetCharId(i);
+            CharData data = DataManager.Instance.GetData<CharData>("Char", charId);
+            if (data != null)
+            {
+                charDatas.Add(data);
+            }
+        }
         
         for (int i = 0; i < slots.Count && i < charDatas.Count; i++)
         {
@@ -85,8 +106,15 @@ public class CharSelectorUI : MonoBehaviour
         if (string.IsNullOrEmpty(resourceName)) return null;
         
         string nameWithoutExt = System.IO.Path.GetFileNameWithoutExtension(resourceName);
-        // Resources 폴더에 해당 이미지가 있다고 가정하고 로드 (예: Resources/item_stagnag)
-        Sprite loadedSprite = Resources.Load<Sprite>(nameWithoutExt);
+        
+        // 새로 바뀐 폴더 구조 (Resources/char) 우선 탐색
+        Sprite loadedSprite = Resources.Load<Sprite>($"char/{nameWithoutExt}");
+        
+        // 만약 없다면 기존 루트 폴더도 혹시 모르니 탐색
+        if (loadedSprite == null)
+        {
+            loadedSprite = Resources.Load<Sprite>(nameWithoutExt);
+        }
         
         if (loadedSprite == null)
         {

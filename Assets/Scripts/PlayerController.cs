@@ -75,7 +75,23 @@ public class PlayerController : NetworkBehaviour
     private NetworkVariable<CharacterDeckData> _netSquadCharIds = new NetworkVariable<CharacterDeckData>(
         new CharacterDeckData { char1 = 1, char2 = 2, char3 = 3, char4 = 4 }, 
         NetworkVariableReadPermission.Everyone, 
-        NetworkVariableWritePermission.Owner);
+        NetworkVariableWritePermission.Server);
+
+        public CharacterDeckData GetLocalDeck()
+    {
+        return _netSquadCharIds.Value;
+    }
+
+    public void ServerInitializeDeck(CharacterDeckData deckData)
+    {
+        if (IsServer)
+        {
+            _netSquadCharIds.Value = deckData;
+            Debug.Log($"[PlayerController] 서버 주도 덱 초기화 완료: {deckData.char1}, {deckData.char2}, {deckData.char3}, {deckData.char4}");
+        }
+    }
+
+    public static PlayerController LocalInstance { get; private set; }
 
     private void Awake()
     {
@@ -84,9 +100,13 @@ public class PlayerController : NetworkBehaviour
         _inputActions = new PlayerInputActions();
     }
 
+    // 접속 승인 시 임시로 덱 데이터를 저장하는 딕셔너리
+    public static System.Collections.Generic.Dictionary<ulong, CharacterDeckData> PendingClientDecks = new System.Collections.Generic.Dictionary<ulong, CharacterDeckData>();
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        if (IsOwner) LocalInstance = this;
         
         Debug.Log($"[PlayerController] OnNetworkSpawn 호출됨! (OwnerClientId: {OwnerClientId}, IsServer: {IsServer}, IsOwner: {IsOwner})");
 
@@ -95,13 +115,25 @@ public class PlayerController : NetworkBehaviour
             StartCoroutine(WaitAndTeleportRoutine());
         }
 
+        if (IsServer)
+        {
+            Debug.Log($"[DEBUG-TRACE] [PlayerController] 서버 스폰 중... PendingClientDecks 조회 시도 (OwnerClientId: {OwnerClientId})");
+            if (PendingClientDecks.TryGetValue(OwnerClientId, out var deck))
+            {
+                Debug.Log($"[DEBUG-TRACE] [PlayerController] 딕셔너리에서 덱 데이터 발견! 주입합니다: {deck.char1}, {deck.char2}, {deck.char3}, {deck.char4}");
+                ServerInitializeDeck(deck);
+                PendingClientDecks.Remove(OwnerClientId);
+            }
+            else
+            {
+                Debug.LogWarning($"[DEBUG-TRACE] [PlayerController] Client {OwnerClientId}의 Pending 덱 데이터가 딕셔너리에 없습니다!!! (초기값 1,2,3,4 유지)");
+            }
+        }
+
         _activeSlotIndex.OnValueChanged += OnActiveSlotChanged;
         _netSquadCharIds.OnValueChanged += OnSquadCharIdsChanged;
 
-        if (IsOwner)
-        {
-            LoadMatchTokenToSquad();
-        }
+
 
         // 스폰 시 최초 렌더링 동기화 시도 (이미 값이 세팅되어 있을 경우 대비)
         LoadCharacterModels(_netSquadCharIds.Value);
@@ -130,6 +162,7 @@ public class PlayerController : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();
+        if (IsOwner) LocalInstance = null;
         
         _activeSlotIndex.OnValueChanged -= OnActiveSlotChanged;
         _netSquadCharIds.OnValueChanged -= OnSquadCharIdsChanged;
@@ -163,41 +196,6 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-private void LoadMatchTokenToSquad()
-    {
-        string matchToken = PlayerPrefs.GetString("MatchToken", "");
-        if (!string.IsNullOrEmpty(matchToken))
-        {
-            try
-            {
-                string wrappedJson = $"{{\"items\":{matchToken}}}";
-                var wrapper = JsonUtility.FromJson<Scavenger.Network.UserInfoListWrapper>(wrappedJson);
-                
-                if (wrapper != null && wrapper.items != null && wrapper.items.Count > 0)
-                {
-                    // 지금은 멀티플레이 테스트를 위해 호스트의 정보를 첫번째 아이템에서 가져옵니다.
-                    // 향후에는 connectionId 또는 username으로 내 UserInfo를 정확히 찾아야 합니다.
-                    var myInfo = wrapper.items[0]; 
-                    if (myInfo.selectedCharIds != null && myInfo.selectedCharIds.Count >= 4)
-                    {
-                        var newDeck = new CharacterDeckData
-                        {
-                            char1 = myInfo.selectedCharIds[0],
-                            char2 = myInfo.selectedCharIds[1],
-                            char3 = myInfo.selectedCharIds[2],
-                            char4 = myInfo.selectedCharIds[3]
-                        };
-                        _netSquadCharIds.Value = newDeck;
-                        Debug.Log($"[PlayerController] MatchToken에서 캐릭터 덱 로드 성공: {newDeck.char1}, {newDeck.char2}, {newDeck.char3}, {newDeck.char4}");
-                    }
-                }
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError($"[PlayerController] MatchToken 파싱 실패: {ex.Message}");
-            }
-        }
-    }
 
     private void OnSquadCharIdsChanged(CharacterDeckData previousValue, CharacterDeckData newValue)
     {

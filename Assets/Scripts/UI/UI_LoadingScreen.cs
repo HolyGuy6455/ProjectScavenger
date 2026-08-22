@@ -109,6 +109,28 @@ namespace Scavenger.UI
                     yield return new WaitForSeconds(0.5f);
                 }
 
+                string matchToken = PlayerPrefs.GetString("MatchToken", "{\"selectedCharIds\":[1,2,3,4]}");
+                
+                // 멀티플레이어 배열 형태의 matchToken인 경우 내 정보만 추출
+                if (matchToken.Trim().StartsWith("["))
+                {
+                    string wrapped = $"{{\"items\":{matchToken.Replace("\"SelectedCharIds\"", "\"selectedCharIds\"").Replace("\"Username\"", "\"username\"")}}}";
+                    var wrapper = JsonUtility.FromJson<Scavenger.Network.UserInfoListWrapper>(wrapped);
+                    if (wrapper != null && wrapper.items != null)
+                    {
+                        var myUsername = Scavenger.Network.NetworkAuthManager.Instance?.Username;
+                        var myInfo = wrapper.items.Find(x => x.username == myUsername);
+                        if (myInfo == null && wrapper.items.Count > 0) myInfo = wrapper.items[0]; // fallback
+                        if (myInfo != null) matchToken = JsonUtility.ToJson(myInfo);
+                    }
+                }
+                
+                Debug.Log($"[DEBUG-TRACE] [UI_LoadingScreen Client] 서버로 전송할 내 MatchToken: {matchToken}");
+                
+                NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
+                NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.UTF8.GetBytes(matchToken);
+                Debug.Log($"[NGO] ConnectionData 세팅 완료: {matchToken}");
+
                 NetworkManager.Singleton.StartClient();
 
                 // 클라이언트 연결 대기 (NGO의 후발 접속자는 최초 씬 동기화 시 OnLoadEventCompleted를 호출하지 않으므로 직접 로드)
@@ -165,6 +187,59 @@ namespace Scavenger.UI
             }
 
             // 싱글플레이어는 자신이 호스트(서버+클라이언트)가 됩니다.
+            string matchToken = PlayerPrefs.GetString("MatchToken", "{\"selectedCharIds\":[1,2,3,4]}");
+            Debug.Log($"[DEBUG-TRACE] [UI_LoadingScreen Host] PlayerPrefs에서 읽어온 MatchToken: {matchToken}");
+            
+            NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.UTF8.GetBytes(matchToken);
+            
+            // Host는 ConnectionApproval 로직을 타지 않으므로 직접 서버용 딕셔너리에 꽂아줍니다.
+            try
+            {
+                Scavenger.Network.UserInfo myInfo = null;
+                
+                // 백엔드 파스칼케이스(PascalCase) 이슈 우회
+                matchToken = matchToken.Replace("\"SelectedCharIds\"", "\"selectedCharIds\"").Replace("\"Username\"", "\"username\"");
+                
+                if (matchToken.Trim().StartsWith("["))
+                {
+                    string wrapped = $"{{\"items\":{matchToken}}}";
+                    var wrapper = JsonUtility.FromJson<Scavenger.Network.UserInfoListWrapper>(wrapped);
+                    if (wrapper != null && wrapper.items != null)
+                    {
+                        var myUsername = Scavenger.Network.NetworkAuthManager.Instance?.Username;
+                        myInfo = wrapper.items.Find(x => x.username == myUsername);
+                        if (myInfo == null && wrapper.items.Count > 0) myInfo = wrapper.items[0];
+                    }
+                }
+                else
+                {
+                    myInfo = JsonUtility.FromJson<Scavenger.Network.UserInfo>(matchToken);
+                }
+
+                if (myInfo != null && myInfo.selectedCharIds != null && myInfo.selectedCharIds.Count >= 4)
+                {
+                    var deck = new PlayerController.CharacterDeckData
+                    {
+                        char1 = myInfo.selectedCharIds[0],
+                        char2 = myInfo.selectedCharIds[1],
+                        char3 = myInfo.selectedCharIds[2],
+                        char4 = myInfo.selectedCharIds[3]
+                    };
+                    PlayerController.PendingClientDecks[NetworkManager.ServerClientId] = deck;
+                    Debug.Log($"[NGO] Host 덱 데이터를 서버용 딕셔너리에 직접 등록했습니다: {deck.char1},{deck.char2},{deck.char3},{deck.char4}");
+                }
+                else
+                {
+                    Debug.LogWarning($"[NGO] 파싱된 Host MatchToken에 캐릭터 데이터가 부족합니다: {matchToken}");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[NGO] Host MatchToken 파싱 중 에러: {ex.Message} \nToken: {matchToken}");
+            }
+
+            Debug.Log($"[NGO] Host ConnectionData 세팅 완료: {matchToken}");
+            
             if (NetworkManager.Singleton.StartHost())
             {
                 Debug.Log("[NGO] 호스트 모드(싱글플레이어) 구동 성공. InGameScene으로 동기화합니다.");

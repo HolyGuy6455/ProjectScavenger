@@ -57,7 +57,7 @@ namespace Scavenger.UI
             if (char3Input != null && int.TryParse(char3Input.text, out int p3)) c3 = p3;
             if (char4Input != null && int.TryParse(char4Input.text, out int p4)) c4 = p4;
 
-            string fakeMatchToken = $"[{{\"selectedCharIds\":[{c1},{c2},{c3},{c4}]}}]";
+            string fakeMatchToken = $"{{\"selectedCharIds\":[{c1},{c2},{c3},{c4}]}}";
             PlayerPrefs.SetString("MatchToken", fakeMatchToken);
             
             PlayerPrefs.Save();
@@ -90,7 +90,7 @@ namespace Scavenger.UI
             if (char3Input != null && int.TryParse(char3Input.text, out int p3)) c3 = p3;
             if (char4Input != null && int.TryParse(char4Input.text, out int p4)) c4 = p4;
 
-            string fakeMatchToken = $"[{{\"selectedCharIds\":[{c1},{c2},{c3},{c4}]}}]";
+            string fakeMatchToken = $"{{\"selectedCharIds\":[{c1},{c2},{c3},{c4}]}}";
             PlayerPrefs.SetString("MatchToken", fakeMatchToken);
 
             PlayerPrefs.Save();
