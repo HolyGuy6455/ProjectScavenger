@@ -71,6 +71,7 @@ namespace Scavenger.UI
             PlayerPrefs.SetString("TargetServerIP", ip);
             PlayerPrefs.SetInt("TargetServerPort", port);
             PlayerPrefs.SetString("MatchToken", matchToken);
+            PlayerPrefs.SetString("SelectedMap", "Stage002");
             PlayerPrefs.Save();
 
             // 로딩 씬으로 넘어감 (인텐트 지정)
@@ -82,6 +83,7 @@ namespace Scavenger.UI
             Debug.Log($"[DEBUG-TRACE] [UI_StartGameController] 서버로부터 HandleHostGameStart 수신! matchToken: {matchToken}");
             
             PlayerPrefs.SetString("MatchToken", matchToken);
+            PlayerPrefs.SetString("SelectedMap", "Stage002");
             PlayerPrefs.Save();
 
             // 로컬 호스트 모드로 로딩 씬 진입

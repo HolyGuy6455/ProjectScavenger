@@ -62,10 +62,10 @@ namespace Scavenger.Network
             {
                 Debug.Log("[NGO] 전용 서버 구동 성공. InGameScene으로 동기화합니다.");
                 
-                // NGO가 Addressable 씬(Stage001)을 클라이언트에게 동기화하려다 해시를 찾지 못해 터지는 것을 방지합니다.
+                // NGO가 Addressable 씬(Stage002)을 클라이언트에게 동기화하려다 해시를 찾지 못해 터지는 것을 방지합니다.
                 NetworkManager.Singleton.SceneManager.VerifySceneBeforeLoading = (sceneIndex, sceneName, loadSceneMode) =>
                 {
-                    if (sceneName != null && sceneName.Contains("Stage001")) return false;
+                    if (sceneName != null && sceneName.Contains("Stage002")) return false;
                     return true;
                 };
                 
@@ -77,17 +77,17 @@ namespace Scavenger.Network
                     Debug.Log($"[NGO-DEBUG] OnLoadEventCompleted! sceneName: {sceneName}");
                     if (sceneName != null && sceneName.Equals("IngameScene", System.StringComparison.OrdinalIgnoreCase))
                     {
-                        Debug.Log("[NGO-DEBUG] NGO 내부 씬 로드 완료 감지! Addressables를 통해 Stage001을 로드합니다.");
-                        UnityEngine.AddressableAssets.Addressables.LoadSceneAsync("Stage001", UnityEngine.SceneManagement.LoadSceneMode.Additive).Completed += handle =>
+                        Debug.Log("[NGO-DEBUG] NGO 내부 씬 로드 완료 감지! Addressables를 통해 Stage002을 로드합니다.");
+                        UnityEngine.AddressableAssets.Addressables.LoadSceneAsync("Stage002", UnityEngine.SceneManagement.LoadSceneMode.Additive).Completed += handle =>
                         {
                             if (handle.Status == UnityEngine.ResourceManagement.AsyncOperations.AsyncOperationStatus.Succeeded)
                             {
-                                Debug.Log("[Bootstrapper] Stage001 맵 로드 성공! 몬스터/엄폐물 동적 스폰을 시작합니다.");
+                                Debug.Log("[Bootstrapper] Stage002 맵 로드 성공! 몬스터/엄폐물 동적 스폰을 시작합니다.");
                                 Scavenger.Core.MapSpawner.SpawnMapObjects();
                             }
                             else
                             {
-                                Debug.LogError("[Bootstrapper] Stage001 맵 로드 실패!");
+                                Debug.LogError("[Bootstrapper] Stage002 맵 로드 실패!");
                             }
                         };
                     }
