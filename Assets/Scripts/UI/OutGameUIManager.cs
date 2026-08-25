@@ -10,7 +10,11 @@ namespace Scavenger.UI
         MainLobby,
         ReadyToBattle,
         FriendParty,
-        CharacterDeck
+        CharacterDeck,
+        SelectOperation,
+        SelectStage,
+        TrainCharacter,
+        StageInfo
     }
 
     public enum OutGameWindowType
@@ -31,12 +35,16 @@ namespace Scavenger.UI
         [SerializeField] private GameObject readyToBattlePanelPrefab;
         [SerializeField] private GameObject friendPartyPanelPrefab;
         [SerializeField] private GameObject characterDeckPanelPrefab;
+        [SerializeField] private GameObject selectOperationPanelPrefab;
+        [SerializeField] private GameObject selectStagePanelPrefab;
+        [SerializeField] private GameObject trainCharacterPanelPrefab;
+        [SerializeField] private GameObject stageInfoPanelPrefab;
 
         [Header("Window Prefabs")]
         [SerializeField] private GameObject characterSelectWindowPrefab;
 
-        [Header("Persistent UI")]
-        [SerializeField] private GameObject persistentPartyListUI; // 파티 리스트 패널
+        // [Header("Persistent UI")]
+        // [SerializeField] private GameObject persistentPartyListUI; // 파티 리스트 패널
 
         private Dictionary<OutGamePanelType, GameObject> _cachedPanels = new Dictionary<OutGamePanelType, GameObject>();
         private Stack<OutGamePanelType> _panelHistory = new Stack<OutGamePanelType>();
@@ -85,10 +93,10 @@ namespace Scavenger.UI
                 }
             }
 
-            if (persistentPartyListUI != null)
-            {
-                persistentPartyListUI.SetActive(panelType != OutGamePanelType.Login);
-            }
+            // if (persistentPartyListUI != null)
+            // {
+            //     persistentPartyListUI.SetActive(panelType != OutGamePanelType.Login);
+            // }
 
             if (_cachedPanels.TryGetValue(panelType, out GameObject cachedPanel) && cachedPanel != null)
             {
@@ -178,10 +186,10 @@ namespace Scavenger.UI
                 {
                     prevPanel.SetActive(true);
                     prevPanel.transform.SetAsLastSibling();
-                    if (persistentPartyListUI != null)
-                    {
-                        persistentPartyListUI.SetActive(previousPanelType != OutGamePanelType.Login);
-                    }
+                    // if (persistentPartyListUI != null)
+                    // {
+                    //     persistentPartyListUI.SetActive(previousPanelType != OutGamePanelType.Login);
+                    // }
                     _currentPanelType = previousPanelType;
                 }
             }
@@ -216,6 +224,10 @@ namespace Scavenger.UI
                 case OutGamePanelType.ReadyToBattle: return readyToBattlePanelPrefab;
                 case OutGamePanelType.FriendParty: return friendPartyPanelPrefab;
                 case OutGamePanelType.CharacterDeck: return characterDeckPanelPrefab;
+                case OutGamePanelType.SelectOperation: return selectOperationPanelPrefab;
+                case OutGamePanelType.SelectStage: return selectStagePanelPrefab;
+                case OutGamePanelType.TrainCharacter: return trainCharacterPanelPrefab;
+                case OutGamePanelType.StageInfo: return stageInfoPanelPrefab;
             }
             return null;
         }
@@ -233,5 +245,9 @@ namespace Scavenger.UI
         public void OnClickGoToReadyToBattle() => ShowPanel(OutGamePanelType.ReadyToBattle);
         public void OnClickGoToParty() => ShowPanel(OutGamePanelType.FriendParty);
         public void OnClickGoToCharacterDeck() => ShowPanel(OutGamePanelType.CharacterDeck);
+        public void OnClickGoToSelectOperation() => ShowPanel(OutGamePanelType.SelectOperation);
+        public void OnClickGoToSelectStage() => ShowPanel(OutGamePanelType.SelectStage);
+        public void OnClickGoToTrainCharacter() => ShowPanel(OutGamePanelType.TrainCharacter);
+        public void OnClickGoToStageInfo() => ShowPanel(OutGamePanelType.StageInfo);
     }
 }

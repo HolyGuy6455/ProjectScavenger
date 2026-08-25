@@ -1,11 +1,12 @@
 {
   "dependencies": {
-    "com.unity.addressables": "1.21.20",
     "com.coplaydev.unity-mcp": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#v10.0.0",
-    "com.unity.cinemachine": "2.9.7",
+    "com.simonoliver.unityfigma": "https://github.com/simonoliver/UnityFigmaBridge.git",
     "com.unity.2d.sprite": "1.0.0",
+    "com.unity.addressables": "1.21.20",
     "com.unity.addressables.android": "1.0.10",
     "com.unity.ai.navigation": "2.0.10",
+    "com.unity.cinemachine": "2.9.7",
     "com.unity.collab-proxy": "2.11.3",
     "com.unity.ide.rider": "3.0.39",
     "com.unity.ide.visualstudio": "2.0.22",
