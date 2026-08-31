@@ -678,7 +678,7 @@ MonoBehaviour:
   characterDeckPanelPrefab: {fileID: 1813855078207234182, guid: 2169579baec9867498450bcf011955f5, type: 3}
   selectOperationPanelPrefab: {fileID: 403311199544709674, guid: 458046228d2aeb2479e54878bcbd72a0, type: 3}
   selectStagePanelPrefab: {fileID: 0}
-  trainCharacterPanelPrefab: {fileID: 0}
+  trainCharacterPanelPrefab: {fileID: 5439909724396608738, guid: 8167043b365dc6142bad6508160be01b, type: 3}
   stageInfoPanelPrefab: {fileID: 3897945546778568232, guid: f4ee5a44f24cfd040a6d4969d61d721c, type: 3}
   characterSelectWindowPrefab: {fileID: 963945710570392003, guid: 3e0ee28af1fccfb4587039e6aec7b7f8, type: 3}
 --- !u!4 &1676664896
