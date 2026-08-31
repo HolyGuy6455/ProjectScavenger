@@ -10,10 +10,14 @@ public class CharData : IData
     public string name;
     public string resourceSlot;
     public string resourceStand;
-    public int[] gun;
-    public int[] item;
-    public int[] itemAmount;
-    public int[] skill;
+
+    [System.NonSerialized]
+    public List<int> gun = new List<int>();
+
+    [System.NonSerialized]
+    public List<int> skill = new List<int>();
+
+    [System.NonSerialized]
     public int ultimateSkill;
 
     public int GetId()
@@ -23,7 +27,7 @@ public class CharData : IData
 
     public int GetGunId(int index = 0)
     {
-        return gun != null && gun.Length > index ? gun[index] : 0;
+        return gun != null && gun.Count > index ? gun[index] : 0;
     }
 }
 

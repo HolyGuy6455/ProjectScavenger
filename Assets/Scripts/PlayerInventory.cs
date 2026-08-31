@@ -61,17 +61,17 @@ public class PlayerInventory : NetworkBehaviour
             currentInventory = inv;
 
             // Initialize given items
-            if (charData.item != null && charData.itemAmount != null)
-            {
-                for (int i = 0; i < charData.item.Length; i++)
-                {
-                    if (charData.item[i] != 0)
-                    {
-                        int amount = i < charData.itemAmount.Length ? charData.itemAmount[i] : 1;
-                        AddItem(charData.item[i], amount); 
-                    }
-                }
-            }
+            // if (charData.item != null && charData.itemAmount != null)
+            // {
+            //     for (int i = 0; i < charData.item.Length; i++)
+            //     {
+            //         if (charData.item[i] != 0)
+            //         {
+            //             int amount = i < charData.itemAmount.Length ? charData.itemAmount[i] : 1;
+            //             AddItem(charData.item[i], amount); 
+            //         }
+            //     }
+            // }
         }
         else
         {

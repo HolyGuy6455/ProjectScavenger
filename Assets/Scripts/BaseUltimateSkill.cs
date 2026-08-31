@@ -14,7 +14,7 @@ public abstract class BaseUltimateSkill : MonoBehaviour
     [Tooltip("궁극기 발동 시 재생할 애니메이션 상태 이름 (비워두면 재생하지 않음)")]
     [SerializeField] protected string ultimateAnimStateName = "Ultimate";
 
-    protected UltimateSkillData currentData;
+    protected SkillData currentData;
 
     protected virtual void Awake()
     {
@@ -43,7 +43,7 @@ public abstract class BaseUltimateSkill : MonoBehaviour
     /// 클라이언트(모든 플레이어 화면)에서 실행되는 연출용 로직입니다.
     /// (파티클 재생, 시네마틱 카메라 켜기 등)
     /// </summary>
-    public virtual void OnClientExecute(UltimateSkillData data, bool isOwner)
+    public virtual void OnClientExecute(SkillData data, bool isOwner)
     {
         currentData = data;
         
@@ -92,7 +92,7 @@ public abstract class BaseUltimateSkill : MonoBehaviour
     /// <summary>
     /// 서버에서만 실행되는 실제 물리적 스킬 판정입니다. (데미지, 스폰 등)
     /// </summary>
-    public abstract void OnServerExecute(UltimateSkillData data, int eventId);
+    public abstract void OnServerExecute(SkillData data, int eventId);
 
     /// <summary>
     /// 시네마틱 연출이 끝났을 때 클라이언트에서 할 후처리입니다.

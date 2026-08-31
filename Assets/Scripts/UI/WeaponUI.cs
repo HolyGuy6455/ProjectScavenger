@@ -102,6 +102,8 @@ public class WeaponUI : MonoBehaviour
     {
         if (gunData == null) return;
 
+        // GunData에서 resourceSilhouette 필드가 삭제되었으므로 이미지 로드 주석 처리
+        /*
         if (weaponImage != null && !string.IsNullOrEmpty(gunData.resourceSilhouette))
         {
             // 확장자(.png 등) 제거 후 이름만 추출
@@ -126,5 +128,6 @@ public class WeaponUI : MonoBehaviour
                 Debug.LogWarning($"[WeaponUI] '{loadPath}' 경로에서 Sprite를 찾을 수 없습니다.");
             }
         }
+        */
     }
 }

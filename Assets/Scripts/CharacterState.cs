@@ -34,7 +34,7 @@ public class CharacterState
         currentThirst = 100f;
         maxThirst = 100f;
         
-        normalSkills = new SkillInstance[charData.skill != null ? charData.skill.Length : 0];
+        normalSkills = new SkillInstance[charData.skill != null ? charData.skill.Count : 0];
         for (int i = 0; i < normalSkills.Length; i++)
         {
             normalSkills[i] = new SkillInstance(charData.skill[i]);

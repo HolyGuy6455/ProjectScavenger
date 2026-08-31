@@ -8,7 +8,7 @@ public class Char03_Ultimate : BaseUltimateSkill
     [SerializeField] private GameObject obstaclePrefab; // 힐 토템, 혹은 장판 프리팹
     [SerializeField] private Transform spawnPoint;      // 구조물이 소환될 위치(빈 오브젝트)
 
-    public override void OnServerExecute(UltimateSkillData data, int eventId)
+    public override void OnServerExecute(SkillData data, int eventId)
     {
         // 서버에서만 실행되는 실제 로직
         if (eventId == 0)
@@ -43,7 +43,7 @@ public class Char03_Ultimate : BaseUltimateSkill
         }
     }
 
-    public override void OnClientExecute(UltimateSkillData data, bool isOwner)
+    public override void OnClientExecute(SkillData data, bool isOwner)
     {
         // 애니메이션, 카메라 시네마틱 등 클라이언트(특히 오너) 연출
         base.OnClientExecute(data, isOwner);

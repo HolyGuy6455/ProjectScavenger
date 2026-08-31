@@ -12,7 +12,7 @@ public class UltimateSkillInstance
         currentCooldown = 0f;
     }
 
-    public UltimateSkillData Data => ultimateSkillId > 0 && DataManager.Instance != null ? DataManager.Instance.GetData<UltimateSkillData>("UltimateSkill", ultimateSkillId) : null;
+    public SkillData Data => ultimateSkillId > 0 && DataManager.Instance != null ? DataManager.Instance.GetData<SkillData>("Skill", ultimateSkillId) : null;
 
     public bool IsReady => currentCooldown <= 0f;
 
@@ -21,7 +21,7 @@ public class UltimateSkillInstance
         var data = Data;
         if (data != null)
         {
-            currentCooldown = data.cooldown;
+            currentCooldown = data.cooltime;
         }
     }
 

@@ -50,7 +50,7 @@ public class SkillInstance
                 return;
             }
 
-            if (data.onFunction != 0 && !CanExecuteSkillFunc(data.onFunction, shooter))
+            if (data.func != 0 && !CanExecuteSkillFunc(data.func, shooter))
             {
                 Debug.Log($"[SkillInstance] 스킬 실행 조건을 만족하지 않습니다.");
                 return;
@@ -60,33 +60,33 @@ public class SkillInstance
         switch (data.activeType)
         {
             case SkillActiveType.Instant:
-                ExecuteSkillFunc(data.onFunction, data.onFunctionValue, shooter);
+                ExecuteSkillBeginFunc(data.func, shooter, data.funcValue);
                 ReduceRemain(shooter);
                 isInstantOffExecuted = false;
                 currentCooldown = data.cooltime;
                 break;
             case SkillActiveType.Charge:
                 isCharging = true;
-                ExecuteSkillFunc(data.onFunction, data.onFunctionValue, shooter);
+                ExecuteSkillBeginFunc(data.func, shooter, data.funcValue);
                 ReduceRemain(shooter);
                 break;
             case SkillActiveType.Toggle:
                 isToggledOn = !isToggledOn;
                 if (isToggledOn)
                 {
-                    ExecuteSkillFunc(data.onFunction, data.onFunctionValue, shooter);
+                    ExecuteSkillBeginFunc(data.func, shooter, data.funcValue);
                     ReduceRemain(shooter);
                 }
                 else
                 {
-                    ExecuteSkillFunc(data.offFunction, data.offFunctionValue, shooter);
+                    ExecuteSkillFinishFunc(data.func, shooter, data.funcValue);
                 }
                 currentCooldown = data.cooltime;
                 break;
             case SkillActiveType.Continuous:
                 if (!isContinuousRunning)
                 {
-                    if (CanExecuteSkillFunc(data.onFunction, shooter))
+                    if (CanExecuteSkillFunc(data.func, shooter))
                     {
                         isContinuousRunning = true;
                         continuousTimer = data.duration;
@@ -94,7 +94,7 @@ public class SkillInstance
                 }
                 break;
             default:
-                ExecuteSkillFunc(data.onFunction, data.onFunctionValue, shooter);
+                ExecuteSkillBeginFunc(data.func, shooter, data.funcValue);
                 ReduceRemain(shooter);
                 currentCooldown = data.cooltime;
                 break;
@@ -115,23 +115,29 @@ public class SkillInstance
             {
                 isCharging = false;
                 currentCooldown = data.cooltime; // 손을 뗐을 때 쿨타임 시작
-                ExecuteSkillFunc(data.offFunction, data.offFunctionValue, shooter);
+                ExecuteSkillFinishFunc(data.func, shooter, data.funcValue);
             }
         }
     }
 
-    public void ExecuteSkillFunc(int funcCode, float funcValue, Shooter playerShooter)
+    public void ExecuteSkillBeginFunc(int funcCode, Shooter playerShooter, params float[] funcValues)
     {
         if (funcCode == 0) return;
 
         switch (funcCode)
         {
-            // 1~4 잠시 무효화
-            // case 1: // 무기 1로 전환
-            // case 2: // 무기 2로 전환
-            // case 3: // 무기 3으로 전환
-            // case 4: // 다음 무기로 전환 (1번 <-> 2번)
-            //     break;
+            case 6: // 1발 재장전
+                if (playerShooter != null) playerShooter.ReloadAmount(1);
+                break;
+        }
+    }
+
+    public void ExecuteSkillFinishFunc(int funcCode, Shooter playerShooter, params float[] funcValues)
+    {
+        if (funcCode == 0) return;
+
+        switch (funcCode)
+        {
             case 5: // 재장전 (전체)
                 if (playerShooter != null)
                 {
@@ -145,9 +151,6 @@ public class SkillInstance
                         playerShooter.Reload();
                     }
                 }
-                break;
-            case 6: // 1발 재장전
-                if (playerShooter != null) playerShooter.ReloadAmount(1);
                 break;
         }
     }
@@ -178,7 +181,7 @@ public class SkillInstance
             float elapsed = data.cooltime - currentCooldown;
             if (elapsed >= data.duration)
             {
-                ExecuteSkillFunc(data.offFunction, data.offFunctionValue, shooter);
+                ExecuteSkillFinishFunc(data.func, shooter, data.funcValue);
                 isInstantOffExecuted = true;
             }
         }
@@ -196,13 +199,13 @@ public class SkillInstance
         {
             continuousTimer = 0f;
 
-            if (CanExecuteSkillFunc(data.onFunction, shooter))
+            if (CanExecuteSkillFunc(data.func, shooter))
             {
-                ExecuteSkillFunc(data.onFunction, data.onFunctionValue, shooter);
+                ExecuteSkillBeginFunc(data.func, shooter, data.funcValue);
                 ReduceRemain(shooter);
 
                 // 실행 직후 조건을 다시 확인하여 (예: 장전 완료) 더 이상 실행할 필요 없으면 즉시 종료
-                if (!CanExecuteSkillFunc(data.onFunction, shooter))
+                if (!CanExecuteSkillFunc(data.func, shooter))
                 {
                     isContinuousRunning = false;
                     currentCooldown = data.cooltime;

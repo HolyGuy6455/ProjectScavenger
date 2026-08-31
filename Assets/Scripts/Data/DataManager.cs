@@ -48,7 +48,6 @@ public class DataManager : MonoBehaviour
         yield return StartCoroutine(LoadDataAsync<ItemDataList, ItemData>("Item", "ItemData"));
         yield return StartCoroutine(LoadDataAsync<CharDataList, CharData>("Char", "CharData"));
         yield return StartCoroutine(LoadDataAsync<SkillDataList, SkillData>("Skill", "SkillData"));
-        yield return StartCoroutine(LoadDataAsync<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "UltimateSkillData"));
         yield return StartCoroutine(LoadDataAsync<LootDataList, LootData>("Loot", "LootData"));
         yield return StartCoroutine(LoadDataAsync<EnemyDataList, EnemyData>("Enemy", "EnemyData"));
         yield return StartCoroutine(LoadDataAsync<ObstacleDataList, ObstacleData>("Obstacle", "ObstacleData"));
@@ -56,8 +55,37 @@ public class DataManager : MonoBehaviour
         // 몹 그룹 데이터 로드 (하나로 합쳐진 어드레서블 'MobGroupData' 파일 사용)
         yield return StartCoroutine(LoadMobGroupsAsync());
 
+        InjectDataRelations();
+
         IsDataLoaded = true;
         Debug.Log("[DataManager] All Initial Data Loaded Successfully via Addressables.");
+    }
+
+    private void InjectDataRelations()
+    {
+        // 1. 총기 데이터 주입
+        foreach (var gunData in GetAllData<GunData>("Gun"))
+        {
+            var charData = GetData<CharData>("Char", gunData.charId);
+            if (charData != null)
+                charData.gun.Add(gunData.id);
+        }
+
+        // 2. 스킬 데이터 주입
+        foreach (var skillData in GetAllData<SkillData>("Skill"))
+        {
+            var charData = GetData<CharData>("Char", skillData.charId);
+            if (charData != null)
+            {
+                charData.skill.Add(skillData.id);
+                if (skillData.func == 1)
+                {
+                    charData.ultimateSkill = skillData.id;
+                }
+            }
+        }
+        
+        Debug.Log("[DataManager] Data Relations Injected Successfully.");
     }
 
     /// <summary>

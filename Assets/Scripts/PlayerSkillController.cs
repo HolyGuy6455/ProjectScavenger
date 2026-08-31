@@ -57,7 +57,7 @@ public class PlayerSkillController : NetworkBehaviour
             if (data == null) continue;
 
             bool hasReloadFunc = false;
-            if (data.offFunction == 5 || data.offFunction == 6)
+            if (data.func == 5 || data.func == 6)
             {
                 hasReloadFunc = true;
             }
@@ -235,7 +235,7 @@ public class PlayerSkillController : NetworkBehaviour
             BaseUltimateSkill activeUlt = playerController.GetActiveUltimateSkill();
             if (activeUlt != null)
             {
-                var data = DataManager.Instance.GetData<UltimateSkillData>("UltimateSkill", currentCharData.ultimateSkill);
+                var data = DataManager.Instance.GetData<SkillData>("Skill", currentCharData.ultimateSkill);
                 activeUlt.OnClientExecute(data, IsOwner);
             }
         }
@@ -261,7 +261,7 @@ public class PlayerSkillController : NetworkBehaviour
             BaseUltimateSkill activeUlt = playerController.GetActiveUltimateSkill();
             if (activeUlt != null && currentCharData != null)
             {
-                var data = DataManager.Instance.GetData<UltimateSkillData>("UltimateSkill", currentCharData.ultimateSkill);
+                var data = DataManager.Instance.GetData<SkillData>("Skill", currentCharData.ultimateSkill);
                 activeUlt.OnServerExecute(data, eventId);
             }
         }
@@ -327,25 +327,25 @@ public class PlayerSkillController : NetworkBehaviour
                 state.lastGunId = gunId;
             }
             
-            Debug.Log($"[PlayerSkillController] 무기 전환: {newGun.gunName}");
+            Debug.Log($"[PlayerSkillController] 무기 전환: ID {newGun.id}");
         }
     }
 
     private void ToggleWeapon(Shooter playerShooter)
     {
-        if (playerShooter == null || playerShooter.CurrentGunData == null || currentCharData.gun == null || currentCharData.gun.Length == 0) return;
+        if (playerShooter == null || playerShooter.CurrentGunData == null || currentCharData.gun == null || currentCharData.gun.Count == 0) return;
 
         int currentGunId = playerShooter.CurrentGunData.id;
         int nextGunId = 0;
 
-        for (int i = 0; i < currentCharData.gun.Length; i++)
+        for (int i = 0; i < currentCharData.gun.Count; i++)
         {
             if (currentCharData.gun[i] == currentGunId)
             {
                 // Find next non-zero gun
-                for (int j = 1; j <= currentCharData.gun.Length; j++)
+                for (int j = 1; j <= currentCharData.gun.Count; j++)
                 {
-                    int checkIndex = (i + j) % currentCharData.gun.Length;
+                    int checkIndex = (i + j) % currentCharData.gun.Count;
                     if (currentCharData.gun[checkIndex] != 0)
                     {
                         nextGunId = currentCharData.gun[checkIndex];

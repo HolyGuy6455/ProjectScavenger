@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class GunData : IData
 {
     public int id;
-    public string gunName;
+    public int charId;
     public int gunGroup;
     public int shotType;
     public float SearchRadius;
@@ -19,7 +19,6 @@ public class GunData : IData
     public float maxSpread;
     public float spreadRecoveryRate = 1f;
     public int maxAmmo;
-    public string resourceSilhouette;
 
     public int GetId()
     {

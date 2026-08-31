@@ -11,6 +11,103 @@ public class DataConverterEditor : EditorWindow
         GetWindow<DataConverterEditor>("Data Converter");
     }
 
+    [MenuItem("Tools/Data/Fill CharLvl TSV (Interpolate)")]
+    public static void FillCharLvlTsv()
+    {
+        string tsvPath = Path.Combine(Application.dataPath, "Data", "Scavenger - CharLvl.tsv");
+        if (!File.Exists(tsvPath))
+        {
+            Debug.LogError("CharLvl TSV not found at " + tsvPath);
+            return;
+        }
+
+        string[] lines = File.ReadAllLines(tsvPath);
+        if (lines.Length < 2) return;
+
+        string header = lines[0];
+        
+        List<CharLvlData> existingData = new List<CharLvlData>();
+        for (int i = 1; i < lines.Length; i++)
+        {
+            string line = lines[i].Trim();
+            if (string.IsNullOrEmpty(line)) continue;
+            string[] parts = line.Split('\t');
+            if (parts.Length >= 5)
+            {
+                CharLvlData data = new CharLvlData();
+                int.TryParse(parts[0], out data.id);
+                int.TryParse(parts[1], out data.charId);
+                int.TryParse(parts[2], out data.level);
+                int.TryParse(parts[3], out data.atk);
+                int.TryParse(parts[4], out data.hp);
+                existingData.Add(data);
+            }
+        }
+
+        Dictionary<int, List<CharLvlData>> charGroups = new Dictionary<int, List<CharLvlData>>();
+        foreach (var data in existingData)
+        {
+            if (!charGroups.ContainsKey(data.charId)) charGroups[data.charId] = new List<CharLvlData>();
+            charGroups[data.charId].Add(data);
+        }
+
+        List<CharLvlData> newData = new List<CharLvlData>();
+        int newId = 1;
+
+        foreach (var kvp in charGroups)
+        {
+            int charId = kvp.Key;
+            List<CharLvlData> keyframes = kvp.Value;
+            keyframes.Sort((a, b) => a.level.CompareTo(b.level));
+
+            if (keyframes.Count == 0) continue;
+
+            int minLevel = keyframes[0].level;
+            int maxLevel = keyframes[keyframes.Count - 1].level;
+
+            for (int lvl = minLevel; lvl <= maxLevel; lvl++)
+            {
+                CharLvlData prev = keyframes[0];
+                CharLvlData next = keyframes[keyframes.Count - 1];
+
+                foreach (var kf in keyframes)
+                {
+                    if (kf.level <= lvl) prev = kf;
+                }
+                
+                next = keyframes.Find(k => k.level >= lvl);
+                if (next == null) next = keyframes[keyframes.Count - 1];
+
+                float t = 0f;
+                if (next.level > prev.level)
+                {
+                    t = (float)(lvl - prev.level) / (next.level - prev.level);
+                }
+
+                CharLvlData interpolated = new CharLvlData();
+                interpolated.id = newId++;
+                interpolated.charId = charId;
+                interpolated.level = lvl;
+                interpolated.atk = Mathf.RoundToInt(Mathf.Lerp(prev.atk, next.atk, t));
+                interpolated.hp = Mathf.RoundToInt(Mathf.Lerp(prev.hp, next.hp, t));
+
+                newData.Add(interpolated);
+            }
+        }
+
+        using (StreamWriter writer = new StreamWriter(tsvPath, false))
+        {
+            writer.WriteLine(header);
+            foreach (var d in newData)
+            {
+                writer.WriteLine($"{d.id}\t{d.charId}\t{d.level}\t{d.atk}\t{d.hp}");
+            }
+        }
+
+        AssetDatabase.Refresh();
+        Debug.Log($"Successfully interpolated CharLvl TSV. Total rows: {newData.Count}");
+    }
+
     private void OnGUI()
     {
         GUILayout.Label("Data Converter", EditorStyles.boldLabel);
@@ -36,10 +133,12 @@ public class DataConverterEditor : EditorWindow
             ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - Skill.tsv");
         }
 
-        if (GUILayout.Button("Convert Ultimate Skill Data"))
+        if (GUILayout.Button("Convert Char Lvl Data"))
         {
-            ConvertData<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "Scavenger - UltimateSkill.tsv");
+            ConvertData<CharLvlDataList, CharLvlData>("CharLvl", "Scavenger - CharLvl.tsv");
         }
+
+
 
         if (GUILayout.Button("Convert Loot Data"))
         {
@@ -74,8 +173,9 @@ public class DataConverterEditor : EditorWindow
         ConvertData<GunDataList, GunData>("Gun", "Scavenger - Gun.tsv");
         ConvertData<ItemDataList, ItemData>("Item", "Scavenger - Item.tsv");
         ConvertData<CharDataList, CharData>("Char", "Scavenger - Char.tsv");
+        ConvertData<CharLvlDataList, CharLvlData>("CharLvl", "Scavenger - CharLvl.tsv");
         ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - Skill.tsv");
-        ConvertData<UltimateSkillDataList, UltimateSkillData>("UltimateSkill", "Scavenger - UltimateSkill.tsv");
+
         ConvertData<LootDataList, LootData>("Loot", "Scavenger - Loot.tsv");
         ConvertData<EnemyDataList, EnemyData>("Enemy", "Scavenger - Enemy.tsv");
         ConvertData<ObstacleDataList, ObstacleData>("Obstacle", "Scavenger - Obstacle.tsv");

@@ -21,7 +21,7 @@ public class Char03Campfire : NetworkBehaviour
     /// <summary>
     /// 궁극기를 시전할 때 Char03_Ultimate에서 호출하여 초기 데이터를 세팅합니다.
     /// </summary>
-    public void Initialize(UltimateSkillData ultData)
+    public void Initialize(SkillData ultData)
     {
         if (ultData != null)
         {

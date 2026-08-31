@@ -24,18 +24,20 @@ public class SkillData : IData
 {
     public int id;
     public string name;
+    public int charId;
+    public int[] index;
+    public int lvl;
     public string resourceIcon;
     public string resourceIcon2;
-    public int onFunction;
-    public float onFunctionValue;
-    public int offFunction;
-    public float offFunctionValue;
+    public int func;
+    public float[] funcValue;
     public float cooltime;
     public float duration;
     public SkillActiveType activeType;
     public float thirst;
     public int remain;
     public RemainCostType remainCostType;
+    public int[] unlockItem;
 
     public int GetId()
     {
