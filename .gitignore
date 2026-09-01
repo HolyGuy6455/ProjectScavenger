@@ -61,3 +61,7 @@ wsl_debug_proxy.ps1
 
 # Android Build Temp Files
 .utmp/
+Assets/Data/Json/
+
+# 과거 대화 내역 백업 폴더
+pastLog/
