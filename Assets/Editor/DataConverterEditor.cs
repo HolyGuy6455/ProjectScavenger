@@ -379,6 +379,10 @@ public class DataConverterEditor : EditorWindow
                         {
                             field.SetValue(obj, float.Parse(val));
                         }
+                        else if (field.FieldType == typeof(bool))
+                        {
+                            field.SetValue(obj, val.Equals("TRUE", System.StringComparison.OrdinalIgnoreCase) || val.Equals("1"));
+                        }
                         else if (field.FieldType == typeof(string))
                         {
                             field.SetValue(obj, val);

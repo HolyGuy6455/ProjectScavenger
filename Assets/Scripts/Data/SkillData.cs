@@ -26,6 +26,7 @@ public class SkillData : IData
     public string name;
     public int charId;
     public int[] index;
+    public int skillGroup;
     public int lvl;
     public string resourceIcon;
     public string resourceIcon2;
@@ -37,7 +38,12 @@ public class SkillData : IData
     public float thirst;
     public int remain;
     public RemainCostType remainCostType;
+#if UNITY_EDITOR
+    public bool unlockFirst;
+    public int unlockLevel;
     public int[] unlockItem;
+    public int[] unlockItemAmount;
+#endif
 
     public int GetId()
     {

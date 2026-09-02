@@ -6053,6 +6053,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TrainCharacterPanel
   leftCharacterRack: {fileID: 8627696478524170131}
   polaroidPrefab: {fileID: 1852813943480969570, guid: a35f0272e7a97de48ab6b15aa0e54d07, type: 3}
+  charNameText: {fileID: 992182794961663787}
+  characterImage: {fileID: 5068835031597124791}
+  levelAmountText: {fileID: 5661151262878521141}
+  roleTags:
+  - {fileID: 2170003058771619042}
+  - {fileID: 7239786577860441495}
+  - {fileID: 643961323322546166}
+  - {fileID: 6998696571330758413}
 --- !u!1 &5442509650674655003
 GameObject:
   m_ObjectHideFlags: 0
@@ -6261,7 +6269,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5540515518839230081}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
   m_Name: 
@@ -6402,7 +6410,7 @@ GameObject:
   - component: {fileID: 5661151262878521141}
   - component: {fileID: 585522438093126387}
   m_Layer: 0
-  m_Name: 32
+  m_Name: LevelAmount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6905,7 +6913,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4001206647972095162
 RectTransform:
   m_ObjectHideFlags: 0

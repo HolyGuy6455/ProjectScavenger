@@ -2,6 +2,14 @@ using UnityEngine;
 using System.Collections.Generic;
 
 
+public enum CharRole
+{
+    None = 0,
+    Infiltrator = 1,  // 침투
+    Striker = 2,      // 타격
+    Anchor = 3,       // 방호
+    Suppressor = 4    // 제압
+}
 
 [System.Serializable]
 public class CharData : IData
@@ -10,6 +18,7 @@ public class CharData : IData
     public string name;
     public string resourceSlot;
     public string resourceStand;
+    public CharRole role;
 
     [System.NonSerialized]
     public List<int> gun = new List<int>();

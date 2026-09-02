@@ -124,7 +124,7 @@ GameObject:
   - component: {fileID: 3086261129637880606}
   - component: {fileID: 1358489688500766784}
   m_Layer: 0
-  m_Name: skillNode
+  m_Name: TrainCharacterSkillNode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
