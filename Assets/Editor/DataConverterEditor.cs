@@ -138,6 +138,13 @@ public class DataConverterEditor : EditorWindow
             ConvertData<CharLvlDataList, CharLvlData>("CharLvl", "Scavenger - CharLvl.tsv");
         }
 
+        GUILayout.Space(20);
+        
+        if (GUILayout.Button("Copy Master Data To Server", GUILayout.Height(30)))
+        {
+            CopyMasterDataToServer();
+        }
+
 
 
         if (GUILayout.Button("Convert Loot Data"))
@@ -179,9 +186,39 @@ public class DataConverterEditor : EditorWindow
         ConvertData<LootDataList, LootData>("Loot", "Scavenger - Loot.tsv");
         ConvertData<EnemyDataList, EnemyData>("Enemy", "Scavenger - Enemy.tsv");
         ConvertData<ObstacleDataList, ObstacleData>("Obstacle", "Scavenger - Obstacle.tsv");
-        ConvertMobGroupData();
+        AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("Finished Convert All Data operation.");
+
+        Debug.Log("All Data Converted Successfully.");
+    }
+
+    [MenuItem("Tools/Data/Copy Master Data To Server")]
+    public static void CopyMasterDataToServer()
+    {
+        string clientDataPath = Application.dataPath + "/Data/";
+        // Assuming ScavengerServer is adjacent to ClaudePractice
+        string serverResourcesPath = System.IO.Path.GetFullPath(Application.dataPath + "/../../ScavengerServer/Resources/");
+        string serverTmpPath = System.IO.Path.GetFullPath(Application.dataPath + "/../../ScavengerServer/tmp/");
+
+        if (!System.IO.Directory.Exists(serverResourcesPath))
+        {
+            System.IO.Directory.CreateDirectory(serverResourcesPath);
+        }
+
+        try
+        {
+            // Copy game items, skills, char levels
+            string clientJsonPath = Application.dataPath + "/Data/Json/";
+            System.IO.File.Copy(clientJsonPath + "Item.json", serverResourcesPath + "Item.json", true);
+            System.IO.File.Copy(clientJsonPath + "Skill.json", serverResourcesPath + "Skill.json", true);
+            System.IO.File.Copy(clientJsonPath + "CharLvl.json", serverResourcesPath + "CharLvl.json", true);
+
+            Debug.Log($"[DataConverter] Master data successfully copied to server: {serverResourcesPath}");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[DataConverter] Failed to copy master data to server: {e.Message}");
+        }
     }
 
     private void ConvertMobGroupData()
@@ -267,6 +304,10 @@ public class DataConverterEditor : EditorWindow
         // 확장자를 .bytes 로 변경
         string savePath = Path.Combine(dataPath, $"{dataName}Data.bytes");
         File.WriteAllBytes(savePath, encryptedBytes);
+        
+        string jsonPath = Application.dataPath + "/Data/Json";
+        if (!Directory.Exists(jsonPath)) Directory.CreateDirectory(jsonPath);
+        File.WriteAllText(Path.Combine(jsonPath, $"{dataName}.json"), jsonContent);
         
         AssetDatabase.Refresh();
         Debug.Log($"Successfully converted and encrypted {dataName}Data to: {savePath}");
