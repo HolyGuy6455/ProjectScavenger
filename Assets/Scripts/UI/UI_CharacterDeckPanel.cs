@@ -55,10 +55,10 @@ namespace Scavenger.UI
         {
             if (OutGameUIManager.Instance != null)
             {
-                var window = OutGameUIManager.Instance.ShowWindow<UI_CharacterSelectWindow>(OutGameWindowType.CharacterSelect);
-                if (window != null)
+                var popup = OutGameUIManager.Instance.ShowPopup<UI_CharacterSelectPopup>(OutGamePopupType.CharacterSelect);
+                if (popup != null)
                 {
-                    window.Open((selectedData) =>
+                    popup.Open((selectedData) =>
                     {
                         if (selectedData != null)
                         {

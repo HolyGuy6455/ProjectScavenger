@@ -38,6 +38,7 @@ public class SkillData : IData
     public float thirst;
     public int remain;
     public RemainCostType remainCostType;
+    public string description;
 #if UNITY_EDITOR
     public bool unlockFirst;
     public int unlockLevel;

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Scavenger.UI
 {
-    public class UI_CharacterSelectWindow : MonoBehaviour
+    public class UI_CharacterSelectPopup : MonoBehaviour
     {
         [Header("UI References")]
         [SerializeField] private Transform contentParent; 
@@ -92,7 +92,7 @@ namespace Scavenger.UI
             
             if (OutGameUIManager.Instance != null)
             {
-                OutGameUIManager.Instance.CloseWindow(gameObject);
+                OutGameUIManager.Instance.ClosePopup(gameObject);
             }
             else
             {
@@ -104,7 +104,7 @@ namespace Scavenger.UI
         {
             if (OutGameUIManager.Instance != null)
             {
-                OutGameUIManager.Instance.CloseWindow(gameObject);
+                OutGameUIManager.Instance.ClosePopup(gameObject);
             }
             else
             {

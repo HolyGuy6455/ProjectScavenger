@@ -51,6 +51,7 @@ public class DataManager : MonoBehaviour
         yield return StartCoroutine(LoadDataAsync<LootDataList, LootData>("Loot", "LootData"));
         yield return StartCoroutine(LoadDataAsync<EnemyDataList, EnemyData>("Enemy", "EnemyData"));
         yield return StartCoroutine(LoadDataAsync<ObstacleDataList, ObstacleData>("Obstacle", "ObstacleData"));
+        yield return StartCoroutine(LoadDataAsync<LevelDataList, LevelData>("Level", "LevelData"));
 
         // 몹 그룹 데이터 로드 (하나로 합쳐진 어드레서블 'MobGroupData' 파일 사용)
         yield return StartCoroutine(LoadMobGroupsAsync());

@@ -17,9 +17,13 @@ namespace Scavenger.UI
         StageInfo
     }
 
-    public enum OutGameWindowType
+    public enum OutGamePopupType
     {
-        CharacterSelect
+        CharacterSelect,
+        CharacterLevelUpCelebration,
+        SkillLevelUpCelebration,
+        SkillLevelUp,
+        SkillSelect
     }
 
     public class OutGameUIManager : MonoBehaviour
@@ -40,8 +44,12 @@ namespace Scavenger.UI
         [SerializeField] private GameObject trainCharacterPanelPrefab;
         [SerializeField] private GameObject stageInfoPanelPrefab;
 
-        [Header("Window Prefabs")]
-        [SerializeField] private GameObject characterSelectWindowPrefab;
+        [Header("Popup Prefabs")]
+        [SerializeField] private GameObject characterSelectPopupPrefab;
+        [SerializeField] private GameObject characterLevelUpCelebrationPopupPrefab;
+        [SerializeField] private GameObject skillLevelUpCelebrationPopupPrefab;
+        [SerializeField] private GameObject skillLevelUpPopupPrefab;
+        [SerializeField] private GameObject skillSelectPopupPrefab;
 
         // [Header("Persistent UI")]
         // [SerializeField] private GameObject persistentPartyListUI; // 파티 리스트 패널
@@ -49,8 +57,8 @@ namespace Scavenger.UI
         private Dictionary<OutGamePanelType, GameObject> _cachedPanels = new Dictionary<OutGamePanelType, GameObject>();
         private Stack<OutGamePanelType> _panelHistory = new Stack<OutGamePanelType>();
         private OutGamePanelType _currentPanelType;
-        private Dictionary<OutGameWindowType, GameObject> _cachedWindows = new Dictionary<OutGameWindowType, GameObject>();
-        private Stack<GameObject> _activeWindows = new Stack<GameObject>();
+        private Dictionary<OutGamePopupType, GameObject> _cachedPopups = new Dictionary<OutGamePopupType, GameObject>();
+        private Stack<GameObject> _activePopups = new Stack<GameObject>();
 
         private void Awake()
         {
@@ -127,51 +135,51 @@ namespace Scavenger.UI
             _currentPanelType = panelType;
         }
 
-        public T ShowWindow<T>(OutGameWindowType windowType) where T : MonoBehaviour
+        public T ShowPopup<T>(OutGamePopupType popupType) where T : MonoBehaviour
         {
-            GameObject windowObj = null;
+            GameObject popupObj = null;
 
-            if (_cachedWindows.TryGetValue(windowType, out GameObject cachedWindow) && cachedWindow != null)
+            if (_cachedPopups.TryGetValue(popupType, out GameObject cachedPopup) && cachedPopup != null)
             {
-                windowObj = cachedWindow;
-                windowObj.SetActive(true);
+                popupObj = cachedPopup;
+                popupObj.SetActive(true);
             }
             else
             {
-                GameObject prefabToLoad = GetWindowPrefabByType(windowType);
+                GameObject prefabToLoad = GetPopupPrefabByType(popupType);
                 if (prefabToLoad != null && canvasTransform != null)
                 {
-                    windowObj = Instantiate(prefabToLoad, canvasTransform, false);
-                    RectTransform rect = windowObj.GetComponent<RectTransform>();
+                    popupObj = Instantiate(prefabToLoad, canvasTransform, false);
+                    RectTransform rect = popupObj.GetComponent<RectTransform>();
                     if (rect != null)
                     {
                         rect.anchoredPosition = Vector2.zero;
                         rect.localScale = Vector3.one;
                     }
-                    _cachedWindows[windowType] = windowObj;
+                    _cachedPopups[popupType] = popupObj;
                 }
                 else
                 {
-                    Debug.LogError($"[OutGameUIManager] 윈도우 프리팹 또는 캔버스 연결 누락! ({windowType})");
+                    Debug.LogError($"[OutGameUIManager] 윈도우 프리팹 또는 캔버스 연결 누락! ({popupType})");
                     return null;
                 }
             }
 
-            windowObj.transform.SetAsLastSibling();
-            if (_activeWindows.Count == 0 || _activeWindows.Peek() != windowObj)
+            popupObj.transform.SetAsLastSibling();
+            if (_activePopups.Count == 0 || _activePopups.Peek() != popupObj)
             {
-                _activeWindows.Push(windowObj);
+                _activePopups.Push(popupObj);
             }
 
-            return windowObj.GetComponent<T>();
+            return popupObj.GetComponent<T>();
         }
 
         public void GoBack()
         {
-            if (_activeWindows.Count > 0)
+            if (_activePopups.Count > 0)
             {
-                GameObject topWindow = _activeWindows.Pop();
-                if (topWindow != null) topWindow.SetActive(false);
+                GameObject topPopup = _activePopups.Pop();
+                if (topPopup != null) topPopup.SetActive(false);
                 return;
             }
 
@@ -195,23 +203,23 @@ namespace Scavenger.UI
             }
         }
 
-        public void CloseWindow(GameObject window)
+        public void ClosePopup(GameObject popup)
         {
-            if (window == null) return;
-            window.SetActive(false);
-            if (_activeWindows.Count > 0 && _activeWindows.Peek() == window)
+            if (popup == null) return;
+            popup.SetActive(false);
+            if (_activePopups.Count > 0 && _activePopups.Peek() == popup)
             {
-                _activeWindows.Pop();
+                _activePopups.Pop();
             }
             else
             {
                 Stack<GameObject> temp = new Stack<GameObject>();
-                while (_activeWindows.Count > 0)
+                while (_activePopups.Count > 0)
                 {
-                    var w = _activeWindows.Pop();
-                    if (w != window) temp.Push(w);
+                    var w = _activePopups.Pop();
+                    if (w != popup) temp.Push(w);
                 }
-                while (temp.Count > 0) _activeWindows.Push(temp.Pop());
+                while (temp.Count > 0) _activePopups.Push(temp.Pop());
             }
         }
 
@@ -232,11 +240,15 @@ namespace Scavenger.UI
             return null;
         }
 
-        private GameObject GetWindowPrefabByType(OutGameWindowType type)
+        private GameObject GetPopupPrefabByType(OutGamePopupType type)
         {
             switch (type)
             {
-                case OutGameWindowType.CharacterSelect: return characterSelectWindowPrefab;
+                case OutGamePopupType.CharacterSelect: return characterSelectPopupPrefab;
+                case OutGamePopupType.CharacterLevelUpCelebration: return characterLevelUpCelebrationPopupPrefab;
+                case OutGamePopupType.SkillLevelUpCelebration: return skillLevelUpCelebrationPopupPrefab;
+                case OutGamePopupType.SkillLevelUp: return skillLevelUpPopupPrefab;
+                case OutGamePopupType.SkillSelect: return skillSelectPopupPrefab;
             }
             return null;
         }

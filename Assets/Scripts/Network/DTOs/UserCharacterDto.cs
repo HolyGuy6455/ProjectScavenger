@@ -8,6 +8,7 @@ namespace Scavenger.Network.DTOs
     {
         public int charId;
         public int level;
+        public int[] equippedSkills = new int[4];
         public List<int> unlockedSkills = new List<int>();
     }
 
@@ -15,5 +16,34 @@ namespace Scavenger.Network.DTOs
     public class UserCharacterListResponse
     {
         public List<UserCharacterDto> characters = new List<UserCharacterDto>();
+    }
+
+    [Serializable]
+    public class EquipSkillRequest
+    {
+        public int charId;
+        public int skillId;
+        public int slotIndex;
+    }
+
+    [Serializable]
+    public class EquipSkillResponse
+    {
+        public string message;
+        public int[] equippedSkills;
+    }
+
+    [Serializable]
+    public class LevelUpSkillRequest
+    {
+        public int charId;
+        public int targetSkillId;
+    }
+
+    [Serializable]
+    public class LevelUpSkillResponse
+    {
+        public string message;
+        public List<int> unlockedSkills;
     }
 }

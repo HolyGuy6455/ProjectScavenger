@@ -563,44 +563,56 @@ MonoBehaviour:
   m_PrototypeFlowInitialScreenId: 
   m_Screens:
   - FigmaNodeId: 4:2
-    FigmaScreenPrefab: {fileID: 1336515435738734098, guid: 4ceccc1398e3cce41be52ec60c3c4515, type: 3}
+    FigmaScreenPrefab: {fileID: 559543776756202167, guid: 4ceccc1398e3cce41be52ec60c3c4515, type: 3}
     FigmaScreenName: Lobby Background
     ParentSectionNodeId: 
   - FigmaNodeId: 3:4
-    FigmaScreenPrefab: {fileID: 1752334476104343843, guid: bbd6fbdb51831f74491babfce38355e6, type: 3}
+    FigmaScreenPrefab: {fileID: 4330823531859730486, guid: bbd6fbdb51831f74491babfce38355e6, type: 3}
     FigmaScreenName: lobby-ui-overlay
     ParentSectionNodeId: 
   - FigmaNodeId: 6:174
-    FigmaScreenPrefab: {fileID: 1653849367665300706, guid: 59e5a019662937748944353fb29d1d31, type: 3}
+    FigmaScreenPrefab: {fileID: 2498464893682036837, guid: 59e5a019662937748944353fb29d1d31, type: 3}
     FigmaScreenName: character-growth-screen
     ParentSectionNodeId: 
   - FigmaNodeId: 39:2
-    FigmaScreenPrefab: {fileID: 7769124813058051467, guid: 030780bb10237f249a99bf3bfc3102f7, type: 3}
+    FigmaScreenPrefab: {fileID: 6901436235525612480, guid: 030780bb10237f249a99bf3bfc3102f7, type: 3}
     FigmaScreenName: BG - Ruined City White
     ParentSectionNodeId: 
   - FigmaNodeId: 40:2
-    FigmaScreenPrefab: {fileID: 2007064171368365215, guid: 18ee488e175ba3d47b201aacda5702be, type: 3}
+    FigmaScreenPrefab: {fileID: 4992498679266972458, guid: 18ee488e175ba3d47b201aacda5702be, type: 3}
     FigmaScreenName: BG - Top-down Overhead
     ParentSectionNodeId: 
   - FigmaNodeId: 38:2
-    FigmaScreenPrefab: {fileID: 780302453656951130, guid: a4bbd3d3a25e3594ca687c43258324d6, type: 3}
+    FigmaScreenPrefab: {fileID: 3347452892796220495, guid: a4bbd3d3a25e3594ca687c43258324d6, type: 3}
     FigmaScreenName: BG - Dawn Cityscape
     ParentSectionNodeId: 
   - FigmaNodeId: 43:2
-    FigmaScreenPrefab: {fileID: 5332352689156820163, guid: f6f5f6c1422514c468b67aded0c41a83, type: 3}
+    FigmaScreenPrefab: {fileID: 26445041112259779, guid: f6f5f6c1422514c468b67aded0c41a83, type: 3}
     FigmaScreenName: image
     ParentSectionNodeId: 
   - FigmaNodeId: 44:4
-    FigmaScreenPrefab: {fileID: 8504208239327516442, guid: b4c785c588a59414e9f7f0bf5997bfaa, type: 3}
+    FigmaScreenPrefab: {fileID: 7839107399798353067, guid: b4c785c588a59414e9f7f0bf5997bfaa, type: 3}
     FigmaScreenName: stage-select-screen
     ParentSectionNodeId: 
   - FigmaNodeId: 49:4
-    FigmaScreenPrefab: {fileID: 2795200088409497707, guid: 2b6fb069d959f1a47960335153347b24, type: 3}
+    FigmaScreenPrefab: {fileID: 3122043680198876127, guid: 2b6fb069d959f1a47960335153347b24, type: 3}
     FigmaScreenName: party-composition-screen
     ParentSectionNodeId: 
   - FigmaNodeId: 53:4
-    FigmaScreenPrefab: {fileID: 4572146725827403194, guid: 5913da3570c9f21439182ee76ac65bf7, type: 3}
+    FigmaScreenPrefab: {fileID: 8682883625727930170, guid: 5913da3570c9f21439182ee76ac65bf7, type: 3}
     FigmaScreenName: stage-info-screen
+    ParentSectionNodeId: 
+  - FigmaNodeId: 66:5
+    FigmaScreenPrefab: {fileID: 3597043293669542872, guid: 286bc0bb3cc574d458eb9ef01a5cf07f, type: 3}
+    FigmaScreenName: popup-showcase-canvas
+    ParentSectionNodeId: 
+  - FigmaNodeId: 68:4
+    FigmaScreenPrefab: {fileID: 551854317823330568, guid: 6aa74df0e4bbb0d4d9e9d242e6239fe5, type: 3}
+    FigmaScreenName: levelup-celebration-overlay
+    ParentSectionNodeId: 
+  - FigmaNodeId: 70:4
+    FigmaScreenPrefab: {fileID: 134609444216685638, guid: a52689d98bea8b6409207f060a0673d2, type: 3}
+    FigmaScreenName: skill-levelup-overlay
     ParentSectionNodeId: 
   m_Sections: []
 --- !u!114 &1174248479
