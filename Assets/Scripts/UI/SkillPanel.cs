@@ -4,21 +4,6 @@ using System.Collections.Generic;
 public class SkillPanel : MonoBehaviour
 {
     [SerializeField] private List<SkillSlot> slots = new List<SkillSlot>();
-    [SerializeField] private UnityEngine.UI.Button tempUltBtn;
-
-    private void Awake()
-    {
-        if (tempUltBtn != null)
-        {
-            tempUltBtn.onClick.AddListener(() =>
-            {
-                if (PlayerSkillController.Instance != null)
-                {
-                    PlayerSkillController.Instance.OnUltimateSkillPointerDown();
-                }
-            });
-        }
-    }
 
     private void OnEnable()
     {

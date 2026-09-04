@@ -126,6 +126,12 @@ public class SkillInstance
 
         switch (funcCode)
         {
+            case 1: // 궁극기
+                if (PlayerSkillController.Instance != null)
+                {
+                    PlayerSkillController.Instance.CmdUseUltimateServerRpc();
+                }
+                break;
             case 6: // 1발 재장전
                 if (playerShooter != null) playerShooter.ReloadAmount(1);
                 break;

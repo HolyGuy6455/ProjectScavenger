@@ -7,7 +7,6 @@ public class CharacterState
 {
     public int charId;
     public SkillInstance[] normalSkills;
-    public UltimateSkillInstance ultimateSkill;
     
     public float currentHealth;
     public float maxHealth;
@@ -34,13 +33,8 @@ public class CharacterState
         currentThirst = 100f;
         maxThirst = 100f;
         
-        normalSkills = new SkillInstance[charData.skill != null ? charData.skill.Count : 0];
-        for (int i = 0; i < normalSkills.Length; i++)
-        {
-            normalSkills[i] = new SkillInstance(charData.skill[i]);
-        }
-
-        ultimateSkill = new UltimateSkillInstance(charData.ultimateSkill);
+        // Initialize empty array; will be populated by SetEquippedSkills
+        normalSkills = new SkillInstance[4];
     }
 
     public bool UpdateSurvivalStats(float deltaTime)
@@ -121,10 +115,24 @@ public class CharacterState
         {
             if (skill != null) skill.UpdateCooldown(cooldownValue);
         }
+    }
 
-        if (ultimateSkill != null)
+    public void SetEquippedSkills(int[] equippedSkills)
+    {
+        if (equippedSkills == null) return;
+        
+        normalSkills = new SkillInstance[4];
+        for (int i = 0; i < 4; i++)
         {
-            ultimateSkill.UpdateCooldown(cooldownValue);
+            int skillId = i < equippedSkills.Length ? equippedSkills[i] : 0;
+            if (skillId > 0)
+            {
+                var skillData = DataManager.Instance.GetData<SkillData>("Skill", skillId);
+                if (skillData != null)
+                {
+                    normalSkills[i] = new SkillInstance(skillId);
+                }
+            }
         }
     }
 }

@@ -72,12 +72,16 @@ public class SkillSlot : MonoBehaviour
             if (!string.IsNullOrEmpty(data.resourceIcon))
             {
                 string name1 = System.IO.Path.GetFileNameWithoutExtension(data.resourceIcon);
-                normalSprite = Resources.Load<Sprite>(name1);
+                Sprite loadedSprite = Resources.Load<Sprite>($"skill/{name1}");
+                if (loadedSprite == null) loadedSprite = Resources.Load<Sprite>(name1);
+                normalSprite = loadedSprite;
             }
             if (!string.IsNullOrEmpty(data.resourceIcon2))
             {
                 string name2 = System.IO.Path.GetFileNameWithoutExtension(data.resourceIcon2);
-                toggledSprite = Resources.Load<Sprite>(name2);
+                Sprite loadedSprite = Resources.Load<Sprite>($"skill/{name2}");
+                if (loadedSprite == null) loadedSprite = Resources.Load<Sprite>(name2);
+                toggledSprite = loadedSprite;
             }
         }
 

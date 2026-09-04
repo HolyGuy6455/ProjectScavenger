@@ -21,7 +21,8 @@ public class CharacterStateManager : MonoBehaviour
         }
     }
 
-    private Dictionary<int, CharacterState> charStates = new Dictionary<int, CharacterState>();
+    private CharacterState[] charStates = new CharacterState[4];
+    private bool isInitialized = false;
     private Health playerHealth;
     private int currentCharId = -1;
     public int CurrentCharId => currentCharId;
@@ -66,7 +67,8 @@ public class CharacterStateManager : MonoBehaviour
     {
         if (currentCharId > 0 && playerHealth != null)
         {
-            if (charStates.TryGetValue(currentCharId, out CharacterState oldState))
+            CharacterState oldState = GetState(currentCharId);
+            if (oldState != null)
             {
                 oldState.currentHealth = playerHealth.CurrentHealth;
                 oldState.maxHealth = playerHealth.MaxHealth;
@@ -78,13 +80,15 @@ public class CharacterStateManager : MonoBehaviour
 
         if (playerHealth != null)
         {
-            if (charStates.TryGetValue(currentCharId, out CharacterState newState))
+            CharacterState newState = GetState(currentCharId);
+            if (newState != null)
             {
                 playerHealth.SetHealth(newState.currentHealth, newState.maxHealth);
             }
         }
         
-        if (charStates.TryGetValue(currentCharId, out CharacterState state))
+        CharacterState state = GetState(currentCharId);
+        if (state != null)
         {
             OnCharacterHungerChanged?.Invoke(currentCharId, state.currentHunger, state.maxHunger);
             OnCharacterThirstChanged?.Invoke(currentCharId, state.currentThirst, state.maxThirst);
@@ -100,15 +104,17 @@ public class CharacterStateManager : MonoBehaviour
             if (playerHealth != null)
             {
                 float defaultMax = playerHealth.MaxHealth;
-                foreach (var state in charStates.Values)
+                foreach (var state in charStates)
                 {
+                    if (state == null) continue;
                     state.maxHealth = defaultMax;
                     state.currentHealth = defaultMax;
                 }
 
                 playerHealth.OnHealthChanged += HandleHealthChanged;
 
-                if (currentCharId > 0 && charStates.TryGetValue(currentCharId, out CharacterState currentState))
+                CharacterState currentState = GetState(currentCharId);
+                if (currentCharId > 0 && currentState != null)
                 {
                     playerHealth.SetHealth(currentState.currentHealth, currentState.maxHealth);
                     OnCharacterHealthChanged?.Invoke(currentCharId, currentState.currentHealth, currentState.maxHealth);
@@ -119,7 +125,8 @@ public class CharacterStateManager : MonoBehaviour
 
     private void HandleHealthChanged(float currentHealth, float maxHealth)
     {
-        if (currentCharId > 0 && charStates.TryGetValue(currentCharId, out CharacterState state))
+        CharacterState state = GetState(currentCharId);
+        if (currentCharId > 0 && state != null)
         {
             state.currentHealth = currentHealth;
             state.maxHealth = maxHealth;
@@ -131,33 +138,62 @@ public class CharacterStateManager : MonoBehaviour
     private void InitializeStates()
     {
         if (DataManager.Instance == null) return;
+        if (isInitialized) return;
 
-        var charDataList = DataManager.Instance.GetAllData<CharData>("Char");
-        if (charDataList != null)
+        int[] defaultDeck = new int[] { 1, 2, 3, 4 };
+        if (UserDataManager.Instance != null && UserDataManager.Instance.SelectedDeck != null && UserDataManager.Instance.SelectedDeck[0] > 0)
         {
-            foreach (var charData in charDataList)
+            defaultDeck = UserDataManager.Instance.SelectedDeck;
+        }
+
+        InitializeDeckStates(defaultDeck);
+    }
+
+    public void InitializeDeckStates(int[] deckCharIds)
+    {
+        if (DataManager.Instance == null) return;
+        
+        for (int i = 0; i < 4; i++)
+        {
+            if (i < deckCharIds.Length && deckCharIds[i] > 0)
             {
+                var charData = DataManager.Instance.GetData<CharData>("Char", deckCharIds[i]);
                 if (charData != null)
                 {
-                    charStates[charData.id] = new CharacterState(charData);
+                    charStates[i] = new CharacterState(charData);
+                    if (UserDataManager.Instance != null)
+                    {
+                        var userChar = UserDataManager.Instance.GetCharacter(deckCharIds[i]);
+                        if (userChar != null && userChar.equippedSkills != null)
+                        {
+                            charStates[i].SetEquippedSkills(userChar.equippedSkills);
+                        }
+                    }
                 }
             }
+            else
+            {
+                charStates[i] = null;
+            }
         }
+        isInitialized = true;
     }
 
     public CharacterState GetState(int charId)
     {
-        if (charStates.Count == 0) InitializeStates();
-        if (charStates.TryGetValue(charId, out CharacterState state)) return state;
+        if (!isInitialized) InitializeStates();
+        foreach (var state in charStates)
+        {
+            if (state != null && state.charId == charId) return state;
+        }
         return null;
     }
 
     private void Update()
     {
         float dt = Time.deltaTime;
-        foreach (var statePair in charStates)
+        foreach (var state in charStates)
         {
-            CharacterState state = statePair.Value;
             if (state != null)
             {
                 state.UpdateAllCooldowns(dt);
@@ -167,7 +203,7 @@ public class CharacterStateManager : MonoBehaviour
                 if (statsChanged)
                 {
                     // 해당 캐릭터가 현재 조종 중인 캐릭터라면 UI 및 플레이어 컴포넌트 동기화
-                    if (statePair.Key == currentCharId)
+                    if (state.charId == currentCharId)
                     {
                         if (playerHealth != null)
                         {
@@ -186,7 +222,8 @@ public class CharacterStateManager : MonoBehaviour
 
     public void ModifyHunger(int charId, float amount)
     {
-        if (charStates.TryGetValue(charId, out CharacterState state))
+        CharacterState state = GetState(charId);
+        if (state != null)
         {
             state.currentHunger = Mathf.Clamp(state.currentHunger + amount, 0, state.maxHunger);
             OnCharacterHungerChanged?.Invoke(charId, state.currentHunger, state.maxHunger);
@@ -195,7 +232,8 @@ public class CharacterStateManager : MonoBehaviour
 
     public void ModifyThirst(int charId, float amount)
     {
-        if (charStates.TryGetValue(charId, out CharacterState state))
+        CharacterState state = GetState(charId);
+        if (state != null)
         {
             state.currentThirst = Mathf.Clamp(state.currentThirst + amount, 0, state.maxThirst);
             OnCharacterThirstChanged?.Invoke(charId, state.currentThirst, state.maxThirst);

@@ -25,10 +25,23 @@ namespace Scavenger.UI
 
         private void InitializeDeck()
         {
+            if (UserDataManager.Instance != null && UserDataManager.Instance.SelectedDeck != null)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    _selectedCharIds[i] = UserDataManager.Instance.SelectedDeck[i] > 0 ? UserDataManager.Instance.SelectedDeck[i] : i + 1;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    _selectedCharIds[i] = i + 1;
+                }
+            }
+
             for (int i = 0; i < 4; i++)
             {
-                _selectedCharIds[i] = i + 1;
-                
                 if (deckNodes != null && i < deckNodes.Length && deckNodes[i] != null)
                 {
                     deckNodes[i].Initialize(i, this);
@@ -76,31 +89,41 @@ namespace Scavenger.UI
 
         private void OnConfirmButtonClicked()
         {
-            List<int> selectedList = new List<int>(_selectedCharIds);
-            if (Scavenger.Network.NetworkPartyManager.Instance != null)
-            {
-                Scavenger.Network.NetworkPartyManager.Instance.SendSelectedCharacters(selectedList);
-            }
-            
-            // [임시 코드] 다음 주 데디서버-백엔드 연동 전까지 로컬 테스트를 위해 PlayerPrefs에 강제 저장
-            if (selectedList.Count >= 4)
-            {
-                string matchToken = $"{{\"selectedCharIds\":[{selectedList[0]},{selectedList[1]},{selectedList[2]},{selectedList[3]}]}}";
-                PlayerPrefs.SetString("MatchToken", matchToken);
-                Debug.Log($"[UI_CharacterDeckPanel] 로컬 테스트용 MatchToken 갱신 완료: {matchToken}");
-            }
-            else
-            {
-                Debug.LogWarning("[UI_CharacterDeckPanel] NetworkPartyManager 인스턴스가 없어 전송할 수 없습니다.");
-            }
+            if (confirmButton != null) confirmButton.interactable = false;
 
-            if (OutGameUIManager.Instance != null)
+            List<int> selectedList = new List<int>(_selectedCharIds);
+            
+            if (UserDataManager.Instance != null)
             {
-                OutGameUIManager.Instance.GoBack();
+                UserDataManager.Instance.SaveSelectedDeck(_selectedCharIds, (success) =>
+                {
+                    if (confirmButton != null) confirmButton.interactable = true;
+                    
+                    if (success)
+                    {
+                        if (Scavenger.Network.NetworkPartyManager.Instance != null)
+                        {
+                            Scavenger.Network.NetworkPartyManager.Instance.SendSelectedCharacters(selectedList);
+                        }
+                        
+                        if (OutGameUIManager.Instance != null)
+                        {
+                            OutGameUIManager.Instance.GoBack();
+                        }
+                        else
+                        {
+                            gameObject.SetActive(false);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError("[UI_CharacterDeckPanel] 덱 저장에 실패하여 다음 단계로 넘어가지 못했습니다.");
+                    }
+                });
             }
             else
             {
-                gameObject.SetActive(false);
+                if (confirmButton != null) confirmButton.interactable = true;
             }
         }
     }

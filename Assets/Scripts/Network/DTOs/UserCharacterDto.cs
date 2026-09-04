@@ -16,6 +16,7 @@ namespace Scavenger.Network.DTOs
     public class UserCharacterListResponse
     {
         public List<UserCharacterDto> characters = new List<UserCharacterDto>();
+        public int[] selectedDeck = new int[4];
     }
 
     [Serializable]
@@ -76,5 +77,18 @@ namespace Scavenger.Network.DTOs
     {
         public List<UserItemDto> userItems;
         public List<UserItemDto> gameItems;
+    }
+
+    [Serializable]
+    public class SaveDeckRequest
+    {
+        public int[] selectedCharIds = new int[4];
+    }
+
+    [Serializable]
+    public class SaveDeckResponse
+    {
+        public string message;
+        public int[] selectedDeck;
     }
 }

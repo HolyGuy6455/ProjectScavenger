@@ -12,6 +12,7 @@ public class UserDataManager : MonoBehaviour
 
     // Cached data
     public List<UserCharacterDto> OwnedCharacters { get; private set; } = new List<UserCharacterDto>();
+    public int[] SelectedDeck { get; private set; } = new int[4];
     public Dictionary<int, int> OwnedUserItems { get; private set; } = new Dictionary<int, int>();
     public Dictionary<int, int> OwnedGameItems { get; private set; } = new Dictionary<int, int>();
 
@@ -80,6 +81,10 @@ public class UserDataManager : MonoBehaviour
                     if (response != null && response.characters != null)
                     {
                         OwnedCharacters = response.characters;
+                        if (response.selectedDeck != null && response.selectedDeck.Length == 4)
+                        {
+                            SelectedDeck = response.selectedDeck;
+                        }
                         Debug.Log($"[UserDataManager] 캘릭터 목록 로드 성공. 보유 캐릭터 수: {OwnedCharacters.Count}");
                         OnCharacterDataUpdated?.Invoke();
                     }
@@ -186,5 +191,45 @@ public class UserDataManager : MonoBehaviour
         
         Debug.Log($"[UserDataManager] 아이템 수량 부분 갱신 완료 ({updatedItems.Count}종)");
         OnItemDataUpdated?.Invoke();
+    }
+
+    public void SaveSelectedDeck(int[] newDeck, Action<bool> onComplete = null)
+    {
+        StartCoroutine(SaveSelectedDeckRoutine(newDeck, onComplete));
+    }
+
+    private IEnumerator SaveSelectedDeckRoutine(int[] newDeck, Action<bool> onComplete)
+    {
+        string url = $"{NetworkAuthManager.Instance.ServerUrl}/api/game/character/deck";
+        
+        var requestDto = new SaveDeckRequest { selectedCharIds = newDeck };
+        string jsonData = JsonUtility.ToJson(requestDto);
+        
+        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+        {
+            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+            request.SetRequestHeader("Authorization", $"Bearer {NetworkAuthManager.Instance.AuthToken}");
+            
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                var response = JsonUtility.FromJson<SaveDeckResponse>(request.downloadHandler.text);
+                if (response != null && response.selectedDeck != null)
+                {
+                    SelectedDeck = response.selectedDeck;
+                }
+                Debug.Log("[UserDataManager] 덱 저장 성공");
+                onComplete?.Invoke(true);
+            }
+            else
+            {
+                Debug.LogError($"[UserDataManager] 덱 저장 실패: {request.error}\n{request.downloadHandler.text}");
+                onComplete?.Invoke(false);
+            }
+        }
     }
 }

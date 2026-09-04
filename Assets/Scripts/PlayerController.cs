@@ -204,6 +204,15 @@ public class PlayerController : NetworkBehaviour
 
     private void LoadCharacterModels(CharacterDeckData deckData)
     {
+        if (IsOwner)
+        {
+            int[] deckIds = new int[] { deckData.char1, deckData.char2, deckData.char3, deckData.char4 };
+            if (CharacterStateManager.Instance != null)
+            {
+                CharacterStateManager.Instance.InitializeDeckStates(deckIds);
+            }
+        }
+
         // 기존 모델 파괴
         for (int i = 0; i < 4; i++)
         {

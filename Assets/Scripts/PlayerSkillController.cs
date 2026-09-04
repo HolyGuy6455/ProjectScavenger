@@ -152,19 +152,7 @@ public class PlayerSkillController : NetworkBehaviour
             var keyboard = Keyboard.current;
             if (keyboard != null)
             {
-                if (keyboard.qKey.wasPressedThisFrame) OnUltimateSkillPointerDown();
-                
-                if (keyboard.eKey.wasPressedThisFrame) OnSkillPointerDown(0);
-                if (keyboard.eKey.wasReleasedThisFrame) OnSkillPointerUp(0);
-                
-                if (keyboard.rKey.wasPressedThisFrame) OnSkillPointerDown(1);
-                if (keyboard.rKey.wasReleasedThisFrame) OnSkillPointerUp(1);
-                
-                if (keyboard.fKey.wasPressedThisFrame) OnSkillPointerDown(2);
-                if (keyboard.fKey.wasReleasedThisFrame) OnSkillPointerUp(2);
-                
-                if (keyboard.vKey.wasPressedThisFrame) OnSkillPointerDown(3);
-                if (keyboard.vKey.wasReleasedThisFrame) OnSkillPointerUp(3);
+                HandleSkillInput(keyboard);
             }
         }
 
@@ -186,29 +174,20 @@ public class PlayerSkillController : NetworkBehaviour
         }
     }
 
-    public void OnUltimateSkillPointerDown()
+    private void HandleSkillInput(Keyboard keyboard)
     {
-        if (currentCharData == null) return;
-        CharacterState state = GetSkillState(currentCharData.id);
-        if (state == null) return;
-
-        UltimateSkillInstance ultimateSkill = state.ultimateSkill;
-        if (ultimateSkill == null || ultimateSkill.ultimateSkillId == 0) return;
-
-        if (ultimateSkill.IsReady)
-        {
-            // 클라이언트(나)의 로컬 쿨타임을 먼저 시작시킵니다.
-            ultimateSkill.Use(); 
-            CmdUseUltimateServerRpc();
-        }
-        else
-        {
-            Debug.Log($"[PlayerSkillController] 궁극기 쿨타임 중입니다: {ultimateSkill.currentCooldown:F1}초 남음");
-        }
+        if (keyboard.qKey.wasPressedThisFrame) OnSkillPointerDown(0);
+        if (keyboard.qKey.wasReleasedThisFrame) OnSkillPointerUp(0);
+        if (keyboard.eKey.wasPressedThisFrame) OnSkillPointerDown(1);
+        if (keyboard.eKey.wasReleasedThisFrame) OnSkillPointerUp(1);
+        if (keyboard.rKey.wasPressedThisFrame) OnSkillPointerDown(2);
+        if (keyboard.rKey.wasReleasedThisFrame) OnSkillPointerUp(2);
+        if (keyboard.fKey.wasPressedThisFrame) OnSkillPointerDown(3);
+        if (keyboard.fKey.wasReleasedThisFrame) OnSkillPointerUp(3);
     }
 
     [ServerRpc]
-    private void CmdUseUltimateServerRpc()
+    public void CmdUseUltimateServerRpc()
     {
         // 서버(데디케이티드 서버)에는 UI가 없으므로 currentCharData나 CharacterStateManager가 
         // 클라이언트와 동일하게 세팅되어 있지 않습니다.
@@ -219,16 +198,6 @@ public class PlayerSkillController : NetworkBehaviour
     [ClientRpc]
     private void RpcPlayUltimateClientRpc()
     {
-        // 서버가 쿨타임을 시작했으므로 클라이언트도 쿨타임을 시작시킵니다 (로컬 예측/동기화)
-        if (currentCharData != null)
-        {
-            CharacterState state = GetSkillState(currentCharData.id);
-            if (state != null && state.ultimateSkill != null)
-            {
-                state.ultimateSkill.Use();
-            }
-        }
-
         var playerController = GetComponent<PlayerController>();
         if (playerController != null)
         {
@@ -276,7 +245,7 @@ public class PlayerSkillController : NetworkBehaviour
 
         SkillInstance skill = state.normalSkills[skillSlotIndex];
         if (skill == null || skill.skillId == 0) return;
-        
+
         skill.Use(state, GetShooter());
     }
 
