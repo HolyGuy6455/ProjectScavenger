@@ -45,5 +45,36 @@ namespace Scavenger.Network.DTOs
     {
         public string message;
         public List<int> unlockedSkills;
+        public List<UserItemDto> updatedGameItems;
+        public int[] equippedSkills;
+    }
+
+    [Serializable]
+    public class LevelUpCharacterRequest
+    {
+        public int charId;
+        public int targetLevel;
+    }
+
+    [Serializable]
+    public class LevelUpCharacterResponse
+    {
+        public string message;
+        public int level;
+        public List<UserItemDto> updatedGameItems;
+    }
+
+    [Serializable]
+    public class UserItemDto
+    {
+        public int itemId;
+        public int amount;
+    }
+
+    [Serializable]
+    public class UserItemListResponse
+    {
+        public List<UserItemDto> userItems;
+        public List<UserItemDto> gameItems;
     }
 }

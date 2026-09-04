@@ -6836,6 +6836,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7528287579583115697}
   - component: {fileID: 5301311837768144986}
+  - component: {fileID: 262665832954040376}
   m_Layer: 0
   m_Name: Line
   m_TagString: Untagged
@@ -6882,6 +6883,22 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &262665832954040376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 853752328099631555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97c7a5308c8e0ef4580734eb6f4d4b15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SkillLevelUpCelebrationPopup
+  levelAmount: {fileID: 6971431119066773463}
+  skillIcon: {fileID: 5913073478013298806}
+  skillName: {fileID: 177316720802394230}
+  skillDescription: {fileID: 5699915782078207976}
 --- !u!1 &901377700323113993
 GameObject:
   m_ObjectHideFlags: 0
@@ -8911,7 +8928,7 @@ GameObject:
   - component: {fileID: 177316720802394230}
   - component: {fileID: 2625884520203065433}
   m_Layer: 0
-  m_Name: SkillTitle
+  m_Name: SkillName
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -21675,7 +21692,7 @@ GameObject:
   - component: {fileID: 6971431119066773463}
   - component: {fileID: 4726500913907799529}
   m_Layer: 0
-  m_Name: 3
+  m_Name: LevelAmount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22465,6 +22482,7 @@ GameObject:
   - component: {fileID: 3225870456240238955}
   - component: {fileID: 6116748781328652911}
   - component: {fileID: 6623084477846054146}
+  - component: {fileID: 6557320876136750120}
   m_Layer: 5
   m_Name: SkillLevelUpCelebrationPopup
   m_TagString: Untagged
@@ -22531,6 +22549,22 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6557320876136750120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2957394713859618599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97c7a5308c8e0ef4580734eb6f4d4b15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SkillLevelUpCelebrationPopup
+  levelAmount: {fileID: 6971431119066773463}
+  skillIcon: {fileID: 5913073478013298806}
+  skillName: {fileID: 177316720802394230}
+  skillDescription: {fileID: 5699915782078207976}
 --- !u!1 &2960940504450946885
 GameObject:
   m_ObjectHideFlags: 0

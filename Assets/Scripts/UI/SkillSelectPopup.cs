@@ -187,23 +187,23 @@ public class SkillSelectPopup : MonoBehaviour
         var popup = OutGameUIManager.Instance.ShowPopup<SkillLevelUpPopup>(OutGamePopupType.SkillLevelUp);
         if (popup != null)
         {
-            SkillData targetSkill = skillData;
-            
             var userChar = UserDataManager.Instance.GetCharacter(_charId);
             bool isUnlocked = userChar != null && userChar.unlockedSkills.Contains(skillData.id);
             
+            SkillData currentSkill = isUnlocked ? skillData : null;
+            SkillData nextSkill = null;
+            
             if (isUnlocked)
             {
-                // 이미 해금된 스킬이라면, 다음 레벨 스킬을 찾아야 함
                 var allSkills = DataManager.Instance.GetAllData<SkillData>("Skill");
-                var nextSkill = allSkills.FirstOrDefault(s => s.charId == _charId && s.skillGroup == skillData.skillGroup && s.lvl == skillData.lvl + 1);
-                if (nextSkill != null)
-                {
-                    targetSkill = nextSkill;
-                }
+                nextSkill = allSkills.FirstOrDefault(s => s.charId == _charId && s.skillGroup == skillData.skillGroup && s.lvl == skillData.lvl + 1);
+            }
+            else
+            {
+                nextSkill = skillData;
             }
             
-            popup.Open(_charId, targetSkill);
+            popup.Open(_charId, currentSkill, nextSkill);
         }
     }
 }

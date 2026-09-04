@@ -7,6 +7,7 @@ public class SkillSelectRow : MonoBehaviour
 {
     [SerializeField] private Image skillIcon;
     [SerializeField] private TextMeshProUGUI skillNameText;
+    [SerializeField] private TextMeshProUGUI skillLevelText;
     [SerializeField] private TextMeshProUGUI skillDescText;
     [SerializeField] private GameObject selectedBorder;
     
@@ -57,6 +58,7 @@ public class SkillSelectRow : MonoBehaviour
         }
 
         if (skillNameText != null) skillNameText.text = skillData.name;
+        if (skillLevelText != null) skillLevelText.text = isUnlocked ? $"Lv. {skillData.lvl}" : "Lv. 0";
         if (skillDescText != null) skillDescText.text = skillData.description;
 
         if (selectedBorder != null) selectedBorder.SetActive(isEquipped);

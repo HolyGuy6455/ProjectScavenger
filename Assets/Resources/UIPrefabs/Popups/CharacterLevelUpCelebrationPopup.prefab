@@ -20412,8 +20412,9 @@ GameObject:
   - component: {fileID: 2136261953091701175}
   - component: {fileID: 8980824856125827626}
   - component: {fileID: 8810042823706528395}
+  - component: {fileID: 3891465379810407374}
   m_Layer: 0
-  m_Name: Image
+  m_Name: CharacterStaningImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20476,6 +20477,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3891465379810407374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1381559721278977277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39f240a2cd3567245a8e439ecbea641f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterLevelUpCelebrationPopup
+  levelAmount: {fileID: 8899687232446263771}
+  characterStandingImage: {fileID: 8810042823706528395}
 --- !u!1 &1385088632200572699
 GameObject:
   m_ObjectHideFlags: 0
@@ -86088,7 +86103,7 @@ GameObject:
   - component: {fileID: 8899687232446263771}
   - component: {fileID: 6702910241527938152}
   m_Layer: 0
-  m_Name: 32
+  m_Name: LevelAmount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

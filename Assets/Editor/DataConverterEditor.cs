@@ -138,6 +138,11 @@ public class DataConverterEditor : EditorWindow
             ConvertData<CharLvlDataList, CharLvlData>("CharLvl", "Scavenger - CharLvl.tsv");
         }
 
+        if (GUILayout.Button("Convert Level Data"))
+        {
+            ConvertData<LevelDataList, LevelData>("Level", "Scavenger - Level.tsv");
+        }
+
         GUILayout.Space(20);
         
         if (GUILayout.Button("Copy Master Data To Server", GUILayout.Height(30)))
@@ -181,6 +186,7 @@ public class DataConverterEditor : EditorWindow
         ConvertData<ItemDataList, ItemData>("Item", "Scavenger - Item.tsv");
         ConvertData<CharDataList, CharData>("Char", "Scavenger - Char.tsv");
         ConvertData<CharLvlDataList, CharLvlData>("CharLvl", "Scavenger - CharLvl.tsv");
+        ConvertData<LevelDataList, LevelData>("Level", "Scavenger - Level.tsv");
         ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - Skill.tsv");
 
         ConvertData<LootDataList, LootData>("Loot", "Scavenger - Loot.tsv");
@@ -207,11 +213,12 @@ public class DataConverterEditor : EditorWindow
 
         try
         {
-            // Copy game items, skills, char levels
+            // Copy game items, skills, char levels, levels
             string clientJsonPath = Application.dataPath + "/Data/Json/";
             System.IO.File.Copy(clientJsonPath + "Item.json", serverResourcesPath + "Item.json", true);
             System.IO.File.Copy(clientJsonPath + "Skill.json", serverResourcesPath + "Skill.json", true);
             System.IO.File.Copy(clientJsonPath + "CharLvl.json", serverResourcesPath + "CharLvl.json", true);
+            System.IO.File.Copy(clientJsonPath + "Level.json", serverResourcesPath + "Level.json", true);
 
             Debug.Log($"[DataConverter] Master data successfully copied to server: {serverResourcesPath}");
         }

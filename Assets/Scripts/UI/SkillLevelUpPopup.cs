@@ -14,36 +14,91 @@ public class SkillLevelUpPopup : MonoBehaviour
     [SerializeField] private TextMeshProUGUI skillNameText;
     [SerializeField] private TextMeshProUGUI skillDescText;
     [SerializeField] private Button levelUpButton;
-    [SerializeField] private TextMeshProUGUI costText; 
+    [SerializeField] private Transform itemsRow;
+    [SerializeField] private GameObject itemSlotPrefab;
+    [SerializeField] private TextMeshProUGUI currentLevelText;
+    [SerializeField] private TextMeshProUGUI nextLevelText;
 
     private int _charId;
     private int _targetSkillId;
 
-    public void Open(int charId, SkillData targetSkill)
+    public void Open(int charId, SkillData currentSkill, SkillData nextSkill)
     {
         _charId = charId;
-        _targetSkillId = targetSkill.id;
+        
+        SkillData displaySkill = nextSkill != null ? nextSkill : currentSkill;
+        if (displaySkill == null) return;
+        
+        _targetSkillId = displaySkill.id;
+
+        if (currentLevelText != null) 
+            currentLevelText.text = currentSkill != null ? $"Lv.{currentSkill.lvl}" : "Lv.0";
+            
+        if (nextLevelText != null) 
+            nextLevelText.text = nextSkill != null ? $"Lv.{nextSkill.lvl}" : "MAX";
 
         if (skillIcon != null)
         {
-            string iconPath = System.IO.Path.GetFileNameWithoutExtension(targetSkill.resourceIcon);
+            string iconPath = System.IO.Path.GetFileNameWithoutExtension(displaySkill.resourceIcon);
             Sprite loadedSprite = Resources.Load<Sprite>($"skill/{iconPath}");
             if (loadedSprite == null) loadedSprite = Resources.Load<Sprite>(iconPath);
             skillIcon.sprite = loadedSprite;
         }
 
-        if (skillNameText != null) skillNameText.text = targetSkill.name;
-        if (skillDescText != null) skillDescText.text = targetSkill.description;
+        if (skillNameText != null) skillNameText.text = displaySkill.name;
+        if (skillDescText != null) skillDescText.text = displaySkill.description;
 
-        if (costText != null)
+
+
+        if (itemsRow != null)
         {
-            if (targetSkill.unlockItem != null && targetSkill.unlockItem.Length > 0)
+            foreach (Transform child in itemsRow)
             {
-                costText.text = $"Need Item: {targetSkill.unlockItem[0]} x {targetSkill.unlockItemAmount[0]}";
+                Destroy(child.gameObject);
+            }
+
+            if (nextSkill == null)
+            {
+                if (levelUpButton != null) levelUpButton.gameObject.SetActive(false);
             }
             else
             {
-                costText.text = "Free";
+                if (levelUpButton != null) levelUpButton.gameObject.SetActive(true);
+
+                if (nextSkill.unlockItem != null && nextSkill.unlockItem.Length > 0 && itemSlotPrefab != null)
+                {
+
+                    for (int i = 0; i < nextSkill.unlockItem.Length; i++)
+                    {
+                        int itemId = nextSkill.unlockItem[i];
+                    if (itemId == 0) continue;
+                    
+                    int requiredAmount = nextSkill.unlockItemAmount[i];
+                    int currentAmount = UserDataManager.Instance != null ? UserDataManager.Instance.GetGameItemAmount(itemId) : 0; 
+                    
+                    string itemName = $"Item {itemId}"; 
+                    Sprite itemIcon = null;
+
+                    var itemData = DataManager.Instance?.GetData<ItemData>("Item", itemId);
+                    if (itemData != null)
+                    {
+                        itemName = itemData.name;
+                        if (!string.IsNullOrEmpty(itemData.uiResource))
+                        {
+                            string itemIconPath = System.IO.Path.GetFileNameWithoutExtension(itemData.uiResource);
+                            itemIcon = Resources.Load<Sprite>($"item/{itemIconPath}");
+                            if (itemIcon == null) itemIcon = Resources.Load<Sprite>(itemIconPath);
+                        }
+                    }
+
+                    var slotGo = Instantiate(itemSlotPrefab, itemsRow);
+                    var slotWrapper = slotGo.GetComponent<ItemSlotWrapper>();
+                    if (slotWrapper != null)
+                    {
+                        slotWrapper.SetData(itemIcon, itemName, requiredAmount, currentAmount);
+                    }
+                    }
+                }
             }
         }
 
@@ -87,15 +142,32 @@ public class SkillLevelUpPopup : MonoBehaviour
                 var response = JsonUtility.FromJson<LevelUpSkillResponse>(request.downloadHandler.text);
                 if (response != null && response.unlockedSkills != null)
                 {
+                    // 서버로부터 받은 갱신된 아이템 수량 반영
+                    if (response.updatedGameItems != null)
+                    {
+                        UserDataManager.Instance.UpdateGameItems(response.updatedGameItems);
+                    }
+
                     var userChar = UserDataManager.Instance.GetCharacter(_charId);
                     if (userChar != null)
                     {
                         userChar.unlockedSkills = response.unlockedSkills;
+                        if (response.equippedSkills != null && response.equippedSkills.Length > 0)
+                        {
+                            userChar.equippedSkills = response.equippedSkills;
+                        }
                         UserDataManager.Instance.FetchCharacterList();
                     }
                     
                     Debug.Log("스킬 레벨업 성공!");
                     OutGameUIManager.Instance.ClosePopup(gameObject);
+                    
+                    var celebrationPopup = OutGameUIManager.Instance.ShowPopup<SkillLevelUpCelebrationPopup>(OutGamePopupType.SkillLevelUpCelebration);
+                    if (celebrationPopup != null)
+                    {
+                        var newSkillData = DataManager.Instance.GetData<SkillData>("Skill", _targetSkillId);
+                        celebrationPopup.Open(newSkillData);
+                    }
                 }
             }
             else

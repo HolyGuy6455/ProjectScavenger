@@ -12,8 +12,11 @@ public class UserDataManager : MonoBehaviour
 
     // Cached data
     public List<UserCharacterDto> OwnedCharacters { get; private set; } = new List<UserCharacterDto>();
+    public Dictionary<int, int> OwnedUserItems { get; private set; } = new Dictionary<int, int>();
+    public Dictionary<int, int> OwnedGameItems { get; private set; } = new Dictionary<int, int>();
 
     public event Action OnCharacterDataUpdated;
+    public event Action OnItemDataUpdated;
 
     private void Awake()
     {
@@ -50,6 +53,7 @@ public class UserDataManager : MonoBehaviour
         if (success)
         {
             FetchCharacterList();
+            FetchItemList();
         }
     }
 
@@ -95,5 +99,92 @@ public class UserDataManager : MonoBehaviour
     public UserCharacterDto GetCharacter(int charId)
     {
         return OwnedCharacters.Find(c => c.charId == charId);
+    }
+
+    public void FetchItemList()
+    {
+        StartCoroutine(FetchItemListRoutine());
+    }
+
+    private IEnumerator FetchItemListRoutine()
+    {
+        string url = $"{NetworkAuthManager.Instance.ServerUrl}/api/game/item/list";
+        
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            request.SetRequestHeader("Authorization", $"Bearer {NetworkAuthManager.Instance.AuthToken}");
+            
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                try
+                {
+                    var response = JsonUtility.FromJson<UserItemListResponse>(request.downloadHandler.text);
+                    if (response != null)
+                    {
+                        OwnedUserItems.Clear();
+                        if (response.userItems != null)
+                        {
+                            foreach (var item in response.userItems)
+                            {
+                                OwnedUserItems[item.itemId] = item.amount;
+                            }
+                        }
+
+                        OwnedGameItems.Clear();
+                        if (response.gameItems != null)
+                        {
+                            foreach (var item in response.gameItems)
+                            {
+                                OwnedGameItems[item.itemId] = item.amount;
+                            }
+                        }
+                        
+                        Debug.Log($"[UserDataManager] 아이템 목록 로드 성공. (UserItems: {OwnedUserItems.Count}, GameItems: {OwnedGameItems.Count})");
+                        OnItemDataUpdated?.Invoke();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[UserDataManager] 아이템 JSON Parsing Error: {e.Message}");
+                }
+            }
+            else
+            {
+                Debug.LogError($"[UserDataManager] 아이템 목록 로드 실패: {request.error}\n{request.downloadHandler.text}");
+            }
+        }
+    }
+
+    public int GetGameItemAmount(int itemId)
+    {
+        if (OwnedGameItems.TryGetValue(itemId, out int amount))
+        {
+            return amount;
+        }
+        return 0;
+    }
+
+    public int GetUserItemAmount(int itemId)
+    {
+        if (OwnedUserItems.TryGetValue(itemId, out int amount))
+        {
+            return amount;
+        }
+        return 0;
+    }
+
+    public void UpdateGameItems(List<UserItemDto> updatedItems)
+    {
+        if (updatedItems == null || updatedItems.Count == 0) return;
+
+        foreach (var item in updatedItems)
+        {
+            OwnedGameItems[item.itemId] = item.amount;
+        }
+        
+        Debug.Log($"[UserDataManager] 아이템 수량 부분 갱신 완료 ({updatedItems.Count}종)");
+        OnItemDataUpdated?.Invoke();
     }
 }
