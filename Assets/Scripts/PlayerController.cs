@@ -7,7 +7,7 @@ using Unity.Netcode;
 /// Unity Input System을 통해 키보드(WASD/화살표), 게임패드(XInput), 안드로이드 가상 조이스틱을 지원합니다.
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
-public class PlayerController : NetworkBehaviour
+public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 {
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float rotationSpeed = 720f;
@@ -659,5 +659,23 @@ public class PlayerController : NetworkBehaviour
             }
         }
         return null;
+    }
+
+    public void PlayShootAnimation()
+    {
+        if (_animator != null)
+        {
+            // 레이어 1 (UpperBody Layer)에서 처음(0f)부터 사격 애니메이션을 재생합니다.
+            _animator.Play("Armature|shoot", 1, 0f);
+        }
+    }
+
+    public void PlayReloadAnimation()
+    {
+        if (_animator != null)
+        {
+            // 레이어 1 (UpperBody Layer)에서 처음(0f)부터 장전 애니메이션을 재생합니다.
+            _animator.Play("Armature|reloading", 1, 0f);
+        }
     }
 }

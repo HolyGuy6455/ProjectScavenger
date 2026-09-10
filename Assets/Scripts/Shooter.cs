@@ -43,6 +43,13 @@ public class Shooter : NetworkBehaviour
     private Vector3 currentTargetPosition;
     private float currentSpread = 0f;
 
+    private IShooterAnimationReceiver animReceiver;
+
+    private void Awake()
+    {
+        animReceiver = GetComponentInParent<IShooterAnimationReceiver>();
+    }
+
     public override void OnNetworkSpawn()
     {
         if (IsServer && currentGunData != null)
@@ -158,6 +165,9 @@ public class Shooter : NetworkBehaviour
 
         // 로컬 쿨타임 갱신 (클라이언트 측에서 쿨타임을 관리하여 연속 요청 방지)
         clientLastFireTime = Time.time;
+
+        // 사격 애니메이션 재생 트리거
+        animReceiver?.PlayShootAnimation();
 
         // 서버에 실제 발사(탄환 생성 및 물리 처리)를 요청
         CmdShootServerRpc(direction, targetPosition);
@@ -290,7 +300,7 @@ public class Shooter : NetworkBehaviour
     {
         if (!IsOwner) return;
         if (currentGunData == null || isReloading) return;
-        
+
         CmdReloadServerRpc();
     }
 
@@ -310,7 +320,7 @@ public class Shooter : NetworkBehaviour
     {
         if (!IsOwner) return;
         if (currentGunData == null || isReloading) return;
-        
+
         CmdReloadAmountServerRpc(amount);
     }
 
@@ -318,5 +328,13 @@ public class Shooter : NetworkBehaviour
     private void CmdReloadAmountServerRpc(int amount)
     {
         CurrentAmmo = Mathf.Min(CurrentAmmo + amount, currentGunData.maxAmmo);
+    }
+
+    /// <summary>
+    /// 재장전 애니메이션만 강제로 트리거합니다. (SkillInstance 등에서 선입력 재생용)
+    /// </summary>
+    public void TriggerReloadAnimation()
+    {
+        animReceiver?.PlayReloadAnimation();
     }
 }

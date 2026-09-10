@@ -132,6 +132,9 @@ public class SkillInstance
                     PlayerSkillController.Instance.CmdUseUltimateServerRpc();
                 }
                 break;
+            case 5: // 재장전 (전체)
+                if (playerShooter != null) playerShooter.TriggerReloadAnimation();
+                break;
             case 6: // 1발 재장전
                 if (playerShooter != null) playerShooter.ReloadAmount(1);
                 break;
