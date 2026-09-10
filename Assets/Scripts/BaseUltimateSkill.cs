@@ -48,7 +48,7 @@ public abstract class BaseUltimateSkill : MonoBehaviour
         currentData = data;
         
         // 애니메이션 재생
-        Animator anim = GetComponent<Animator>();
+        Animator anim = GetComponentInChildren<Animator>();
         if (anim != null && !string.IsNullOrEmpty(ultimateAnimStateName))
         {
             anim.Play(ultimateAnimStateName, 0, 0f);

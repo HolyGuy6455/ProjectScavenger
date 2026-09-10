@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: tripo_mat_8d985a69
+  m_Name: b41bf9cc_f8d2_4b26_9198_d7f026bd68f2
   m_Shader: {fileID: 4800000, guid: be891319084e9d147b09d89e80ce60e0, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -56,7 +56,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
-        m_Texture: {fileID: 2800000, guid: be38c53d011860f48842a1ef16a866f6, type: 3}
+        m_Texture: {fileID: 2800000, guid: 2099ec5a5ad07bf44b885dee5dbdb4a3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BentNormalMap:
@@ -132,7 +132,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: be38c53d011860f48842a1ef16a866f6, type: 3}
+        m_Texture: {fileID: 2800000, guid: 2099ec5a5ad07bf44b885dee5dbdb4a3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MaskMap:
@@ -297,9 +297,9 @@ Material:
     - _CoatMask: 0
     - _ColorShift_Speed: 0
     - _ComposerMaskMode: 0
-    - _Cull: 2
-    - _CullMode: 2
-    - _CullModeForward: 2
+    - _Cull: 0
+    - _CullMode: 0
+    - _CullModeForward: 0
     - _Cutoff: 0.5
     - _DetailAlbedoMapScale: 1
     - _DetailAlbedoScale: 1
@@ -408,7 +408,7 @@ Material:
     - _Offset_Y_Axis_BLD: 0.09
     - _Offset_Z: 0
     - _OutlineOverridden: 0
-    - _OutlineVisible: 1
+    - _OutlineVisible: 0
     - _Outline_Width: 0
     - _PPDLodThreshold: 5
     - _PPDMaxSamples: 15
@@ -417,8 +417,8 @@ Material:
     - _PPDPrimitiveWidth: 1
     - _Parallax: 0.02
     - _QueueOffset: 0
-    - _ReceiveShadows: 1
-    - _ReceivesSSR: 1
+    - _ReceiveShadows: 0
+    - _ReceivesSSR: 0
     - _RefractionModel: 0
     - _RimLight: 0
     - _RimLightOverridden: 0
@@ -550,7 +550,7 @@ Material:
     - emissive: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
---- !u!114 &4633417022104633087
+--- !u!114 &4609870900420652005
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}

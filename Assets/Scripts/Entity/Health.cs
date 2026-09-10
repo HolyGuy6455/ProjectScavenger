@@ -191,7 +191,7 @@ public class Health : NetworkBehaviour, IDamageable
 
     public virtual void PlayDeathAnimation()
     {
-        Animator animator = GetComponent<Animator>();
+        Animator animator = GetComponentInChildren<Animator>();
         if (animator != null)
         {
             animator.SetBool("IsDeath", true);

@@ -18,6 +18,9 @@ public class PlayerController : NetworkBehaviour
     [Header("Animation")]
     [SerializeField] private Animator _animator;
 
+    [Header("Character Position")]
+    [SerializeField] private Transform _prefabsPosition;
+
     private Rigidbody _rb;
     private PlayerInputActions _inputActions;
     private Vector2 _keyboardInput;
@@ -27,10 +30,8 @@ public class PlayerController : NetworkBehaviour
     private bool _isShooting = false;
     private SectorIndicator _sectorIndicator;
 
-    private string _currentAnimState = "Idle";
-    
     // 네트워크 동기화를 위한 변수 (오너가 쓰고 모두가 읽음)
-    private NetworkVariable<bool> _netIsRunning = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    private NetworkVariable<Vector2> _netAnimInput = new NetworkVariable<Vector2>(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     
     // 캐릭터 동적 교체를 위한 변수
     private NetworkVariable<int> _activeSlotIndex = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -232,7 +233,11 @@ public class PlayerController : NetworkBehaviour
             GameObject prefab = Resources.Load<GameObject>($"Prefabs/Characters/char{charId:D3}");
             if (prefab != null)
             {
-                _characterModels[i] = Instantiate(prefab, transform);
+                // 인스펙터에 할당되어 있지 않다면 자식 중에 이름으로 찾고, 그래도 없으면 자기 자신(Player)을 부모로 사용합니다.
+                Transform parentTransform = _prefabsPosition != null ? _prefabsPosition : transform.Find("PrefabsPosition");
+                if (parentTransform == null) parentTransform = transform;
+
+                _characterModels[i] = Instantiate(prefab, parentTransform);
                 _characterModels[i].SetActive(false); // 일단 모두 끄기
             }
             else
@@ -256,11 +261,11 @@ public class PlayerController : NetworkBehaviour
                 
                 if (isActive)
                 {
-                    _animator = _characterModels[i].GetComponent<Animator>();
+                    _animator = _characterModels[i].GetComponentInChildren<Animator>();
                     if (_animator != null)
                     {
-                        string targetAnim = _netIsRunning.Value ? "Run" : "Idle";
-                        _animator.Play(targetAnim); // 즉시 상태 동기화
+                        _animator.SetFloat("InputX", _netAnimInput.Value.x);
+                        _animator.SetFloat("InputY", _netAnimInput.Value.y);
                     }
                 }
             }
@@ -366,12 +371,8 @@ public class PlayerController : NetworkBehaviour
         // 애니메이션은 모든 클라이언트에서 동일하게 재생되어야 하므로 IsOwner 체크 밖에서 처리
         if (_animator != null)
         {
-            string targetAnim = _netIsRunning.Value ? "Run" : "Idle";
-            if (_currentAnimState != targetAnim)
-            {
-                _animator.CrossFadeInFixedTime(targetAnim, 0.1f);
-                _currentAnimState = targetAnim;
-            }
+            _animator.SetFloat("InputX", _netAnimInput.Value.x);
+            _animator.SetFloat("InputY", _netAnimInput.Value.y);
         }
     }
 
@@ -493,11 +494,12 @@ public class PlayerController : NetworkBehaviour
             combinedInput.Normalize();
         }
 
-        // 애니메이션 동기화 변수 업데이트
-        _netIsRunning.Value = combinedInput.magnitude > 0.1f;
-
         Vector3 moveDir = new Vector3(combinedInput.x, 0f, combinedInput.y);
         _rb.MovePosition(_rb.position + moveDir * (moveSpeed * Time.fixedDeltaTime));
+
+        // 애니메이션 동기화 변수 업데이트 (로컬 이동 방향 기준)
+        Vector3 localMoveDir = transform.InverseTransformDirection(moveDir);
+        _netAnimInput.Value = new Vector2(localMoveDir.x, localMoveDir.z);
 
         // 2. 회전 처리
         Vector3 lookDir = Vector3.zero;
