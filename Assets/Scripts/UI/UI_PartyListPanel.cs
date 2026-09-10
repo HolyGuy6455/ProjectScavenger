@@ -18,7 +18,7 @@ namespace Scavenger.UI
                 {
                     if (NetworkPartyManager.Instance != null)
                     {
-                        NetworkPartyManager.Instance.LeaveParty();
+                        NetworkPartyManager.Instance.LeavePartyAndDestroy();
                     }
                 });
             }

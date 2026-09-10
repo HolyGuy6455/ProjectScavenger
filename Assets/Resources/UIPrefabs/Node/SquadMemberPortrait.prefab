@@ -34,10 +34,10 @@ RectTransform:
   - {fileID: 3644464274213219915}
   m_Father: {fileID: 4144018343286181471}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 94.8572, y: 94.8617}
+  m_SizeDelta: {x: -17.1428, y: -17.138298}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3124367603918313890
 CanvasRenderer:
@@ -100,6 +100,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6506004294190843835}
   - component: {fileID: 7581778616515381597}
+  - component: {fileID: 2966651112420389129}
   m_Layer: 0
   m_Name: SquadMemberPortrait
   m_TagString: Untagged
@@ -126,7 +127,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 75.49997, y: -74.000015}
-  m_SizeDelta: {x: 151, y: 148}
+  m_SizeDelta: {x: 0, y: 148}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7581778616515381597
 MonoBehaviour:
@@ -135,7 +136,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2587161530221158924}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
   m_Name: 
@@ -148,6 +149,20 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &2966651112420389129
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2587161530221158924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86710e43de46f6f4bac7c8e50813a599, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.AspectRatioFitter
+  m_AspectMode: 2
+  m_AspectRatio: 1
 --- !u!1 &4778190556414730698
 GameObject:
   m_ObjectHideFlags: 0
@@ -184,7 +199,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 4.4302, y: -134}
+  m_AnchoredPosition: {x: 4.4302063, y: -134}
   m_SizeDelta: {x: 142.14, y: 39.61}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1135747225070710168
@@ -350,16 +365,16 @@ RectTransform:
   m_GameObject: {fileID: 4907596721894613318}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4419795501430193892}
   m_Father: {fileID: 6506004294190843835}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 75.50018, y: -56.00019}
-  m_SizeDelta: {x: 112, y: 112}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3397466989176280260
 MonoBehaviour:
@@ -368,7 +383,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4907596721894613318}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
   m_Name: 
@@ -419,7 +434,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
-  m_Shape: 0
+  m_Shape: 1
   m_StrokeColor: {r: 1, g: 1, b: 1, a: 1}
   m_FillColor: {r: 0.95686275, g: 0.92941177, b: 0.8784314, a: 1}
   m_StrokeWidth: 4
@@ -478,7 +493,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Shadow
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.1882353}
-  m_EffectDistance: {x: 1, y: -3}
+  m_EffectDistance: {x: 3, y: -6}
   m_UseGraphicAlpha: 1
 --- !u!1 &6083173166492306450
 GameObject:
@@ -513,10 +528,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 4419795501430193892}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 97.578, y: 97.5782}
+  m_SizeDelta: {x: 2.7208023, y: 2.7164993}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2951884839380298305
 MonoBehaviour:

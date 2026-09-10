@@ -39,12 +39,10 @@ public class SkillData : IData
     public int remain;
     public RemainCostType remainCostType;
     public string description;
-#if UNITY_EDITOR
     public bool unlockFirst;
     public int unlockLevel;
     public int[] unlockItem;
     public int[] unlockItemAmount;
-#endif
 
     public int GetId()
     {

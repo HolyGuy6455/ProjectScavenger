@@ -85,7 +85,7 @@ public class UserDataManager : MonoBehaviour
                         {
                             SelectedDeck = response.selectedDeck;
                         }
-                        Debug.Log($"[UserDataManager] 캘릭터 목록 로드 성공. 보유 캐릭터 수: {OwnedCharacters.Count}");
+                        Debug.Log($"[UserDataManager] 캐릭터 목록 로드 성공. 보유 캐릭터 수: {OwnedCharacters.Count}");
                         OnCharacterDataUpdated?.Invoke();
                     }
                 }

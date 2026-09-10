@@ -30,6 +30,8 @@ namespace Scavenger.Network
 
         public List<UserInfo> OnlineUsers { get; private set; } = new List<UserInfo>();
         public List<UserInfo> PartyMembers { get; private set; } = new List<UserInfo>();
+        
+        public bool IsMultiplay => PartyMembers != null && PartyMembers.Count > 0;
 
         public event Action OnOnlineUsersUpdated;
         public event Action OnPartyMembersUpdated;
@@ -51,32 +53,25 @@ namespace Scavenger.Network
 
         private void Start()
         {
-            // 인증 매니저의 로그인이 완료되면 SignalR 파티 허브에 접속 시도
-            NetworkAuthManager.Instance.OnLoginComplete += HandleLoginComplete;
+            // 수동으로 접속(Connect)을 호출하도록 변경됨
         }
 
         private void OnDestroy()
         {
-            if (NetworkAuthManager.Instance != null)
-                NetworkAuthManager.Instance.OnLoginComplete -= HandleLoginComplete;
-
             if (_hubConnection != null)
             {
                 _ = _hubConnection.StopAsync();
             }
         }
 
-        private async void HandleLoginComplete(bool success)
+        public async void Connect()
         {
-            Debug.Log($"[Party] 로그인 완료 이벤트 수신 (성공 여부: {success})");
-            if (success)
+            if (_hubConnection != null && _hubConnection.State != HubConnectionState.Disconnected)
             {
-                await ConnectToPartyHub();
+                Debug.Log("[Party] 이미 연결되어 있거나 연결 중입니다.");
+                return;
             }
-        }
 
-        private async Task ConnectToPartyHub()
-        {
             string url = NetworkAuthManager.Instance.ServerUrl + "/partyHub";
 
             _hubConnection = new HubConnectionBuilder()
@@ -201,7 +196,7 @@ namespace Scavenger.Network
         }
 
         // 파티를 떠날 때 호출하는 함수
-        public async void LeaveParty()
+        public async Task LeavePartyAsync()
         {
             if (_hubConnection != null && _hubConnection.State == HubConnectionState.Connected)
             {
@@ -214,6 +209,26 @@ namespace Scavenger.Network
                 {
                     Debug.LogError($"[Party] 파티 떠나기 실패: {ex.Message}");
                 }
+            }
+        }
+
+        // 파티 스코프를 벗어날 때 호출되어 모든 상태를 정리하고 객체를 파괴하는 함수
+        public async void LeavePartyAndDestroy()
+        {
+            await LeavePartyAsync();
+            
+            // await 도중 오브젝트가 파괴되었는지 검사 (Unity C++ 객체 소멸 확인)
+            if (this == null) return;
+            
+            if (_hubConnection != null)
+            {
+                await _hubConnection.StopAsync();
+                _hubConnection = null;
+            }
+
+            if (this != null && gameObject != null)
+            {
+                Destroy(gameObject);
             }
         }
 

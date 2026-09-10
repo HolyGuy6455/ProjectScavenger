@@ -60,6 +60,13 @@ namespace Scavenger.UI
         private Dictionary<OutGamePopupType, GameObject> _cachedPopups = new Dictionary<OutGamePopupType, GameObject>();
         private Stack<GameObject> _activePopups = new Stack<GameObject>();
 
+        private bool IsPartyScope(OutGamePanelType type)
+        {
+            return type == OutGamePanelType.StageInfo || 
+                   type == OutGamePanelType.CharacterDeck || 
+                   type == OutGamePanelType.FriendParty;
+        }
+
         private void Awake()
         {
             if (Instance == null) Instance = this;
@@ -84,6 +91,11 @@ namespace Scavenger.UI
             if (panelType == OutGamePanelType.MainLobby)
             {
                 _panelHistory.Clear();
+            }
+
+            if (!IsPartyScope(panelType))
+            {
+                Scavenger.Network.NetworkPartyManager.Instance?.LeavePartyAndDestroy();
             }
             
             // 현재 떠있는 패널이 있다면 무조건 끕니다.
@@ -124,6 +136,8 @@ namespace Scavenger.UI
                         rect.localScale = Vector3.one;
                     }
                     _cachedPanels[panelType] = newPanel;
+                    newPanel.SetActive(true);
+                    newPanel.transform.SetAsLastSibling();
                 }
                 else
                 {
@@ -157,6 +171,7 @@ namespace Scavenger.UI
                         rect.localScale = Vector3.one;
                     }
                     _cachedPopups[popupType] = popupObj;
+                    popupObj.SetActive(true);
                 }
                 else
                 {
@@ -199,6 +214,11 @@ namespace Scavenger.UI
                     //     persistentPartyListUI.SetActive(previousPanelType != OutGamePanelType.Login);
                     // }
                     _currentPanelType = previousPanelType;
+
+                    if (!IsPartyScope(previousPanelType))
+                    {
+                        Scavenger.Network.NetworkPartyManager.Instance?.LeavePartyAndDestroy();
+                    }
                 }
             }
         }
