@@ -96,7 +96,7 @@ public class SimpleCheater : MonoBehaviour
     {
         if (PlayerController.LocalInstance != null)
         {
-            PlayerController.LocalInstance.PlayCinematic("Entering", () =>
+            PlayerController.LocalInstance.PlayCinematic("Entering", true, () =>
             {
                 Debug.Log("[Cheat] 수동 테스트: 'Entering' 시네마틱 연출이 종료되었습니다.");
             });

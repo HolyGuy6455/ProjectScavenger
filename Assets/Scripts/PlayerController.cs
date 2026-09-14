@@ -354,8 +354,8 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         // 물리 복구
         if (_rb != null) _rb.isKinematic = false;
 
-        // 씬 진입(스폰) 시네마틱 연출 재생
-        PlayCinematic("Entering", null);
+        // 씬 진입(스폰) 시네마틱 연출 재생 (카메라/UI 복구 O)
+        PlayCinematic("Entering", true, null);
     }
 
     private void Update()
@@ -691,15 +691,21 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         }
     }
 
-    public void PlayCinematic(string stateName, System.Action onComplete)
+    public void PlayCinematic(string stateName, bool restoreState, System.Action onComplete)
     {
         if (!IsOwner) return;
-        StartCoroutine(PlayCinematicRoutine(stateName, onComplete));
+        StartCoroutine(PlayCinematicRoutine(stateName, restoreState, onComplete));
     }
 
-    private System.Collections.IEnumerator PlayCinematicRoutine(string stateName, System.Action onComplete)
+    private System.Collections.IEnumerator PlayCinematicRoutine(string stateName, bool restoreState, System.Action onComplete)
     {
         _isCinematicPlaying = true;
+        
+        // 시네마틱 재생 시 UI 숨김
+        if (MenuToggleController.Instance != null)
+        {
+            MenuToggleController.Instance.SetUIVisibility(false);
+        }
         
         // 이동/입력 초기화
         _keyboardInput = Vector2.zero;
@@ -751,25 +757,31 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
             }
         }
 
-        // 연출 시간만큼 대기
-        yield return new WaitForSeconds(waitTime - 1.0f);
+        // 연출 시간만큼 대기 (종료 1초 전에 카메라 복구 처리를 위해 분할 대기)
+        yield return new WaitForSeconds(Mathf.Max(0f, waitTime - 1.0f));
 
-        // 카메라 복구
-        if (cinematicCamera != null)
+        // 카메라 복구 (restoreState가 true일 때만)
+        if (restoreState && cinematicCamera != null)
         {
             cinematicCamera.Priority = 0;
         }
 
         yield return new WaitForSeconds(1.0f);
 
-
-        if (_animator != null)
+        // 애니메이션 및 레이어 복구 (restoreState가 true일 때만)
+        if (restoreState && _animator != null)
         {
             if (_animator.layerCount > 1) _animator.SetLayerWeight(1, 1f);
             _animator.Play("Movement", 0, 0f); // 기본 상태로 복귀
         }
 
         _isCinematicPlaying = false;
+        
+        // UI 원상 복구 (restoreState가 true일 때만 - exit 연출은 결과창을 띄우므로 복구 안함)
+        if (restoreState && MenuToggleController.Instance != null)
+        {
+            MenuToggleController.Instance.SetUIVisibility(true);
+        }
         
         onComplete?.Invoke();
     }

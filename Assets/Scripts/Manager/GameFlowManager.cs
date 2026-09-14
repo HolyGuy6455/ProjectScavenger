@@ -38,21 +38,17 @@ namespace Scavenger.Manager
             Debug.Log("[GameFlowManager] 게임 클리어 상태로 전환됩니다.");
             CurrentState = GameResultState.Clear;
             
-            // 로컬 플레이어가 존재하면 클리어 연출(exit) 재생 후 UI 표시, 없으면 바로 처리
+            // 로컬 플레이어가 존재하면 클리어 연출(exit) 재생 후 EndGame 호출, 없으면 바로 호출
             if (PlayerController.LocalInstance != null)
             {
-                PlayerController.LocalInstance.PlayCinematic("exit", () => 
+                PlayerController.LocalInstance.PlayCinematic("Exit", false, () => 
                 {
-                    // TODO: 여기서 클리어 화면(보상 내역 등) UI를 띄워야 함
-                    // EndGame(GameResultState.Clear); 
-                    Debug.Log("[GameFlowManager] 클리어 연출 종료. 클리어 UI를 띄워야 합니다.");
+                    EndGame(GameResultState.Clear);
                 });
             }
             else
             {
-                // TODO: 여기서 클리어 화면(보상 내역 등) UI를 띄워야 함
-                // EndGame(GameResultState.Clear);
-                Debug.Log("[GameFlowManager] 로컬 플레이어 없음. 클리어 UI를 띄워야 합니다.");
+                EndGame(GameResultState.Clear);
             }
         }
 
@@ -76,12 +72,31 @@ namespace Scavenger.Manager
 
         private void EndGame(GameResultState result)
         {
+            // 여기서 이벤트를 발생시키면 서버로 결과를 전송하는 로직 등이 실행됩니다.
             OnGameEnded?.Invoke(result);
 
-            // Phase 2에서 여기에 서버 송신 로직을 연결하거나, 
-            // OnGameEnded 이벤트를 NetworkGameResultSender 가 구독하도록 할 예정입니다.
-            
-            // 임시로 ReturnToMainMenu 호출
+            // 이벤트 송신이 완료된 후 후속 처리
+            // 1. 클리어가 아니면 즉시 로비로 복귀
+            if (result != GameResultState.Clear)
+            {
+                ReturnToMainMenu();
+                return;
+            }
+
+            // 2. 결산창을 띄울 수 없는 예외 상황
+            if (MenuToggleController.Instance == null)
+            {
+                Debug.LogWarning("[GameFlowManager] MenuToggleController 인스턴스가 없어 결과창을 띄우지 못했습니다. 바로 로비로 복귀합니다.");
+                ReturnToMainMenu();
+                return;
+            }
+
+            // 3. 클리어 시 결산창 표시 시도
+            MenuToggleController.Instance.ShowClearResultUI();
+        }
+
+        private void ReturnToMainMenu()
+        {
             var uiSystem = FindObjectOfType<Scavenger.UI.UI_SystemActions>();
             if (uiSystem != null)
             {

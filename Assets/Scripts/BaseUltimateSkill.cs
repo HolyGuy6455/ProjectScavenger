@@ -9,6 +9,9 @@ public abstract class BaseUltimateSkill : MonoBehaviour
     [Tooltip("시네마틱 연출 시간 (0 이하로 설정 시 애니메이션 길이를 자동 계산합니다)")]
     [SerializeField] protected float cinematicDuration = -1f;
 
+    [Tooltip("궁극기 사용 중 메인 UI를 잠시 숨길지 여부입니다.")]
+    [SerializeField] protected bool hideUIDuringUltimate = true;
+
     [Tooltip("궁극기 발동 시 재생할 애니메이션 상태 이름 (비워두면 재생하지 않음)")]
     [SerializeField] protected string ultimateAnimStateName = "Ultimate";
 
@@ -62,6 +65,12 @@ public abstract class BaseUltimateSkill : MonoBehaviour
         CharacterCinematicController cinematicCtrl = GetComponent<CharacterCinematicController>();
         CinemachineVirtualCamera cinematicCamera = cinematicCtrl != null ? cinematicCtrl.CinematicCamera : null;
 
+        // 궁극기 연출 중 UI 숨김
+        if (isOwner && hideUIDuringUltimate && MenuToggleController.Instance != null)
+        {
+            MenuToggleController.Instance.SetUIVisibility(false);
+        }
+
         // 궁극기를 쓴 본인 화면에서만 카메라 클로즈업 연출을 합니다.
         if (isOwner && cinematicCamera != null)
         {
@@ -103,6 +112,12 @@ public abstract class BaseUltimateSkill : MonoBehaviour
         if (isOwner && cinematicCamera != null)
         {
             cinematicCamera.Priority = 0;
+        }
+
+        // UI 복구
+        if (isOwner && hideUIDuringUltimate && MenuToggleController.Instance != null)
+        {
+            MenuToggleController.Instance.SetUIVisibility(true);
         }
 
         // 애니메이션 복구 (위에서 선언한 anim 재사용)
