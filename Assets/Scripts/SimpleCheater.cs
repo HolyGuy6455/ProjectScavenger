@@ -87,4 +87,24 @@ public class SimpleCheater : MonoBehaviour
 
         Debug.Log($"[Cheat] 플레이어를 스폰 포인트({spawnObj.transform.position})로 텔레포트했습니다.");
     }
+
+    /// <summary>
+    /// 수동으로 'Entering' 시작 연출 시네마틱을 테스트합니다.
+    /// 디버그 UI 버튼의 OnClick()에 이 메서드를 연결하세요.
+    /// </summary>
+    public void TestEnteringCinematic()
+    {
+        if (PlayerController.LocalInstance != null)
+        {
+            PlayerController.LocalInstance.PlayCinematic("Entering", () =>
+            {
+                Debug.Log("[Cheat] 수동 테스트: 'Entering' 시네마틱 연출이 종료되었습니다.");
+            });
+            Debug.Log("[Cheat] 수동 테스트: 'Entering' 시네마틱 재생을 요청했습니다.");
+        }
+        else
+        {
+            Debug.LogWarning("[Cheat] PlayerController.LocalInstance를 찾을 수 없습니다.");
+        }
+    }
 }

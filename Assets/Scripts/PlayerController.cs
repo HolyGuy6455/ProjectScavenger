@@ -28,6 +28,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     private Vector2 _joystickRotationInput;
     public Vector2 JoystickRotationInput => _joystickRotationInput;
     private bool _isShooting = false;
+    private bool _isCinematicPlaying = false;
     private SectorIndicator _sectorIndicator;
 
     // 네트워크 동기화를 위한 변수 (오너가 쓰고 모두가 읽음)
@@ -352,6 +353,9 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
         // 물리 복구
         if (_rb != null) _rb.isKinematic = false;
+
+        // 씬 진입(스폰) 시네마틱 연출 재생
+        PlayCinematic("Entering", null);
     }
 
     private void Update()
@@ -485,6 +489,14 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     private void FixedUpdate()
     {
         if (!IsOwner) return; // 위치 이동과 물리 연산, 입력 처리는 로컬 오너만 수행합니다.
+
+        if (_isCinematicPlaying)
+        {
+            // 시네마틱 재생 중에는 움직임과 회전을 강제로 멈춥니다.
+            _netAnimInput.Value = Vector2.zero;
+            if (_rb != null) _rb.linearVelocity = Vector3.zero;
+            return;
+        }
 
         // 1. 이동 처리
         // 키보드 입력과 조이스틱 입력을 합산한 후, 최대 크기가 1을 넘지 않도록 제한합니다.
@@ -677,5 +689,88 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
             // 레이어 1 (UpperBody Layer)에서 처음(0f)부터 장전 애니메이션을 재생합니다.
             _animator.Play("Armature|reloading", 1, 0f);
         }
+    }
+
+    public void PlayCinematic(string stateName, System.Action onComplete)
+    {
+        if (!IsOwner) return;
+        StartCoroutine(PlayCinematicRoutine(stateName, onComplete));
+    }
+
+    private System.Collections.IEnumerator PlayCinematicRoutine(string stateName, System.Action onComplete)
+    {
+        _isCinematicPlaying = true;
+        
+        // 이동/입력 초기화
+        _keyboardInput = Vector2.zero;
+        _joystickInput = Vector2.zero;
+        _joystickRotationInput = Vector2.zero;
+        if (shooter != null && _isShooting)
+        {
+            _isShooting = false;
+            shooter.SetTrigger(false);
+        }
+
+        // 애니메이션 재생 전 -z 방향을 바라보도록 강제 회전
+        transform.rotation = Quaternion.LookRotation(Vector3.back);
+        if (_rb != null)
+        {
+            _rb.rotation = transform.rotation;
+        }
+
+        Cinemachine.CinemachineVirtualCamera cinematicCamera = null;
+        float waitTime = 2.0f; // 기본 대기 시간
+
+        if (_activeSlotIndex.Value >= 0 && _activeSlotIndex.Value < _characterModels.Length)
+        {
+            GameObject activeModel = _characterModels[_activeSlotIndex.Value];
+            if (activeModel != null)
+            {
+                var cinematicCtrl = activeModel.GetComponent<CharacterCinematicController>();
+                if (cinematicCtrl != null && cinematicCtrl.CinematicCamera != null)
+                {
+                    cinematicCamera = cinematicCtrl.CinematicCamera;
+                    cinematicCamera.Priority = 20; // 카메라 뷰 뺏어오기
+                }
+
+                if (_animator != null)
+                {
+                    // 상반신 레이어 무력화
+                    if (_animator.layerCount > 1) _animator.SetLayerWeight(1, 0f);
+                    
+                    _animator.Play(stateName, 0, 0f);
+                    
+                    // 프레임 대기 후 애니메이션 길이 계산
+                    yield return null;
+                    AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
+                    if (stateInfo.IsName(stateName))
+                    {
+                        waitTime = stateInfo.length;
+                    }
+                }
+            }
+        }
+
+        // 연출 시간만큼 대기
+        yield return new WaitForSeconds(waitTime - 1.0f);
+
+        // 카메라 복구
+        if (cinematicCamera != null)
+        {
+            cinematicCamera.Priority = 0;
+        }
+
+        yield return new WaitForSeconds(1.0f);
+
+
+        if (_animator != null)
+        {
+            if (_animator.layerCount > 1) _animator.SetLayerWeight(1, 1f);
+            _animator.Play("Movement", 0, 0f); // 기본 상태로 복귀
+        }
+
+        _isCinematicPlaying = false;
+        
+        onComplete?.Invoke();
     }
 }

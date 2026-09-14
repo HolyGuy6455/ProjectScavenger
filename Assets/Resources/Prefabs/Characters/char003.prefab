@@ -106,6 +106,7 @@ GameObject:
   - component: {fileID: 4029467520544899065}
   - component: {fileID: 4695430886169141575}
   - component: {fileID: 234687275558872560}
+  - component: {fileID: 3490549365545400927}
   m_Layer: 6
   m_Name: char003
   m_TagString: Untagged
@@ -143,7 +144,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9a6b8979d4c7f54fa900ef22a016210, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Char03_Ultimate
-  cinematicCamera: {fileID: 7599106757235454957}
   cinematicDuration: 2
   ultimateAnimStateName: Ultimate
   obstaclePrefab: {fileID: 7551767110004594919, guid: ef30e2aad47003d42b5fc517d5a16d8a, type: 3}
@@ -170,6 +170,19 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &3490549365545400927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 431937702807140913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c88e2b6420acffc4db70264b88d125cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterCinematicController
+  cinematicCamera: {fileID: 7599106757235454957}
 --- !u!1 &473415342030304152
 GameObject:
   m_ObjectHideFlags: 0

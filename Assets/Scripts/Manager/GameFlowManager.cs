@@ -37,7 +37,23 @@ namespace Scavenger.Manager
 
             Debug.Log("[GameFlowManager] 게임 클리어 상태로 전환됩니다.");
             CurrentState = GameResultState.Clear;
-            EndGame(GameResultState.Clear);
+            
+            // 로컬 플레이어가 존재하면 클리어 연출(exit) 재생 후 UI 표시, 없으면 바로 처리
+            if (PlayerController.LocalInstance != null)
+            {
+                PlayerController.LocalInstance.PlayCinematic("exit", () => 
+                {
+                    // TODO: 여기서 클리어 화면(보상 내역 등) UI를 띄워야 함
+                    // EndGame(GameResultState.Clear); 
+                    Debug.Log("[GameFlowManager] 클리어 연출 종료. 클리어 UI를 띄워야 합니다.");
+                });
+            }
+            else
+            {
+                // TODO: 여기서 클리어 화면(보상 내역 등) UI를 띄워야 함
+                // EndGame(GameResultState.Clear);
+                Debug.Log("[GameFlowManager] 로컬 플레이어 없음. 클리어 UI를 띄워야 합니다.");
+            }
         }
 
         public void OnGameFailed()
