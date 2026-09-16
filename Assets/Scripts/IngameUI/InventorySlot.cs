@@ -9,15 +9,15 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     [SerializeField] private Image iconImage;
     [SerializeField] private TextMeshProUGUI quantityText;
     [SerializeField] private Button slotButton;
-    [SerializeField] private Animator animator;
-    [SerializeField] private Image bgImage;
+    // [SerializeField] private Animator animator;
+    // [SerializeField] private Image bgImage;
 
     public int SlotIndex { get; private set; }
 
     private void Awake()
     {
         // 컴포넌트 누락 여부 검사
-        if (animator == null || bgImage == null || iconImage == null || quantityText == null || slotButton == null)
+        if (iconImage == null || quantityText == null || slotButton == null)
         {
             Debug.LogWarning($"[InventorySlot] {gameObject.name}의 Inspector에 할당되지 않은 컴포넌트가 있습니다!");
         }
@@ -76,18 +76,18 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     private void SetSelected(bool isSelected)
     {
-        if (animator != null)
-        {
-            animator.SetBool("IsSelected", isSelected);
-        }
+        // if (animator != null)
+        // {
+        //     animator.SetBool("IsSelected", isSelected);
+        // }
     }
 
     public void SetHighlight(bool isHighlighted)
     {
-        if (animator != null)
-        {
-            animator.SetBool("IsHighlighted", isHighlighted);
-        }
+        // if (animator != null)
+        // {
+        //     animator.SetBool("IsHighlighted", isHighlighted);
+        // }
     }
 
     private void UpdateQuantityText(InventoryItem item)

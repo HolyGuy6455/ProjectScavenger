@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,12 +8,13 @@ public class InventoryOrSkillPanelToggleManager : MonoBehaviour
     [SerializeField] private GameObject skillPanel;
     [SerializeField] private GameObject inventoryPanel;
 
-    [Header("Button Settings")]
+    [Header("Toggle Buttons (Supports multiple buttons)")]
+    [SerializeField] private List<Button> toggleButtons = new List<Button>();
+
+    [Header("Legacy Single Button Settings (Optional)")]
     [SerializeField] private Image buttonImage;
     [SerializeField] private Sprite backpackIcon; // Shown when skill panel is active
     [SerializeField] private Sprite gunIcon;      // Shown when inventory panel is active
-
-    private Button button;
 
     public static InventoryOrSkillPanelToggleManager Instance { get; private set; }
 
@@ -28,10 +30,21 @@ public class InventoryOrSkillPanelToggleManager : MonoBehaviour
         }
         Instance = this;
 
-        button = GetComponent<Button>();
-        if (button != null)
+        // Register any attached Button component
+        Button selfButton = GetComponent<Button>();
+        if (selfButton != null && !toggleButtons.Contains(selfButton))
         {
-            button.onClick.AddListener(OnToggleClicked);
+            toggleButtons.Add(selfButton);
+        }
+
+        // Register listeners for all toggle buttons
+        foreach (var btn in toggleButtons)
+        {
+            if (btn != null)
+            {
+                btn.onClick.RemoveListener(OnToggleClicked);
+                btn.onClick.AddListener(OnToggleClicked);
+            }
         }
     }
 
@@ -41,7 +54,7 @@ public class InventoryOrSkillPanelToggleManager : MonoBehaviour
         UpdateButtonIcon();
     }
 
-    private void OnToggleClicked()
+    public void OnToggleClicked()
     {
         // Check current active states
         bool isSkillActive = skillPanel != null && skillPanel.activeSelf;

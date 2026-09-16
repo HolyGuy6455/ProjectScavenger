@@ -11,9 +11,11 @@ public class MenuToggleController : MonoBehaviour
     [SerializeField] private GameObject pauseMenuUI;
     [SerializeField] private ClearResultPanel clearResultPanel;
 
-    [Header("Settings")]
-    [Tooltip("UI에 있는 메뉴 버튼을 연결하면, 해당 버튼을 클릭할 때 메뉴가 토글됩니다.")]
-    [SerializeField] private Button toggleButton;
+    [Header("Buttons")]
+    [Tooltip("일시정지 메뉴를 열거나 토글하는 버튼 (예: 인게임 햄버거 메뉴 버튼)")]
+    [SerializeField] private Button openPauseButton;
+    [Tooltip("일시정지 메뉴를 닫는 버튼 (예: 일시정지 창 내 Close 버튼)")]
+    [SerializeField] private Button closePauseButton;
 
     private bool isMenuOpen = false;
     private bool isCinematicHidden = false; // 시네마틱에 의해 강제로 숨겨졌는지 여부
@@ -31,9 +33,14 @@ public class MenuToggleController : MonoBehaviour
     private void Start()
     {
         // UI 버튼 클릭 이벤트 연결
-        if (toggleButton != null)
+        if (openPauseButton != null)
         {
-            toggleButton.onClick.AddListener(ToggleMenu);
+            openPauseButton.onClick.AddListener(OpenMenu);
+        }
+
+        if (closePauseButton != null)
+        {
+            closePauseButton.onClick.AddListener(CloseMenu);
         }
 
         // CanvasGroup 가져오기 (없으면 자동으로 추가)
@@ -69,7 +76,21 @@ public class MenuToggleController : MonoBehaviour
         }
     }
 
-    // UI 버튼의 OnClick 이벤트나 다른 스크립트(예: 가상 버튼)에서 직접 호출할 수 있는 public 함수
+    public void OpenMenu()
+    {
+        if (isCinematicHidden) return;
+        isMenuOpen = true;
+        UpdateUIState(false);
+    }
+
+    public void CloseMenu()
+    {
+        if (isCinematicHidden) return;
+        isMenuOpen = false;
+        UpdateUIState(false);
+    }
+
+    // UI 버튼의 OnClick 이벤트나 다른 스크립트에서 직접 호출할 수 있는 public 함수
     public void ToggleMenu()
     {
         if (isCinematicHidden) return; // 시네마틱 연출 중에는 메뉴 토글 금지
@@ -181,9 +202,13 @@ public class MenuToggleController : MonoBehaviour
     
     private void OnDestroy()
     {
-        if (toggleButton != null)
+        if (openPauseButton != null)
         {
-            toggleButton.onClick.RemoveListener(ToggleMenu);
+            openPauseButton.onClick.RemoveListener(OpenMenu);
+        }
+        if (closePauseButton != null)
+        {
+            closePauseButton.onClick.RemoveListener(CloseMenu);
         }
     }
 }
