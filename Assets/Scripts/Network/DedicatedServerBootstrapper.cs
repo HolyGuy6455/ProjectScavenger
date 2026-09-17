@@ -136,7 +136,12 @@ namespace Scavenger.Network
                             char4 = userInfo.selectedCharIds[3]
                         };
                         PlayerController.PendingClientDecks[request.ClientNetworkId] = deck;
-                        Debug.Log($"[NGO] Connection Approval 성공! ClientID: {request.ClientNetworkId}, Deck: {deck.char1}, {deck.char2}, {deck.char3}, {deck.char4}");
+                        
+                        // 닉네임 저장 로직 (OffScreenAllySpawner 연동)
+                        string playerName = !string.IsNullOrEmpty(userInfo.username) ? userInfo.username : $"Player_{request.ClientNetworkId}";
+                        OffScreenAllySpawner.PendingClientNames[request.ClientNetworkId] = playerName;
+
+                        Debug.Log($"[NGO] Connection Approval 성공! ClientID: {request.ClientNetworkId}, Name: {playerName}, Deck: {deck.char1}, {deck.char2}, {deck.char3}, {deck.char4}");
                     }
                     else
                     {
