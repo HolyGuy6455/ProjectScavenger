@@ -128,11 +128,10 @@ public class MenuToggleController : MonoBehaviour
     }
 
     /// <summary>
-    /// 게임 클리어 후 결산창을 띄웁니다.
+    /// 게임 클리어 연출이 시작될 때 미리 결산창 패널을 투명하게 켭니다. (버튼 입력을 받기 위함)
     /// </summary>
-    public void ShowClearResultUI()
+    public void PrepareClearResultUI()
     {
-        // 모든 기존 UI 끄기
         isCinematicHidden = true;
         isMenuOpen = false;
         UpdateUIState(false);
@@ -141,8 +140,23 @@ public class MenuToggleController : MonoBehaviour
         {
             clearResultPanel.gameObject.SetActive(true);
             CanvasGroup cg = GetOrAddCanvasGroup(clearResultPanel.gameObject);
-            cg.alpha = 0f;
-            FadeCanvasGroup(cg, 1f, 0.5f); // 0.5초 동안 서서히 등장
+            cg.alpha = 1f; // 버튼 입력을 받아야 하므로 패널 자체는 1f
+        }
+    }
+
+    /// <summary>
+    /// 게임 클리어 시네마틱이 끝난 후 불립니다.
+    /// </summary>
+    public void ShowClearResultUI()
+    {
+        if (clearResultPanel != null)
+        {
+            // 이제 ClearResultPanel 내부에서 스르륵 연출 등을 처리합니다.
+            var panelScript = clearResultPanel.GetComponent<ClearResultPanel>();
+            if (panelScript != null)
+            {
+                panelScript.OnCinematicFinished();
+            }
         }
         else
         {

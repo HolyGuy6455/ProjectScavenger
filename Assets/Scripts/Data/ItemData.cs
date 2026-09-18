@@ -19,6 +19,8 @@ public class ItemData : IData
     public int[] func;
     public int[] value;
     public int quantityShowType;
+    public int serverFunc;
+    public int serverValue;
     public QuantityShowType QuantityShowType => (QuantityShowType)quantityShowType;
 
     public int GetId()

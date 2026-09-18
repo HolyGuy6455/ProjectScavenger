@@ -90,6 +90,25 @@ namespace Scavenger.Network
                 else
                 {
                     Debug.Log($"[NetworkGameResultSender] 결과 송신 성공: {request.downloadHandler.text}");
+                    try
+                    {
+                        var response = JsonUtility.FromJson<GameResultResponse>(request.downloadHandler.text);
+                        if (response != null)
+                        {
+                            Debug.Log($"[NetworkGameResultSender] 플레이어 경험치 변화: {response.UserPrevExp} -> {response.UserCurrentExp}, 레벨: {response.UserPrevLevel} -> {response.UserCurrentLevel}");
+                            if (response.CharacterExpData != null)
+                            {
+                                foreach (var charExp in response.CharacterExpData)
+                                {
+                                    Debug.Log($"[NetworkGameResultSender] 캐릭터 {charExp.CharId} 경험치 변화: {charExp.PrevExp} -> {charExp.CurrentExp}, 레벨: {charExp.PrevLevel} -> {charExp.CurrentLevel}");
+                                }
+                            }
+                        }
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.LogError($"[NetworkGameResultSender] 응답 파싱 오류: {e.Message}");
+                    }
                 }
             }
         }

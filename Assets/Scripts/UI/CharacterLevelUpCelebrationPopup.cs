@@ -1,15 +1,37 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class CharacterLevelUpCelebrationPopup : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI levelAmount;
     [SerializeField] private Image characterStandingImage;
+    [SerializeField] private Button closeButton;
 
-    public void Open(int newLevel, CharData charData)
+    private Action _onCloseCallback;
+
+    private void Awake()
+    {
+        if (closeButton != null)
+        {
+            closeButton.onClick.AddListener(OnCloseClicked);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (closeButton != null)
+        {
+            closeButton.onClick.RemoveListener(OnCloseClicked);
+        }
+    }
+
+    public void Open(int newLevel, CharData charData, Action onCloseCallback = null)
     {
         if (charData == null) return;
+        
+        _onCloseCallback = onCloseCallback;
 
         if (levelAmount != null)
         {
@@ -38,5 +60,18 @@ public class CharacterLevelUpCelebrationPopup : MonoBehaviour
         }
 
         gameObject.SetActive(true);
+    }
+
+    private void OnCloseClicked()
+    {
+        if (Scavenger.UI.OutGameUIManager.Instance != null)
+        {
+            Scavenger.UI.OutGameUIManager.Instance.ClosePopup(gameObject);
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
+        _onCloseCallback?.Invoke();
     }
 }

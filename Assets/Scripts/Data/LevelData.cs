@@ -5,8 +5,8 @@ using System.Collections.Generic;
 public class LevelData : IData
 {
     public int level;
+    public int requiredExp;
     public int requiredItemId;
-    public int requiredItemAmount;
 
     public int GetId()
     {

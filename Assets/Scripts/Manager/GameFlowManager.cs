@@ -38,6 +38,13 @@ namespace Scavenger.Manager
             Debug.Log("[GameFlowManager] 게임 클리어 상태로 전환됩니다.");
             CurrentState = GameResultState.Clear;
             
+            // 시네마틱 시작 전, ClearResultPanel을 투명하게 미리 켭니다.
+            var menuToggle = FindObjectOfType<MenuToggleController>();
+            if (menuToggle != null)
+            {
+                menuToggle.PrepareClearResultUI();
+            }
+
             // 로컬 플레이어가 존재하면 클리어 연출(exit) 재생 후 EndGame 호출, 없으면 바로 호출
             if (PlayerController.LocalInstance != null)
             {

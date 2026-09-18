@@ -20491,6 +20491,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterLevelUpCelebrationPopup
   levelAmount: {fileID: 8899687232446263771}
   characterStandingImage: {fileID: 8810042823706528395}
+  closeButton: {fileID: 0}
 --- !u!1 &1385088632200572699
 GameObject:
   m_ObjectHideFlags: 0
@@ -34975,7 +34976,6 @@ GameObject:
   - component: {fileID: 2737289013018090168}
   - component: {fileID: 7564375277004910034}
   - component: {fileID: 6219031994734747853}
-  - component: {fileID: 310549914299189158}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -35084,18 +35084,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &310549914299189158
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2368694578422623174}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8662f5e032b6fb549a09f2259c5e21fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_NavigateBackButton
 --- !u!1 &2372344965482379793
 GameObject:
   m_ObjectHideFlags: 0
@@ -69025,6 +69013,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterLevelUpCelebrationPopup
   levelAmount: {fileID: 8899687232446263771}
   characterStandingImage: {fileID: 8810042823706528395}
+  closeButton: {fileID: 6219031994734747853}
 --- !u!1 &4642247029371758377
 GameObject:
   m_ObjectHideFlags: 0

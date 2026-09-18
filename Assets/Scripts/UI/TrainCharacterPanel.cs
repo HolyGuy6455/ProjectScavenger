@@ -15,6 +15,8 @@ public class TrainCharacterPanel : MonoBehaviour
     [SerializeField] private TextMeshProUGUI charNameText;
     [SerializeField] private Image characterImage;
     [SerializeField] private TextMeshProUGUI levelAmountText;
+    [SerializeField] private Image xpFill;
+    [SerializeField] private TextMeshProUGUI xpRatioText;
     [SerializeField] private GameObject[] roleTags; // 0: Infiltrator, 1: Striker, 2: Anchor, 3: Suppressor
     
     [Header("Skills UI")]
@@ -274,6 +276,22 @@ public class TrainCharacterPanel : MonoBehaviour
         {
             levelScrollController.Initialize(_levelScrollItems, charDto.level);
         }
+
+        if (xpFill != null || xpRatioText != null)
+        {
+            var levelData = DataManager.Instance.GetData<LevelData>("Level", charDto.level);
+            if (levelData != null && levelData.requiredExp > 0)
+            {
+                float ratio = (float)charDto.exp / levelData.requiredExp;
+                if (xpFill != null) xpFill.fillAmount = ratio;
+                if (xpRatioText != null) xpRatioText.text = $"{charDto.exp} / {levelData.requiredExp}";
+            }
+            else
+            {
+                if (xpFill != null) xpFill.fillAmount = 1f;
+                if (xpRatioText != null) xpRatioText.text = "MAX";
+            }
+        }
     }
 
     private void HandleLevelSelected(int targetLevel)
@@ -286,18 +304,35 @@ public class TrainCharacterPanel : MonoBehaviour
         _currentTargetLevel = targetLevel;
 
         Dictionary<int, int> totalCosts = new Dictionary<int, int>();
+        int currentExp = userChar.exp;
 
         // Calculate costs from current level to targetLevel - 1
         for (int i = userChar.level; i < targetLevel; i++)
         {
             var levelData = DataManager.Instance.GetData<LevelData>("Level", i);
-            if (levelData != null && levelData.requiredItemId > 0 && levelData.requiredItemAmount > 0)
+            if (levelData == null) continue;
+            
+            int expNeededForThisLevel = levelData.requiredExp - currentExp;
+            if (expNeededForThisLevel > 0)
             {
-                if (totalCosts.ContainsKey(levelData.requiredItemId))
-                    totalCosts[levelData.requiredItemId] += levelData.requiredItemAmount;
+                int reqItemId = levelData.requiredItemId;
+                if (reqItemId == 0) continue;
+                
+                var itemData = DataManager.Instance.GetData<ItemData>("Item", reqItemId);
+                if (itemData == null || itemData.serverFunc != 1 || itemData.serverValue <= 0) continue;
+                
+                int expPerItem = itemData.serverValue;
+                int itemsNeeded = (expNeededForThisLevel + expPerItem - 1) / expPerItem;
+
+                if (totalCosts.ContainsKey(reqItemId))
+                    totalCosts[reqItemId] += itemsNeeded;
                 else
-                    totalCosts[levelData.requiredItemId] = levelData.requiredItemAmount;
+                    totalCosts[reqItemId] = itemsNeeded;
+
+                currentExp += itemsNeeded * expPerItem;
             }
+            
+            currentExp -= levelData.requiredExp;
         }
 
         int slotIndex = 0;

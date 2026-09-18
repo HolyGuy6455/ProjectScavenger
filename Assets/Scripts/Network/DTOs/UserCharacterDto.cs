@@ -8,6 +8,7 @@ namespace Scavenger.Network.DTOs
     {
         public int charId;
         public int level;
+        public int exp;
         public int[] equippedSkills = new int[4];
         public List<int> unlockedSkills = new List<int>();
     }
