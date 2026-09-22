@@ -44,7 +44,7 @@ namespace Scavenger.UI
 
             if (avatarImage != null)
             {
-                string standPath = System.IO.Path.GetFileNameWithoutExtension(charData.resourceStand);
+                string standPath = System.IO.Path.GetFileNameWithoutExtension(charData.resourceSlot);
                 Sprite loadedSprite = Resources.Load<Sprite>($"char/{standPath}");
                 if (loadedSprite == null) loadedSprite = Resources.Load<Sprite>(standPath);
                 

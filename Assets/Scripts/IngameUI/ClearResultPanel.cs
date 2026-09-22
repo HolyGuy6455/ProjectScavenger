@@ -25,6 +25,8 @@ public class ClearResultPanel : MonoBehaviour
         if (invisibleScreenButton != null)
         {
             invisibleScreenButton.onClick.AddListener(OnScreenClicked);
+            // 데이터를 받기 전까지는 상호작용 불가능하게 막아둡니다.
+            invisibleScreenButton.interactable = false;
         }
 
         if (backgroundDimObj != null) backgroundDimObj.SetActive(false);
@@ -55,7 +57,12 @@ public class ClearResultPanel : MonoBehaviour
             stageClearPopup.Initialize(loots, expResults, playerExpResult, OnStageClearPopupClosed);
         }
         
-        if (invisibleScreenButton != null) invisibleScreenButton.gameObject.SetActive(true);
+        if (invisibleScreenButton != null) 
+        {
+            invisibleScreenButton.gameObject.SetActive(true);
+            // 이제 데이터를 받았으므로 터치 가능
+            invisibleScreenButton.interactable = true;
+        }
         if (backgroundDimObj != null) backgroundDimObj.SetActive(false);
     }
 

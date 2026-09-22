@@ -145,6 +145,21 @@ public class MenuToggleController : MonoBehaviour
     }
 
     /// <summary>
+    /// 서버로부터 받은 게임 클리어 결과를 세팅합니다.
+    /// </summary>
+    public void SetupClearResultData(System.Collections.Generic.List<Scavenger.UI.LootInfo> loots, System.Collections.Generic.List<Scavenger.UI.CharExpResult> charExp, Scavenger.UI.PlayerExpResult playerExp)
+    {
+        if (clearResultPanel != null)
+        {
+            var panelScript = clearResultPanel.GetComponent<ClearResultPanel>();
+            if (panelScript != null)
+            {
+                panelScript.SetupResultFlow(loots, charExp, playerExp);
+            }
+        }
+    }
+
+    /// <summary>
     /// 게임 클리어 시네마틱이 끝난 후 불립니다.
     /// </summary>
     public void ShowClearResultUI()

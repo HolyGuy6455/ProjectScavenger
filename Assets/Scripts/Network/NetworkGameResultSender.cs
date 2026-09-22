@@ -38,6 +38,8 @@ namespace Scavenger.Network
             StartCoroutine(SendResultRoutine(state));
         }
 
+        public event System.Action<GameResultResponse> OnGameResultReceived;
+
         private IEnumerator SendResultRoutine(GameResultState state)
         {
             if (NetworkAuthManager.Instance == null || string.IsNullOrEmpty(NetworkAuthManager.Instance.AuthToken))
@@ -103,6 +105,7 @@ namespace Scavenger.Network
                                     Debug.Log($"[NetworkGameResultSender] 캐릭터 {charExp.CharId} 경험치 변화: {charExp.PrevExp} -> {charExp.CurrentExp}, 레벨: {charExp.PrevLevel} -> {charExp.CurrentLevel}");
                                 }
                             }
+                            OnGameResultReceived?.Invoke(response);
                         }
                     }
                     catch (System.Exception e)

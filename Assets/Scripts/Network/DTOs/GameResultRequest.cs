@@ -5,8 +5,11 @@ namespace Scavenger.Network.DTOs
     [System.Serializable]
     public class GameItemDto
     {
-        public int ItemId;
-        public int Amount;
+        public int itemId;
+        public int amount;
+
+        public int ItemId { get => itemId; set => itemId = value; }
+        public int Amount { get => amount; set => amount = value; }
     }
 
     [System.Serializable]

@@ -44,6 +44,30 @@ public class SimpleCheater : MonoBehaviour
     }
 
     /// <summary>
+    /// 플레이어의 인벤토리에 감자(아이템 ID: 2)를 1개 추가합니다.
+    /// 디버그 UI 버튼의 OnClick()에 이 메서드를 연결하세요.
+    /// </summary>
+    public void AddPotatoToInventory()
+    {
+        if (PlayerInventory.Instance != null)
+        {
+            bool success = PlayerInventory.Instance.AddItem(2, 1);
+            if (success)
+            {
+                Debug.Log("[SimpleCheater] 인벤토리에 감자(ID: 2) 1개를 추가했습니다.");
+            }
+            else
+            {
+                Debug.LogWarning("[SimpleCheater] 감자 추가 실패 (인벤토리가 꽉 찼거나 아이템 데이터가 없습니다).");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[SimpleCheater] PlayerInventory.Instance를 찾을 수 없습니다.");
+        }
+    }
+
+    /// <summary>
     /// 플레이어를 스폰 포인트(PlayerSpawnPosition)로 강제 텔레포트 시킵니다.
     /// 디버그 UI 버튼의 OnClick()에 이 메서드를 연결하세요.
     /// </summary>

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace Scavenger.Manager
 {
@@ -90,16 +91,102 @@ namespace Scavenger.Manager
                 return;
             }
 
-            // 2. 결산창을 띄울 수 없는 예외 상황
+            // 2. 서버 응답을 기다립니다. NetworkGameResultSender 이벤트 구독.
+            if (Scavenger.Network.NetworkGameResultSender.Instance != null)
+            {
+                Scavenger.Network.NetworkGameResultSender.Instance.OnGameResultReceived += HandleGameResultReceived;
+            }
+            else
+            {
+                Debug.LogWarning("[GameFlowManager] NetworkGameResultSender 인스턴스가 없어 결과창 데이터를 받을 수 없습니다.");
+            }
+
+            // 3. 결산창 표시 시도 (시네마틱 종료 콜백을 위해)
             if (MenuToggleController.Instance == null)
             {
                 Debug.LogWarning("[GameFlowManager] MenuToggleController 인스턴스가 없어 결과창을 띄우지 못했습니다. 바로 로비로 복귀합니다.");
                 ReturnToMainMenu();
                 return;
             }
-
-            // 3. 클리어 시 결산창 표시 시도
             MenuToggleController.Instance.ShowClearResultUI();
+        }
+
+        private void HandleGameResultReceived(Scavenger.Network.DTOs.GameResultResponse response)
+        {
+            if (Scavenger.Network.NetworkGameResultSender.Instance != null)
+            {
+                Scavenger.Network.NetworkGameResultSender.Instance.OnGameResultReceived -= HandleGameResultReceived;
+            }
+
+            // LootInfo 파싱
+            List<Scavenger.UI.LootInfo> loots = new List<Scavenger.UI.LootInfo>();
+            if (response.AddedItems != null)
+            {
+                foreach (var item in response.AddedItems)
+                {
+                    loots.Add(new Scavenger.UI.LootInfo { itemId = item.ItemId, count = item.Amount, isBonus = false });
+                }
+            }
+
+            // PlayerExpResult 파싱
+            Scavenger.UI.PlayerExpResult playerExp = new Scavenger.UI.PlayerExpResult();
+            playerExp.oldLevel = response.UserPrevLevel;
+            playerExp.newLevel = response.UserCurrentLevel;
+            playerExp.oldExp = response.UserPrevExp;
+            playerExp.newExp = response.UserCurrentExp;
+
+            var oldLevelData = DataManager.Instance.GetData<LevelData>("Level", playerExp.oldLevel);
+            var newLevelData = DataManager.Instance.GetData<LevelData>("Level", playerExp.newLevel);
+            playerExp.maxExpForOldLevel = oldLevelData != null ? oldLevelData.requiredExp : 1;
+            playerExp.maxExpForNewLevel = newLevelData != null ? newLevelData.requiredExp : 1;
+
+            if (playerExp.newLevel > playerExp.oldLevel)
+            {
+                playerExp.addedExp = (playerExp.maxExpForOldLevel - playerExp.oldExp) + playerExp.newExp;
+            }
+            else
+            {
+                playerExp.addedExp = playerExp.newExp - playerExp.oldExp;
+            }
+
+            // CharExpResult 파싱
+            List<Scavenger.UI.CharExpResult> charExpList = new List<Scavenger.UI.CharExpResult>();
+            if (response.CharacterExpData != null)
+            {
+                foreach (var ch in response.CharacterExpData)
+                {
+                    var charData = DataManager.Instance.GetData<CharData>("Char", ch.CharId);
+                    if (charData == null) continue;
+
+                    Scavenger.UI.CharExpResult charExp = new Scavenger.UI.CharExpResult();
+                    charExp.charData = charData;
+                    charExp.oldLevel = ch.PrevLevel;
+                    charExp.newLevel = ch.CurrentLevel;
+                    charExp.oldExp = ch.PrevExp;
+                    charExp.newExp = ch.CurrentExp;
+
+                    var cOldLevelData = DataManager.Instance.GetData<LevelData>("Level", charExp.oldLevel);
+                    var cNewLevelData = DataManager.Instance.GetData<LevelData>("Level", charExp.newLevel);
+                    charExp.maxExpForOldLevel = cOldLevelData != null ? cOldLevelData.requiredExp : 1;
+                    charExp.maxExpForNewLevel = cNewLevelData != null ? cNewLevelData.requiredExp : 1;
+
+                    if (charExp.newLevel > charExp.oldLevel)
+                    {
+                        charExp.addedExp = (charExp.maxExpForOldLevel - charExp.oldExp) + charExp.newExp;
+                    }
+                    else
+                    {
+                        charExp.addedExp = charExp.newExp - charExp.oldExp;
+                    }
+
+                    charExpList.Add(charExp);
+                }
+            }
+
+            if (MenuToggleController.Instance != null)
+            {
+                MenuToggleController.Instance.SetupClearResultData(loots, charExpList, playerExp);
+            }
         }
 
         private void ReturnToMainMenu()

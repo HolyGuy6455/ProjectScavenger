@@ -62,6 +62,15 @@ namespace Scavenger.UI
         public void Initialize(List<LootInfo> loots, List<CharExpResult> expResults, PlayerExpResult playerExpResult, Action onCloseCallback = null)
         {
             _onCloseCallback = onCloseCallback;
+            
+            if (confirmButton != null)
+            {
+                confirmButton.onClick.RemoveAllListeners();
+                confirmButton.onClick.AddListener(() => {
+                    _onCloseCallback?.Invoke();
+                });
+            }
+
             // 팝업 자체는 비활성화 상태로 둔 채 데이터 세팅만 함. PlayShowAnimation 시 켜짐.
             SetConfirmButtonInteractable(false);
             ClearLoot();
