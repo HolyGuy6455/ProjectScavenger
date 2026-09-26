@@ -72,6 +72,7 @@ namespace Scavenger.UI
             PlayerPrefs.SetInt("TargetServerPort", port);
             PlayerPrefs.SetString("MatchToken", matchToken);
             PlayerPrefs.SetString("SelectedMap", "Stage002");
+            PlayerPrefs.SetInt("IsTestMode", 0);
             PlayerPrefs.Save();
 
             // 로딩 씬으로 넘어감 (인텐트 지정)
@@ -84,6 +85,7 @@ namespace Scavenger.UI
             
             PlayerPrefs.SetString("MatchToken", matchToken);
             PlayerPrefs.SetString("SelectedMap", "Stage002");
+            PlayerPrefs.SetInt("IsTestMode", 0);
             PlayerPrefs.Save();
 
             // 로컬 호스트 모드로 로딩 씬 진입

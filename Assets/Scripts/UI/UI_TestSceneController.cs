@@ -11,13 +11,10 @@ namespace Scavenger.UI
         [SerializeField] private Button startDedicatedButton;
         [SerializeField] private TMP_Dropdown mapDropdown; // 나중을 위해 추가
         
-        [Header("임시 캐릭터 테스트용")]
-        [SerializeField] private TMP_InputField char1Input;
-        [SerializeField] private TMP_InputField char2Input;
-        [SerializeField] private TMP_InputField char3Input;
-        [SerializeField] private TMP_InputField char4Input;
+        [Header("Char Nodes")]
+        [SerializeField] private TestSceneCharNode[] charNodes;
 
-        private void Start()
+        private System.Collections.IEnumerator Start()
         {
             if (startButton != null)
             {
@@ -37,6 +34,24 @@ namespace Scavenger.UI
                 mapDropdown.options.Add(new TMP_Dropdown.OptionData("Stage002"));
                 // 나중에 맵이 추가되면 여기에 추가할 수 있습니다.
             }
+
+            // DataManager가 생성되고 초기 데이터 로드가 완료될 때까지 대기
+            while (DataManager.Instance == null || !DataManager.Instance.IsDataLoaded)
+            {
+                yield return null;
+            }
+
+            if (charNodes != null && charNodes.Length >= 4)
+            {
+                int[] charIds = new int[] { 1, 2, 3, 4 };
+                for (int i = 0; i < 4; i++)
+                {
+                    if (charNodes[i] != null)
+                    {
+                        charNodes[i].Initialize(charIds[i]);
+                    }
+                }
+            }
         }
 
         private void OnStartClicked()
@@ -51,14 +66,28 @@ namespace Scavenger.UI
             PlayerPrefs.SetString("SelectedMap", selectedMap);
             
             // 임시 테스트용 가짜 MatchToken 생성 로직
-            int c1 = 1, c2 = 2, c3 = 3, c4 = 4; // 입력 안했을 때 기본 테스트용 번호 (10~13)
-            if (char1Input != null && int.TryParse(char1Input.text, out int p1)) c1 = p1;
-            if (char2Input != null && int.TryParse(char2Input.text, out int p2)) c2 = p2;
-            if (char3Input != null && int.TryParse(char3Input.text, out int p3)) c3 = p3;
-            if (char4Input != null && int.TryParse(char4Input.text, out int p4)) c4 = p4;
+            int c1 = 1, c2 = 2, c3 = 3, c4 = 4; // 입력 안했을 때 기본 테스트용 번호
+            
+            if (charNodes != null && charNodes.Length >= 4)
+            {
+                c1 = charNodes[0].CurrentCharId;
+                c2 = charNodes[1].CurrentCharId;
+                c3 = charNodes[2].CurrentCharId;
+                c4 = charNodes[3].CurrentCharId;
+
+                for(int i=0; i<4; i++)
+                {
+                    if (charNodes[i] != null)
+                    {
+                        var skills = charNodes[i].CurrentSkills;
+                        PlayerPrefs.SetString($"TestSkills_{i}", string.Join(",", skills));
+                    }
+                }
+            }
 
             string fakeMatchToken = $"{{\"selectedCharIds\":[{c1},{c2},{c3},{c4}]}}";
             PlayerPrefs.SetString("MatchToken", fakeMatchToken);
+            PlayerPrefs.SetInt("IsTestMode", 1);
             
             PlayerPrefs.Save();
 
@@ -85,13 +114,26 @@ namespace Scavenger.UI
 
             // 임시 테스트용 가짜 MatchToken 생성 로직
             int c1 = 10, c2 = 11, c3 = 12, c4 = 13;
-            if (char1Input != null && int.TryParse(char1Input.text, out int p1)) c1 = p1;
-            if (char2Input != null && int.TryParse(char2Input.text, out int p2)) c2 = p2;
-            if (char3Input != null && int.TryParse(char3Input.text, out int p3)) c3 = p3;
-            if (char4Input != null && int.TryParse(char4Input.text, out int p4)) c4 = p4;
+            if (charNodes != null && charNodes.Length >= 4)
+            {
+                c1 = charNodes[0].CurrentCharId;
+                c2 = charNodes[1].CurrentCharId;
+                c3 = charNodes[2].CurrentCharId;
+                c4 = charNodes[3].CurrentCharId;
+
+                for(int i=0; i<4; i++)
+                {
+                    if (charNodes[i] != null)
+                    {
+                        var skills = charNodes[i].CurrentSkills;
+                        PlayerPrefs.SetString($"TestSkills_{i}", string.Join(",", skills));
+                    }
+                }
+            }
 
             string fakeMatchToken = $"{{\"selectedCharIds\":[{c1},{c2},{c3},{c4}]}}";
             PlayerPrefs.SetString("MatchToken", fakeMatchToken);
+            PlayerPrefs.SetInt("IsTestMode", 1);
 
             PlayerPrefs.Save();
 

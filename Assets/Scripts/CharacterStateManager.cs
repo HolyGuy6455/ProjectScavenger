@@ -135,13 +135,40 @@ public class CharacterStateManager : MonoBehaviour
     }
 
 
+    [System.Serializable]
+    private class TokenData
+    {
+        public int[] selectedCharIds;
+    }
+
     private void InitializeStates()
     {
         if (DataManager.Instance == null) return;
         if (isInitialized) return;
 
         int[] defaultDeck = new int[] { 1, 2, 3, 4 };
-        if (UserDataManager.Instance != null && UserDataManager.Instance.SelectedDeck != null && UserDataManager.Instance.SelectedDeck[0] > 0)
+        bool isTestMode = PlayerPrefs.GetInt("IsTestMode", 0) == 1;
+
+        if (isTestMode)
+        {
+            string matchToken = PlayerPrefs.GetString("MatchToken", "");
+            if (!string.IsNullOrEmpty(matchToken))
+            {
+                try
+                {
+                    TokenData tokenData = JsonUtility.FromJson<TokenData>(matchToken);
+                    if (tokenData != null && tokenData.selectedCharIds != null && tokenData.selectedCharIds.Length > 0)
+                    {
+                        defaultDeck = tokenData.selectedCharIds;
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning($"Failed to parse Test MatchToken: {e.Message}");
+                }
+            }
+        }
+        else if (UserDataManager.Instance != null && UserDataManager.Instance.SelectedDeck != null && UserDataManager.Instance.SelectedDeck[0] > 0)
         {
             defaultDeck = UserDataManager.Instance.SelectedDeck;
         }
@@ -153,6 +180,8 @@ public class CharacterStateManager : MonoBehaviour
     {
         if (DataManager.Instance == null) return;
         
+        bool isTestMode = PlayerPrefs.GetInt("IsTestMode", 0) == 1;
+
         for (int i = 0; i < 4; i++)
         {
             if (i < deckCharIds.Length && deckCharIds[i] > 0)
@@ -161,7 +190,12 @@ public class CharacterStateManager : MonoBehaviour
                 if (charData != null)
                 {
                     charStates[i] = new CharacterState(charData);
-                    if (UserDataManager.Instance != null)
+                    
+                    if (isTestMode)
+                    {
+                        charStates[i].SetEquippedSkills(new int[] { 1, 2, 3, 4 });
+                    }
+                    else if (UserDataManager.Instance != null)
                     {
                         var userChar = UserDataManager.Instance.GetCharacter(deckCharIds[i]);
                         if (userChar != null && userChar.equippedSkills != null)
