@@ -166,3 +166,7 @@ Think of it like running lint after a coding session—not after every keystroke
 - **Simple request** ("create a blue sphere at 1,2,3") → Verify immediately after
 - **Multi-step task** → Verify after each logical phase completes
 - **Batch operations** (created 5 objects) → One screenshot at the end, not five
+
+## General Project Knowledge
+- **Unity MCP**: This project has a Unity MCP connected.
+- **Remote Server Access**: Running `ssh aws` in the terminal connects directly to the remote machine where the server is currently running.

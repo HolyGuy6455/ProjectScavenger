@@ -19,6 +19,7 @@ public class CharData : IData
     public string resourceSlot;
     public string resourceStand;
     public CharRole role;
+    public int[] defaultSkills;
 
     [System.NonSerialized]
     public List<int> gun = new List<int>();

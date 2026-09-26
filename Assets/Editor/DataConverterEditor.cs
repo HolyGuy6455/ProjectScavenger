@@ -144,12 +144,6 @@ public class DataConverterEditor : EditorWindow
         }
 
         GUILayout.Space(20);
-        
-        if (GUILayout.Button("Copy Master Data To Server", GUILayout.Height(30)))
-        {
-            CopyMasterDataToServer();
-        }
-
 
 
         if (GUILayout.Button("Convert Loot Data"))
@@ -217,6 +211,7 @@ public class DataConverterEditor : EditorWindow
             string clientJsonPath = Application.dataPath + "/Data/Json/";
             System.IO.File.Copy(clientJsonPath + "Item.json", serverResourcesPath + "Item.json", true);
             System.IO.File.Copy(clientJsonPath + "Skill.json", serverResourcesPath + "Skill.json", true);
+            System.IO.File.Copy(clientJsonPath + "Char.json", serverResourcesPath + "Char.json", true);
             System.IO.File.Copy(clientJsonPath + "CharLvl.json", serverResourcesPath + "CharLvl.json", true);
             System.IO.File.Copy(clientJsonPath + "Level.json", serverResourcesPath + "Level.json", true);
 
