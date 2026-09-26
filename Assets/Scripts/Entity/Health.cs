@@ -27,6 +27,7 @@ public class Health : NetworkBehaviour, IDamageable
     }
     public float MaxHealth => maxHealth;
     public bool IsDead { get; private set; }
+    public bool IsInvincible { get; set; }
 
     #region C# Actions (스크립트용 이벤트)
     public event System.Action<float, float> OnHealthChanged; // (현재 체력, 최대 체력)
@@ -72,6 +73,7 @@ public class Health : NetworkBehaviour, IDamageable
     /// </summary>
     public void TakeDamage(DamageInfo damageInfo)
     {
+        if (IsInvincible) return; // 무적 상태일 때는 데미지 무시
         if (!IsServer) return; // 서버만 데미지 처리 가능
         if (IsDead) return;
         if (damageInfo.amount <= 0) return;

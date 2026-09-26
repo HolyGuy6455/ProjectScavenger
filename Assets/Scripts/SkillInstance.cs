@@ -132,6 +132,13 @@ public class SkillInstance
                     PlayerSkillController.Instance.CmdUseUltimateServerRpc();
                 }
                 break;
+            case 3: // 구르기
+                if (PlayerController.LocalInstance != null)
+                {
+                    // Data.duration: 구르기 시간, funcValues[0]: 이동 거리, funcValues[1]: 무적 시간
+                    PlayerController.LocalInstance.StartRoll(Data.duration, funcValues[0], funcValues[1]);
+                }
+                break;
             case 5: // 재장전 (전체)
                 if (playerShooter != null) playerShooter.TriggerReloadAnimation();
                 break;

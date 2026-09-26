@@ -29,6 +29,8 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     public Vector2 JoystickRotationInput => _joystickRotationInput;
     private bool _isShooting = false;
     private bool _isCinematicPlaying = false;
+    private bool _isRolling = false;
+    private Health _health;
     private SectorIndicator _sectorIndicator;
 
     // 네트워크 동기화를 위한 변수 (오너가 쓰고 모두가 읽음)
@@ -98,6 +100,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
+        _health = GetComponent<Health>();
         // Awake에서는 InputSystem을 미리 생성해둡니다.
         _inputActions = new PlayerInputActions();
     }
@@ -490,11 +493,14 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     {
         if (!IsOwner) return; // 위치 이동과 물리 연산, 입력 처리는 로컬 오너만 수행합니다.
 
-        if (_isCinematicPlaying)
+        if (_isCinematicPlaying || _isRolling)
         {
-            // 시네마틱 재생 중에는 움직임과 회전을 강제로 멈춥니다.
-            _netAnimInput.Value = Vector2.zero;
-            if (_rb != null) _rb.linearVelocity = Vector3.zero;
+            if (_isCinematicPlaying)
+            {
+                // 시네마틱 재생 중에는 움직임과 회전을 강제로 멈춥니다.
+                _netAnimInput.Value = Vector2.zero;
+                if (_rb != null) _rb.linearVelocity = Vector3.zero;
+            }
             return;
         }
 
@@ -657,6 +663,86 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
             Quaternion targetRotation = Quaternion.LookRotation(lookDir, Vector3.up);
             _rb.MoveRotation(Quaternion.RotateTowards(_rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
         }
+    }
+
+    public void StartRoll(float duration, float distance, float invincibleTime)
+    {
+        if (_isRolling || !IsOwner) return;
+        StartCoroutine(RollRoutine(duration, distance, invincibleTime));
+    }
+
+    private System.Collections.IEnumerator RollRoutine(float duration, float distance, float invincibleTime)
+    {
+        _isRolling = true;
+        if (_health != null) _health.IsInvincible = true;
+
+        Vector2 combinedInput = _keyboardInput + _joystickInput;
+        Vector3 rollDir = transform.forward;
+        if (combinedInput.sqrMagnitude > 0.001f)
+        {
+            combinedInput.Normalize();
+            rollDir = new Vector3(combinedInput.x, 0f, combinedInput.y);
+        }
+
+        float originalAnimSpeed = 1f;
+        if (_animator != null)
+        {
+            originalAnimSpeed = _animator.speed;
+            _animator.Play("Roll", 0, 0f);
+            
+            // Play 직후 상태를 갱신하여 애니메이션 길이를 가져옵니다.
+            _animator.Update(0f);
+            AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
+            
+            if (stateInfo.IsName("Roll") && duration > 0f)
+            {
+                // 구르기 시간(duration) 동안 애니메이션 1회가 정확히 끝나도록 배속 설정
+                _animator.speed = stateInfo.length / duration;
+            }
+        }
+
+        if (shooter != null && _isShooting)
+        {
+            _isShooting = false;
+            shooter.SetTrigger(false);
+        }
+
+        float elapsedTime = 0f;
+        bool invincibilityEnded = false;
+        float speed = distance / duration;
+
+        Vector3 localMoveDir = transform.InverseTransformDirection(rollDir);
+        _netAnimInput.Value = new Vector2(localMoveDir.x, localMoveDir.z);
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.fixedDeltaTime;
+            
+            if (!invincibilityEnded && elapsedTime >= invincibleTime)
+            {
+                invincibilityEnded = true;
+                if (_health != null) _health.IsInvincible = false;
+            }
+
+            _rb.MovePosition(_rb.position + rollDir * (speed * Time.fixedDeltaTime));
+            
+            if (rollDir.sqrMagnitude > 0.001f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(rollDir, Vector3.up);
+                _rb.MoveRotation(Quaternion.RotateTowards(_rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
+            }
+
+            yield return new WaitForFixedUpdate();
+        }
+
+        if (_animator != null)
+        {
+            // 구르기 종료 후 원래 애니메이션 속도로 복구
+            _animator.speed = originalAnimSpeed;
+        }
+
+        if (_health != null) _health.IsInvincible = false;
+        _isRolling = false;
     }
 
     public BaseUltimateSkill GetActiveUltimateSkill()
