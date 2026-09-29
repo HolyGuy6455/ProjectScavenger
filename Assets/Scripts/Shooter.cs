@@ -4,9 +4,26 @@ using UnityEngine;
 
 /// <summary>
 /// 총알을 발사하는 기능을 담당하는 컴포넌트입니다.
-/// GunData를 기반으로 쿨타임, 잔탄, 연사 기능을 모두 관리합니다.
+/// AmmoData를 기반으로 쿨타임, 잔탄, 연사 기능을 모두 관리합니다.
 /// 멀티플레이어(NGO) 환경에 맞춰 발사와 잔탄 계산은 서버가 전담합니다.
 /// </summary>
+public struct AmmoGroup : INetworkSerializable, IEquatable<AmmoGroup>
+{
+    public int ammoId;
+    public int count;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref ammoId);
+        serializer.SerializeValue(ref count);
+    }
+
+    public bool Equals(AmmoGroup other)
+    {
+        return ammoId == other.ammoId && count == other.count;
+    }
+}
+
 public class Shooter : NetworkBehaviour
 {
     [Header("Shooter Settings")]
@@ -17,23 +34,24 @@ public class Shooter : NetworkBehaviour
     [SerializeField] private Transform firePoint;
 
     [Header("Current Status (Debug)")]
-    [SerializeField] private GunData currentGunData;
-    public GunData CurrentGunData => currentGunData;
+    [SerializeField] private AmmoData currentAmmoData;
+    public AmmoData CurrentAmmoData => currentAmmoData;
+    public int currentShotType;
     
-    // 잔탄 수는 서버가 관리하며 클라이언트에게 동기화됩니다.
-    public NetworkVariable<int> NetworkCurrentAmmo = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkList<AmmoGroup> chamberAmmoQueue = new NetworkList<AmmoGroup>(null, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
     
     public int CurrentAmmo 
     { 
-        get => NetworkCurrentAmmo.Value; 
-        set 
-        { 
-            if (IsServer) NetworkCurrentAmmo.Value = value; 
-        } 
+        get 
+        {
+            int total = 0;
+            foreach (var group in chamberAmmoQueue) total += group.count;
+            return total;
+        }
     }
     
     public event Action<int, int> OnAmmoChanged;
-    public event Action<GunData> OnWeaponChanged;
+    public event Action<AmmoData> OnWeaponChanged;
     
     [SerializeField] private bool isReloading;
 
@@ -52,16 +70,17 @@ public class Shooter : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (IsServer && currentGunData != null)
+        if (IsServer && currentAmmoData != null)
         {
-            CurrentAmmo = currentGunData.maxAmmo;
+            chamberAmmoQueue.Clear();
+            InternalLoadAmmo(currentAmmoData.maxAmmo, currentAmmoData.id);
         }
 
-        NetworkCurrentAmmo.OnValueChanged += (oldValue, newValue) =>
+        chamberAmmoQueue.OnListChanged += (changeEvent) =>
         {
-            if (currentGunData != null)
+            if (currentAmmoData != null)
             {
-                OnAmmoChanged?.Invoke(newValue, currentGunData.maxAmmo);
+                OnAmmoChanged?.Invoke(CurrentAmmo, currentAmmoData.maxAmmo);
             }
         };
     }
@@ -77,44 +96,48 @@ public class Shooter : NetworkBehaviour
         }
         else if (currentSpread > 0f)
         {
-            float recoveryRate = currentGunData != null ? currentGunData.spreadRecoveryRate : 1f;
+            float recoveryRate = currentAmmoData != null ? currentAmmoData.spreadRecoveryRate : 1f;
             currentSpread -= recoveryRate * Time.deltaTime;
             if (currentSpread < 0f) currentSpread = 0f;
         }
     }
 
-    public void EquipGun(GunData newGunData, int restoredAmmo = -1)
+    public void EquipGun(AmmoData newAmmoData, int restoredAmmo = -1)
     {
-        if (newGunData == null) return;
+        if (newAmmoData == null) return;
 
-        ApplyGunData(newGunData, restoredAmmo);
+        ApplyAmmoData(newAmmoData, restoredAmmo);
 
         // 클라이언트에서 호출한 경우 서버에도 장착 사실을 알림
         if (!IsServer && IsOwner)
         {
-            CmdEquipGunServerRpc(newGunData.id, restoredAmmo);
+            CmdEquipGunServerRpc(newAmmoData.id, restoredAmmo);
         }
     }
 
     [ServerRpc]
     private void CmdEquipGunServerRpc(int gunId, int restoredAmmo)
     {
-        GunData serverGunData = DataManager.Instance.GetData<GunData>("Gun", gunId);
+        AmmoData serverAmmoData = DataManager.Instance.GetData<AmmoData>("Ammo", gunId);
         
-        if (serverGunData != null)
+        if (serverAmmoData != null)
         {
-            ApplyGunData(serverGunData, restoredAmmo);
+            ApplyAmmoData(serverAmmoData, restoredAmmo);
         }
     }
 
-    private void ApplyGunData(GunData newGunData, int restoredAmmo = -1)
+    private void ApplyAmmoData(AmmoData newAmmoData, int restoredAmmo = -1)
     {
-        currentGunData = newGunData;
+        currentAmmoData = newAmmoData;
         
         if (IsServer) 
         {
-            int targetAmmo = restoredAmmo >= 0 ? restoredAmmo : currentGunData.maxAmmo;
-            CurrentAmmo = targetAmmo;
+            chamberAmmoQueue.Clear();
+            int targetAmmo = restoredAmmo >= 0 ? restoredAmmo : currentAmmoData.maxAmmo;
+            if (targetAmmo > 0)
+            {
+                InternalLoadAmmo(targetAmmo, currentAmmoData.id);
+            }
         }
 
         isReloading = false;
@@ -123,7 +146,63 @@ public class Shooter : NetworkBehaviour
         serverLastFireTime = 0f;
         currentSpread = 0f;
         
-        OnWeaponChanged?.Invoke(currentGunData);
+        OnWeaponChanged?.Invoke(currentAmmoData);
+    }
+
+    public void EquipGunWithChamber(AmmoData newAmmoData, AmmoGroup[] savedChamber)
+    {
+        if (newAmmoData == null) return;
+
+        currentAmmoData = newAmmoData;
+        isReloading = false;
+        isTriggerPulled = false;
+        clientLastFireTime = 0f;
+        serverLastFireTime = 0f;
+        currentSpread = 0f;
+        
+        OnWeaponChanged?.Invoke(currentAmmoData);
+
+        if (!IsServer && IsOwner)
+        {
+            CmdEquipGunWithChamberServerRpc(newAmmoData.id, savedChamber);
+        }
+        else if (IsServer)
+        {
+            chamberAmmoQueue.Clear();
+            if (savedChamber != null && savedChamber.Length > 0)
+            {
+                foreach (var group in savedChamber) chamberAmmoQueue.Add(group);
+            }
+            else
+            {
+                InternalLoadAmmo(currentAmmoData.maxAmmo, currentAmmoData.id);
+            }
+        }
+    }
+
+    [ServerRpc]
+    private void CmdEquipGunWithChamberServerRpc(int gunId, AmmoGroup[] savedChamber)
+    {
+        AmmoData serverAmmoData = DataManager.Instance.GetData<AmmoData>("Ammo", gunId);
+        
+        if (serverAmmoData != null)
+        {
+            currentAmmoData = serverAmmoData;
+            chamberAmmoQueue.Clear();
+            if (savedChamber != null && savedChamber.Length > 0)
+            {
+                foreach (var group in savedChamber) chamberAmmoQueue.Add(group);
+            }
+            else
+            {
+                InternalLoadAmmo(currentAmmoData.maxAmmo, currentAmmoData.id);
+            }
+            isReloading = false;
+            isTriggerPulled = false;
+            serverLastFireTime = 0f;
+            currentSpread = 0f;
+            OnWeaponChanged?.Invoke(currentAmmoData);
+        }
     }
 
     /*
@@ -158,10 +237,10 @@ public class Shooter : NetworkBehaviour
     {
         if (!IsOwner) return; // 발사 요청은 소유자(Owner)만 할 수 있습니다.
 
-        if (currentGunData == null) return;
+        if (currentAmmoData == null) return;
         if (isReloading) return;
         if (CurrentAmmo <= 0) return;
-        if (Time.time - clientLastFireTime < currentGunData.fireRate) return;
+        if (Time.time - clientLastFireTime < currentAmmoData.fireRate) return;
 
         // 로컬 쿨타임 갱신 (클라이언트 측에서 쿨타임을 관리하여 연속 요청 방지)
         clientLastFireTime = Time.time;
@@ -177,7 +256,7 @@ public class Shooter : NetworkBehaviour
     private void CmdShootServerRpc(Vector3 direction, Vector3 targetPosition)
     {
         // 서버 측에서 한 번 더 검증 (해킹 방지)
-        if (currentGunData == null || isReloading || CurrentAmmo <= 0 || Time.time - serverLastFireTime < currentGunData.fireRate)
+        if (currentAmmoData == null || isReloading || CurrentAmmo <= 0 || Time.time - serverLastFireTime < currentAmmoData.fireRate)
             return;
 
         PerformShoot(direction, targetPosition);
@@ -197,7 +276,7 @@ public class Shooter : NetworkBehaviour
             currentAimDirection = direction;
             currentTargetPosition = targetPosition;
 
-            if (currentGunData != null && currentGunData.shotType == 2)
+            if (currentAmmoData != null && currentShotType == 2)
             {
                 // 포물선 무기(수류탄 등)는 조준할 시간을 벌어주기 위해 첫 발사에 딜레이(fireRate)를 줍니다.
                 // clientLastFireTime을 현재 시간으로 덮어씌워서, 쿨타임이 한 바퀴 돌아야 쏴지도록 속입니다.
@@ -226,8 +305,22 @@ public class Shooter : NetworkBehaviour
     private void PerformShoot(Vector3 direction, Vector3 targetPosition)
     {
         if (!IsServer) return;
+        if (chamberAmmoQueue.Count == 0) return;
 
-        CurrentAmmo--;
+        int lastIndex = chamberAmmoQueue.Count - 1;
+        var lastGroup = chamberAmmoQueue[lastIndex];
+        int ammoId = lastGroup.ammoId;
+        
+        lastGroup.count--;
+        if (lastGroup.count <= 0)
+        {
+            chamberAmmoQueue.RemoveAt(lastIndex);
+        }
+        else
+        {
+            chamberAmmoQueue[lastIndex] = lastGroup;
+        }
+
         serverLastFireTime = Time.time;
 
         if (bulletPrefab == null) return;
@@ -235,18 +328,21 @@ public class Shooter : NetworkBehaviour
         direction.Normalize();
         if (direction == Vector3.zero) direction = transform.forward;
 
+        AmmoData shotData = DataManager.Instance.GetData<AmmoData>("Ammo", ammoId);
+        if (shotData == null) shotData = currentAmmoData;
+
         float randomSpread = UnityEngine.Random.Range(-currentSpread * 0.5f, currentSpread * 0.5f);
         direction = Quaternion.Euler(0, randomSpread, 0) * direction;
 
-        currentSpread += currentGunData.spreadPerShot;
-        if (currentSpread > currentGunData.maxSpread)
+        currentSpread += shotData.spreadPerShot;
+        if (currentSpread > shotData.maxSpread)
         {
-            currentSpread = currentGunData.maxSpread;
+            currentSpread = shotData.maxSpread;
         }
 
         Vector3 spawnPosition = firePoint != null ? firePoint.position : transform.position;
-        int shots = currentGunData.bulletsPerShot > 0 ? currentGunData.bulletsPerShot : 1;
-        float degree = currentGunData.bulletDegree;
+        int shots = shotData.bulletsPerShot > 0 ? shotData.bulletsPerShot : 1;
+        float degree = shotData.bulletDegree;
 
         if (shots == 1)
         {
@@ -256,13 +352,13 @@ public class Shooter : NetworkBehaviour
             // 네트워크 오브젝트 스폰
             newBullet.GetComponent<NetworkObject>()?.Spawn();
 
-            if (currentGunData.shotType == 2)
+            if (currentShotType == 2)
             {
-                newBullet.InitializeParabola(targetPosition, gameObject, currentGunData.ExplosionRadius);
+                newBullet.InitializeParabola(targetPosition, gameObject, shotData.ExplosionRadius, shotData);
             }
             else
             {
-                newBullet.Initialize(direction, gameObject);
+                newBullet.Initialize(direction, gameObject, shotData);
             }
         }
         else
@@ -281,13 +377,13 @@ public class Shooter : NetworkBehaviour
                 // 네트워크 오브젝트 스폰
                 newBullet.GetComponent<NetworkObject>()?.Spawn();
 
-                if (currentGunData.shotType == 2)
+                if (currentShotType == 2)
                 {
-                    newBullet.InitializeParabola(targetPosition, gameObject, currentGunData.ExplosionRadius);
+                    newBullet.InitializeParabola(targetPosition, gameObject, shotData.ExplosionRadius, shotData);
                 }
                 else
                 {
-                    newBullet.Initialize(rotatedDir, gameObject);
+                    newBullet.Initialize(rotatedDir, gameObject, shotData);
                 }
             }
         }
@@ -296,38 +392,69 @@ public class Shooter : NetworkBehaviour
     /// <summary>
     /// 재장전을 수행합니다.
     /// </summary>
-    public void Reload()
+    public void Reload(int amount = -1, int ammoId = -1)
     {
         if (!IsOwner) return;
-        if (currentGunData == null || isReloading) return;
+        if (currentAmmoData == null || isReloading) return;
 
-        CmdReloadServerRpc();
+        CmdReloadServerRpc(amount, ammoId);
     }
 
     [ServerRpc]
-    private void CmdReloadServerRpc()
+    private void CmdReloadServerRpc(int amount, int ammoId)
     {
-        if (currentGunData != null)
+        if (currentAmmoData != null)
         {
-            CurrentAmmo = currentGunData.maxAmmo;
+            chamberAmmoQueue.Clear();
+            if (ammoId == -1) ammoId = currentAmmoData.id;
+            int loadAmount = (amount <= 0) ? currentAmmoData.maxAmmo : amount;
+            InternalLoadAmmo(loadAmount, ammoId);
         }
     }
 
     /// <summary>
-    /// 지정된 수량만큼 재장전합니다. (샷건 등 1발씩 장전용)
+    /// 특수 탄환 또는 일반 탄환을 지정된 수량만큼 장전합니다.
     /// </summary>
-    public void ReloadAmount(int amount)
+    public void LoadAmmo(int amount, int ammoId = -1)
     {
         if (!IsOwner) return;
-        if (currentGunData == null || isReloading) return;
+        if (currentAmmoData == null || isReloading) return;
 
-        CmdReloadAmountServerRpc(amount);
+        CmdLoadAmmoServerRpc(amount, ammoId);
     }
 
     [ServerRpc]
-    private void CmdReloadAmountServerRpc(int amount)
+    private void CmdLoadAmmoServerRpc(int amount, int ammoId)
     {
-        CurrentAmmo = Mathf.Min(CurrentAmmo + amount, currentGunData.maxAmmo);
+        InternalLoadAmmo(amount, ammoId);
+    }
+
+    private void InternalLoadAmmo(int amount, int ammoId)
+    {
+        if (!IsServer) return;
+        if (currentAmmoData == null) return;
+        
+        if (ammoId == -1) ammoId = currentAmmoData.id;
+        
+        int currentTotal = CurrentAmmo;
+        int spaceLeft = currentAmmoData.maxAmmo - currentTotal;
+        if (spaceLeft <= 0) return;
+        
+        int loadCount = Mathf.Min(amount, spaceLeft);
+        if (loadCount <= 0) return;
+        
+        if (chamberAmmoQueue.Count > 0)
+        {
+            var lastGroup = chamberAmmoQueue[chamberAmmoQueue.Count - 1];
+            if (lastGroup.ammoId == ammoId)
+            {
+                lastGroup.count += loadCount;
+                chamberAmmoQueue[chamberAmmoQueue.Count - 1] = lastGroup;
+                return;
+            }
+        }
+        
+        chamberAmmoQueue.Add(new AmmoGroup { ammoId = ammoId, count = loadCount });
     }
 
     /// <summary>

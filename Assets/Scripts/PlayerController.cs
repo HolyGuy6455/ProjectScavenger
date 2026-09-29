@@ -530,16 +530,16 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
             Vector3 inputDir = new Vector3(_joystickRotationInput.x, 0f, _joystickRotationInput.y).normalized;
             float inputMag = Mathf.Clamp01(_joystickRotationInput.magnitude);
 
-            // GunData에서 탐색 범위와 각도를 가져옵니다. 총이 없으면 기본값을 사용합니다.
+            // AmmoData에서 탐색 범위와 각도를 가져옵니다. 총이 없으면 기본값을 사용합니다.
             float searchRadius = 15f;
             float searchAngle = 90f;
             int shotType = 1;
             float explosionRadius = 5f;
-            if (shooter != null && shooter.CurrentGunData != null) {
-                searchRadius = shooter.CurrentGunData.SearchRadius;
-                searchAngle = shooter.CurrentGunData.SearchAngle;
-                shotType = shooter.CurrentGunData.shotType;
-                explosionRadius = shooter.CurrentGunData.ExplosionRadius;
+            if (shooter != null && shooter.CurrentAmmoData != null) {
+                searchRadius = shooter.CurrentAmmoData.SearchRadius;
+                searchAngle = shooter.CurrentAmmoData.SearchAngle;
+                shotType = shooter.currentShotType;
+                explosionRadius = shooter.CurrentAmmoData.ExplosionRadius;
             }
 
             if (shotType == 1 || shotType == 0) // 직사형 (기본값)

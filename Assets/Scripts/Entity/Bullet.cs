@@ -39,9 +39,16 @@ public class Bullet : NetworkBehaviour
     private float parabolaTime;
     private Vector3 previousPos;
     private float explosionRadius;
+    private int specialBuffId = 0;
 
-    public void Initialize(Vector3 direction, GameObject shooter)
+    public void Initialize(Vector3 direction, GameObject shooter, AmmoData ammoData = null)
     {
+        if (ammoData != null)
+        {
+            this.damage = ammoData.damage;
+            this.specialBuffId = ammoData.specialBuff;
+        }
+
         moveDirection = direction.normalized;
         attacker = shooter;
         isParabola = false;
@@ -54,8 +61,14 @@ public class Bullet : NetworkBehaviour
     /// <summary>
     /// 목표 지점을 향해 포물선으로 날아가도록 초기화합니다.
     /// </summary>
-    public void InitializeParabola(Vector3 targetPos, GameObject shooter, float expRadius)
+    public void InitializeParabola(Vector3 targetPos, GameObject shooter, float expRadius, AmmoData ammoData = null)
     {
+        if (ammoData != null)
+        {
+            this.damage = ammoData.damage;
+            this.specialBuffId = ammoData.specialBuff;
+        }
+
         targetPosition = targetPos;
         startPosition = transform.position;
         previousPos = startPosition;
@@ -140,7 +153,7 @@ public class Bullet : NetworkBehaviour
                 if (damageable != null)
                 {
                     // 거리에 따른 데미지 감소 로직 등을 추후 추가할 수 있습니다.
-                    DamageInfo damageInfo = new DamageInfo(damage, attacker, col.transform.position, hitNormal);
+                    DamageInfo damageInfo = new DamageInfo(damage, attacker, col.transform.position, hitNormal, specialBuffId);
                     damageable.TakeDamage(damageInfo);
                 }
             }
@@ -154,7 +167,7 @@ public class Bullet : NetworkBehaviour
                 
                 if (damageable != null)
                 {
-                    DamageInfo damageInfo = new DamageInfo(damage, attacker, hitPoint, hitNormal);
+                    DamageInfo damageInfo = new DamageInfo(damage, attacker, hitPoint, hitNormal, specialBuffId);
                     damageable.TakeDamage(damageInfo);
                 }
             }

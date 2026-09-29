@@ -9,12 +9,14 @@ public struct DamageInfo
     public GameObject attacker;
     public Vector3 hitPoint;
     public Vector3 hitNormal;
+    public int buffId;
 
-    public DamageInfo(float amount, GameObject attacker = null, Vector3 hitPoint = default, Vector3 hitNormal = default)
+    public DamageInfo(float amount, GameObject attacker = null, Vector3 hitPoint = default, Vector3 hitNormal = default, int buffId = 0)
     {
         this.amount = amount;
         this.attacker = attacker;
         this.hitPoint = hitPoint;
         this.hitNormal = hitNormal;
+        this.buffId = buffId;
     }
 }

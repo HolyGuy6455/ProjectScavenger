@@ -113,9 +113,9 @@ public class DataConverterEditor : EditorWindow
         GUILayout.Label("Data Converter", EditorStyles.boldLabel);
         GUILayout.Space(10);
 
-        if (GUILayout.Button("Convert Gun Data"))
+        if (GUILayout.Button("Convert Ammo Data"))
         {
-            ConvertData<GunDataList, GunData>("Gun", "Scavenger - Gun.tsv");
+            ConvertData<AmmoDataList, AmmoData>("Ammo", "Scavenger - Ammo.tsv");
         }
 
         if (GUILayout.Button("Convert Item Data"))
@@ -176,7 +176,7 @@ public class DataConverterEditor : EditorWindow
 
     private void ConvertAllData()
     {
-        ConvertData<GunDataList, GunData>("Gun", "Scavenger - Gun.tsv");
+        ConvertData<AmmoDataList, AmmoData>("Ammo", "Scavenger - Ammo.tsv");
         ConvertData<ItemDataList, ItemData>("Item", "Scavenger - Item.tsv");
         ConvertData<CharDataList, CharData>("Char", "Scavenger - Char.tsv");
         ConvertData<CharLvlDataList, CharLvlData>("CharLvl", "Scavenger - CharLvl.tsv");

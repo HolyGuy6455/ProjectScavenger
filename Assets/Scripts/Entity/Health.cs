@@ -80,6 +80,22 @@ public class Health : NetworkBehaviour, IDamageable
 
         CurrentHealth -= damageInfo.amount;
         
+        // 특수 디버프/버프 적용
+        if (damageInfo.buffId > 0)
+        {
+            BuffController buffController = GetComponent<BuffController>();
+            if (buffController != null)
+            {
+                int slotIndex = 0;
+                PlayerController pc = GetComponent<PlayerController>();
+                if (pc != null)
+                {
+                    slotIndex = pc.ActiveSlotIndex;
+                }
+                buffController.AddBuffServerRpc(slotIndex, damageInfo.buffId);
+            }
+        }
+
         // 서버측 이벤트 호출
         OnDamageTaken?.Invoke(damageInfo);
         onDamageTakenUnityEvent?.Invoke(damageInfo);

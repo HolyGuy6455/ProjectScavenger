@@ -142,9 +142,46 @@ public class SkillInstance
             case 5: // 재장전 (전체)
                 if (playerShooter != null) playerShooter.TriggerReloadAnimation();
                 break;
-            case 6: // 1발 재장전
-                if (playerShooter != null) playerShooter.ReloadAmount(1);
+            case 6: // 재장전 (1발)
+                if (playerShooter != null)
+                {
+                    playerShooter.TriggerReloadAnimation();
+                    int amount = (funcValues != null && funcValues.Length > 0 && funcValues[0] > 0) ? (int)funcValues[0] : 1;
+                    int ammoId = (funcValues != null && funcValues.Length > 1) ? (int)funcValues[1] : -1;
+                    playerShooter.LoadAmmo(amount, ammoId);
+                }
                 break;
+        }
+    }
+
+    private void RefundChamberAmmo(Shooter playerShooter)
+    {
+        if (playerShooter == null || playerShooter.chamberAmmoQueue == null) return;
+        if (PlayerSkillController.Instance == null || CharacterStateManager.Instance == null || CharacterStateManager.Instance.CurrentCharData == null) return;
+
+        CharacterState state = PlayerSkillController.Instance.GetSkillState(CharacterStateManager.Instance.CurrentCharData.id);
+        if (state == null || state.normalSkills == null) return;
+
+        foreach (var group in playerShooter.chamberAmmoQueue)
+        {
+            if (group.ammoId <= 0) continue;
+
+            // 이 ammoId를 장전하는 스킬을 찾아서 remainAmount 환불
+            foreach (var skill in state.normalSkills)
+            {
+                if (skill == null) continue;
+                var data = skill.Data;
+                
+                // 장전 스킬(func 5 또는 6)이면서 해당 ammoId를 장전하는 스킬인지 확인
+                if (data != null && (data.func == 5 || data.func == 6) && data.funcValue != null && data.funcValue.Length > 1)
+                {
+                    if ((int)data.funcValue[1] == group.ammoId)
+                    {
+                        skill.remainAmount += group.count;
+                        break; // 해당 묶음 환불 완료, 다음 묶음으로
+                    }
+                }
+            }
         }
     }
 
@@ -157,14 +194,20 @@ public class SkillInstance
             case 5: // 재장전 (전체)
                 if (playerShooter != null)
                 {
+                    int ammoId = (funcValues != null && funcValues.Length > 1) ? (int)funcValues[1] : -1;
+                    int amount = (funcValues != null && funcValues.Length > 0 && funcValues[0] > 0) ? (int)funcValues[0] : -1;
                     var data = Data;
-                    if (data != null && data.remainCostType == RemainCostType.Ammo && playerShooter.CurrentGunData != null && remainAmount < playerShooter.CurrentGunData.maxAmmo)
+                    
+                    // 챔버를 비우기 전에 남은 탄환들을 각각의 스킬 인벤토리로 환불
+                    RefundChamberAmmo(playerShooter);
+                    
+                    if (data != null && data.remainCostType == RemainCostType.Ammo && playerShooter.CurrentAmmoData != null && remainAmount < playerShooter.CurrentAmmoData.maxAmmo)
                     {
-                        playerShooter.ReloadAmount(remainAmount);
+                        playerShooter.Reload(remainAmount, ammoId);
                     }
                     else
                     {
-                        playerShooter.Reload();
+                        playerShooter.Reload(amount, ammoId);
                     }
                 }
                 break;
@@ -181,7 +224,7 @@ public class SkillInstance
         {
             case 5: // 재장전 (전체)
             case 6: // 재장전 (1발)
-                return playerShooter.CurrentGunData != null && playerShooter.CurrentAmmo < playerShooter.CurrentGunData.maxAmmo;
+                return playerShooter.CurrentAmmoData != null && playerShooter.CurrentAmmo < playerShooter.CurrentAmmoData.maxAmmo;
             default:
                 return true;
         }
@@ -255,9 +298,9 @@ public class SkillInstance
                 remainAmount -= 1;
                 break;
             case RemainCostType.Ammo:
-                if (shooter != null && shooter.CurrentGunData != null)
+                if (shooter != null && shooter.CurrentAmmoData != null)
                 {
-                    int ammoCost = shooter.CurrentGunData.maxAmmo - shooter.CurrentAmmo;
+                    int ammoCost = shooter.CurrentAmmoData.maxAmmo - shooter.CurrentAmmo;
                     if (ammoCost > 0)
                     {
                         remainAmount -= ammoCost;

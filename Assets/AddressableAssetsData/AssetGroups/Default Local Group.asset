@@ -35,13 +35,13 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 21ab4398afbd02941afe0742394205ee
-    m_Address: UltimateSkillData
+  - m_GUID: 5ad5affc8ba56c84e83cdd862fe172f5
+    m_Address: AmmoData
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 543351cc98223d94e9cb166d46768396
-    m_Address: GunData
+  - m_GUID: 5afafd4a862cc0141afc3bded7962f25
+    m_Address: CharLvlData
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

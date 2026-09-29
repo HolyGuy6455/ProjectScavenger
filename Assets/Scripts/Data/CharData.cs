@@ -20,9 +20,10 @@ public class CharData : IData
     public string resourceStand;
     public CharRole role;
     public int[] defaultSkills;
-
-    [System.NonSerialized]
-    public List<int> gun = new List<int>();
+    public string gunName;
+    public int shotType;
+    public string resourceSilhouette;
+    public int defaultAmmoId;
 
     [System.NonSerialized]
     public List<int> skill = new List<int>();
@@ -37,7 +38,7 @@ public class CharData : IData
 
     public int GetGunId(int index = 0)
     {
-        return gun != null && gun.Count > index ? gun[index] : 0;
+        return defaultAmmoId;
     }
 }
 

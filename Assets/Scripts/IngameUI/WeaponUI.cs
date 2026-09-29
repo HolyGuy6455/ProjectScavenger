@@ -31,10 +31,10 @@ public class WeaponUI : MonoBehaviour
             shooter.OnWeaponChanged += HandleWeaponChanged;
             
             // 현재 장착중인 무기가 있다면 UI 즉시 갱신
-            if (shooter.CurrentGunData != null)
+            if (shooter.CurrentAmmoData != null)
             {
-                HandleWeaponChanged(shooter.CurrentGunData);
-                HandleAmmoChanged(shooter.CurrentAmmo, shooter.CurrentGunData.maxAmmo);
+                HandleWeaponChanged(shooter.CurrentAmmoData);
+                HandleAmmoChanged(shooter.CurrentAmmo, shooter.CurrentAmmoData.maxAmmo);
             }
         }
     }
@@ -63,10 +63,10 @@ public class WeaponUI : MonoBehaviour
             shooter.OnAmmoChanged += HandleAmmoChanged;
             shooter.OnWeaponChanged += HandleWeaponChanged;
             
-            if (shooter.CurrentGunData != null)
+            if (shooter.CurrentAmmoData != null)
             {
-                HandleWeaponChanged(shooter.CurrentGunData);
-                HandleAmmoChanged(shooter.CurrentAmmo, shooter.CurrentGunData.maxAmmo);
+                HandleWeaponChanged(shooter.CurrentAmmoData);
+                HandleAmmoChanged(shooter.CurrentAmmo, shooter.CurrentAmmoData.maxAmmo);
             }
         }
     }
@@ -91,7 +91,7 @@ public class WeaponUI : MonoBehaviour
         }
     }
 
-    private void HandleWeaponChanged(GunData gunData)
+    private void HandleWeaponChanged(AmmoData gunData)
     {
         if (gunData == null) return;
     }

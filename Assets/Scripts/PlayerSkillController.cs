@@ -97,14 +97,16 @@ public class PlayerSkillController : NetworkBehaviour
         Shooter playerShooter = GetShooter();
 
         // 1. 기존 캐릭터의 현재 무기 잔탄 저장
-        if (currentCharData != null && playerShooter != null && playerShooter.CurrentGunData != null)
+        if (currentCharData != null && playerShooter != null && playerShooter.CurrentAmmoData != null)
         {
             CharacterState oldState = GetSkillState(currentCharData.id);
             if (oldState != null)
             {
-                int ammoGroup = playerShooter.CurrentGunData.gunGroup > 0 ? playerShooter.CurrentGunData.gunGroup : playerShooter.CurrentGunData.id;
-                oldState.gunAmmo[ammoGroup] = playerShooter.CurrentAmmo;
-                oldState.lastGunId = playerShooter.CurrentGunData.id;
+                oldState.savedChamber.Clear();
+                foreach (var group in playerShooter.chamberAmmoQueue)
+                {
+                    oldState.savedChamber.Add(group);
+                }
             }
         }
 
@@ -117,21 +119,13 @@ public class PlayerSkillController : NetworkBehaviour
             CharacterState newState = GetSkillState(charData.id);
             if (newState != null)
             {
-                int gunToEquip = newState.lastGunId > 0 ? newState.lastGunId : charData.GetGunId(0);
+                int gunToEquip = charData.GetGunId(0);
                 
-                GunData assignedGun = DataManager.Instance.GetData<GunData>("Gun", gunToEquip);
+                AmmoData assignedGun = DataManager.Instance.GetData<AmmoData>("Ammo", gunToEquip);
                 if (assignedGun != null)
                 {
-                    // 3. 잔탄 복원 (없으면 EquipGun 내부에서 maxAmmo로 설정됨)
-                    int ammoGroup = assignedGun.gunGroup > 0 ? assignedGun.gunGroup : assignedGun.id;
-                    int savedAmmo = -1;
-                    if (newState.gunAmmo.TryGetValue(ammoGroup, out int val))
-                    {
-                        savedAmmo = val;
-                    }
-
-                    playerShooter.EquipGun(assignedGun, savedAmmo);
-                    newState.lastGunId = gunToEquip; // 초기화 시 기록
+                    playerShooter.currentShotType = charData.shotType;
+                    playerShooter.EquipGunWithChamber(assignedGun, newState.savedChamber.ToArray());
                 }
             }
         }
@@ -262,88 +256,4 @@ public class PlayerSkillController : NetworkBehaviour
         skill.ReleaseUse(GetShooter());
     }
 
-    private void SwitchWeapon(Shooter playerShooter, int gunId)
-    {
-        if (gunId <= 0 || currentCharData == null) return;
-
-        GunData newGun = DataManager.Instance.GetData<GunData>("Gun", gunId);
-        if (newGun != null && (playerShooter.CurrentGunData == null || playerShooter.CurrentGunData.id != newGun.id))
-        {
-            CharacterState state = GetSkillState(currentCharData.id);
-
-            // 현재 무기 잔탄 저장
-            if (playerShooter.CurrentGunData != null && state != null)
-            {
-                int oldAmmoGroup = playerShooter.CurrentGunData.gunGroup > 0 ? playerShooter.CurrentGunData.gunGroup : playerShooter.CurrentGunData.id;
-                state.gunAmmo[oldAmmoGroup] = playerShooter.CurrentAmmo;
-            }
-
-            int restoredAmmo = -1;
-            if (state != null)
-            {
-                int newAmmoGroup = newGun.gunGroup > 0 ? newGun.gunGroup : newGun.id;
-                if (state.gunAmmo.TryGetValue(newAmmoGroup, out int savedAmmo))
-                {
-                    restoredAmmo = savedAmmo;
-                }
-            }
-
-            if (playerShooter != null) playerShooter.EquipGun(newGun, restoredAmmo);
-            
-            // 새 무기 상태 업데이트
-            if (state != null)
-            {
-                state.lastGunId = gunId;
-            }
-            
-            Debug.Log($"[PlayerSkillController] 무기 전환: ID {newGun.id}");
-        }
-    }
-
-    private void ToggleWeapon(Shooter playerShooter)
-    {
-        if (playerShooter == null || playerShooter.CurrentGunData == null || currentCharData.gun == null || currentCharData.gun.Count == 0) return;
-
-        int currentGunId = playerShooter.CurrentGunData.id;
-        int nextGunId = 0;
-
-        for (int i = 0; i < currentCharData.gun.Count; i++)
-        {
-            if (currentCharData.gun[i] == currentGunId)
-            {
-                // Find next non-zero gun
-                for (int j = 1; j <= currentCharData.gun.Count; j++)
-                {
-                    int checkIndex = (i + j) % currentCharData.gun.Count;
-                    if (currentCharData.gun[checkIndex] != 0)
-                    {
-                        nextGunId = currentCharData.gun[checkIndex];
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-
-        if (nextGunId == 0) // Fallback
-        {
-            foreach (int g in currentCharData.gun)
-            {
-                if (g != 0)
-                {
-                    nextGunId = g;
-                    break;
-                }
-            }
-        }
-
-        if (nextGunId > 0 && nextGunId != currentGunId)
-        {
-            SwitchWeapon(playerShooter, nextGunId);
-        }
-        else
-        {
-            Debug.Log("[PlayerSkillController] 교체할 다음 무기가 없습니다.");
-        }
-    }
 }

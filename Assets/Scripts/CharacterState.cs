@@ -17,8 +17,7 @@ public class CharacterState
     public float currentThirst;
     public float maxThirst;
     
-    public int lastGunId;
-    public System.Collections.Generic.Dictionary<int, int> gunAmmo = new System.Collections.Generic.Dictionary<int, int>();
+    public System.Collections.Generic.List<AmmoGroup> savedChamber = new System.Collections.Generic.List<AmmoGroup>();
 
     public CharacterState(CharData charData)
     {

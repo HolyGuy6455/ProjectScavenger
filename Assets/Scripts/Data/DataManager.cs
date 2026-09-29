@@ -44,7 +44,7 @@ public class DataManager : MonoBehaviour
         IsDataLoaded = false;
 
         // 어드레서블 주소(Address)는 에디터에서 세팅한 주소(보통 확장자가 빠진 이름)를 사용합니다.
-        yield return StartCoroutine(LoadDataAsync<GunDataList, GunData>("Gun", "GunData"));
+        yield return StartCoroutine(LoadDataAsync<AmmoDataList, AmmoData>("Ammo", "AmmoData"));
         yield return StartCoroutine(LoadDataAsync<ItemDataList, ItemData>("Item", "ItemData"));
         yield return StartCoroutine(LoadDataAsync<CharDataList, CharData>("Char", "CharData"));
         yield return StartCoroutine(LoadDataAsync<SkillDataList, SkillData>("Skill", "SkillData"));
@@ -64,14 +64,6 @@ public class DataManager : MonoBehaviour
 
     private void InjectDataRelations()
     {
-        // 1. 총기 데이터 주입
-        foreach (var gunData in GetAllData<GunData>("Gun"))
-        {
-            var charData = GetData<CharData>("Char", gunData.charId);
-            if (charData != null)
-                charData.gun.Add(gunData.id);
-        }
-
         // 2. 스킬 데이터 주입
         foreach (var skillData in GetAllData<SkillData>("Skill"))
         {
