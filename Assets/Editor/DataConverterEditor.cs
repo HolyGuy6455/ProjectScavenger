@@ -264,6 +264,8 @@ public class DataConverterEditor : EditorWindow
         string savePath = Path.Combine(dataPath, "MobGroupData.bytes");
         File.WriteAllBytes(savePath, encryptedBytes);
         
+        UnityEditor.AssetDatabase.Refresh();
+        
         Debug.Log($"Successfully converted {dataList.Groups.Count} Mob Groups to: {savePath}");
     }
 

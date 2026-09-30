@@ -97,6 +97,13 @@ public class MobSpawner : MonoBehaviour
         Quaternion spawnRot = Quaternion.Euler(info.LocalEulerAngles);
         
         GameObject spawnedMob = Instantiate(prefab, spawnPos, spawnRot);
+        
+        // 이름 기반 탐색의 불안정성을 해결하기 위해, 스포너가 명시적으로 고유 ID를 주입합니다.
+        EnemyController enemyController = spawnedMob.GetComponent<EnemyController>();
+        if (enemyController != null)
+        {
+            enemyController.SetEnemyId(enemyData.id);
+        }
 
         // 4. NGO 네트워크 스폰 호출 (서버가 클라이언트들에게 동기화 지시)
         NetworkObject netObj = spawnedMob.GetComponent<NetworkObject>();

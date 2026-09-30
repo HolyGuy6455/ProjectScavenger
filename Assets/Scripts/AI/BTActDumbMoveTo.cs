@@ -1,8 +1,10 @@
 using System;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 
 [Serializable]
-public class BTActMoveTo : BTActionLogic
+[MovedFrom(true, null, null, "BTActMoveTo")]
+public class BTActDumbMoveTo : BTActionLogic
 {
     public string targetPositionKey = "";
     public string mySelfKey = "";
@@ -21,20 +23,20 @@ public class BTActMoveTo : BTActionLogic
 
         if (targetPosProp == null || mySelfProp == null)
         {
-            Debug.LogError("[BTActMoveTo] Blackboard keys are missing or of incorrect type.");
+            Debug.LogError("[BTActDumbMoveTo] Blackboard keys are missing or of incorrect type.");
             return NodeState.FAILURE;
         }
 
         if (mySelfProp.value == null)
         {
-            Debug.LogError("[BTActMoveTo] MySelf GameObject is null.");
+            Debug.LogError("[BTActDumbMoveTo] MySelf GameObject is null.");
             return NodeState.FAILURE;
         }
 
         var movement = mySelfProp.value.GetComponent<EntityMovement>();
         if (movement == null)
         {
-            Debug.LogError("[BTActMoveTo] EntityMovement component is missing on MySelf GameObject.");
+            Debug.LogError("[BTActDumbMoveTo] EntityMovement component is missing on MySelf GameObject.");
             return NodeState.FAILURE;
         }
 
@@ -53,7 +55,7 @@ public class BTActMoveTo : BTActionLogic
             return NodeState.SUCCESS;
         }
 
-        movement.MoveTo(targetPos);
+        movement.DumbMoveTo(targetPos);
         return NodeState.RUNNING;
     }
 }
