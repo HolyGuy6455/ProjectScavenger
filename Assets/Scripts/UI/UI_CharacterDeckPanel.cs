@@ -90,8 +90,6 @@ namespace Scavenger.UI
         private void OnConfirmButtonClicked()
         {
             if (confirmButton != null) confirmButton.interactable = false;
-
-            List<int> selectedList = new List<int>(_selectedCharIds);
             
             if (UserDataManager.Instance != null)
             {
@@ -103,7 +101,7 @@ namespace Scavenger.UI
                     {
                         if (Scavenger.Network.NetworkPartyManager.Instance != null)
                         {
-                            Scavenger.Network.NetworkPartyManager.Instance.SendSelectedCharacters(selectedList);
+                            Scavenger.Network.NetworkPartyManager.Instance.RefreshDeck();
                         }
                         
                         if (OutGameUIManager.Instance != null)

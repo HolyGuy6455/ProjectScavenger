@@ -232,15 +232,15 @@ namespace Scavenger.Network
             }
         }
 
-        // 선택한 4개의 캐릭터를 서버로 전송하는 함수
-        public async void SendSelectedCharacters(List<int> charIds)
+        // 서버에 저장된 덱 정보를 다시 읽어와 파티에 반영하도록 요청하는 함수
+        public async void RefreshDeck()
         {
             if (_hubConnection != null && _hubConnection.State == HubConnectionState.Connected)
             {
                 try
                 {
-                    await _hubConnection.InvokeAsync("SelectCharacters", charIds);
-                    Debug.Log($"[Party] 캐릭터 선택 정보 전송 완료");
+                    await _hubConnection.InvokeAsync("RefreshDeck");
+                    Debug.Log($"[Party] 덱 갱신 요청 완료");
                 }
                 catch (Exception ex)
                 {
