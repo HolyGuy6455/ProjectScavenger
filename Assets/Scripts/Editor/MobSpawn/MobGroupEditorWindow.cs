@@ -159,13 +159,16 @@ public class MobGroupEditorWindow : EditorWindow
             return;
         }
 
+        // Authoring 컴포넌트의 설정된 반지름을 AreaSize로 동기화하여 저장
+        editAreaSize = authoringRoot.radius;
+
         MobGroupData newData = new MobGroupData
         {
             GroupID = editGroupID,
             Memo = editMemo,
             Category = editCategory,
             DangerLevel = editDangerLevel,
-            AreaSize = editAreaSize,
+            AreaSize = authoringRoot.radius,
             SpawnInfos = new List<MobSpawnInfo>()
         };
 
@@ -204,28 +207,42 @@ public class MobGroupEditorWindow : EditorWindow
             return;
         }
 
+        // 씬의 Authoring 컴포넌트 반지름을 로드한 데이터의 AreaSize로 맞춤
+        authoringRoot.radius = data.AreaSize;
+
         // Clear existing children
         for (int i = authoringRoot.transform.childCount - 1; i >= 0; i--)
         {
             DestroyImmediate(authoringRoot.transform.GetChild(i).gameObject);
         }
 
-        // Spawn dummies
+        // Spawn dummies or actual prefabs
         foreach (var info in data.SpawnInfos)
         {
-            GameObject dummy = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            dummy.name = info.MobID;
-            dummy.transform.SetParent(authoringRoot.transform);
-            dummy.transform.localPosition = info.LocalPosition;
-            dummy.transform.localEulerAngles = info.LocalEulerAngles;
-            
-            // Give it a slightly different material/color to denote it's a dummy
-            if (dummy.GetComponent<Renderer>() != null)
+            GameObject spawnObj = null;
+
+            // 1. 같은 이름의 프리팹 검색 시도
+            string[] guids = AssetDatabase.FindAssets($"{info.MobID} t:Prefab");
+            if (guids.Length > 0)
             {
-                // Note: creating new material in editor script can leak, but fine for simple dummy visualization if handled carefully.
-                // Using sharedMaterial directly might modify the default material, let's just use MaterialPropertyBlock or avoid changing color.
-                // Actually, just let it be a default cube to be safe.
+                string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                if (prefab != null)
+                {
+                    spawnObj = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                }
             }
+
+            // 2. 프리팹을 못 찾았으면 기본 큐브로 대체
+            if (spawnObj == null)
+            {
+                spawnObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            }
+
+            spawnObj.name = info.MobID;
+            spawnObj.transform.SetParent(authoringRoot.transform);
+            spawnObj.transform.localPosition = info.LocalPosition;
+            spawnObj.transform.localEulerAngles = info.LocalEulerAngles;
         }
 
         authoringRoot.CurrentLoadedGroupID = data.GroupID;
