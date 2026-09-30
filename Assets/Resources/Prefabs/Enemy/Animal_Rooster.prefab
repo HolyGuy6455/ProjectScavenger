@@ -1,0 +1,597 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1226158920139408715
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2642994461546607760}
+  - component: {fileID: 1689849328117939962}
+  - component: {fileID: 2579797649231569894}
+  - component: {fileID: 921170705562535445}
+  - component: {fileID: 6938468987314919654}
+  - component: {fileID: 273470665313786195}
+  - component: {fileID: 3943734319083790122}
+  - component: {fileID: 6165863499796765}
+  - component: {fileID: 987877342655545458}
+  - component: {fileID: -441924815081087731}
+  - component: {fileID: -1046192047035558958}
+  - component: {fileID: -2828825535598470214}
+  - component: {fileID: 8129919451694431373}
+  - component: {fileID: 6806687160027039604}
+  - component: {fileID: 9139889782215874437}
+  m_Layer: 7
+  m_Name: Animal_Rooster
+  m_TagString: Enemy
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2642994461546607760
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -4.54, y: 1, z: -3.03}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5624433393453338399}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &1689849328117939962
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Mesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!136 &2579797649231569894
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &921170705562535445
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 5
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 0
+--- !u!114 &6938468987314919654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 3725456425
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 0
+--- !u!114 &273470665313786195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b43764360b850f44a9fc9b4affde7b22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+  maxHealth: 100
+  destroyOnDeath: 0
+  destroyDelay: 0
+  NetworkCurrentHealth:
+    m_InternalValue: 100
+  onHealthChangedUnityEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onDamageTakenUnityEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onHealedUnityEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeathUnityEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 273470665313786195}
+        m_TargetAssemblyTypeName: Health, Assembly-CSharp
+        m_MethodName: DeathAnimationDone
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &3943734319083790122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 905f14e2cba7d204792077dcc4567a00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthBarSpawner
+  healthBarPrefab: {fileID: 4891483080001246480, guid: 0977d689f837f9e4fa1b0ab55cc36be0, type: 3}
+  parentTransform: {fileID: 0}
+  targetHealth: {fileID: 273470665313786195}
+  targetTransform: {fileID: 2642994461546607760}
+  worldOffset: {x: 0, y: 2, z: 0}
+  useCustomColor: 1
+  barColor: {r: 1, g: 0.3537736, b: 0.47748908, a: 1}
+--- !u!114 &6165863499796765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba93fb69bb17b5c41a602fb0358664eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIBrain
+  rootNode:
+    rid: 3558163897100009576
+  blackboard:
+  - rid: 3558163897100009580
+  - rid: 3558163961612599431
+  - rid: 3558163897100009581
+  - rid: 3558163961612599389
+  - rid: 3558163961612599432
+  - rid: 3558163961612599399
+  - rid: 2871842154846355669
+  - rid: 2871842154846355613
+  - rid: 2395884903716880500
+  - rid: 2395884903716880502
+  references:
+    version: 2
+    RefIds:
+    - rid: 2395884903716880500
+      type: {class: BTSharedBoolean, ns: , asm: Assembly-CSharp}
+      data:
+        key: IsAttacked
+        value: 0
+    - rid: 2395884903716880502
+      type: {class: BTSharedGameObject, ns: , asm: Assembly-CSharp}
+      data:
+        key: Attacker
+        value: {fileID: 0}
+    - rid: 2395884903716880503
+      type: {class: BTActCheckBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsAttacked
+        successIfTrue: 1
+    - rid: 2395884903716880504
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: BTActCalculateFleePos
+        nodeMemo: 
+        logic:
+          rid: 2395884903716880505
+    - rid: 2395884903716880505
+      type: {class: BTActCalculateFleePos, ns: , asm: Assembly-CSharp}
+      data:
+        mySelfKey: MySelf
+        attackerKey: Attacker
+        outFleePosKey: Target/Pos
+        fleeDistance: 10
+    - rid: 2395884903716880506
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: BTActWait
+        nodeMemo: 
+        logic:
+          rid: 2395884903716880507
+    - rid: 2395884903716880507
+      type: {class: BTActWait, ns: , asm: Assembly-CSharp}
+      data:
+        waitTimeMin: 5
+        waitTimeMax: 5
+    - rid: 2871842154846355613
+      type: {class: BTSharedBoolean, ns: , asm: Assembly-CSharp}
+      data:
+        key: 'HasLastPos '
+        value: 0
+    - rid: 2871842154846355632
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: BTActSetBool
+        nodeMemo: 
+        logic:
+          rid: 2871842154846355633
+    - rid: 2871842154846355633
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsAttacked
+        setToValue: 0
+    - rid: 2871842154846355634
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: BTActDumbMoveTo
+        nodeMemo: 
+        logic:
+          rid: 2871842154846355635
+    - rid: 2871842154846355635
+      type: {class: BTActDumbMoveTo, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Target/Pos
+        mySelfKey: MySelf
+    - rid: 2871842154846355668
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: BTActDistanceCheck
+        nodeMemo: 
+        logic:
+          rid: 2871842154846355670
+    - rid: 2871842154846355669
+      type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
+      data:
+        key: Start/InRange
+        value: 2
+    - rid: 2871842154846355670
+      type: {class: BTActDistanceCheck, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Start/Pos
+        mySelfKey: MySelf
+        distanceKey: Start/InRange
+        successIfCloser: 0
+    - rid: 2871842154846355671
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: BTActMoveTo
+        nodeMemo: 
+        logic:
+          rid: 2871842154846355672
+    - rid: 2871842154846355672
+      type: {class: BTActDumbMoveTo, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Start/Pos
+        mySelfKey: MySelf
+    - rid: 3558163897100009576
+      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC120\uD0DD"
+        nodeMemo: 
+        children:
+        - rid: 3558163961612599390
+        - rid: 3558163961612599379
+        - rid: 3558163961612599374
+    - rid: 3558163897100009580
+      type: {class: BTSharedGameObject, ns: , asm: Assembly-CSharp}
+      data:
+        key: MySelf
+        value: {fileID: 1226158920139408715}
+    - rid: 3558163897100009581
+      type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
+      data:
+        key: Target/Dist
+        value: 5
+    - rid: 3558163961612599374
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uD3C9\uC2DC \uC0C1\uD0DC (\uC548\uC804\uD568)"
+        nodeMemo: 
+        children:
+        - rid: 2871842154846355668
+        - rid: 2871842154846355671
+    - rid: 3558163961612599379
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uB3C4\uB9DD\uCE58\uAE30"
+        nodeMemo: 
+        children:
+        - rid: 3558163961612599380
+        - rid: 2395884903716880504
+        - rid: 2871842154846355634
+        - rid: 2395884903716880506
+        - rid: 2871842154846355632
+    - rid: 3558163961612599380
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: IsAttacked?
+        nodeMemo: 
+        logic:
+          rid: 2395884903716880503
+    - rid: 3558163961612599389
+      type: {class: BTSharedBoolean, ns: , asm: Assembly-CSharp}
+      data:
+        key: IsInitialized
+        value: 0
+    - rid: 3558163961612599390
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uCD08\uAE30\uD654"
+        nodeMemo: 
+        children:
+        - rid: 3558163961612599391
+        - rid: 3558163961612599393
+        - rid: 3558163961612599395
+    - rid: 3558163961612599391
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: isItInitialized?
+        nodeMemo: 
+        logic:
+          rid: 3558163961612599392
+    - rid: 3558163961612599392
+      type: {class: BTActCheckBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsInitialized
+        successIfTrue: 0
+    - rid: 3558163961612599393
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: SetStartPos
+        nodeMemo: 
+        logic:
+          rid: 3558163961612599394
+    - rid: 3558163961612599394
+      type: {class: BTActCopyPos, ns: , asm: Assembly-CSharp}
+      data:
+        targetObjectKey: MySelf
+        outPositionKey: Start/Pos
+    - rid: 3558163961612599395
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: SetInitailized
+        nodeMemo: 
+        logic:
+          rid: 3558163961612599398
+    - rid: 3558163961612599398
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsInitialized
+        setToValue: 1
+    - rid: 3558163961612599399
+      type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
+      data:
+        key: Start/Dist
+        value: 20
+    - rid: 3558163961612599431
+      type: {class: BTSharedVector3, ns: , asm: Assembly-CSharp}
+      data:
+        key: Target/Pos
+        value: {x: 0, y: 0, z: 0}
+    - rid: 3558163961612599432
+      type: {class: BTSharedVector3, ns: , asm: Assembly-CSharp}
+      data:
+        key: Start/Pos
+        value: {x: 0, y: 0, z: 0}
+--- !u!114 &987877342655545458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dee19920f0c951e499a1e66156efd787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EntityMovement
+  moveSpeed: 4
+  rotationSpeed: 720
+  stoppingDistance: 0.1
+--- !u!114 &-441924815081087731
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Components::Unity.Netcode.Components.NetworkTransform
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
+--- !u!114 &-1046192047035558958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Components::Unity.Netcode.Components.NetworkRigidbody
+--- !u!114 &-2828825535598470214
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e2d3c79cf9b0b44c8a4cb773395bb65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootDropper
+--- !u!114 &8129919451694431373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e460bbecbd7a2c4bb17698d73b58e32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimator
+--- !u!114 &6806687160027039604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 935df63b07486184694625ec2484a3c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  mobID: 2
+--- !u!114 &9139889782215874437
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a5f694712eaa3f4a864f86d8bc4b002, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIBrainDamageLinker
+  attackedBoolKey: IsAttacked
+  attackerObjKey: Attacker
+--- !u!1001 &5297562618735421684
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2642994461546607760}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: f570f9a01f3de8f41868f0a256eb648e, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f570f9a01f3de8f41868f0a256eb648e, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f570f9a01f3de8f41868f0a256eb648e, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f570f9a01f3de8f41868f0a256eb648e, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f570f9a01f3de8f41868f0a256eb648e, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f570f9a01f3de8f41868f0a256eb648e, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f570f9a01f3de8f41868f0a256eb648e, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f570f9a01f3de8f41868f0a256eb648e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f570f9a01f3de8f41868f0a256eb648e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: f570f9a01f3de8f41868f0a256eb648e, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: f570f9a01f3de8f41868f0a256eb648e, type: 3}
+      propertyPath: m_Name
+      value: Rooster_walk
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f570f9a01f3de8f41868f0a256eb648e, type: 3}
+--- !u!4 &5624433393453338399 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f570f9a01f3de8f41868f0a256eb648e, type: 3}
+  m_PrefabInstance: {fileID: 5297562618735421684}
+  m_PrefabAsset: {fileID: 0}

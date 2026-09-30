@@ -218,6 +218,26 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
+    - rid: 2395884903716880526
+      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Player/LastPos
+        mySelfKey: MySelf
+    - rid: 2395884903716880527
+      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Start/Pos
+        mySelfKey: MySelf
+    - rid: 2395884903716880528
+      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Player/LastPos
+        mySelfKey: MySelf
+    - rid: 2395884903716880529
+      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Start/Pos
+        mySelfKey: MySelf
     - rid: 2871842154846355598
       type: {class: BTAction, ns: , asm: Assembly-CSharp}
       data:
@@ -331,15 +351,10 @@ MonoBehaviour:
     - rid: 2871842154846355634
       type: {class: BTAction, ns: , asm: Assembly-CSharp}
       data:
-        nodeName: BTActMoveTo
+        nodeName: BTActSmartMoveTo
         nodeMemo: 
         logic:
-          rid: 2871842154846355635
-    - rid: 2871842154846355635
-      type: {class: BTActMoveTo, ns: , asm: Assembly-CSharp}
-      data:
-        targetPositionKey: Start/Pos
-        mySelfKey: MySelf
+          rid: 2395884903716880527
     - rid: 2871842154846355636
       type: {class: BTSelector, ns: , asm: Assembly-CSharp}
       data:
@@ -394,15 +409,10 @@ MonoBehaviour:
     - rid: 2871842154846355643
       type: {class: BTAction, ns: , asm: Assembly-CSharp}
       data:
-        nodeName: Move To Player
+        nodeName: BTActSmartMoveTo
         nodeMemo: 
         logic:
-          rid: 2871842154846355644
-    - rid: 2871842154846355644
-      type: {class: BTActMoveTo, ns: , asm: Assembly-CSharp}
-      data:
-        targetPositionKey: Player/LastPos
-        mySelfKey: MySelf
+          rid: 2395884903716880526
     - rid: 2871842154846355645
       type: {class: BTSequence, ns: , asm: Assembly-CSharp}
       data:
@@ -506,15 +516,10 @@ MonoBehaviour:
     - rid: 2871842154846355663
       type: {class: BTAction, ns: , asm: Assembly-CSharp}
       data:
-        nodeName: Move To
+        nodeName: BTActSmartMoveTo
         nodeMemo: 
         logic:
-          rid: 2871842154846355664
-    - rid: 2871842154846355664
-      type: {class: BTActMoveTo, ns: , asm: Assembly-CSharp}
-      data:
-        targetPositionKey: Player/LastPos
-        mySelfKey: MySelf
+          rid: 2395884903716880528
     - rid: 2871842154846355668
       type: {class: BTAction, ns: , asm: Assembly-CSharp}
       data:
@@ -537,15 +542,10 @@ MonoBehaviour:
     - rid: 2871842154846355671
       type: {class: BTAction, ns: , asm: Assembly-CSharp}
       data:
-        nodeName: BTActMoveTo
+        nodeName: BTActSmartMoveTo
         nodeMemo: 
         logic:
-          rid: 2871842154846355672
-    - rid: 2871842154846355672
-      type: {class: BTActMoveTo, ns: , asm: Assembly-CSharp}
-      data:
-        targetPositionKey: Start/Pos
-        mySelfKey: MySelf
+          rid: 2395884903716880529
     - rid: 3558163897100009576
       type: {class: BTSelector, ns: , asm: Assembly-CSharp}
       data:
@@ -814,6 +814,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 935df63b07486184694625ec2484a3c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  mobID: 1
 --- !u!1001 &8017058706133763299
 PrefabInstance:
   m_ObjectHideFlags: 0

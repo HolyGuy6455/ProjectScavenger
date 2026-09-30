@@ -1,0 +1,74 @@
+{
+    "GroupID": "Anim_002_5Roosters",
+    "Memo": "",
+    "Category": 1,
+    "DangerLevel": 1,
+    "AreaSize": 3.0,
+    "SpawnInfos": [
+        {
+            "MobID": "Animal_Rooster",
+            "LocalPosition": {
+                "x": 0.25,
+                "y": 0.5,
+                "z": 1.1699999570846558
+            },
+            "LocalEulerAngles": {
+                "x": 0.0,
+                "y": 13.2847318649292,
+                "z": 0.0
+            }
+        },
+        {
+            "MobID": "Animal_Rooster",
+            "LocalPosition": {
+                "x": -1.2799999713897706,
+                "y": 0.5,
+                "z": 0.5799999833106995
+            },
+            "LocalEulerAngles": {
+                "x": 0.0,
+                "y": 301.7339172363281,
+                "z": 0.0
+            }
+        },
+        {
+            "MobID": "Animal_Rooster",
+            "LocalPosition": {
+                "x": -1.159999966621399,
+                "y": 0.5,
+                "z": -1.0499999523162842
+            },
+            "LocalEulerAngles": {
+                "x": 0.0,
+                "y": 229.62730407714845,
+                "z": 0.0
+            }
+        },
+        {
+            "MobID": "Animal_Rooster",
+            "LocalPosition": {
+                "x": 0.6200000047683716,
+                "y": 0.5,
+                "z": -1.2799999713897706
+            },
+            "LocalEulerAngles": {
+                "x": 0.0,
+                "y": 153.5297393798828,
+                "z": 0.0
+            }
+        },
+        {
+            "MobID": "Animal_Rooster",
+            "LocalPosition": {
+                "x": 1.4600000381469727,
+                "y": 0.5,
+                "z": 0.009999999776482582
+            },
+            "LocalEulerAngles": {
+                "x": 3.7343573922044018e-7,
+                "y": 89.49349975585938,
+                "z": 6.911230698847248e-9
+            }
+        }
+    ]
+}
