@@ -406,6 +406,16 @@ public class DataConverterEditor : EditorWindow
                             }
                             field.SetValue(obj, arr);
                         }
+                        else if (field.FieldType == typeof(string[]))
+                        {
+                            var parts = val.Split(',');
+                            string[] arr = new string[parts.Length];
+                            for (int p = 0; p < parts.Length; p++)
+                            {
+                                arr[p] = parts[p].Trim();
+                            }
+                            field.SetValue(obj, arr);
+                        }
                     }
                     catch (System.Exception e)
                     {
