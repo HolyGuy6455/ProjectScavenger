@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public class LootData : IData
 {
     public int id;
-    public int[] item;
+    public string[] itemRef;
     public int[] chance;
 
     public int GetId()

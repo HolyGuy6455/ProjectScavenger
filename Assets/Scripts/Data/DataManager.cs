@@ -238,4 +238,15 @@ public class DataManager : MonoBehaviour
         }
         return list;
     }
+
+    /// <summary>
+    /// 지정한 태그를 포함하고 있는 모든 아이템(ItemData) 리스트를 반환합니다.
+    /// </summary>
+    public List<ItemData> GetItemsByTag(string tag)
+    {
+        List<ItemData> allItems = GetAllData<ItemData>("Item");
+        if (allItems == null) return new List<ItemData>();
+
+        return allItems.Where(item => item.tags != null && item.tags.Contains(tag)).ToList();
+    }
 }

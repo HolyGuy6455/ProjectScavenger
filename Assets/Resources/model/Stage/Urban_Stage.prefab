@@ -464,7 +464,6 @@ GameObject:
   - component: {fileID: 7628441279534886086}
   - component: {fileID: 2476349732700570643}
   - component: {fileID: 4054976028611292424}
-  - component: {fileID: 7557228272617522385}
   m_Layer: 0
   m_Name: Academy_Roof_Trim2
   m_TagString: Untagged
@@ -566,20 +565,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -1140928259027954350, guid: cc9e0800151831f40becde37ac767a4e, type: 3}
---- !u!114 &7557228272617522385
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 381428876702711237}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4fce39a19a71ca469a6202fdc75e756, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.Environment.ObscurableCeiling
-  fadeSpeed: 5
-  targetAlpha: 0.2
 --- !u!1 &393808977857032052
 GameObject:
   m_ObjectHideFlags: 0
@@ -1737,7 +1722,6 @@ GameObject:
   - component: {fileID: 287596234017048160}
   - component: {fileID: 8483722255885577745}
   - component: {fileID: 4154589525421292061}
-  - component: {fileID: 2114020599497386728}
   m_Layer: 0
   m_Name: Academy_Roof_Trim1
   m_TagString: Untagged
@@ -1839,20 +1823,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4404015809594783433, guid: cc9e0800151831f40becde37ac767a4e, type: 3}
---- !u!114 &2114020599497386728
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 784930447513789212}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4fce39a19a71ca469a6202fdc75e756, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.Environment.ObscurableCeiling
-  fadeSpeed: 5
-  targetAlpha: 0.2
 --- !u!1 &802342642530148314
 GameObject:
   m_ObjectHideFlags: 0
@@ -10040,7 +10010,6 @@ GameObject:
   - component: {fileID: 3053464347070685172}
   - component: {fileID: 4338113792893364460}
   - component: {fileID: 7162303633112851240}
-  - component: {fileID: 7220563648572937914}
   m_Layer: 0
   m_Name: Academy_Wall_Top
   m_TagString: Untagged
@@ -10142,20 +10111,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -6894285239800949652, guid: cc9e0800151831f40becde37ac767a4e, type: 3}
---- !u!114 &7220563648572937914
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5097484211758935970}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e4fce39a19a71ca469a6202fdc75e756, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.Environment.ObscurableCeiling
-  fadeSpeed: 5
-  targetAlpha: 0.2
 --- !u!1 &5129879611388106371
 GameObject:
   m_ObjectHideFlags: 0

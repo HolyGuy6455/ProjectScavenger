@@ -86,7 +86,7 @@ public class SkillLevelUpPopup : MonoBehaviour
                         if (!string.IsNullOrEmpty(itemData.uiResource))
                         {
                             string itemIconPath = System.IO.Path.GetFileNameWithoutExtension(itemData.uiResource);
-                            itemIcon = Resources.Load<Sprite>($"item/{itemIconPath}");
+                            itemIcon = Resources.Load<Sprite>($"Items/{itemIconPath}");
                             if (itemIcon == null) itemIcon = Resources.Load<Sprite>(itemIconPath);
                         }
                     }

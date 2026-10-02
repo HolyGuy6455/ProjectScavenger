@@ -596,7 +596,7 @@ GameObject:
   - component: {fileID: 1228738453}
   - component: {fileID: 1228738455}
   m_Layer: 0
-  m_Name: NetworkManager
+  m_Name: AuthManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

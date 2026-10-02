@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.Netcode;
 
-public class ItemInstanceManager : MonoBehaviour
+public class ItemInstanceManager : NetworkBehaviour
 {
     public static ItemInstanceManager Instance { get; private set; }
 
@@ -73,9 +74,11 @@ public class ItemInstanceManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 맵(월드) 상에 공용 FieldItem 프리팹을 생성합니다.
+    /// 맵(월드) 상에 공용 FieldItem 프리팹을 생성합니다. 
+    /// 클라이언트에서 호출 시 자동으로 서버에 생성을 요청(ServerRpc)합니다.
+    /// 주의: 클라이언트가 호출했을 경우 반환값은 즉시 획득할 수 없으므로 null을 반환합니다.
     /// </summary>
-    public GameObject SpawnFieldItem(int itemId, int quantity, Vector3 position)
+    public GameObject SpawnFieldItem(int itemId, int quantity, Vector3 position, Vector3 throwVelocity = default, ulong parentNetworkId = 0)
     {
         if (fieldItemPrefab == null)
         {
@@ -83,7 +86,48 @@ public class ItemInstanceManager : MonoBehaviour
             return null;
         }
 
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+        {
+            // 서버(호스트)라면 즉시 스폰
+            return SpawnFieldItemInternal(itemId, quantity, position, throwVelocity, parentNetworkId);
+        }
+        else if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsClient)
+        {
+            // 클라이언트라면 서버에 요청
+            RequestSpawnFieldItemServerRpc(itemId, quantity, position, throwVelocity, parentNetworkId);
+            return null;
+        }
+
+        return null;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestSpawnFieldItemServerRpc(int itemId, int quantity, Vector3 position, Vector3 throwVelocity, ulong parentNetworkId)
+    {
+        SpawnFieldItemInternal(itemId, quantity, position, throwVelocity, parentNetworkId);
+    }
+
+    private GameObject SpawnFieldItemInternal(int itemId, int quantity, Vector3 position, Vector3 throwVelocity, ulong parentNetworkId)
+    {
         GameObject spawned = Instantiate(fieldItemPrefab, position, Quaternion.identity);
+        
+        NetworkObject netObj = spawned.GetComponent<NetworkObject>();
+        if (netObj != null)
+        {
+            // 스폰 전에 부모를 미리 지정합니다.
+            if (parentNetworkId != 0 && NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(parentNetworkId, out var parentNetObj))
+            {
+                spawned.transform.SetParent(parentNetObj.transform, true);
+            }
+            else
+            {
+                // 별도의 부모가 없다면, 하이라키 정리를 위해 자신(ItemInstanceManager)을 부모로 설정합니다.
+                spawned.transform.SetParent(this.transform, true);
+            }
+
+            netObj.Spawn();
+        }
+
         FieldItem fieldItem = spawned.GetComponent<FieldItem>();
         if (fieldItem != null)
         {
@@ -92,6 +136,12 @@ public class ItemInstanceManager : MonoBehaviour
         else
         {
             Debug.LogWarning($"[ItemInstanceManager] 스폰된 프리팹 '{fieldItemPrefab.name}'에 FieldItem 컴포넌트가 없습니다.");
+        }
+        
+        if (throwVelocity != default)
+        {
+            Rigidbody rb = spawned.GetComponent<Rigidbody>();
+            if (rb != null) rb.AddForce(throwVelocity, ForceMode.Impulse);
         }
         
         return spawned;

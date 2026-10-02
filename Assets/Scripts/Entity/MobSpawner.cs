@@ -109,6 +109,17 @@ public class MobSpawner : MonoBehaviour
         NetworkObject netObj = spawnedMob.GetComponent<NetworkObject>();
         if (netObj != null)
         {
+            // 스폰 전에 부모를 미리 설정하면, NGO가 알아서 부모-자식 관계를 동기화한 채로 스폰합니다.
+            GameObject mobContainer = GameObject.Find("MobContainer");
+            if (mobContainer != null)
+            {
+                NetworkObject containerNetObj = mobContainer.GetComponent<NetworkObject>();
+                if (containerNetObj != null && containerNetObj.IsSpawned)
+                {
+                    spawnedMob.transform.SetParent(containerNetObj.transform, true);
+                }
+            }
+
             netObj.Spawn(true); // true = destroyWithScene
         }
         else

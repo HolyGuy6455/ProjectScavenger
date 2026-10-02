@@ -14,7 +14,7 @@ public class ItemData : IData
     public int id;
     public string name;
     public string uiResource;
-    public string tag;
+    public string[] tags;
     public int maxQuantity;
     public int[] func;
     public int[] value;
