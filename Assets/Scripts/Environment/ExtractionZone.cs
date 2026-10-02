@@ -63,7 +63,13 @@ namespace Scavenger.Environment
         private void CheckExtractionState()
         {
             bool isOffline = NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening || !IsSpawned;
-            int requiredPlayers = isOffline ? 1 : NetworkManager.Singleton.ConnectedClientsIds.Count;
+            
+            // 요구 플레이어 수를 생존자 기준으로 가져옵니다. 0명 이하일 경우 1로 고정하여 예외 처리
+            int requiredPlayers = 1;
+            if (Scavenger.Manager.GameFlowManager.Instance != null)
+            {
+                requiredPlayers = Mathf.Max(1, Scavenger.Manager.GameFlowManager.Instance.GetAlivePlayersCount());
+            }
             
             if (playersInZone.Count > 0 && playersInZone.Count >= requiredPlayers)
             {
@@ -83,7 +89,12 @@ namespace Scavenger.Environment
                 }
                 else
                 {
-                    isExtractingLocal = true;
+                    if (!isExtractingLocal)
+                    {
+                        isExtractingLocal = true;
+                        if (Scavenger.Manager.GameFlowManager.Instance != null)
+                            Scavenger.Manager.GameFlowManager.Instance.NotifyExtractionState(this, true);
+                    }
                 }
             }
             else
@@ -100,14 +111,65 @@ namespace Scavenger.Environment
                 }
                 else
                 {
-                    isExtractingLocal = false;
+                    if (isExtractingLocal)
+                    {
+                        isExtractingLocal = false;
+                        if (Scavenger.Manager.GameFlowManager.Instance != null)
+                            Scavenger.Manager.GameFlowManager.Instance.NotifyExtractionState(this, false);
+                    }
                     localExtractionTimer = 0f;
                 }
             }
         }
 
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            isExtracting.OnValueChanged += HandleExtractionStateChanged;
+            if (isExtracting.Value && Scavenger.Manager.GameFlowManager.Instance != null)
+            {
+                Scavenger.Manager.GameFlowManager.Instance.NotifyExtractionState(this, true);
+            }
+            
+            if (Scavenger.Manager.GameFlowManager.Instance != null)
+            {
+                Scavenger.Manager.GameFlowManager.Instance.OnAlivePlayersChanged += HandleAlivePlayersChanged;
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            isExtracting.OnValueChanged -= HandleExtractionStateChanged;
+            if (Scavenger.Manager.GameFlowManager.Instance != null)
+            {
+                Scavenger.Manager.GameFlowManager.Instance.NotifyExtractionState(this, false);
+                Scavenger.Manager.GameFlowManager.Instance.OnAlivePlayersChanged -= HandleAlivePlayersChanged;
+            }
+        }
+
+        private void HandleAlivePlayersChanged(int aliveCount)
+        {
+            // 누군가 죽거나 나가서 생존자 수가 변하면 탈출 조건을 다시 평가합니다.
+            if (IsServer || (!IsSpawned && (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)))
+            {
+                CheckExtractionState();
+            }
+        }
+
+        private void HandleExtractionStateChanged(bool previousValue, bool newValue)
+        {
+            if (Scavenger.Manager.GameFlowManager.Instance != null)
+            {
+                Scavenger.Manager.GameFlowManager.Instance.NotifyExtractionState(this, newValue);
+            }
+        }
+
         private bool isExtractingLocal = false;
         private float localExtractionTimer = 0f;
+
+        public bool IsExtracting => (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening && IsSpawned) ? isExtracting.Value : isExtractingLocal;
+        public float CurrentExtractionTimer => (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening && IsSpawned) ? currentExtractionTimer.Value : localExtractionTimer;
 
         private void Update()
         {

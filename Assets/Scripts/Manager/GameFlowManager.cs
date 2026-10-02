@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.Netcode;
 
 namespace Scavenger.Manager
 {
@@ -20,6 +21,19 @@ namespace Scavenger.Manager
 
         public event Action<GameResultState> OnGameEnded;
 
+        // 탈출 UI 연동을 위한 이벤트
+        public event Action<Scavenger.Environment.ExtractionZone, bool> OnExtractionStateChanged;
+        
+        // 생존자 수 변경 이벤트 (탈출 구역 재평가용)
+        public event Action<int> OnAlivePlayersChanged;
+
+        private int _lastAlivePlayersCount = -1;
+
+        public void NotifyExtractionState(Scavenger.Environment.ExtractionZone zone, bool isExtracting)
+        {
+            OnExtractionStateChanged?.Invoke(zone, isExtracting);
+        }
+
         private void Awake()
         {
             if (Instance == null)
@@ -30,6 +44,51 @@ namespace Scavenger.Manager
             {
                 Destroy(gameObject);
             }
+        }
+
+        private void Update()
+        {
+            // 방장(서버) 혹은 오프라인 상태에서만 생존자 수 추적
+            bool isOffline = NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening;
+            if (isOffline || NetworkManager.Singleton.IsServer)
+            {
+                int currentAlive = GetAlivePlayersCount();
+                if (currentAlive != _lastAlivePlayersCount)
+                {
+                    _lastAlivePlayersCount = currentAlive;
+                    OnAlivePlayersChanged?.Invoke(currentAlive);
+
+                    if (currentAlive == 0 && CurrentState == GameResultState.None)
+                    {
+                        OnGameFailed();
+                    }
+                }
+            }
+        }
+
+        public int GetAlivePlayersCount()
+        {
+            bool isOffline = NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening;
+            if (isOffline)
+            {
+                if (PlayerController.LocalInstance != null)
+                {
+                    var health = PlayerController.LocalInstance.GetComponent<Health>();
+                    return (health != null && !health.IsDead) ? 1 : 0;
+                }
+                return 1;
+            }
+
+            int count = 0;
+            foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+            {
+                if (client.PlayerObject != null)
+                {
+                    var health = client.PlayerObject.GetComponent<Health>();
+                    if (health != null && !health.IsDead) count++;
+                }
+            }
+            return count;
         }
 
         public void OnGameCleared()
