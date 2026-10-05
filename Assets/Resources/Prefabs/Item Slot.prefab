@@ -850,6 +850,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InventorySlot
   iconImage: {fileID: 6891449067499914148}
   quantityText: {fileID: 6147647116396187473}
+  quantityParentObj: {fileID: 580519299249029538}
   slotButton: {fileID: 3456887803076014980}
 --- !u!222 &5031090202628005982
 CanvasRenderer:

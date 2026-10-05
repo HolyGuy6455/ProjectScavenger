@@ -8,6 +8,7 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 {
     [SerializeField] private Image iconImage;
     [SerializeField] private TextMeshProUGUI quantityText;
+    [SerializeField] private GameObject quantityParentObj;
     [SerializeField] private Button slotButton;
     // [SerializeField] private Animator animator;
     // [SerializeField] private Image bgImage;
@@ -56,6 +57,10 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
             {
                 quantityText.text = "";
             }
+            if (quantityParentObj != null)
+            {
+                quantityParentObj.SetActive(false);
+            }
             SetSelected(false);
             return;
         }
@@ -97,11 +102,13 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         if (showType == QuantityShowType.None)
         {
             quantityText.text = "";
+            if (quantityParentObj != null) quantityParentObj.SetActive(false);
         }
         else if (showType == QuantityShowType.Integer)
         {
             quantityText.text = item.Quantity.ToString();
             quantityText.color = Color.white;
+            if (quantityParentObj != null) quantityParentObj.SetActive(item.Quantity > 1);
         }
         else if (showType == QuantityShowType.Fraction)
         {
@@ -109,6 +116,7 @@ public class InventorySlot : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
             int max = item.Data.maxQuantity;
             
             quantityText.text = $"{quantity} / {max}";
+            if (quantityParentObj != null) quantityParentObj.SetActive(true);
 
             if (max > 0)
             {

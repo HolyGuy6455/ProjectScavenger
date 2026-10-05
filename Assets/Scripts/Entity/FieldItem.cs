@@ -64,7 +64,7 @@ public class FieldItem : NetworkBehaviour
         }
     }
 
-    private void TryPickup(int targetSlotIndex = -1)
+    public void TryPickup(int targetSlotIndex = -1)
     {
         PlayerInventory inventory = PlayerInventory.Instance;
         if (inventory != null)

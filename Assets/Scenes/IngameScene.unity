@@ -311,6 +311,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: IngamePauseUI
       objectReference: {fileID: 0}
+    - target: {fileID: 242902444981689710, guid: e390aa6250a24ed4eb2a8b117a6718dd, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 825761585732663682, guid: e390aa6250a24ed4eb2a8b117a6718dd, type: 3}
       propertyPath: m_SizeDelta.y
       value: 18
@@ -321,7 +325,7 @@ PrefabInstance:
       objectReference: {fileID: 966040913}
     - target: {fileID: 1728214949674697063, guid: e390aa6250a24ed4eb2a8b117a6718dd, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 949.5876
       objectReference: {fileID: 0}
     - target: {fileID: 3644364938554589131, guid: e390aa6250a24ed4eb2a8b117a6718dd, type: 3}
       propertyPath: m_SizeDelta.x
@@ -776,6 +780,59 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 3503181666617751901, guid: 3910f37baec396c46af66b8aeb05c02c, type: 3}
   m_PrefabInstance: {fileID: 531564751}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &535133565
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 535133567}
+  - component: {fileID: 535133566}
+  m_Layer: 0
+  m_Name: ItemContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &535133566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 535133565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 1635519666
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+--- !u!4 &535133567
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 535133565}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -31.59982, y: -26.02522, z: -15.4496}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &540583025
 GameObject:
   m_ObjectHideFlags: 0
@@ -1233,6 +1290,7 @@ GameObject:
   - component: {fileID: 940697209}
   - component: {fileID: 940697210}
   - component: {fileID: 940697211}
+  - component: {fileID: 940697213}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1349,6 +1407,18 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &940697213
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 940697202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cede7925c32dddb4282fceed2a5c2e67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MobManager
 --- !u!1 &966040913 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5190469020220521252, guid: e390aa6250a24ed4eb2a8b117a6718dd, type: 3}
@@ -2507,3 +2577,4 @@ SceneRoots:
   - {fileID: 649551434}
   - {fileID: 540583028}
   - {fileID: 1766753874}
+  - {fileID: 535133567}
