@@ -171,7 +171,7 @@ MonoBehaviour:
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
-  AutoObjectParentSync: 0
+  AutoObjectParentSync: 1
 --- !u!114 &273470665313786195
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -298,7 +298,7 @@ MonoBehaviour:
         logic:
           rid: 3558163961612599378
     - rid: 3558163961612599378
-      type: {class: BTActMoveTo, ns: , asm: Assembly-CSharp}
+      type: {class: BTActDumbMoveTo, ns: , asm: Assembly-CSharp}
       data:
         targetPositionKey: Target/Pos
         mySelfKey: MySelf
@@ -420,6 +420,7 @@ MonoBehaviour:
         outGameObjectKey: Player/GameObj
         findClosest: 0
         mySelfKey: MySelf
+        returnRunningIfNotFound: 1
     - rid: 3558163961612599426
       type: {class: BTAction, ns: , asm: Assembly-CSharp}
       data:
@@ -567,7 +568,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e2d3c79cf9b0b44c8a4cb773395bb65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootDropper
-  lootTableId: 2
 --- !u!1 &5709097323135882136
 GameObject:
   m_ObjectHideFlags: 0

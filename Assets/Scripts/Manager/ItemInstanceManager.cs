@@ -6,6 +6,8 @@ public class ItemInstanceManager : NetworkBehaviour
 {
     public static ItemInstanceManager Instance { get; private set; }
 
+    private NetworkObject _itemContainerNetObj;
+
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -114,18 +116,29 @@ public class ItemInstanceManager : NetworkBehaviour
         NetworkObject netObj = spawned.GetComponent<NetworkObject>();
         if (netObj != null)
         {
-            // 스폰 전에 부모를 미리 지정합니다.
+            netObj.Spawn(true);
+
             if (parentNetworkId != 0 && NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(parentNetworkId, out var parentNetObj))
             {
-                spawned.transform.SetParent(parentNetObj.transform, true);
+                netObj.TrySetParent(parentNetObj.transform, true);
             }
             else
             {
-                // 별도의 부모가 없다면, 하이라키 정리를 위해 자신(ItemInstanceManager)을 부모로 설정합니다.
-                spawned.transform.SetParent(this.transform, true);
-            }
+                // 최적화를 위해 GameObject.Find 결과를 캐싱하여 재사용합니다.
+                if (_itemContainerNetObj == null)
+                {
+                    GameObject itemContainer = GameObject.Find("ItemContainer");
+                    if (itemContainer != null)
+                    {
+                        _itemContainerNetObj = itemContainer.GetComponent<NetworkObject>();
+                    }
+                }
 
-            netObj.Spawn();
+                if (_itemContainerNetObj != null && _itemContainerNetObj.IsSpawned)
+                {
+                    netObj.TrySetParent(_itemContainerNetObj.transform, true);
+                }
+            }
         }
 
         FieldItem fieldItem = spawned.GetComponent<FieldItem>();
