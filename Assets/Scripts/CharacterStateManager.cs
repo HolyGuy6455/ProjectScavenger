@@ -193,7 +193,21 @@ public class CharacterStateManager : MonoBehaviour
                     
                     if (isTestMode)
                     {
-                        charStates[i].SetEquippedSkills(new int[] { 1, 2, 3, 4 });
+                        string testSkillsStr = PlayerPrefs.GetString($"TestSkills_{i}", "");
+                        if (!string.IsNullOrEmpty(testSkillsStr))
+                        {
+                            string[] split = testSkillsStr.Split(',');
+                            int[] parsedSkills = new int[split.Length];
+                            for (int s = 0; s < split.Length; s++)
+                            {
+                                int.TryParse(split[s], out parsedSkills[s]);
+                            }
+                            charStates[i].SetEquippedSkills(parsedSkills);
+                        }
+                        else
+                        {
+                            charStates[i].SetEquippedSkills(new int[] { 1, 2, 3, 4 });
+                        }
                     }
                     else if (UserDataManager.Instance != null)
                     {
