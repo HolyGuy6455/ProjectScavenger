@@ -8,11 +8,22 @@ public enum QuantityShowType
     Fraction = 2
 }
 
+public enum ItemCategory
+{
+    All = 0,
+    Important = 1, // 중요
+    Food = 2,      // 음식
+    Tool = 3,      // 도구
+    Consumable = 4 // 소모품
+}
+
 [System.Serializable]
 public class ItemData : IData
 {
     public int id;
     public string name;
+    public string Desc;
+    public int category;
     public string uiResource;
     public string[] tags;
     public int maxQuantity;
@@ -22,6 +33,7 @@ public class ItemData : IData
     public int serverFunc;
     public int serverValue;
     public QuantityShowType QuantityShowType => (QuantityShowType)quantityShowType;
+    public ItemCategory Category => (ItemCategory)category;
 
     public int GetId()
     {

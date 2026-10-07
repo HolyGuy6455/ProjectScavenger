@@ -14,7 +14,8 @@ namespace Scavenger.UI
         SelectOperation,
         SelectStage,
         TrainCharacter,
-        StageInfo
+        StageInfo,
+        Storage // 계정 창고 패널 추가
     }
 
     public enum OutGamePopupType
@@ -43,6 +44,7 @@ namespace Scavenger.UI
         [SerializeField] private GameObject selectStagePanelPrefab;
         [SerializeField] private GameObject trainCharacterPanelPrefab;
         [SerializeField] private GameObject stageInfoPanelPrefab;
+        [SerializeField] private GameObject storagePanelPrefab; // 계정 창고 프리팹
 
         [Header("Popup Prefabs")]
         [SerializeField] private GameObject characterSelectPopupPrefab;
@@ -256,6 +258,7 @@ namespace Scavenger.UI
                 case OutGamePanelType.SelectStage: return selectStagePanelPrefab;
                 case OutGamePanelType.TrainCharacter: return trainCharacterPanelPrefab;
                 case OutGamePanelType.StageInfo: return stageInfoPanelPrefab;
+                case OutGamePanelType.Storage: return storagePanelPrefab;
             }
             return null;
         }
@@ -281,5 +284,6 @@ namespace Scavenger.UI
         public void OnClickGoToSelectStage() => ShowPanel(OutGamePanelType.SelectStage);
         public void OnClickGoToTrainCharacter() => ShowPanel(OutGamePanelType.TrainCharacter);
         public void OnClickGoToStageInfo() => ShowPanel(OutGamePanelType.StageInfo);
+        public void OnClickGoToStorage() => ShowPanel(OutGamePanelType.Storage);
     }
 }

@@ -680,6 +680,7 @@ MonoBehaviour:
   selectStagePanelPrefab: {fileID: 0}
   trainCharacterPanelPrefab: {fileID: 5439909724396608738, guid: 8167043b365dc6142bad6508160be01b, type: 3}
   stageInfoPanelPrefab: {fileID: 3897945546778568232, guid: f4ee5a44f24cfd040a6d4969d61d721c, type: 3}
+  storagePanelPrefab: {fileID: 4798374054230103912, guid: 58752f8bf43fe854e9f3944fffe06aef, type: 3}
   characterSelectPopupPrefab: {fileID: 963945710570392003, guid: 3e0ee28af1fccfb4587039e6aec7b7f8, type: 3}
   characterLevelUpCelebrationPopupPrefab: {fileID: 4635000736612556670, guid: 3910f37baec396c46af66b8aeb05c02c, type: 3}
   skillLevelUpCelebrationPopupPrefab: {fileID: 2957394713859618599, guid: 1108361ba3638db4e8124164dfb6ebbe, type: 3}
