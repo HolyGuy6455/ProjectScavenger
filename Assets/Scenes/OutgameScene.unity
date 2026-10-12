@@ -177,7 +177,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 607fc8cfec8c09a4eb415db4c6ff2a02, type: 3}
+  m_Sprite: {fileID: 21300000, guid: ad3546b14e0668d49bf70f39251bbbe2, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -208,7 +208,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.AspectRatioFitter
   m_AspectMode: 4
-  m_AspectRatio: 1.5625
+  m_AspectRatio: 1.1322538
 --- !u!1 &633862923
 GameObject:
   m_ObjectHideFlags: 0
