@@ -51,7 +51,9 @@ namespace Scavenger.Network
             var requestDto = new GameResultRequest
             {
                 ResultStatus = state.ToString(),
-                CollectedItems = new List<GameItemDto>()
+                StageId = 1, // TODO: Replace with actual StageId when available
+                CollectedItems = new List<GameItemDto>(),
+                KilledMonsters = new List<KilledMonsterDto>() // TODO: Replace with actual killed monsters list
             };
 
             // 인벤토리 아이템 취합
