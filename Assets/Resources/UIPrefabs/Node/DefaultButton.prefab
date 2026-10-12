@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 4452498827225944561}
   - component: {fileID: 456623333827138658}
   - component: {fileID: 188242162792850693}
-  - component: {fileID: 8779151162718895455}
   m_Layer: 0
   m_Name: DefaultButton
   m_TagString: Untagged
@@ -122,19 +121,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &8779151162718895455
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4757625836159977775}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f9d1b4722a279c04ba737a8c27ba4d4f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_NavigateButton
-  targetPanel: 1
 --- !u!1 &8512570257660369595
 GameObject:
   m_ObjectHideFlags: 0

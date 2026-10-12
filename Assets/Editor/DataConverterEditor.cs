@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
+using Scavenger.Network.DTOs;
 
 public class DataConverterEditor : EditorWindow
 {
@@ -123,6 +124,11 @@ public class DataConverterEditor : EditorWindow
             ConvertData<ItemDataList, ItemData>("Item", "Scavenger - Item.tsv");
         }
 
+        if (GUILayout.Button("Convert User Currency Data"))
+        {
+            ConvertData<UserCurrencyDataList, UserCurrencyData>("UserCurrency", "Scavenger - UserCurrency.tsv");
+        }
+
         if (GUILayout.Button("Convert Char Data"))
         {
             ConvertData<CharDataList, CharData>("Char", "Scavenger - Char.tsv");
@@ -141,6 +147,11 @@ public class DataConverterEditor : EditorWindow
         if (GUILayout.Button("Convert Level Data"))
         {
             ConvertData<LevelDataList, LevelData>("Level", "Scavenger - Level.tsv");
+        }
+
+        if (GUILayout.Button("Convert Quest Data"))
+        {
+            ConvertQuestData();
         }
 
         GUILayout.Space(20);
@@ -178,10 +189,12 @@ public class DataConverterEditor : EditorWindow
     {
         ConvertData<AmmoDataList, AmmoData>("Ammo", "Scavenger - Ammo.tsv");
         ConvertData<ItemDataList, ItemData>("Item", "Scavenger - Item.tsv");
+        ConvertData<UserCurrencyDataList, UserCurrencyData>("UserCurrency", "Scavenger - UserCurrency.tsv");
         ConvertData<CharDataList, CharData>("Char", "Scavenger - Char.tsv");
         ConvertData<CharLvlDataList, CharLvlData>("CharLvl", "Scavenger - CharLvl.tsv");
         ConvertData<LevelDataList, LevelData>("Level", "Scavenger - Level.tsv");
         ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - Skill.tsv");
+        ConvertQuestData();
 
         ConvertData<LootDataList, LootData>("Loot", "Scavenger - Loot.tsv");
         ConvertData<EnemyDataList, EnemyData>("Enemy", "Scavenger - Enemy.tsv");
@@ -210,10 +223,12 @@ public class DataConverterEditor : EditorWindow
             // Copy game items, skills, char levels, levels
             string clientJsonPath = Application.dataPath + "/Data/Json/";
             System.IO.File.Copy(clientJsonPath + "Item.json", serverResourcesPath + "Item.json", true);
+            System.IO.File.Copy(clientJsonPath + "UserCurrency.json", serverResourcesPath + "UserCurrencys.json", true);
             System.IO.File.Copy(clientJsonPath + "Skill.json", serverResourcesPath + "Skill.json", true);
             System.IO.File.Copy(clientJsonPath + "Char.json", serverResourcesPath + "Char.json", true);
             System.IO.File.Copy(clientJsonPath + "CharLvl.json", serverResourcesPath + "CharLvl.json", true);
             System.IO.File.Copy(clientJsonPath + "Level.json", serverResourcesPath + "Level.json", true);
+            System.IO.File.Copy(clientJsonPath + "Quest.json", serverResourcesPath + "Quest.json", true);
 
             Debug.Log($"[DataConverter] Master data successfully copied to server: {serverResourcesPath}");
         }
@@ -269,7 +284,164 @@ public class DataConverterEditor : EditorWindow
         Debug.Log($"Successfully converted {dataList.Groups.Count} Mob Groups to: {savePath}");
     }
 
-    private void ConvertData<TList, TData>(string dataName, string tsvFileName) 
+    private void ConvertQuestData()
+    {
+        ConvertData<QuestDataList, QuestData>("Quest", "Scavenger - Quest.tsv", ParseQuestTsv, ExportQuestJson);
+    }
+
+    private List<QuestData> ParseQuestTsv(string tsvContent)
+    {
+        var quests = new List<QuestData>();
+        string[] lines = tsvContent.Split(new[] { '\r', '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
+        if (lines.Length < 2) return quests;
+
+        string[] headers = lines[0].Split('\t');
+        var columns = new Dictionary<string, int>(System.StringComparer.OrdinalIgnoreCase);
+        var rewardSlots = new SortedSet<int>();
+        for (int i = 0; i < headers.Length; i++)
+        {
+            string header = headers[i].Trim().TrimStart('\uFEFF');
+            if (header.StartsWith("#")) continue;
+            columns[header] = i;
+            if (header.StartsWith("rewardType_", System.StringComparison.OrdinalIgnoreCase)
+                && int.TryParse(header.Substring("rewardType_".Length), out int slot) && slot > 0)
+            {
+                rewardSlots.Add(slot);
+            }
+        }
+
+        foreach (string required in new[] { "id", "name", "desc", "cycleType", "targetType", "targetId", "targetCount" })
+        {
+            if (!columns.ContainsKey(required))
+                throw new System.FormatException($"Quest TSV is missing required column '{required}'.");
+        }
+        foreach (int slot in rewardSlots)
+        {
+            if (!columns.ContainsKey($"rewardId_{slot}") || !columns.ContainsKey($"rewardItemCount_{slot}"))
+                throw new System.FormatException($"Quest TSV reward slot {slot} is missing its ID or count column.");
+        }
+
+        var ids = new HashSet<int>();
+        for (int i = 1; i < lines.Length; i++)
+        {
+            if (string.IsNullOrWhiteSpace(lines[i])) continue;
+            string[] values = lines[i].Split('\t');
+            string ReadCell(string column) => columns.TryGetValue(column, out int index) && index < values.Length
+                ? values[index].Trim() : string.Empty;
+            int ReadInt(string column)
+            {
+                string value = ReadCell(column);
+                return string.IsNullOrEmpty(value) || value == "_" ? 0
+                    : int.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
+            }
+
+            try
+            {
+                QuestCycleType cycle;
+                switch (ReadCell("cycleType").ToUpperInvariant())
+                {
+                    // The client calls one-time quests MAIN; the TSV and server call them ONCE.
+                    case "ONCE": cycle = QuestCycleType.MAIN; break;
+                    case "DAILY": cycle = QuestCycleType.DAILY; break;
+                    case "WEEKLY": cycle = QuestCycleType.WEEKLY; break;
+                    default: throw new System.FormatException($"Unknown quest cycle '{ReadCell("cycleType")}'.");
+                }
+
+                var rewards = new List<QuestReward>();
+                foreach (int slot in rewardSlots)
+                {
+                    string type = ReadCell($"rewardType_{slot}");
+                    int rewardId = ReadInt($"rewardId_{slot}");
+                    int count = ReadInt($"rewardItemCount_{slot}");
+                    if ((string.IsNullOrEmpty(type) || type == "_") && rewardId == 0 && count == 0) continue;
+                    if (string.IsNullOrEmpty(type) || type == "_" || rewardId <= 0 || count <= 0)
+                        throw new System.FormatException($"Incomplete reward in slot {slot}.");
+                    rewards.Add(new QuestReward { Type = type, Id = rewardId, Count = count });
+                }
+
+                int id = ReadInt("id");
+                if (id <= 0 || !ids.Add(id))
+                    throw new System.FormatException($"Invalid or duplicate quest ID {id}.");
+
+                quests.Add(new QuestData
+                {
+                    id = id,
+                    isComplete = ReadCell("isComplete"),
+                    Name = ReadCell("name"),
+                    Desc = ReadCell("desc"),
+                    CycleType = cycle,
+                    PreQuestId = ReadInt("preQuestId"),
+                    TargetType = ReadInt("targetType"),
+                    TargetId = ReadInt("targetId"),
+                    TargetCount = ReadInt("targetCount"),
+                    Rewards = rewards.ToArray(),
+                    Shortcut = ReadCell("shortcut"),
+                    ShortcutValue = ReadCell("shortcut_value"),
+                    StartDate = ReadCell("start_date"),
+                    EndDate = ReadCell("end_date")
+                });
+            }
+            catch (System.Exception e)
+            {
+                throw new System.FormatException($"Quest TSV row {i + 1}: {e.Message}", e);
+            }
+        }
+        return quests;
+    }
+
+    [System.Serializable]
+    private class ServerQuestData
+    {
+        public int id;
+        public string is_complete;
+        public string name;
+        public string desc;
+        public string cycleType;
+        public int preQuestId;
+        public int targetType;
+        public int targetId;
+        public int targetCount;
+        public QuestReward[] rewards;
+        public string shortcut;
+        public string shortcut_value;
+        public string start_date;
+        public string end_date;
+    }
+
+    [System.Serializable]
+    private class ServerQuestDataList
+    {
+        public List<ServerQuestData> quests = new List<ServerQuestData>();
+    }
+
+    private string ExportQuestJson(QuestDataList dataList)
+    {
+        var serverData = new ServerQuestDataList();
+        foreach (var quest in dataList.quests)
+        {
+            serverData.quests.Add(new ServerQuestData
+            {
+                id = quest.id,
+                is_complete = quest.isComplete,
+                name = quest.Name,
+                desc = quest.Desc,
+                cycleType = quest.CycleType == QuestCycleType.MAIN ? "ONCE" : quest.CycleType.ToString(),
+                preQuestId = quest.PreQuestId,
+                targetType = quest.TargetType,
+                targetId = quest.TargetId,
+                targetCount = quest.TargetCount,
+                rewards = quest.Rewards,
+                shortcut = quest.Shortcut,
+                shortcut_value = quest.ShortcutValue,
+                start_date = quest.StartDate,
+                end_date = quest.EndDate
+            });
+        }
+        return JsonUtility.ToJson(serverData);
+    }
+
+    private void ConvertData<TList, TData>(string dataName, string tsvFileName,
+        System.Func<string, List<TData>> parser = null, System.Func<TList, string> jsonExporter = null)
         where TList : IDataList<TData>, new()
         where TData : class, IData, new()
     {
@@ -282,7 +454,7 @@ public class DataConverterEditor : EditorWindow
 
         string tsvContent = File.ReadAllText(tsvPath);
         TList dataList = new TList();
-        var list = ParseTsv<TData>(tsvContent);
+        var list = parser != null ? parser(tsvContent) : ParseTsv<TData>(tsvContent);
         
         // Find the List<TData> field and set it
         var fields = typeof(TList).GetFields();
@@ -296,6 +468,7 @@ public class DataConverterEditor : EditorWindow
         }
 
         string jsonContent = JsonUtility.ToJson(dataList);
+        string exportedJson = jsonExporter != null ? jsonExporter(dataList) : jsonContent;
         byte[] encryptedBytes = CryptoUtility.Encrypt(jsonContent);
 
         // 출력 경로는 Resources_moved/Data 로 변경
@@ -311,7 +484,7 @@ public class DataConverterEditor : EditorWindow
         
         string jsonPath = Application.dataPath + "/Data/Json";
         if (!Directory.Exists(jsonPath)) Directory.CreateDirectory(jsonPath);
-        File.WriteAllText(Path.Combine(jsonPath, $"{dataName}.json"), jsonContent);
+        File.WriteAllText(Path.Combine(jsonPath, $"{dataName}.json"), exportedJson);
         
         AssetDatabase.Refresh();
         Debug.Log($"Successfully converted and encrypted {dataName}Data to: {savePath}");

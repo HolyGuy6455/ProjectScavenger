@@ -17,6 +17,7 @@ public class ItemSlotWrapper : MonoBehaviour
         if (itemIcon != null && icon != null)
         {
             itemIcon.sprite = icon;
+            itemIcon.enabled = true;
         }
 
         if (itemNameText != null)
@@ -37,6 +38,21 @@ public class ItemSlotWrapper : MonoBehaviour
             {
                 itemAmountText.color = insufficientColor;
             }
+        }
+    }
+
+    public void SetRewardData(Sprite icon, int amount)
+    {
+        if (itemIcon != null)
+        {
+            itemIcon.sprite = icon;
+            itemIcon.enabled = icon != null;
+        }
+
+        if (itemAmountText != null)
+        {
+            itemAmountText.text = amount.ToString("N0");
+            itemAmountText.color = sufficientColor;
         }
     }
 }

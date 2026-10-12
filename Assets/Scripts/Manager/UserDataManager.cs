@@ -13,11 +13,12 @@ public class UserDataManager : MonoBehaviour
     // Cached data
     public List<UserCharacterDto> OwnedCharacters { get; private set; } = new List<UserCharacterDto>();
     public int[] SelectedDeck { get; private set; } = new int[4];
-    public Dictionary<int, int> OwnedUserItems { get; private set; } = new Dictionary<int, int>();
+    public Dictionary<int, int> OwnedUserCurrencys { get; private set; } = new Dictionary<int, int>();
     public Dictionary<int, int> OwnedGameItems { get; private set; } = new Dictionary<int, int>();
 
     public event Action OnCharacterDataUpdated;
     public event Action OnItemDataUpdated;
+    public event Action OnCurrencyDataUpdated;
 
     private void Awake()
     {
@@ -125,15 +126,15 @@ public class UserDataManager : MonoBehaviour
             {
                 try
                 {
-                    var response = JsonUtility.FromJson<UserItemListResponse>(request.downloadHandler.text);
+                    var response = JsonUtility.FromJson<UserCurrencyListResponse>(request.downloadHandler.text);
                     if (response != null)
                     {
-                        OwnedUserItems.Clear();
-                        if (response.userItems != null)
+                        OwnedUserCurrencys.Clear();
+                        if (response.userCurrencys != null)
                         {
-                            foreach (var item in response.userItems)
+                            foreach (var item in response.userCurrencys)
                             {
-                                OwnedUserItems[item.itemId] = item.amount;
+                                OwnedUserCurrencys[item.itemId] = item.amount;
                             }
                         }
 
@@ -146,8 +147,11 @@ public class UserDataManager : MonoBehaviour
                             }
                         }
                         
-                        Debug.Log($"[UserDataManager] 아이템 목록 로드 성공. (UserItems: {OwnedUserItems.Count}, GameItems: {OwnedGameItems.Count})");
+                        SyncStamina(response.stamina, response.maxStamina, response.nextStaminaRecoverySeconds);
+
+                        Debug.Log($"[UserDataManager] 아이템 목록 로드 성공. (UserCurrencys: {OwnedUserCurrencys.Count}, GameItems: {OwnedGameItems.Count})");
                         OnItemDataUpdated?.Invoke();
+                        OnCurrencyDataUpdated?.Invoke();
                     }
                 }
                 catch (Exception e)
@@ -171,16 +175,16 @@ public class UserDataManager : MonoBehaviour
         return 0;
     }
 
-    public int GetUserItemAmount(int itemId)
+    public int GetUserCurrencyAmount(int itemId)
     {
-        if (OwnedUserItems.TryGetValue(itemId, out int amount))
+        if (OwnedUserCurrencys.TryGetValue(itemId, out int amount))
         {
             return amount;
         }
         return 0;
     }
 
-    public void UpdateGameItems(List<UserItemDto> updatedItems)
+    public void UpdateGameItems(List<UserCurrencyDto> updatedItems)
     {
         if (updatedItems == null || updatedItems.Count == 0) return;
 
@@ -232,4 +236,38 @@ public class UserDataManager : MonoBehaviour
             }
         }
     }
+
+    // --- 스테미너 동기화 및 로컬 계산 로직 ---
+    private int _syncedStamina;
+    private int _maxStamina = 300;
+    private int _secondsUntilNextRecoveryAtSync;
+    private System.DateTime _staminaSyncTime;
+
+    public void SyncStamina(int current, int max, int nextRecoverySeconds)
+    {
+        _syncedStamina = current;
+        _maxStamina = max;
+        _secondsUntilNextRecoveryAtSync = nextRecoverySeconds;
+        _staminaSyncTime = System.DateTime.Now;
+    }
+
+    public int GetCurrentStamina()
+    {
+        if (_syncedStamina >= _maxStamina) return _syncedStamina;
+
+        double elapsedSeconds = (System.DateTime.Now - _staminaSyncTime).TotalSeconds;
+        if (elapsedSeconds < _secondsUntilNextRecoveryAtSync)
+        {
+            return _syncedStamina;
+        }
+
+        // 첫 회복 이후 경과 시간
+        double remainingElapsed = elapsedSeconds - _secondsUntilNextRecoveryAtSync;
+        int recovered = 1 + (int)(remainingElapsed / 360.0); // 360초당 1회복
+        int current = _syncedStamina + recovered;
+        
+        return Mathf.Min(current, _maxStamina);
+    }
+
+    public int GetMaxStamina() => _maxStamina;
 }

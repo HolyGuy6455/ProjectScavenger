@@ -47,7 +47,7 @@ namespace Scavenger.Network.DTOs
     {
         public string message;
         public List<int> unlockedSkills;
-        public List<UserItemDto> updatedGameItems;
+        public List<UserCurrencyDto> updatedGameItems;
         public int[] equippedSkills;
     }
 
@@ -63,21 +63,24 @@ namespace Scavenger.Network.DTOs
     {
         public string message;
         public int level;
-        public List<UserItemDto> updatedGameItems;
+        public List<UserCurrencyDto> updatedGameItems;
     }
 
     [Serializable]
-    public class UserItemDto
+    public class UserCurrencyDto
     {
         public int itemId;
         public int amount;
     }
 
     [Serializable]
-    public class UserItemListResponse
+    public class UserCurrencyListResponse
     {
-        public List<UserItemDto> userItems;
-        public List<UserItemDto> gameItems;
+        public List<UserCurrencyDto> userCurrencys;
+        public List<UserCurrencyDto> gameItems;
+        public int stamina;
+        public int maxStamina;
+        public int nextStaminaRecoverySeconds;
     }
 
     [Serializable]

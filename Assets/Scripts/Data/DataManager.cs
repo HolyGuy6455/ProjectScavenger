@@ -46,12 +46,14 @@ public class DataManager : MonoBehaviour
         // 어드레서블 주소(Address)는 에디터에서 세팅한 주소(보통 확장자가 빠진 이름)를 사용합니다.
         yield return StartCoroutine(LoadDataAsync<AmmoDataList, AmmoData>("Ammo", "AmmoData"));
         yield return StartCoroutine(LoadDataAsync<ItemDataList, ItemData>("Item", "ItemData"));
+        yield return StartCoroutine(LoadDataAsync<UserCurrencyDataList, UserCurrencyData>("UserCurrency", "UserCurrencyData"));
         yield return StartCoroutine(LoadDataAsync<CharDataList, CharData>("Char", "CharData"));
         yield return StartCoroutine(LoadDataAsync<SkillDataList, SkillData>("Skill", "SkillData"));
         yield return StartCoroutine(LoadDataAsync<LootDataList, LootData>("Loot", "LootData"));
         yield return StartCoroutine(LoadDataAsync<EnemyDataList, EnemyData>("Enemy", "EnemyData"));
         yield return StartCoroutine(LoadDataAsync<ObstacleDataList, ObstacleData>("Obstacle", "ObstacleData"));
         yield return StartCoroutine(LoadDataAsync<LevelDataList, LevelData>("Level", "LevelData"));
+        yield return StartCoroutine(LoadDataAsync<QuestDataList, QuestData>("Quest", "QuestData"));
 
         // 몹 그룹 데이터 로드 (하나로 합쳐진 어드레서블 'MobGroupData' 파일 사용)
         yield return StartCoroutine(LoadMobGroupsAsync());
