@@ -63,6 +63,7 @@ namespace Scavenger.UI
         private OutGamePanelType _currentPanelType;
         private Dictionary<OutGamePopupType, GameObject> _cachedPopups = new Dictionary<OutGamePopupType, GameObject>();
         private Stack<GameObject> _activePopups = new Stack<GameObject>();
+        private Transform _inactivePanelRoot;
 
         private bool IsPartyScope(OutGamePanelType type)
         {
@@ -91,6 +92,11 @@ namespace Scavenger.UI
         }
 
         public void ShowPanel(OutGamePanelType panelType)
+        {
+            ShowPanel(panelType, null);
+        }
+
+        private void ShowPanel(OutGamePanelType panelType, Action<GameObject> beforeEnable)
         {
             if (panelType == OutGamePanelType.MainLobby)
             {
@@ -124,6 +130,7 @@ namespace Scavenger.UI
 
             if (_cachedPanels.TryGetValue(panelType, out GameObject cachedPanel) && cachedPanel != null)
             {
+                beforeEnable?.Invoke(cachedPanel);
                 cachedPanel.SetActive(true);
                 cachedPanel.transform.SetAsLastSibling();
             }
@@ -132,7 +139,9 @@ namespace Scavenger.UI
                 GameObject prefabToLoad = GetPanelPrefabByType(panelType);
                 if (prefabToLoad != null && canvasTransform != null)
                 {
-                    GameObject newPanel = Instantiate(prefabToLoad, canvasTransform, false);
+                    GameObject newPanel = beforeEnable != null
+                        ? InstantiatePanelInactive(prefabToLoad)
+                        : Instantiate(prefabToLoad, canvasTransform, false);
                     RectTransform rect = newPanel.GetComponent<RectTransform>();
                     if (rect != null)
                     {
@@ -140,6 +149,7 @@ namespace Scavenger.UI
                         rect.localScale = Vector3.one;
                     }
                     _cachedPanels[panelType] = newPanel;
+                    beforeEnable?.Invoke(newPanel);
                     newPanel.SetActive(true);
                     newPanel.transform.SetAsLastSibling();
                 }
@@ -151,6 +161,55 @@ namespace Scavenger.UI
             }
 
             _currentPanelType = panelType;
+        }
+
+        private GameObject InstantiatePanelInactive(GameObject prefab)
+        {
+            if (_inactivePanelRoot == null)
+            {
+                var root = new GameObject("InactivePanelRoot");
+                root.transform.SetParent(canvasTransform, false);
+                root.SetActive(false);
+                _inactivePanelRoot = root.transform;
+            }
+
+            // 활성 프리팹도 OnEnable이 실행되기 전에 초기값을 전달할 수 있게 합니다.
+            GameObject panel = Instantiate(prefab, _inactivePanelRoot, false);
+            panel.SetActive(false);
+            panel.transform.SetParent(canvasTransform, false);
+            return panel;
+        }
+
+        public void GoToQuestShortcut(string shortcut, string shortcutValue)
+        {
+            switch (shortcut)
+            {
+                case "STAGE_SELECT":
+                    // 스테이지 선택 화면이 준비되기 전까지는 스테이지 정보로 이동합니다.
+                    ShowPanel(OutGamePanelType.StageInfo);
+                    break;
+
+                case "TRAIN_CHARACTOR":
+                    if (!int.TryParse(shortcutValue, out int charId) || charId < 0)
+                    {
+                        Debug.LogWarning($"[OutGameUIManager] 잘못된 캐릭터 바로가기 값: {shortcutValue}");
+                        return;
+                    }
+
+                    ShowPanel(OutGamePanelType.TrainCharacter, panel =>
+                    {
+                        var trainPanel = panel.GetComponent<TrainCharacterPanel>();
+                        if (trainPanel != null)
+                        {
+                            trainPanel.SetCharacterForNextOpen(charId);
+                        }
+                    });
+                    break;
+
+                default:
+                    Debug.LogWarning($"[OutGameUIManager] 지원하지 않는 퀘스트 바로가기: {shortcut}");
+                    break;
+            }
         }
 
         public T ShowPopup<T>(OutGamePopupType popupType) where T : MonoBehaviour

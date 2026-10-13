@@ -25,11 +25,28 @@ namespace Scavenger.Network.DTOs
     }
 
     [Serializable]
+    public class QuestBatchRewardRequest
+    {
+        public List<int> questIds;
+    }
+
+    [Serializable]
+    public class QuestRewardDto
+    {
+        public string type;
+        public int id;
+        public int count;
+    }
+
+    [Serializable]
     public class QuestRewardResponse
     {
         public string message;
         public List<UserCurrencyDto> addedItems;
         public List<UserCurrencyDto> addedGameItems;
+        public List<int> claimedQuestIds;
+        public List<QuestRewardDto> grantedRewards;
+        public List<UserQuestDto> quests;
     }
 
     public enum QuestCycleType

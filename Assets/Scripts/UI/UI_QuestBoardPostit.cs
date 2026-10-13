@@ -1,11 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Networking;
 using TMPro;
-using Scavenger.Network;
 using Scavenger.Network.DTOs;
 using UnityFigmaBridge.Runtime.UI;
 
@@ -63,12 +60,13 @@ namespace Scavenger.UI
 
         private UserQuestDto _currentQuest;
         private QuestData _masterData;
-        private Action _onRewardClaimed;
+        private Action<int> _onClaimRequested;
+        private bool _canClaim = true;
 
-        public void Setup(UserQuestDto quest, Action onRewardClaimed)
+        public void Setup(UserQuestDto quest, Action<int> onClaimRequested)
         {
             _currentQuest = quest;
-            _onRewardClaimed = onRewardClaimed;
+            _onClaimRequested = onClaimRequested;
 
             _masterData = DataManager.Instance.GetData<QuestData>("Quest", _currentQuest.questId);
             if (_masterData == null) return;
@@ -163,13 +161,12 @@ namespace Scavenger.UI
                 // 보상 수령 완료
                 if (stampReceived != null) stampReceived.SetActive(true);
             }
-            else if (_currentQuest.isCompleted || _currentQuest.progressValue >= _masterData.TargetCount)
+            else if (_currentQuest.isCompleted)
             {
                 // 목표 달성, 보상 미수령
-                if (claimObject != null)
+                if (claimObject != null) claimObject.SetActive(true);
+                if (claimButton != null)
                 {
-                    claimObject.SetActive(true);
-                    claimButton.interactable = true;
                     claimButton.onClick.RemoveAllListeners();
                     claimButton.onClick.AddListener(OnClickClaim);
                 }
@@ -177,61 +174,35 @@ namespace Scavenger.UI
             else
             {
                 // 목표 미달성
-                if (goObject != null)
+                if (goObject != null) goObject.SetActive(true);
+                if (goButton != null)
                 {
-                    goObject.SetActive(true);
                     goButton.onClick.RemoveAllListeners();  
                     goButton.onClick.AddListener(OnClickGo);
                 }
             }
+
+            SetClaimInteractable(_canClaim);
+        }
+
+        public void SetClaimInteractable(bool canClaim)
+        {
+            _canClaim = canClaim;
+            if (claimButton != null)
+                claimButton.interactable = canClaim && _currentQuest != null && _currentQuest.isCompleted && !_currentQuest.isRewarded;
         }
 
         private void OnClickGo()
         {
-            Debug.Log($"[{_currentQuest.questId}] 바로가기 버튼 클릭됨");
-            // TODO: 해당 던전이나 UI로 보내는 로직
+            if (_masterData == null || OutGameUIManager.Instance == null) return;
+
+            OutGameUIManager.Instance.GoToQuestShortcut(_masterData.Shortcut, _masterData.ShortcutValue);
         }
 
         private void OnClickClaim()
         {
-            if (claimButton != null) claimButton.interactable = false;
-            StartCoroutine(ClaimRewardRoutine());
-        }
-
-        private IEnumerator ClaimRewardRoutine()
-        {
-            string url = $"{NetworkAuthManager.Instance.ServerUrl}/api/quest/reward";
-            var requestDto = new QuestRewardRequest { questId = _currentQuest.questId };
-            string jsonData = JsonUtility.ToJson(requestDto);
-
-            using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
-            {
-                byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
-                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                request.downloadHandler = new DownloadHandlerBuffer();
-                request.SetRequestHeader("Content-Type", "application/json");
-                request.SetRequestHeader("Authorization", $"Bearer {NetworkAuthManager.Instance.AuthToken}");
-
-                yield return request.SendWebRequest();
-
-                if (request.result == UnityWebRequest.Result.Success)
-                {
-                    _currentQuest.isRewarded = true;
-                    
-                    // 수령 직후 즉시 로컬 UI 상태를 갱신해 도장을 찍어줌 (서버 새로고침 대기 없이)
-                    UpdateState();
-                    
-                    UserDataManager.Instance.FetchItemList(); 
-                    
-                    // 패널 쪽 리스트 전체 새로고침 트리거
-                    _onRewardClaimed?.Invoke();
-                }
-                else
-                {
-                    Debug.LogError($"[UI_QuestBoardPostit] 보상 수령 실패: {request.error}\n{request.downloadHandler.text}");
-                    if (claimButton != null) claimButton.interactable = true;
-                }
-            }
+            if (!_canClaim || _currentQuest == null || !_currentQuest.isCompleted || _currentQuest.isRewarded) return;
+            _onClaimRequested?.Invoke(_currentQuest.questId);
         }
     }
 }

@@ -35,13 +35,26 @@ namespace Scavenger.UI
         
         private int _currentPage = 0;
         private int _maxPage = 0;
+        private bool _isLoading;
+        private bool _isClaimingReward;
+        private int _listRequestVersion;
+
+        private bool CanClaim => !_isLoading && !_isClaimingReward;
         
         private int ItemsPerPage => (postits != null && postits.Count > 0) ? postits.Count : 6;
 
         private void OnEnable()
         {
+            ClearQuests();
             UpdateTabSelection();
-            FetchQuests();
+            if (!_isClaimingReward) FetchQuests();
+        }
+
+        private void OnDisable()
+        {
+            // 재진입 전에 시작한 목록 요청이 새 화면을 덮어쓰지 않게 합니다.
+            _listRequestVersion++;
+            _isLoading = false;
         }
 
         private void Start()
@@ -88,35 +101,67 @@ namespace Scavenger.UI
 
         private void FetchQuests()
         {
-            StartCoroutine(FetchQuestsRoutine());
+            ClearQuests();
+            var auth = NetworkAuthManager.Instance;
+            var userData = UserDataManager.Instance;
+            if (auth == null || userData == null) return;
+
+            _isLoading = true;
+            UpdateClaimButtons();
+            int version = ++_listRequestVersion;
+            userData.StartCoroutine(FetchQuestsRoutine(auth.ServerUrl, auth.AuthToken, version));
         }
 
-        private IEnumerator FetchQuestsRoutine()
+        private IEnumerator FetchQuestsRoutine(string serverUrl, string authToken, int version)
         {
-            string url = $"{NetworkAuthManager.Instance.ServerUrl}/api/quest/list";
-
-            using (UnityWebRequest request = UnityWebRequest.Get(url))
+            try
             {
-                request.SetRequestHeader("Authorization", $"Bearer {NetworkAuthManager.Instance.AuthToken}");
-                
-                yield return request.SendWebRequest();
-
-                if (request.result == UnityWebRequest.Result.Success)
+                using (UnityWebRequest request = UnityWebRequest.Get($"{serverUrl}/api/quest/list"))
                 {
-                    var response = JsonUtility.FromJson<QuestListResponse>(request.downloadHandler.text);
-                    if (response != null && response.quests != null)
+                    request.timeout = 15;
+                    request.SetRequestHeader("Authorization", $"Bearer {authToken}");
+                    yield return request.SendWebRequest();
+
+                    if (this == null || version != _listRequestVersion || !isActiveAndEnabled) yield break;
+
+                    if (request.result == UnityWebRequest.Result.Success)
                     {
-                        _allQuests = response.quests;
-                        FilterAndSortQuests();
-                        _currentPage = 0; // 데이터 갱신 시 첫 페이지로 리셋
-                        RefreshPage();
+                        var response = ParseResponse<QuestListResponse>(request.downloadHandler.text);
+                        if (response?.quests != null) ApplyQuestList(response.quests);
+                        else Debug.LogError("[QuestBoardPanel] 퀘스트 목록 응답에 quests가 없습니다.");
+                    }
+                    else
+                    {
+                        Debug.LogError($"[QuestBoardPanel] 퀘스트 목록 로드 실패: {request.error}\n{request.downloadHandler.text}");
                     }
                 }
-                else
+            }
+            finally
+            {
+                if (this != null && version == _listRequestVersion)
                 {
-                    Debug.LogError($"[QuestBoardPanel] 퀘스트 목록 로드 실패: {request.error}\n{request.downloadHandler.text}");
+                    _isLoading = false;
+                    if (isActiveAndEnabled) UpdateClaimButtons();
                 }
             }
+        }
+
+        private static T ParseResponse<T>(string json) where T : class
+        {
+            try { return JsonUtility.FromJson<T>(json); }
+            catch (Exception e)
+            {
+                Debug.LogError($"[QuestBoardPanel] JSON 응답 처리 실패: {e.Message}");
+                return null;
+            }
+        }
+
+        private void ApplyQuestList(List<UserQuestDto> quests)
+        {
+            _allQuests = quests;
+            _currentPage = 0;
+            FilterAndSortQuests();
+            if (isActiveAndEnabled) RefreshPage();
         }
 
         private void FilterAndSortQuests()
@@ -130,6 +175,7 @@ namespace Scavenger.UI
 
             // 조건에 맞는 퀘스트 필터링 및 정렬 (수령 가능 -> 진행 중 -> 수령 완료 순)
             _filteredQuests = _allQuests.Where(q => {
+                if (q == null) return false;
                 var masterData = DataManager.Instance.GetData<QuestData>("Quest", q.questId);
                 return masterData != null && masterData.CycleType == _currentTab;
             }).OrderBy(q => q.isRewarded ? 2 : (q.isCompleted ? 0 : 1)).ToList();
@@ -137,21 +183,43 @@ namespace Scavenger.UI
             _maxPage = Mathf.Max(0, (_filteredQuests.Count - 1) / ItemsPerPage);
         }
 
+        private void ClearQuests()
+        {
+            _allQuests.Clear();
+            _filteredQuests.Clear();
+            _currentPage = 0;
+            _maxPage = 0;
+            UpdatePaginationUI();
+            UpdateClaimButtons();
+            if (postits == null || postits.Count == 0) return;
+
+            for (int i = 0; i < postits.Count; i++)
+            {
+                if (postits[i] != null) postits[i].gameObject.SetActive(false);
+            }
+        }
+
         private void RefreshPage()
         {
-            if (postits == null || postits.Count == 0) return;
+            if (postits == null || postits.Count == 0)
+            {
+                UpdatePaginationUI();
+                UpdateClaimButtons();
+                return;
+            }
 
             int startIndex = _currentPage * ItemsPerPage;
             
             for (int i = 0; i < postits.Count; i++)
             {
+                if (postits[i] == null) continue;
                 int dataIndex = startIndex + i;
                 
                 if (dataIndex < _filteredQuests.Count)
                 {
                     // 데이터가 있으면 켜고 내용 세팅
                     postits[i].gameObject.SetActive(true);
-                    postits[i].Setup(_filteredQuests[dataIndex], OnRewardClaimed);
+                    postits[i].Setup(_filteredQuests[dataIndex], OnClickClaim);
                 }
                 else
                 {
@@ -161,6 +229,7 @@ namespace Scavenger.UI
             }
 
             UpdatePaginationUI();
+            UpdateClaimButtons();
         }
 
         private void UpdatePaginationUI()
@@ -198,15 +267,99 @@ namespace Scavenger.UI
             }
         }
 
-        private void OnRewardClaimed()
+        private void UpdateClaimButtons()
         {
-            FetchQuests(); // 수령 후 상태 새로고침
+            if (claimAllButton != null)
+                claimAllButton.interactable = CanClaim && _filteredQuests.Any(q => q.isCompleted && !q.isRewarded);
+
+            if (postits == null) return;
+            foreach (var postit in postits)
+                if (postit != null) postit.SetClaimInteractable(CanClaim);
+        }
+
+        private void OnClickClaim(int questId)
+        {
+            if (!CanClaim || !_filteredQuests.Any(q => q.questId == questId && q.isCompleted && !q.isRewarded)) return;
+
+            BeginClaim("/api/quest/reward", JsonUtility.ToJson(new QuestRewardRequest { questId = questId }));
         }
 
         private void OnClickClaimAll()
         {
-            Debug.Log("일괄 수령 버튼 클릭됨!");
-            // TODO: 일괄 수령 API 연결
+            if (!CanClaim) return;
+
+            var questIds = GetClaimableQuestIds();
+            if (questIds.Count == 0) return;
+
+            BeginClaim("/api/quest/reward/batch", JsonUtility.ToJson(new QuestBatchRewardRequest { questIds = questIds }));
+        }
+
+        private List<int> GetClaimableQuestIds()
+        {
+            // 클릭 시점에 현재 탭의 모든 페이지에서 보이는 수령 가능 퀘스트만 고정합니다.
+            return _filteredQuests.Where(q => q.isCompleted && !q.isRewarded)
+                .Select(q => q.questId).Distinct().ToList();
+        }
+
+        private void BeginClaim(string path, string json)
+        {
+            var auth = NetworkAuthManager.Instance;
+            var userData = UserDataManager.Instance;
+            if (auth == null || userData == null) return;
+
+            _isClaimingReward = true;
+            UpdateClaimButtons();
+            // 화면을 닫거나 포스트잇을 재사용해도 서버 응답과 잔액 갱신은 완료합니다.
+            userData.StartCoroutine(ClaimRewardsRoutine(userData, auth.ServerUrl + path, auth.AuthToken, json));
+        }
+
+        private IEnumerator ClaimRewardsRoutine(UserDataManager userData, string url, string authToken, string json)
+        {
+            bool applied = false;
+            try
+            {
+                using (var request = new UnityWebRequest(url, "POST"))
+                {
+                    request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(json));
+                    request.downloadHandler = new DownloadHandlerBuffer();
+                    request.timeout = 15;
+                    request.SetRequestHeader("Content-Type", "application/json");
+                    request.SetRequestHeader("Authorization", $"Bearer {authToken}");
+                    yield return request.SendWebRequest();
+
+                    if (request.result == UnityWebRequest.Result.Success)
+                    {
+                        var response = ParseResponse<QuestRewardResponse>(request.downloadHandler.text);
+                        if (response?.quests != null)
+                        {
+                            if (userData != null) userData.ApplyQuestReward(response);
+                            if (this != null) ApplyQuestList(response.quests);
+                            applied = true;
+                        }
+                        else Debug.LogError("[QuestBoardPanel] 보상 응답에 갱신된 quests가 없습니다.");
+                    }
+                    else
+                    {
+                        Debug.LogError($"[QuestBoardPanel] 보상 수령 실패: {request.error}\n{request.downloadHandler.text}");
+                    }
+                }
+            }
+            finally
+            {
+                // 통신 실패여도 서버는 지급했을 수 있으므로 POST 재시도 대신 상태를 재조회합니다.
+                if (!applied && userData != null && NetworkAuthManager.Instance != null)
+                    userData.FetchItemList();
+
+                if (this != null)
+                {
+                    _isClaimingReward = false;
+                    if (isActiveAndEnabled)
+                    {
+                        if (!applied) FetchQuests();
+                        else UpdateClaimButtons();
+                    }
+                }
+            }
         }
     }
 }

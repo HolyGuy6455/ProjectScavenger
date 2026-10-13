@@ -197,6 +197,39 @@ public class UserDataManager : MonoBehaviour
         OnItemDataUpdated?.Invoke();
     }
 
+    public void ApplyQuestReward(QuestRewardResponse response)
+    {
+        if (response == null) return;
+
+        bool currencyUpdated = false;
+        bool gameItemsUpdated = false;
+
+        // 보상 응답의 amount는 지급량이 아니라 지급 후 보유 수량입니다.
+        if (response.addedItems != null)
+        {
+            foreach (var item in response.addedItems)
+            {
+                if (item == null) continue;
+                OwnedUserCurrencys[item.itemId] = item.amount;
+                currencyUpdated = true;
+            }
+        }
+
+        if (response.addedGameItems != null)
+        {
+            foreach (var item in response.addedGameItems)
+            {
+                if (item == null) continue;
+                OwnedGameItems[item.itemId] = item.amount;
+                gameItemsUpdated = true;
+            }
+        }
+
+        // 이벤트 구독자는 두 종류의 잔액이 모두 반영된 상태를 조회합니다.
+        if (gameItemsUpdated) OnItemDataUpdated?.Invoke();
+        if (currencyUpdated) OnCurrencyDataUpdated?.Invoke();
+    }
+
     public void SaveSelectedDeck(int[] newDeck, Action<bool> onComplete = null)
     {
         StartCoroutine(SaveSelectedDeckRoutine(newDeck, onComplete));

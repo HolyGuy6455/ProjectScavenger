@@ -34,6 +34,7 @@ public class TrainCharacterPanel : MonoBehaviour
     private List<GameObject> _spawnedPolaroids = new List<GameObject>();
     private readonly float[] _polaroidRotations = { 2f, -3f, 1.5f, -2f };
     private int _selectedCharId = -1;
+    private int _characterIdOnNextOpen = -1;
     private int _currentTargetLevel = -1;
     
     [Header("Level Up UI")]
@@ -61,6 +62,13 @@ public class TrainCharacterPanel : MonoBehaviour
     private void Start()
     {
         InitLevelScroll();
+
+        // 첫 진입의 OnEnable/바로가기 선택은 Start보다 먼저 실행됩니다.
+        // 스크롤 생성 후에도 그 캐릭터의 레벨과 비용을 표시합니다.
+        if (_selectedCharId > 0)
+        {
+            SelectCharacter(_selectedCharId);
+        }
     }
 
     private void OnDestroy()
@@ -127,6 +135,12 @@ public class TrainCharacterPanel : MonoBehaviour
 
     private void OnEnable()
     {
+        if (_characterIdOnNextOpen >= 0)
+        {
+            _selectedCharId = _characterIdOnNextOpen;
+            _characterIdOnNextOpen = -1;
+        }
+
         if (UserDataManager.Instance != null)
         {
             UserDataManager.Instance.OnCharacterDataUpdated += RefreshUI;
@@ -179,7 +193,7 @@ public class TrainCharacterPanel : MonoBehaviour
         if (charToSelect != null)
         {
             CharData masterData = DataManager.Instance.GetData<CharData>("Char", charToSelect.charId);
-            HandlePolaroidClicked(charToSelect, masterData);
+            ApplyCharacterSelection(charToSelect, masterData);
         }
     }
 
@@ -219,6 +233,35 @@ public class TrainCharacterPanel : MonoBehaviour
     }
 
     private void HandlePolaroidClicked(UserCharacterDto charDto, CharData masterData)
+    {
+        ApplyCharacterSelection(charDto, masterData);
+    }
+
+    public void SetCharacterForNextOpen(int charId)
+    {
+        _characterIdOnNextOpen = charId;
+    }
+
+    public void SelectCharacter(int charId)
+    {
+        // 보유 캐릭터 데이터가 늦게 도착해도 RefreshUI에서 이 선택을 사용합니다.
+        _selectedCharId = charId;
+        if (UserDataManager.Instance == null || DataManager.Instance == null) return;
+
+        var charDto = UserDataManager.Instance.GetCharacter(charId);
+        var masterData = charDto != null ? DataManager.Instance.GetData<CharData>("Char", charId) : null;
+        if (charDto != null && masterData != null)
+        {
+            ApplyCharacterSelection(charDto, masterData);
+        }
+        else
+        {
+            // 0은 특정 캐릭터 지정 없음. 미보유 캐릭터도 기본 보유 캐릭터를 표시합니다.
+            RefreshUI();
+        }
+    }
+
+    private void ApplyCharacterSelection(UserCharacterDto charDto, CharData masterData)
     {
         _selectedCharId = charDto.charId;
         Debug.Log($"[TrainCharacterPanel] 캐릭터 선택됨: {masterData.name} (Lv.{charDto.level})");
