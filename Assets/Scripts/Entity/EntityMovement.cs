@@ -8,6 +8,9 @@ public class EntityMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 4f;
     [SerializeField] private float rotationSpeed = 720f;
     [SerializeField] private float stoppingDistance = 0.1f;
+    [SerializeField]
+    [Tooltip("활성화하면 이동 방향을 바라봅니다. 비활성화하면 SetLookAtPosition으로 지정한 월드 위치를 바라봅니다.")]
+    private bool syncMovementAndFacing = true;
 
     private Rigidbody _rb;
     private Vector3 _targetPosition;
@@ -22,12 +25,29 @@ public class EntityMovement : MonoBehaviour
     private Vector3 _moveDirection;
     private float _customSpeed;
 
+    private Vector3 _lookAtPosition;
+    private bool _hasLookAtPosition;
+
+    /// <summary>이동 방향을 바라볼지, 별도 위치를 바라볼지 설정합니다.</summary>
+    public bool SyncMovementAndFacing
+    {
+        get => syncMovementAndFacing;
+        set => syncMovementAndFacing = value;
+    }
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
         // Rigidbody 설정 (물리 충돌 등 원치 않는 회전 방지)
         _rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
     }
+
+    /// <summary>별도 시선 대상을 해제합니다. 동기화가 꺼져 있으면 현재 방향을 유지합니다.</summary>
+    public void ClearLookAtPosition()
+    {
+        _hasLookAtPosition = false;
+    }
+
 
     /// <summary>
     /// 외부(AI 등)에서 목표 좌표를 지정해 장애물을 무시하고 직진합니다.
@@ -96,52 +116,75 @@ public class EntityMovement : MonoBehaviour
         _rb.angularVelocity = Vector3.zero;
     }
 
+    /// <summary>
+    /// 별도로 바라볼 월드 위치를 설정합니다.
+    /// SyncMovementAndFacing이 false일 때 이동 중이나 정지 중에도 적용됩니다.
+    /// </summary>
+    public void SetLookAtPosition(Vector3 worldPosition)
+    {
+        _lookAtPosition = worldPosition;
+        _hasLookAtPosition = true;
+    }
+
+
     private void FixedUpdate()
     {
+        Vector3 movementDirection = Vector3.zero;
+
         if (_isMovingInDirection)
         {
-            Vector3 mDir = _moveDirection;
-            mDir.y = 0f;
-            
-            _rb.MovePosition(_rb.position + mDir * (_customSpeed * Time.fixedDeltaTime));
-            
-            if (mDir.sqrMagnitude > 0.001f)
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(mDir);
-                _rb.rotation = Quaternion.RotateTowards(_rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
-            }
-            return;
+            movementDirection = _moveDirection;
+            movementDirection.y = 0f;
+            _rb.MovePosition(_rb.position + movementDirection * (_customSpeed * Time.fixedDeltaTime));
         }
-
-        if (!_isMoving) return;
-
-        Vector3 dir = _targetPosition - _rb.position;
-        dir.y = 0f; // y축(높이) 이동은 무시하고 평면 이동만 처리
-
-        float dist = dir.magnitude;
-        if (dist <= stoppingDistance)
+        else if (_isMoving)
         {
-            if (_isSmartMoving && _pathCorners.Count > 0)
+            Vector3 dir = _targetPosition - _rb.position;
+            dir.y = 0f;
+
+            if (dir.magnitude <= stoppingDistance)
             {
-                _targetPosition = _pathCorners.Dequeue();
+                if (_isSmartMoving && _pathCorners.Count > 0)
+                {
+                    _targetPosition = _pathCorners.Dequeue();
+                }
+                else
+                {
+                    Stop();
+                }
             }
             else
             {
-                Stop();
+                movementDirection = dir.normalized;
+                _rb.MovePosition(_rb.position + movementDirection * (moveSpeed * Time.fixedDeltaTime));
             }
+        }
+
+        UpdateFacing(movementDirection);
+    }
+
+
+    private void UpdateFacing(Vector3 movementDirection)
+    {
+        Vector3 facingDirection;
+        if (syncMovementAndFacing)
+        {
+            facingDirection = movementDirection;
+        }
+        else if (_hasLookAtPosition)
+        {
+            facingDirection = _lookAtPosition - _rb.position;
+        }
+        else
+        {
             return;
         }
 
-        Vector3 moveDir = dir.normalized;
-        
-        // 1. 이동
-        _rb.MovePosition(_rb.position + moveDir * (moveSpeed * Time.fixedDeltaTime));
+        facingDirection.y = 0f;
+        if (facingDirection.sqrMagnitude <= 0.001f) return;
 
-        // 2. 회전
-        if (moveDir.sqrMagnitude > 0.001f)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(moveDir);
-            _rb.rotation = Quaternion.RotateTowards(_rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
-        }
+        Quaternion targetRotation = Quaternion.LookRotation(facingDirection);
+        _rb.rotation = Quaternion.RotateTowards(
+            _rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
     }
 }

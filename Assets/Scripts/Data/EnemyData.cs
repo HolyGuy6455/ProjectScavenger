@@ -8,6 +8,7 @@ public class EnemyData : IData
     public int hp;
     public int lootTable;
     public string prefabName;
+    public int ammoId; // 0이면 사격 무기 없음
 
     public int GetId()
     {
