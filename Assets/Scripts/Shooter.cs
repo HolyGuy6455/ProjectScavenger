@@ -32,6 +32,7 @@ public class Shooter : NetworkBehaviour
     
     [Tooltip("총알이 생성될 위치 (지정하지 않으면 이 게임 오브젝트의 위치를 사용합니다)")]
     [SerializeField] private Transform firePoint;
+    public Transform FirePoint => firePoint != null ? firePoint : transform;
 
     [Header("Current Status (Debug)")]
     [SerializeField] private AmmoData currentAmmoData;
@@ -54,6 +55,7 @@ public class Shooter : NetworkBehaviour
     public event Action<AmmoData> OnWeaponChanged;
     
     [SerializeField] private bool isReloading;
+    public bool IsReloading => isReloading;
 
     private float lastFireTime;
     private bool isTriggerPulled;
@@ -76,13 +78,26 @@ public class Shooter : NetworkBehaviour
             InternalLoadAmmo(currentAmmoData.maxAmmo, currentAmmoData.id);
         }
 
-        chamberAmmoQueue.OnListChanged += (changeEvent) =>
-        {
-            if (currentAmmoData != null)
-            {
-                OnAmmoChanged?.Invoke(CurrentAmmo, currentAmmoData.maxAmmo);
-            }
-        };
+        chamberAmmoQueue.OnListChanged += HandleAmmoListChanged;
+        NotifyAmmoChanged();
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        chamberAmmoQueue.OnListChanged -= HandleAmmoListChanged;
+        isReloading = false;
+        isTriggerPulled = false;
+    }
+
+    private void HandleAmmoListChanged(NetworkListEvent<AmmoGroup> changeEvent)
+    {
+        NotifyAmmoChanged();
+    }
+
+    private void NotifyAmmoChanged()
+    {
+        if (currentAmmoData != null)
+            OnAmmoChanged?.Invoke(CurrentAmmo, currentAmmoData.maxAmmo);
     }
 
     private void Update()
@@ -147,6 +162,7 @@ public class Shooter : NetworkBehaviour
         currentSpread = 0f;
         
         OnWeaponChanged?.Invoke(currentAmmoData);
+        NotifyAmmoChanged();
     }
 
     public void EquipGunWithChamber(AmmoData newAmmoData, AmmoGroup[] savedChamber)
@@ -160,8 +176,6 @@ public class Shooter : NetworkBehaviour
         serverLastFireTime = 0f;
         currentSpread = 0f;
         
-        OnWeaponChanged?.Invoke(currentAmmoData);
-
         if (!IsServer && IsOwner)
         {
             CmdEquipGunWithChamberServerRpc(newAmmoData.id, savedChamber);
@@ -178,6 +192,9 @@ public class Shooter : NetworkBehaviour
                 InternalLoadAmmo(currentAmmoData.maxAmmo, currentAmmoData.id);
             }
         }
+
+        OnWeaponChanged?.Invoke(currentAmmoData);
+        NotifyAmmoChanged();
     }
 
     [ServerRpc]
@@ -202,6 +219,7 @@ public class Shooter : NetworkBehaviour
             serverLastFireTime = 0f;
             currentSpread = 0f;
             OnWeaponChanged?.Invoke(currentAmmoData);
+            NotifyAmmoChanged();
         }
     }
 
@@ -232,15 +250,15 @@ public class Shooter : NetworkBehaviour
 
     /// <summary>
     /// 단발 사격을 시도하거나 수동으로 한 발씩 발사할 때 호출합니다.
+    /// 서버에서는 발사 성공 여부, 클라이언트에서는 발사 요청 수락 여부를 반환합니다.
     /// </summary>
-    public void TryShoot(Vector3 direction, Vector3 targetPosition = default)
+    public bool TryShoot(Vector3 direction, Vector3 targetPosition = default)
     {
-        if (!IsOwner) return; // 발사 요청은 소유자(Owner)만 할 수 있습니다.
+        if (!IsSpawned || !IsOwner) return false; // 발사 요청은 소유자(Owner)만 할 수 있습니다.
 
-        if (currentAmmoData == null) return;
-        if (isReloading) return;
-        if (CurrentAmmo <= 0) return;
-        if (Time.time - clientLastFireTime < currentAmmoData.fireRate) return;
+        if (currentAmmoData == null || isReloading || CurrentAmmo <= 0) return false;
+        if (Time.time - clientLastFireTime < currentAmmoData.fireRate) return false;
+        if (IsServer && Time.time - serverLastFireTime < currentAmmoData.fireRate) return false;
 
         // 로컬 쿨타임 갱신 (클라이언트 측에서 쿨타임을 관리하여 연속 요청 방지)
         clientLastFireTime = Time.time;
@@ -248,8 +266,12 @@ public class Shooter : NetworkBehaviour
         // 사격 애니메이션 재생 트리거
         animReceiver?.PlayShootAnimation();
 
-        // 서버에 실제 발사(탄환 생성 및 물리 처리)를 요청
-        CmdShootServerRpc(direction, targetPosition);
+        // 서버 소유 AI는 즉시 처리하고, 클라이언트 소유자는 서버에 요청한다.
+        if (IsServer)
+            PerformShoot(direction, targetPosition);
+        else
+            CmdShootServerRpc(direction, targetPosition);
+        return true;
     }
 
     [ServerRpc]
@@ -390,6 +412,32 @@ public class Shooter : NetworkBehaviour
     }
 
     /// <summary>
+    /// 서버 소유 AI의 재장전 대기를 시작하고, 완료 또는 취소 전까지 사격을 막습니다.
+    /// </summary>
+    public bool BeginReload()
+    {
+        if (!IsSpawned || !IsServer || !IsOwner || currentAmmoData == null || isReloading)
+            return false;
+
+        SetTrigger(false);
+        isReloading = true;
+        return true;
+    }
+
+    public void CancelReload()
+    {
+        isReloading = false;
+    }
+
+    public void CompleteReload()
+    {
+        if (!isReloading) return;
+        isReloading = false;
+        if (IsSpawned && IsServer && IsOwner)
+            Reload();
+    }
+
+    /// <summary>
     /// 재장전을 수행합니다.
     /// </summary>
     public void Reload(int amount = -1, int ammoId = -1)
@@ -397,19 +445,26 @@ public class Shooter : NetworkBehaviour
         if (!IsOwner) return;
         if (currentAmmoData == null || isReloading) return;
 
-        CmdReloadServerRpc(amount, ammoId);
+        if (IsServer)
+            PerformReload(amount, ammoId);
+        else
+            CmdReloadServerRpc(amount, ammoId);
     }
 
     [ServerRpc]
     private void CmdReloadServerRpc(int amount, int ammoId)
     {
-        if (currentAmmoData != null)
-        {
-            chamberAmmoQueue.Clear();
-            if (ammoId == -1) ammoId = currentAmmoData.id;
-            int loadAmount = (amount <= 0) ? currentAmmoData.maxAmmo : amount;
-            InternalLoadAmmo(loadAmount, ammoId);
-        }
+        PerformReload(amount, ammoId);
+    }
+
+    private void PerformReload(int amount, int ammoId)
+    {
+        if (!IsServer || currentAmmoData == null) return;
+
+        chamberAmmoQueue.Clear();
+        if (ammoId == -1) ammoId = currentAmmoData.id;
+        int loadAmount = (amount <= 0) ? currentAmmoData.maxAmmo : amount;
+        InternalLoadAmmo(loadAmount, ammoId);
     }
 
     /// <summary>

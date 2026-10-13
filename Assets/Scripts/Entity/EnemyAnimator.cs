@@ -38,6 +38,7 @@ public class EnemyAnimator : NetworkBehaviour, IShooterAnimationReceiver
     private float _timeSinceMovement;
     private bool _isMoving;
     private bool _wasSkillExecuting;
+    private bool _isSkillAnimationPlaying;
 
     // 이전 프레임의 상태를 기억하여 Play가 매 프레임 불리는 것을 방지
     private bool _wasMoving = false;
@@ -65,6 +66,7 @@ public class EnemyAnimator : NetworkBehaviour, IShooterAnimationReceiver
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        _isSkillAnimationPlaying = false;
         ResetMovementTracking();
     }
 
@@ -110,6 +112,9 @@ public class EnemyAnimator : NetworkBehaviour, IShooterAnimationReceiver
         }
 
         UpdateMovementParameters();
+
+        // 원격 클라이언트에서도 전신 스킬이 끝날 때까지 이동 상태 전환을 기다립니다.
+        if (_isSkillAnimationPlaying) return;
 
         // 스킬 중에도 위치 이력을 갱신해야 종료 후 누적 변위를 이동으로 오인하지 않습니다.
         foreach (var skill in _skills)
@@ -163,7 +168,7 @@ public class EnemyAnimator : NetworkBehaviour, IShooterAnimationReceiver
 
     public void PlayShootAnimation()
     {
-        if (IsSpawned && !IsServer) return;
+        if (_isSkillAnimationPlaying || (IsSpawned && !IsServer)) return;
 
         PlayConfiguredAnimation(shootStateName, shootLayer);
         if (IsSpawned) PlayShootAnimationClientRpc();
@@ -172,8 +177,60 @@ public class EnemyAnimator : NetworkBehaviour, IShooterAnimationReceiver
     [ClientRpc]
     private void PlayShootAnimationClientRpc()
     {
-        if (IsServer) return;
+        if (IsServer || _isSkillAnimationPlaying) return;
         PlayConfiguredAnimation(shootStateName, shootLayer);
+    }
+
+    public bool PlaySkillAnimation(string stateName)
+    {
+        if (IsSpawned && !IsServer) return false;
+        if (!HasConfiguredAnimation(stateName, 0)) return false;
+
+        PlaySkillAnimationLocal(stateName);
+        if (IsSpawned) PlaySkillAnimationClientRpc(stateName);
+        return true;
+    }
+
+    [ClientRpc]
+    private void PlaySkillAnimationClientRpc(string stateName)
+    {
+        if (IsServer) return;
+        PlaySkillAnimationLocal(stateName);
+    }
+
+    private void PlaySkillAnimationLocal(string stateName)
+    {
+        _isSkillAnimationPlaying = true;
+        _wasSkillExecuting = true;
+        // 일반 사격의 상체 레이어가 전신 스킬의 총/팔 동작을 덮지 않도록 비웁니다.
+        PlayConfiguredAnimation(shootEmptyStateName, shootLayer);
+        PlayConfiguredAnimation(stateName, 0);
+    }
+
+    public void EndSkillAnimation()
+    {
+        if (IsSpawned && !IsServer) return;
+
+        EndSkillAnimationLocal();
+        if (IsSpawned) EndSkillAnimationClientRpc();
+    }
+
+    [ClientRpc]
+    private void EndSkillAnimationClientRpc()
+    {
+        if (IsServer) return;
+        EndSkillAnimationLocal();
+    }
+
+    private void EndSkillAnimationLocal()
+    {
+        if (!_isSkillAnimationPlaying) return;
+
+        _isSkillAnimationPlaying = false;
+        // 다음 AI 행동(재장전 등)을 뒤늦은 이동 상태 복귀가 덮지 않도록 즉시 복귀합니다.
+        PlayConfiguredAnimation(_isMoving ? movementStateName : "Idle", 0);
+        _wasMoving = _isMoving;
+        _wasSkillExecuting = false;
     }
 
     public void PlayReloadAnimation()
