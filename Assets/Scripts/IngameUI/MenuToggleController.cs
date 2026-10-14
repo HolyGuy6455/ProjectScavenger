@@ -19,10 +19,13 @@ public class MenuToggleController : MonoBehaviour
 
     private bool isMenuOpen = false;
     private bool isCinematicHidden = false; // 시네마틱에 의해 강제로 숨겨졌는지 여부
+    private readonly System.Collections.Generic.HashSet<Object> cinematicHideSources = new System.Collections.Generic.HashSet<Object>();
+    private bool IsCinematicHidden => isCinematicHidden || cinematicHideSources.Count > 0;
     
     // CanvasGroup 캐싱
     private CanvasGroup ingameCanvasGroup;
     private CanvasGroup pauseCanvasGroup;
+    private readonly System.Collections.Generic.Dictionary<CanvasGroup, Coroutine> fadeRoutines = new System.Collections.Generic.Dictionary<CanvasGroup, Coroutine>();
 
     private void Awake()
     {
@@ -78,14 +81,14 @@ public class MenuToggleController : MonoBehaviour
 
     public void OpenMenu()
     {
-        if (isCinematicHidden) return;
+        if (IsCinematicHidden) return;
         isMenuOpen = true;
         UpdateUIState(false);
     }
 
     public void CloseMenu()
     {
-        if (isCinematicHidden) return;
+        if (IsCinematicHidden) return;
         isMenuOpen = false;
         UpdateUIState(false);
     }
@@ -93,7 +96,7 @@ public class MenuToggleController : MonoBehaviour
     // UI 버튼의 OnClick 이벤트나 다른 스크립트에서 직접 호출할 수 있는 public 함수
     public void ToggleMenu()
     {
-        if (isCinematicHidden) return; // 시네마틱 연출 중에는 메뉴 토글 금지
+        if (IsCinematicHidden) return; // 시네마틱 연출 중에는 메뉴 토글 금지
         
         isMenuOpen = !isMenuOpen;
         UpdateUIState(false);
@@ -101,8 +104,8 @@ public class MenuToggleController : MonoBehaviour
 
     private void UpdateUIState(bool instant = false)
     {
-        bool showIngame = !isMenuOpen && !isCinematicHidden;
-        bool showPause = isMenuOpen && !isCinematicHidden;
+        bool showIngame = !isMenuOpen && !IsCinematicHidden;
+        bool showPause = isMenuOpen && !IsCinematicHidden;
 
         if (ingameCanvasGroup != null)
             FadeCanvasGroup(ingameCanvasGroup, showIngame ? 1f : 0f, instant ? 0f : 0.3f);
@@ -124,6 +127,16 @@ public class MenuToggleController : MonoBehaviour
             isMenuOpen = false;
         }
         
+        UpdateUIState(false);
+    }
+
+    /// <summary>다른 시네마틱이 끝나도 현재 보스 연출의 UI 숨김은 유지합니다.</summary>
+    public void SetCinematicHidden(Object source, bool hidden)
+    {
+        if (ReferenceEquals(source, null)) return;
+        bool changed = hidden ? cinematicHideSources.Add(source) : cinematicHideSources.Remove(source);
+        if (!changed) return;
+        if (IsCinematicHidden) isMenuOpen = false;
         UpdateUIState(false);
     }
 
@@ -182,10 +195,11 @@ public class MenuToggleController : MonoBehaviour
     private void FadeCanvasGroup(CanvasGroup cg, float targetAlpha, float duration)
     {
         if (cg == null) return;
-        
-        // 이미 진행 중인 코루틴이 있다면 멈출 수 있도록 구조를 짜도 되지만,
-        // 단순함을 위해 DOTween 느낌으로 코루틴을 돌립니다. (빠른 전환 시 약간 튈 수 있음)
-        StartCoroutine(FadeRoutine(cg, targetAlpha, duration));
+
+        // 인트로가 바로 취소돼도 이전 숨김 페이드가 UI를 뒤늦게 꺼버리지 않게 합니다.
+        if (fadeRoutines.TryGetValue(cg, out var previous) && previous != null)
+            StopCoroutine(previous);
+        fadeRoutines[cg] = StartCoroutine(FadeRoutine(cg, targetAlpha, duration));
     }
 
     private System.Collections.IEnumerator FadeRoutine(CanvasGroup cg, float targetAlpha, float duration)

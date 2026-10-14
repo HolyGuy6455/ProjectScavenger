@@ -10,6 +10,16 @@ public class PlayerSkillController : NetworkBehaviour
     private List<int> partyCharIds = new List<int>();
     private CharData currentCharData;
     private Shooter cachedShooter;
+    private PlayerController cachedPlayerController;
+
+    private bool IsInputLocked
+    {
+        get
+        {
+            if (cachedPlayerController == null) cachedPlayerController = GetComponent<PlayerController>();
+            return cachedPlayerController != null && cachedPlayerController.IsInputLocked;
+        }
+    }
 
     public override void OnNetworkSpawn()
     {
@@ -158,6 +168,12 @@ public class PlayerSkillController : NetworkBehaviour
             {
                 if (skill == null || skill.skillId == 0) continue;
 
+                // UI가 숨겨져 PointerUp을 받지 못해도 누르고 있던 스킬을 정리합니다.
+                if (IsOwner && IsInputLocked && skill.isCharging)
+                {
+                    skill.ReleaseUse(GetShooter());
+                }
+
                 if (skill.isContinuousRunning)
                 {
                     skill.UpdateContinuous(Time.deltaTime, GetShooter());
@@ -183,6 +199,7 @@ public class PlayerSkillController : NetworkBehaviour
     [ServerRpc]
     public void CmdUseUltimateServerRpc()
     {
+        if (IsInputLocked) return;
         // 서버(데디케이티드 서버)에는 UI가 없으므로 currentCharData나 CharacterStateManager가 
         // 클라이언트와 동일하게 세팅되어 있지 않습니다.
         // 클라이언트에서 쿨타임 검증을 마치고 보냈으므로, 여기서는 모든 클라이언트에게 연출을 지시합니다.
@@ -192,6 +209,7 @@ public class PlayerSkillController : NetworkBehaviour
     [ClientRpc]
     private void RpcPlayUltimateClientRpc()
     {
+        if (IsInputLocked) return;
         var playerController = GetComponent<PlayerController>();
         if (playerController != null)
         {
@@ -209,7 +227,7 @@ public class PlayerSkillController : NetworkBehaviour
     /// </summary>
     public void OnUltimateAnimationEvent(int eventId)
     {
-        if (IsOwner)
+        if (IsOwner && !IsInputLocked)
         {
             CmdExecuteUltimateActionServerRpc(eventId);
         }
@@ -218,6 +236,7 @@ public class PlayerSkillController : NetworkBehaviour
     [ServerRpc]
     private void CmdExecuteUltimateActionServerRpc(int eventId)
     {
+        if (IsInputLocked) return;
         var playerController = GetComponent<PlayerController>();
         if (playerController != null)
         {
@@ -232,7 +251,7 @@ public class PlayerSkillController : NetworkBehaviour
 
     public void OnSkillPointerDown(int skillSlotIndex)
     {
-        if (currentCharData == null) return;
+        if (IsInputLocked || currentCharData == null) return;
         CharacterState state = GetSkillState(currentCharData.id);
         if (state == null) return;
         if (skillSlotIndex < 0 || skillSlotIndex >= state.normalSkills.Length) return;

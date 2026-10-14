@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
+using System.Collections.Generic;
 
 /// <summary>
 /// 쿼터뷰 캐릭터 이동 스크립트
@@ -30,6 +31,8 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     private bool _isShooting = false;
     private bool _isCinematicPlaying = false;
     private bool _isRolling = false;
+    private readonly HashSet<UnityEngine.Object> _cinematicInputLocks = new HashSet<UnityEngine.Object>();
+    public bool IsInputLocked => _isCinematicPlaying || _cinematicInputLocks.Count > 0;
     private Health _health;
     private SectorIndicator _sectorIndicator;
 
@@ -96,6 +99,45 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     }
 
     public static PlayerController LocalInstance { get; private set; }
+
+    public void SetCinematicInputLocked(UnityEngine.Object source, bool locked)
+    {
+        if (ReferenceEquals(source, null)) return;
+
+        if (locked)
+        {
+            if (source != null && _cinematicInputLocks.Add(source))
+            {
+                ClearGameplayInput();
+            }
+        }
+        else
+        {
+            _cinematicInputLocks.Remove(source);
+        }
+    }
+
+    private void ClearGameplayInput()
+    {
+        _keyboardInput = Vector2.zero;
+        _joystickInput = Vector2.zero;
+        _joystickRotationInput = Vector2.zero;
+        _isShooting = false;
+        if (shooter == null) shooter = GetComponent<Shooter>();
+        if (shooter != null) shooter.SetTrigger(false);
+        if (IsOwner && IsSpawned) _netAnimInput.Value = Vector2.zero;
+        if (_animator != null)
+        {
+            _animator.SetFloat("InputX", 0f);
+            _animator.SetFloat("InputY", 0f);
+        }
+        if (_rb != null && !_rb.isKinematic)
+        {
+            _rb.linearVelocity = Vector3.zero;
+            _rb.angularVelocity = Vector3.zero;
+        }
+        if (_sectorIndicator != null) _sectorIndicator.Hide();
+    }
 
     private void Awake()
     {
@@ -167,6 +209,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();
+        _cinematicInputLocks.Clear();
         if (IsOwner) LocalInstance = null;
         
         _activeSlotIndex.OnValueChanged -= OnActiveSlotChanged;
@@ -279,6 +322,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     [ServerRpc]
     private void ChangeCharacterSlotServerRpc(int slotIndex)
     {
+        if (IsInputLocked) return;
         if (slotIndex >= 0 && slotIndex < 4)
         {
             _activeSlotIndex.Value = slotIndex;
@@ -363,7 +407,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
     private void Update()
     {
-        if (IsOwner)
+        if (IsOwner && !IsInputLocked)
         {
             // 테스트용 캐릭터 스왑 (숫자키 1~4)
             if (Keyboard.current != null)
@@ -378,14 +422,15 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         // 애니메이션은 모든 클라이언트에서 동일하게 재생되어야 하므로 IsOwner 체크 밖에서 처리
         if (_animator != null)
         {
-            _animator.SetFloat("InputX", _netAnimInput.Value.x);
-            _animator.SetFloat("InputY", _netAnimInput.Value.y);
+            Vector2 animInput = IsInputLocked ? Vector2.zero : _netAnimInput.Value;
+            _animator.SetFloat("InputX", animInput.x);
+            _animator.SetFloat("InputY", animInput.y);
         }
     }
 
     private void OnMove(InputAction.CallbackContext ctx)
     {
-        _keyboardInput = ctx.ReadValue<Vector2>();
+        _keyboardInput = IsInputLocked ? Vector2.zero : ctx.ReadValue<Vector2>();
     }
 
     /// <summary>
@@ -393,7 +438,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     /// </summary>
     public void SetMoveInput(Vector2 input)
     {
-        _joystickInput = input;
+        _joystickInput = IsInputLocked ? Vector2.zero : input;
     }
 
     /// <summary>
@@ -401,7 +446,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     /// </summary>
     public void SetRotationInput(Vector2 input)
     {
-        _joystickRotationInput = input;
+        _joystickRotationInput = IsInputLocked ? Vector2.zero : input;
     }
 
     private Transform FindClosestEnemyInSector(Vector3 forwardDir, float radius, float angle)
@@ -493,16 +538,12 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     {
         if (!IsOwner) return; // 위치 이동과 물리 연산, 입력 처리는 로컬 오너만 수행합니다.
 
-        if (_isCinematicPlaying || _isRolling)
+        if (IsInputLocked)
         {
-            if (_isCinematicPlaying)
-            {
-                // 시네마틱 재생 중에는 움직임과 회전을 강제로 멈춥니다.
-                _netAnimInput.Value = Vector2.zero;
-                if (_rb != null) _rb.linearVelocity = Vector3.zero;
-            }
+            ClearGameplayInput();
             return;
         }
+        if (_isRolling) return;
 
         // 1. 이동 처리
         // 키보드 입력과 조이스틱 입력을 합산한 후, 최대 크기가 1을 넘지 않도록 제한합니다.
@@ -667,7 +708,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
     public void StartRoll(float duration, float distance, float invincibleTime)
     {
-        if (_isRolling || !IsOwner) return;
+        if (_isRolling || !IsOwner || IsInputLocked) return;
         StartCoroutine(RollRoutine(duration, distance, invincibleTime));
     }
 
@@ -714,7 +755,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         Vector3 localMoveDir = transform.InverseTransformDirection(rollDir);
         _netAnimInput.Value = new Vector2(localMoveDir.x, localMoveDir.z);
 
-        while (elapsedTime < duration)
+        while (elapsedTime < duration && !IsInputLocked)
         {
             elapsedTime += Time.fixedDeltaTime;
             
@@ -794,14 +835,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         }
         
         // 이동/입력 초기화
-        _keyboardInput = Vector2.zero;
-        _joystickInput = Vector2.zero;
-        _joystickRotationInput = Vector2.zero;
-        if (shooter != null && _isShooting)
-        {
-            _isShooting = false;
-            shooter.SetTrigger(false);
-        }
+        ClearGameplayInput();
 
         // 애니메이션 재생 전 -z 방향을 바라보도록 강제 회전
         transform.rotation = Quaternion.LookRotation(Vector3.back);

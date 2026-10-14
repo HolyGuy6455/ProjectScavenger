@@ -12,6 +12,9 @@ public class MobSpawner : MonoBehaviour
     
     public float SpawnRadius = 5f;
 
+    private readonly List<GameObject> _spawnedMobs = new List<GameObject>();
+    public IReadOnlyList<GameObject> SpawnedMobs => _spawnedMobs;
+
     private void OnDrawGizmos()
     {
         // Danger Level에 따라 기즈모 색상을 서서히 변경 (1=초록, 5=노랑, 10=빨강)
@@ -41,6 +44,7 @@ public class MobSpawner : MonoBehaviour
         }
 
         // 💡 실제 몬스터 스폰 로직은 중앙 집중화된 MobManager에게 위임합니다.
-        MobManager.Instance.SpawnMobGroup(AllowedCategories, MaxDangerLevel, SpawnRadius, transform.position);
+        _spawnedMobs.RemoveAll(mob => mob == null);
+        _spawnedMobs.AddRange(MobManager.Instance.SpawnMobGroup(AllowedCategories, MaxDangerLevel, SpawnRadius, transform.position));
     }
 }

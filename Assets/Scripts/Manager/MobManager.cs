@@ -21,19 +21,21 @@ public class MobManager : NetworkBehaviour
     /// <summary>
     /// 조건에 맞는 몹 그룹을 결정하고 개별 소환을 진행합니다.
     /// </summary>
-    public void SpawnMobGroup(MobCategory allowedCategories, int maxDangerLevel, float spawnRadius, Vector3 centerPosition)
+    public List<GameObject> SpawnMobGroup(MobCategory allowedCategories, int maxDangerLevel, float spawnRadius, Vector3 centerPosition)
     {
+        var spawnedMobs = new List<GameObject>();
+
         // NGO 멀티플레이 환경: 몹 소환은 서버에서만 권한을 가짐
         if (NetworkManager.Singleton != null && !NetworkManager.Singleton.IsServer)
         {
             Debug.LogWarning("[MobManager] 몹 스폰은 서버에서만 실행될 수 있습니다.");
-            return;
+            return spawnedMobs;
         }
 
         if (DataManager.Instance == null)
         {
             Debug.LogError("[MobManager] 씬에 DataManager가 존재하지 않습니다!");
-            return;
+            return spawnedMobs;
         }
 
         // 1. 내 조건에 맞는 랜덤 몹 그룹 데이터 가져오기
@@ -41,19 +43,21 @@ public class MobManager : NetworkBehaviour
         
         if (groupData == null)
         {
-            return;
+            return spawnedMobs;
         }
 
         // 2. 그룹 안의 몬스터 데이터(SpawnInfos)를 순회하며 개별 소환
         foreach (var spawnInfo in groupData.SpawnInfos)
         {
-            SpawnSingleMob(spawnInfo, centerPosition);
+            var spawnedMob = SpawnSingleMob(spawnInfo, centerPosition);
+            if (spawnedMob != null) spawnedMobs.Add(spawnedMob);
         }
         
         Debug.Log($"[MobManager] 성공적으로 '{groupData.GroupID}' 그룹을 소환했습니다.");
+        return spawnedMobs;
     }
 
-    private void SpawnSingleMob(MobSpawnInfo info, Vector3 centerPosition)
+    private GameObject SpawnSingleMob(MobSpawnInfo info, Vector3 centerPosition)
     {
         // 1. DataManager에서 EnemyData 가져오기 (문자열 prefabName으로 검색)
         var allEnemies = DataManager.Instance.GetAllData<EnemyData>("Enemy");
@@ -71,7 +75,7 @@ public class MobManager : NetworkBehaviour
         if (enemyData == null)
         {
             Debug.LogError($"[MobManager] '{info.MobID}' 이름(prefabName)을 가진 EnemyData를 찾을 수 없습니다.");
-            return;
+            return null;
         }
 
         // 2. 프리팹 로드 
@@ -81,7 +85,7 @@ public class MobManager : NetworkBehaviour
         if (prefab == null)
         {
             Debug.LogError($"[MobManager] 프리팹을 찾을 수 없습니다: Resources/Prefabs/Enemy/{enemyData.prefabName}");
-            return;
+            return null;
         }
 
         // 3. 인스턴스화 (중심 위치 + 에디터 툴에서 저장한 상대 위치/회전값 적용)
@@ -121,5 +125,6 @@ public class MobManager : NetworkBehaviour
         {
             Debug.LogWarning($"[MobManager] {enemyData.prefabName} 프리팹에 NetworkObject 컴포넌트가 없습니다!");
         }
+        return spawnedMob;
     }
 }

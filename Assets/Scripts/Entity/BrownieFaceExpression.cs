@@ -9,6 +9,7 @@ public sealed class BrownieFaceExpression : MonoBehaviour
     [Range(0f, 1f)] public float faceExpression;
     private MaterialPropertyBlock block;
     private static readonly int BaseMapST = Shader.PropertyToID("_BaseMap_ST");
+    private static readonly int MainTexST = Shader.PropertyToID("_MainTex_ST");
 
     private void OnEnable() { ApplyExpression(); }
     private void LateUpdate() { ApplyExpression(); }
@@ -19,8 +20,10 @@ public sealed class BrownieFaceExpression : MonoBehaviour
             faceMaterialIndex >= faceRenderer.sharedMaterials.Length) return;
         if (block == null) block = new MaterialPropertyBlock();
         faceRenderer.GetPropertyBlock(block, faceMaterialIndex);
-        block.SetVector(BaseMapST, new Vector4(1f, 1f,
-            faceExpression >= 0.5f ? 0.5f : 0f, 0f));
+        var atlasTransform = new Vector4(1f, 1f, faceExpression >= 0.5f ? 0.5f : 0f, 0f);
+        block.SetVector(BaseMapST, atlasTransform);
+        // Unity Toon Shader는 _BaseMap 대신 _MainTex의 UV 변환으로 얼굴을 그립니다.
+        block.SetVector(MainTexST, atlasTransform);
         faceRenderer.SetPropertyBlock(block, faceMaterialIndex);
     }
 
@@ -29,6 +32,7 @@ public sealed class BrownieFaceExpression : MonoBehaviour
         if (faceRenderer == null || block == null) return;
         faceRenderer.GetPropertyBlock(block, faceMaterialIndex);
         block.SetVector(BaseMapST, new Vector4(1f, 1f, 0f, 0f));
+        block.SetVector(MainTexST, new Vector4(1f, 1f, 0f, 0f));
         faceRenderer.SetPropertyBlock(block, faceMaterialIndex);
     }
 }

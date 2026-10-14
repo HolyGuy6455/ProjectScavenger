@@ -54,6 +54,7 @@ public class CharacterStateManager : MonoBehaviour
 
     public void ChangeCharacter(int id)
     {
+        if (PlayerController.LocalInstance != null && PlayerController.LocalInstance.IsInputLocked) return;
         if (DataManager.Instance == null) return;
         CharData data = DataManager.Instance.GetData<CharData>("Char", id);
         if (data == null) return;
