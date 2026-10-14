@@ -1101,15 +1101,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 410285852013246557, guid: c736fa6ae0037d04bafe8020004e8a1e, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -67.03
+      value: -52.42
       objectReference: {fileID: 0}
     - target: {fileID: 410285852013246557, guid: c736fa6ae0037d04bafe8020004e8a1e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.0030638962
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 410285852013246557, guid: c736fa6ae0037d04bafe8020004e8a1e, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -28.07
+      value: -21.46
       objectReference: {fileID: 0}
     - target: {fileID: 410285852013246557, guid: c736fa6ae0037d04bafe8020004e8a1e, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3192,6 +3192,75 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e14dfdfaac630540a1d33783264b886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.Network.ItemSpawnPoint
+--- !u!1001 &1897325268
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 245161661292494468, guid: 07f7ac9823a9d3e4393419dddd4c56bd, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 49.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 245161661292494468, guid: 07f7ac9823a9d3e4393419dddd4c56bd, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.29
+      objectReference: {fileID: 0}
+    - target: {fileID: 245161661292494468, guid: 07f7ac9823a9d3e4393419dddd4c56bd, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 24.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 245161661292494468, guid: 07f7ac9823a9d3e4393419dddd4c56bd, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 245161661292494468, guid: 07f7ac9823a9d3e4393419dddd4c56bd, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 245161661292494468, guid: 07f7ac9823a9d3e4393419dddd4c56bd, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 245161661292494468, guid: 07f7ac9823a9d3e4393419dddd4c56bd, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 245161661292494468, guid: 07f7ac9823a9d3e4393419dddd4c56bd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 245161661292494468, guid: 07f7ac9823a9d3e4393419dddd4c56bd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 245161661292494468, guid: 07f7ac9823a9d3e4393419dddd4c56bd, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 427488248307913273, guid: 07f7ac9823a9d3e4393419dddd4c56bd, type: 3}
+      propertyPath: m_Name
+      value: MobSpawner (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1517414741565351400, guid: 07f7ac9823a9d3e4393419dddd4c56bd, type: 3}
+      propertyPath: SpawnRadius
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1517414741565351400, guid: 07f7ac9823a9d3e4393419dddd4c56bd, type: 3}
+      propertyPath: MaxDangerLevel
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1517414741565351400, guid: 07f7ac9823a9d3e4393419dddd4c56bd, type: 3}
+      propertyPath: AllowedCategories
+      value: 4
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 07f7ac9823a9d3e4393419dddd4c56bd, type: 3}
 --- !u!1 &1915094967
 GameObject:
   m_ObjectHideFlags: 0
@@ -3586,8 +3655,48 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2657760329926192556, guid: 48807bedaad56524baf8ca533649dc99, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2790383516630005604}
   m_SourcePrefab: {fileID: 100100000, guid: 48807bedaad56524baf8ca533649dc99, type: 3}
+--- !u!1 &2790383516630005603 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2657760329926192556, guid: 48807bedaad56524baf8ca533649dc99, type: 3}
+  m_PrefabInstance: {fileID: 2790383516630005602}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2790383516630005604
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2790383516630005603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
+  m_SerializedVersion: 0
+  m_AgentTypeID: 0
+  m_CollectObjects: 2
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_UseGeometry: 1
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 0
+  m_TileSize: 256
+  m_OverrideVoxelSize: 0
+  m_VoxelSize: 0.16666667
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: 47a44ce3bb8eead4b98f66c4eb6b08fe, type: 2}
+  m_BuildHeightMesh: 0
 --- !u!4 &3830348670367265961
 Transform:
   m_ObjectHideFlags: 0
@@ -3597,7 +3706,7 @@ Transform:
   m_GameObject: {fileID: 1776961409503592569}
   serializedVersion: 2
   m_LocalRotation: {x: 0.00000069694744, y: 0.99981326, z: -0.00000007480696, w: -0.01932567}
-  m_LocalPosition: {x: -60.89, y: 2, z: -26.66}
+  m_LocalPosition: {x: -65.16, y: 2, z: -28.64}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3728,6 +3837,7 @@ SceneRoots:
   - {fileID: 406250184}
   - {fileID: 1083527987}
   - {fileID: 1757999362}
+  - {fileID: 1897325268}
   - {fileID: 8592323669876902844}
   - {fileID: 1802717300}
   - {fileID: 950583927}

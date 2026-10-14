@@ -1,0 +1,22 @@
+{
+    "GroupID": "Boss_001_Brownie_01",
+    "Memo": "브라우니 배치 1번째",
+    "Category": 4,
+    "DangerLevel": 8,
+    "AreaSize": 20.0,
+    "SpawnInfos": [
+        {
+            "MobID": "Boss_Brownie",
+            "LocalPosition": {
+                "x": -4.900000095367432,
+                "y": 0.0,
+                "z": 12.5
+            },
+            "LocalEulerAngles": {
+                "x": 0.0,
+                "y": 157.85501098632813,
+                "z": 0.0
+            }
+        }
+    ]
+}
