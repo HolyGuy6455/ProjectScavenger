@@ -39,6 +39,7 @@ public class EnemyAnimator : NetworkBehaviour, IShooterAnimationReceiver
     private bool _isMoving;
     private bool _wasSkillExecuting;
     private bool _isSkillAnimationPlaying;
+    private bool _isDead;
 
     // 이전 프레임의 상태를 기억하여 Play가 매 프레임 불리는 것을 방지
     private bool _wasMoving = false;
@@ -66,6 +67,7 @@ public class EnemyAnimator : NetworkBehaviour, IShooterAnimationReceiver
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        _isDead = false;
         _isSkillAnimationPlaying = false;
         ResetMovementTracking();
     }
@@ -86,7 +88,7 @@ public class EnemyAnimator : NetworkBehaviour, IShooterAnimationReceiver
 
     private void TickMovement(float deltaTime)
     {
-        if (_animator == null || movementRoot == null) return;
+        if (_isDead || _animator == null || movementRoot == null) return;
 
         // NetworkTransform으로 이동하는 원격 개체도 같은 방식으로 관찰합니다.
         Vector3 displacement = movementRoot.position - _previousPosition;
@@ -168,7 +170,7 @@ public class EnemyAnimator : NetworkBehaviour, IShooterAnimationReceiver
 
     public void PlayShootAnimation()
     {
-        if (_isSkillAnimationPlaying || (IsSpawned && !IsServer)) return;
+        if (_isDead || _isSkillAnimationPlaying || (IsSpawned && !IsServer)) return;
 
         PlayConfiguredAnimation(shootStateName, shootLayer);
         if (IsSpawned) PlayShootAnimationClientRpc();
@@ -183,7 +185,7 @@ public class EnemyAnimator : NetworkBehaviour, IShooterAnimationReceiver
 
     public bool PlaySkillAnimation(string stateName)
     {
-        if (IsSpawned && !IsServer) return false;
+        if (_isDead || (IsSpawned && !IsServer)) return false;
         if (!HasConfiguredAnimation(stateName, 0)) return false;
 
         PlaySkillAnimationLocal(stateName);
@@ -200,6 +202,8 @@ public class EnemyAnimator : NetworkBehaviour, IShooterAnimationReceiver
 
     private void PlaySkillAnimationLocal(string stateName)
     {
+        if (_isDead) return;
+
         _isSkillAnimationPlaying = true;
         _wasSkillExecuting = true;
         // 일반 사격의 상체 레이어가 전신 스킬의 총/팔 동작을 덮지 않도록 비웁니다.
@@ -235,7 +239,7 @@ public class EnemyAnimator : NetworkBehaviour, IShooterAnimationReceiver
 
     public void PlayReloadAnimation()
     {
-        if (IsSpawned && !IsServer) return;
+        if (_isDead || (IsSpawned && !IsServer)) return;
 
         PlayReloadAnimationLocal();
         if (IsSpawned) PlayReloadAnimationClientRpc();
@@ -257,9 +261,24 @@ public class EnemyAnimator : NetworkBehaviour, IShooterAnimationReceiver
         PlayConfiguredAnimation(reloadStateName, reloadLayer);
     }
 
+    /// <summary>Health의 사망 이벤트가 각 클라이언트에서 호출합니다. 이후 일반 애니메이션 전환을 막습니다.</summary>
+    public bool PlayDeathAnimation(string stateName)
+    {
+        if (_isDead) return true;
+
+        PlayConfiguredAnimation(shootEmptyStateName, shootLayer);
+        _isDead = true;
+        _isSkillAnimationPlaying = false;
+
+        if (!HasConfiguredAnimation(stateName, 0)) return false;
+        _animator.Play(stateName, 0, 0f);
+        return true;
+    }
+
     private void PlayConfiguredAnimation(string stateName, int layer)
     {
-        if (HasConfiguredAnimation(stateName, layer))
+        // 사망 뒤 도착한 사격/스킬 종료 RPC도 사망 모션을 덮지 못하게 합니다.
+        if (!_isDead && HasConfiguredAnimation(stateName, layer))
         {
             _animator.Play(stateName, layer, 0f);
         }

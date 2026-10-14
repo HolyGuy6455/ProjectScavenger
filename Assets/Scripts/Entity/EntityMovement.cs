@@ -61,35 +61,35 @@ public class EntityMovement : MonoBehaviour
     }
 
     /// <summary>
-    /// NavMesh를 이용해 길을 찾은 뒤, 장애물을 피해 이동합니다.
+    /// 완전한 NavMesh 경로가 있으면 이동합니다. 경로가 없거나 끊겨 있으면 정지하고 false를 반환합니다.
     /// </summary>
-    public void SmartMoveTo(Vector3 targetPos)
+    public bool SmartMoveTo(Vector3 targetPos)
     {
         NavMeshPath path = new NavMeshPath();
-        if (NavMesh.CalculatePath(_rb.position, targetPos, NavMesh.AllAreas, path))
+        if (!NavMesh.CalculatePath(_rb.position, targetPos, NavMesh.AllAreas, path)
+            || path.status != NavMeshPathStatus.PathComplete)
         {
-            _pathCorners.Clear();
-            // 0번 인덱스는 현재 위치이므로 1번부터 큐에 넣습니다.
-            for (int i = 1; i < path.corners.Length; i++)
-            {
-                _pathCorners.Enqueue(path.corners[i]);
-            }
-            
-            _isMoving = true;
-            _isSmartMoving = true;
-            _isMovingInDirection = false;
-            
-            // 첫 번째 목적지 설정
-            if (_pathCorners.Count > 0)
-            {
-                _targetPosition = _pathCorners.Dequeue();
-            }
+            Stop();
+            return false;
         }
-        else
+
+        var corners = path.corners;
+        if (corners.Length < 2)
         {
-            // 길을 찾을 수 없으면 일단 멍청한 이동으로 대체
-            DumbMoveTo(targetPos);
+            Stop();
+            return false;
         }
+
+        _pathCorners.Clear();
+        // 0번은 현재 위치이므로 다음 지점부터 이동합니다.
+        for (int i = 1; i < corners.Length; i++)
+            _pathCorners.Enqueue(corners[i]);
+
+        _isMoving = true;
+        _isSmartMoving = true;
+        _isMovingInDirection = false;
+        _targetPosition = _pathCorners.Dequeue();
+        return true;
     }
 
     /// <summary>

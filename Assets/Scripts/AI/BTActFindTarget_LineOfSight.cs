@@ -7,7 +7,8 @@ public class BTActFindTarget_LineOfSight : BTActionLogic
     public string targetTag = "Player";
     [Min(0f)] public float maxDistance = 20f;
     [Range(0f, 360f)] public float fieldOfView = 120f; // 정면 기준 좌우를 합한 수평 시야각
-    public LayerMask obstacleLayer; // 장애물로 판정할 레이어 (예: Wall, Default 등)
+    [Tooltip("시야를 막는 벽/장애물 레이어입니다. 타겟 태그의 오브젝트(자식 포함), 자기 자신, 트리거는 제외합니다.")]
+    public LayerMask obstacleLayer;
     public string mySelfKey = "";
     public string outGameObjectKey = "";
     
@@ -17,7 +18,7 @@ public class BTActFindTarget_LineOfSight : BTActionLogic
     {
         string mySelfStr = GetKeyValueString<BTSharedGameObject>(brain, mySelfKey);
         string waitStr = returnRunningIfNotFound ? "\n(시야 내에 타겟이 없으면 대기합니다)" : "";
-        return $"{mySelfStr}의 거리 {maxDistance} 이내, 정면 기준 수평 총 시야각 {fieldOfView}° 안에 있는 태그 '{targetTag}' 중 장애물에 가리지 않은 가장 가까운 오브젝트를 '{outGameObjectKey}'에 저장합니다.\n(장애물 레이어: {obstacleLayer.value}, 찾지 못하면 출력값을 비웁니다){waitStr}";
+        return $"{mySelfStr}의 거리 {maxDistance} 이내, 정면 기준 수평 총 시야각 {fieldOfView}° 안에 있는 태그 '{targetTag}' 중 장애물에 가리지 않은 가장 가까운 오브젝트를 '{outGameObjectKey}'에 저장합니다.\n지정한 장애물 레이어({obstacleLayer.value})만 시야를 막습니다. 타겟 태그의 오브젝트·자신(자식 포함)과 트리거는 장애물에서 제외하며, 찾지 못하면 출력값을 비웁니다.{waitStr}";
     }
 
     public override NodeState Evaluate(AIBrain brain)
@@ -85,7 +86,9 @@ public class BTActFindTarget_LineOfSight : BTActionLogic
                 && Vector3.Angle(horizontalForward, horizontalDirection) > halfFieldOfView)
                 continue;
 
-            if (Physics.Linecast(rayStartPos, targetPos, obstacleLayer)) continue;
+            var hits = Physics.RaycastAll(rayStartPos, toTarget.normalized, Mathf.Sqrt(distSqr),
+                obstacleLayer, QueryTriggerInteraction.Ignore);
+            if (HasBlockingHit(hits, mySelf.transform, targetTag)) continue;
 
             closestDistSqr = distSqr;
             closestObj = target;
@@ -98,5 +101,28 @@ public class BTActFindTarget_LineOfSight : BTActionLogic
 
         outGoProp.value = closestObj;
         return NodeState.SUCCESS;
+    }
+
+    private static bool HasBlockingHit(RaycastHit[] hits, Transform observer, string targetTag)
+    {
+        foreach (var hit in hits)
+        {
+            Transform hitTransform = hit.collider.transform;
+            if (hitTransform.IsChildOf(observer)) continue;
+
+            // 몸체는 타겟 태그여도 자식 콜라이더의 태그는 Untagged일 수 있다.
+            bool belongsToTarget = false;
+            for (Transform parent = hitTransform; parent != null; parent = parent.parent)
+            {
+                if (!parent.CompareTag(targetTag)) continue;
+                belongsToTarget = true;
+                break;
+            }
+            if (belongsToTarget) continue;
+
+            // 대상/자신의 콜라이더를 건너뛰어도 그 뒤에 있는 벽은 검사한다.
+            return true;
+        }
+        return false;
     }
 }

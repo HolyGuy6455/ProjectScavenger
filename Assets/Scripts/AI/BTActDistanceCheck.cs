@@ -8,6 +8,8 @@ public class BTActDistanceCheck : BTActionLogic
     public string mySelfKey = "";
     public string distanceKey = "";
     public bool successIfCloser = true;
+    [Tooltip("높이 차이를 제외합니다. SmartMoveTo의 도착 판정과 같은 수평 거리를 사용합니다.")]
+    public bool horizontalOnly = false;
 
     public override string GetDescription(AIBrain brain)
     {
@@ -16,8 +18,9 @@ public class BTActDistanceCheck : BTActionLogic
         string distStr = GetKeyValueString<BTSharedNumeric>(brain, distanceKey);
 
         string conditionStr = successIfCloser ? "이하면" : "이상이면";
+        string distanceType = horizontalOnly ? "수평 거리" : "거리";
 
-        return $"{mySelfStr}로 부터 좌표 {posStr}까지의 거리가 {distStr} {conditionStr} Success, 아니면 Failed를 반환합니다.";
+        return $"{mySelfStr}로 부터 좌표 {posStr}까지의 {distanceType}가 {distStr} {conditionStr} Success, 아니면 Failed를 반환합니다.";
     }
 
     public override NodeState Evaluate(AIBrain brain)
@@ -41,7 +44,9 @@ public class BTActDistanceCheck : BTActionLogic
         Vector3 targetPos = targetPosProp.value;
         Vector3 myPos = mySelfProp.value.transform.position;
 
-        float distance = Vector3.Distance(myPos, targetPos);
+        Vector3 offset = targetPos - myPos;
+        if (horizontalOnly) offset.y = 0f;
+        float distance = offset.magnitude;
 
         bool conditionMet = successIfCloser ? (distance <= (float)distanceProp.value) : (distance >= (float)distanceProp.value);
 

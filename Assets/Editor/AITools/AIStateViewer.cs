@@ -604,12 +604,14 @@ public class AIStateViewer : EditorWindow
     private void OnEnable()
     {
         Selection.selectionChanged += OnSelectionChanged;
+        Undo.undoRedoPerformed += OnSelectionChanged;
         EditorApplication.update += OnEditorUpdate;
     }
 
     private void OnDisable()
     {
         Selection.selectionChanged -= OnSelectionChanged;
+        Undo.undoRedoPerformed -= OnSelectionChanged;
         EditorApplication.update -= OnEditorUpdate;
     }
 
@@ -738,15 +740,13 @@ public class AIStateViewer : EditorWindow
             if (act.logic != null)
             {
                 string desc = act.logic.GetDescription(currentBrain);
-                if (!string.IsNullOrEmpty(desc))
-                {
-                    HelpBox descBox = new HelpBox(desc, HelpBoxMessageType.Info);
-                    descBox.style.marginBottom = 10;
-                    descBox.style.marginTop = 10;
-                    dynamicFieldsContainer.Add(descBox);
-                }
+                HelpBox descBox = new HelpBox(desc, HelpBoxMessageType.Info) { name = "logicDescription" };
+                descBox.style.marginBottom = 10;
+                descBox.style.marginTop = 10;
+                descBox.style.display = string.IsNullOrEmpty(desc) ? DisplayStyle.None : DisplayStyle.Flex;
+                dynamicFieldsContainer.Add(descBox);
 
-                Label logicTitle = new Label("Logic Blackboard Keys");
+                Label logicTitle = new Label("Logic Settings");
                 logicTitle.style.unityFontStyleAndWeight = FontStyle.Bold;
                 logicTitle.style.marginBottom = 5;
                 logicTitle.style.color = new Color(0.7f, 0.9f, 0.7f);
@@ -766,13 +766,15 @@ public class AIStateViewer : EditorWindow
                 System.Reflection.FieldInfo[] fields = act.logic.GetType().GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
                 foreach (var field in fields)
                 {
+                    if (typeof(BTInput).IsAssignableFrom(field.FieldType))
+                    {
+                        DrawInputField(act, field, (BTInput)field.GetValue(act.logic));
+                        continue;
+                    }
+
                     if (field.FieldType == typeof(string))
                     {
                         string currentValue = (string)field.GetValue(act.logic);
-                        if (currentValue != null && !availableKeys.Contains(currentValue))
-                            availableKeys.Add(currentValue);
-
-                        // Create a custom Dropdown using Button + GenericMenu to support "AAA/BBB" nested paths!
                         VisualElement fieldRow = new VisualElement();
                         fieldRow.style.flexDirection = FlexDirection.Row;
                         fieldRow.style.marginBottom = 2;
@@ -780,8 +782,15 @@ public class AIStateViewer : EditorWindow
                         Label fieldLabel = new Label(field.Name);
                         fieldLabel.style.width = 145; 
                         fieldLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
+
+                        var fieldKeys = new List<string>(availableKeys);
+                        if (currentValue != null && !fieldKeys.Contains(currentValue))
+                            fieldKeys.Add(currentValue);
                         
+                        // Button + GenericMenu로 "AAA/BBB" 형태의 Blackboard 키 경로를 표시한다.
                         Button fieldDropdownBtn = new Button();
+                        fieldDropdownBtn.name = field.Name;
+                        fieldDropdownBtn.tooltip = "Blackboard에서 읽거나 쓸 변수의 키입니다.";
                         fieldDropdownBtn.text = string.IsNullOrEmpty(currentValue) ? "(None)" : currentValue;
                         fieldDropdownBtn.style.flexGrow = 1;
                         fieldDropdownBtn.style.unityTextAlign = TextAnchor.MiddleLeft;
@@ -789,7 +798,7 @@ public class AIStateViewer : EditorWindow
                         fieldDropdownBtn.clicked += () => 
                         {
                             GenericMenu menu = new GenericMenu();
-                            foreach(string key in availableKeys)
+                            foreach(string key in fieldKeys)
                             {
                                 string menuPath = string.IsNullOrEmpty(key) ? "None" : key;
                                 menu.AddItem(new GUIContent(menuPath), key == currentValue, () => 
@@ -852,6 +861,39 @@ public class AIStateViewer : EditorWindow
                         fieldRow.Add(floatField);
                         dynamicFieldsContainer.Add(fieldRow);
                     }
+                    else if (field.FieldType == typeof(LayerMask))
+                    {
+                        var editedBrain = currentBrain;
+                        var editedLogic = act.logic;
+                        var fieldRow = new VisualElement();
+                        fieldRow.style.flexDirection = FlexDirection.Row;
+                        fieldRow.style.marginBottom = 5;
+
+                        var fieldLabel = new Label(field.Name);
+                        fieldLabel.style.width = 145;
+                        fieldLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
+
+                        var maskField = new LayerMaskField { name = field.Name };
+                        maskField.SetValueWithoutNotify(((LayerMask)field.GetValue(editedLogic)).value);
+                        maskField.style.flexGrow = 1;
+                        maskField.RegisterValueChangedCallback(evt =>
+                        {
+                            if (editedBrain == null || currentBrain != editedBrain
+                                || selectedNode != act || act.logic != editedLogic) return;
+                            Undo.RecordObject(editedBrain, "Edit " + field.Name);
+                            field.SetValue(editedLogic, (LayerMask)evt.newValue);
+                            EditorUtility.SetDirty(editedBrain);
+                            if (PrefabUtility.IsPartOfPrefabInstance(editedBrain))
+                                PrefabUtility.RecordPrefabInstancePropertyModifications(editedBrain);
+
+                            var description = dynamicFieldsContainer.Q<HelpBox>("logicDescription");
+                            if (description != null) description.text = editedLogic.GetDescription(editedBrain);
+                        });
+
+                        fieldRow.Add(fieldLabel);
+                        fieldRow.Add(maskField);
+                        dynamicFieldsContainer.Add(fieldRow);
+                    }
                     else if (field.FieldType.IsEnum)
                     {
                         VisualElement fieldRow = new VisualElement();
@@ -889,6 +931,140 @@ public class AIStateViewer : EditorWindow
             childrenCountLabel.text = $"Children Count: {sel.children.Count}";
             logicDropdown.style.display = DisplayStyle.None;
         }
+    }
+
+    private void DrawInputField(BTAction action, System.Reflection.FieldInfo field, BTInput input)
+    {
+        var editedBrain = currentBrain;
+        var editedLogic = action.logic;
+        bool wasNull = input == null;
+        if (input == null)
+        {
+            if (field.FieldType.IsAbstract) return;
+            input = (BTInput)System.Activator.CreateInstance(field.FieldType);
+        }
+
+        System.Func<bool> canEdit = () => editedBrain != null && currentBrain == editedBrain
+            && selectedNode == action && action.logic == editedLogic
+            && (ReferenceEquals(field.GetValue(editedLogic), input)
+                || (wasNull && field.GetValue(editedLogic) == null));
+        System.Action<System.Action, bool> commit = (change, rebuild) =>
+        {
+            if (!canEdit()) return;
+            Undo.RecordObject(editedBrain, "Edit " + field.Name + " Input");
+            field.SetValue(editedLogic, input);
+            change();
+            EditorUtility.SetDirty(editedBrain);
+            if (PrefabUtility.IsPartOfPrefabInstance(editedBrain))
+                PrefabUtility.RecordPrefabInstancePropertyModifications(editedBrain);
+            if (rebuild)
+            {
+                UpdateInspector();
+            }
+            else
+            {
+                // 값 입력 중에는 컨트롤을 재생성하지 않아 키보드 포커스를 유지한다.
+                var description = dynamicFieldsContainer.Q<HelpBox>("logicDescription");
+                if (description != null)
+                {
+                    description.text = editedLogic.GetDescription(editedBrain);
+                    description.style.display = string.IsNullOrEmpty(description.text)
+                        ? DisplayStyle.None : DisplayStyle.Flex;
+                }
+            }
+        };
+
+        var row = new VisualElement();
+        row.style.flexDirection = FlexDirection.Row;
+        row.style.marginBottom = 2;
+        var label = new Label(field.Name);
+        label.style.width = 145;
+        label.style.unityTextAlign = TextAnchor.MiddleLeft;
+        row.Add(label);
+
+        if (input.useDirectValue)
+        {
+            VisualElement valueField;
+            if (input.ValueType == typeof(string))
+            {
+                var text = new TextField { isDelayed = true };
+                text.SetValueWithoutNotify((string)input.DirectValue ?? "");
+                text.RegisterValueChangedCallback(evt => commit(() => input.DirectValue = evt.newValue, false));
+                valueField = text;
+            }
+            else if (input.ValueType == typeof(double))
+            {
+                var number = new DoubleField { isDelayed = true };
+                number.SetValueWithoutNotify((double)input.DirectValue);
+                number.RegisterValueChangedCallback(evt => commit(() => input.DirectValue = evt.newValue, false));
+                valueField = number;
+            }
+            else if (input.ValueType == typeof(bool))
+            {
+                var boolean = new Toggle();
+                boolean.SetValueWithoutNotify((bool)input.DirectValue);
+                boolean.RegisterValueChangedCallback(evt => commit(() => input.DirectValue = evt.newValue, false));
+                valueField = boolean;
+            }
+            else if (input.ValueType == typeof(Vector3))
+            {
+                var vector = new Vector3Field();
+                vector.SetValueWithoutNotify((Vector3)input.DirectValue);
+                vector.RegisterValueChangedCallback(evt => commit(() => input.DirectValue = evt.newValue, false));
+                valueField = vector;
+            }
+            else if (input.ValueType == typeof(GameObject))
+            {
+                var gameObject = new ObjectField { objectType = typeof(GameObject), allowSceneObjects = true };
+                gameObject.SetValueWithoutNotify((GameObject)input.DirectValue);
+                gameObject.RegisterValueChangedCallback(evt => commit(() => input.DirectValue = (GameObject)evt.newValue, false));
+                valueField = gameObject;
+            }
+            else
+            {
+                valueField = new Label("지원하지 않는 입력 타입: " + input.ValueType.Name);
+            }
+            valueField.name = field.Name + ".directValue";
+            valueField.tooltip = "직접 입력한 값을 사용합니다.";
+            valueField.style.flexGrow = 1;
+            row.Add(valueField);
+        }
+        else
+        {
+            var dropdown = new Button { name = field.Name + ".blackboardKey" };
+            dropdown.text = string.IsNullOrEmpty(input.blackboardKey) ? "(None)" : input.blackboardKey;
+            dropdown.tooltip = "선택한 Blackboard 변수의 값을 사용합니다.";
+            dropdown.style.flexGrow = 1;
+            dropdown.style.unityTextAlign = TextAnchor.MiddleLeft;
+            dropdown.clicked += () =>
+            {
+                if (!canEdit()) return;
+                var keys = new List<string> { "" };
+                if (editedBrain.blackboard != null)
+                {
+                    foreach (var variable in editedBrain.blackboard)
+                        if (input.BlackboardVariableType.IsInstanceOfType(variable) && !string.IsNullOrEmpty(variable.key)
+                            && !keys.Contains(variable.key)) keys.Add(variable.key);
+                }
+                var menu = new GenericMenu();
+                foreach (string key in keys)
+                {
+                    string menuPath = string.IsNullOrEmpty(key) ? "None" : key;
+                    menu.AddItem(new GUIContent(menuPath), key == input.blackboardKey,
+                        () => commit(() => input.blackboardKey = key, true));
+                }
+                menu.ShowAsContext();
+            };
+            row.Add(dropdown);
+        }
+
+        var directToggle = new Toggle("직접 입력") { name = field.Name + ".useDirectValue" };
+        directToggle.tooltip = "체크: 직접 입력한 값 사용 / 체크 해제: Blackboard 값 사용";
+        directToggle.SetValueWithoutNotify(input.useDirectValue);
+        directToggle.style.marginLeft = 5;
+        directToggle.RegisterValueChangedCallback(evt => commit(() => input.useDirectValue = evt.newValue, true));
+        row.Add(directToggle);
+        dynamicFieldsContainer.Add(row);
     }
 
     private void RebuildTreeUI()
