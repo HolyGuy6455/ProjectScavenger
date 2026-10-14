@@ -38,11 +38,11 @@ public class LootDropper : NetworkBehaviour
                 string refValue = lootData.itemRef[i];
                 if (string.IsNullOrEmpty(refValue) || refValue == "0") continue;
 
-                // 확률 계산 (데이터가 비어있으면 100%로 간주)
-                int chance = i < lootData.chance.Length ? lootData.chance[i] : 100;
+                // 확률 배열이 짧으면 100%(1000)로 간주합니다.
+                int chance = i < lootData.chance.Length ? lootData.chance[i] : 1000;
                 
-                // 0 ~ 99 의 난수가 chance보다 작으면 스폰 (예: chance가 50이면 50% 확률)
-                if (Random.Range(0, 100) < chance)
+                // 0 ~ 999의 난수와 비교합니다. (예: 500 = 50%, 1000 = 100%)
+                if (Random.Range(0, 1000) < chance)
                 {
                     if (int.TryParse(refValue, out int itemId))
                     {

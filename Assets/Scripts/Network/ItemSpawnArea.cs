@@ -40,10 +40,10 @@ namespace Scavenger.Network
                 string refValue = lootData.itemRef[i];
                 if (string.IsNullOrEmpty(refValue) || refValue == "0") continue;
 
-                int chance = i < lootData.chance.Length ? lootData.chance[i] : 100;
+                int chance = i < lootData.chance.Length ? lootData.chance[i] : 1000;
 
-                // 0 ~ 99 의 난수가 chance보다 작으면 스폰 당첨!
-                if (Random.Range(0, 100) < chance)
+                // 0 ~ 999의 난수와 비교합니다. (예: 500 = 50%, 1000 = 100%)
+                if (Random.Range(0, 1000) < chance)
                 {
                     // 당첨된 아이템을 현재 할당된 스폰 포인트에 생성합니다.
                     if (int.TryParse(refValue, out int itemId))
