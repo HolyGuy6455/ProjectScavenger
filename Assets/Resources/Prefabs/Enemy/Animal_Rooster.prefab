@@ -530,9 +530,9 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9a5f694712eaa3f4a864f86d8bc4b002, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AIBrainDamageLinker
-  attackedBoolKey: IsAttacked
-  attackerObjKey: Attacker
+  m_EditorClassIdentifier: Assembly-CSharp::AIBrainStimulusLinker
+  pendingBoolKey: IsAttacked
+  sourceObjectKey: Attacker
 --- !u!1001 &5297562618735421684
 PrefabInstance:
   m_ObjectHideFlags: 0

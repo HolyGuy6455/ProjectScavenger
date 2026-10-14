@@ -100,6 +100,8 @@ GameObject:
   - component: {fileID: 8310323941203480117}
   - component: {fileID: 8310323941203480118}
   - component: {fileID: 6641874754532552051}
+  - component: {fileID: 6936300022463704949}
+  - component: {fileID: 2706786381688388156}
   m_Layer: 7
   m_Name: Boss_Brownie
   m_TagString: Enemy
@@ -276,7 +278,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIBrain
   rootNode:
-    rid: 3558163897100009576
+    rid: 5831856187308507284
   blackboard:
   - rid: 3558163897100009580
   - rid: 3558163961612599431
@@ -297,6 +299,10 @@ MonoBehaviour:
   - rid: 8310323941203480122
   - rid: 1015
   - rid: 1027
+  - rid: 5831856187308507285
+  - rid: 5831856187308507286
+  - rid: 5831856187308507287
+  - rid: 5831856187308507288
   references:
     version: 2
     RefIds:
@@ -1103,6 +1109,72 @@ MonoBehaviour:
       data:
         key: Start/Pos
         value: {x: 0, y: 0, z: 0}
+    - rid: 5831856187308507284
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC790\uADF9 \uCC98\uB9AC \uD6C4 \uD589\uB3D9 \uC120\uD0DD"
+        nodeMemo:
+        children:
+        - rid: 5831856187308507289
+        - rid: 5831856187308507291
+        - rid: 3558163897100009576
+    - rid: 5831856187308507285
+      type: {class: BTSharedBoolean, ns: , asm: Assembly-CSharp}
+      data:
+        key: HasPendingStimulus
+        value: 0
+    - rid: 5831856187308507286
+      type: {class: BTSharedGameObject, ns: , asm: Assembly-CSharp}
+      data:
+        key: StimulusSource
+        value: {fileID: 0}
+    - rid: 5831856187308507287
+      type: {class: BTSharedVector3, ns: , asm: Assembly-CSharp}
+      data:
+        key: StimulusPosition
+        value: {x: 0, y: 0, z: 0}
+    - rid: 5831856187308507288
+      type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
+      data:
+        key: StimulusType
+        value: 0
+    - rid: 5831856187308507289
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uD53C\uACA9 \uC704\uCE58\uB97C \uAE30\uC5B5\uD558\uACE0 \uACC4\uC18D"
+        nodeMemo: "\uD53C\uACA9 \uB2F9\uC2DC \uC704\uCE58\uB97C \uD55C \uBC88 \uAE30\uC5B5\uD55C
+          \uB4A4 \uAC19\uC740 \uD2F1\uC5D0 \uAE30\uC874 \uD589\uB3D9 \uC120\uD0DD\uC744
+          \uACC4\uC18D\uD569\uB2C8\uB2E4."
+        logic:
+          rid: 5831856187308507290
+    - rid: 5831856187308507290
+      type: {class: BTActRememberStimulus, ns: , asm: Assembly-CSharp}
+      data:
+        pendingBoolKey: HasPendingStimulus
+        stimulusTypeKey: StimulusType
+        stimulusPositionKey: StimulusPosition
+        acceptedType: 0
+        outPositionKey: Player/LastPos
+        hasPositionBoolKey: 'HasLastPos '
+    - rid: 5831856187308507291
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC18C\uB9AC \uC704\uCE58\uB97C \uAE30\uC5B5\uD558\uACE0 \uACC4\uC18D"
+        nodeMemo: "\uC11C\uBC84\uC5D0\uC11C ReportStimulus(Noise, \uC18C\uB9AC \uBC1C\uC0DD
+          \uC704\uCE58)\uB97C \uC804\uB2EC\uD558\uBA74 \uADF8 \uC704\uCE58\uB97C
+          \uAE30\uC5B5\uD558\uACE0 \uAE30\uC874 \uC0AC\uACA9\xB7\uCD94\uACA9\uC744
+          \uACC4\uC18D\uD569\uB2C8\uB2E4."
+        logic:
+          rid: 5831856187308507292
+    - rid: 5831856187308507292
+      type: {class: BTActRememberStimulus, ns: , asm: Assembly-CSharp}
+      data:
+        pendingBoolKey: HasPendingStimulus
+        stimulusTypeKey: StimulusType
+        stimulusPositionKey: StimulusPosition
+        acceptedType: 1
+        outPositionKey: Player/LastPos
+        hasPositionBoolKey: 'HasLastPos '
     - rid: 8310323941203480121
       type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
       data:
@@ -1262,7 +1334,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c88e2b6420acffc4db70264b88d125cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterCinematicController
-  cinematicCamera: {fileID: 7599106757235454957, guid: ad7fb6d69b601e44b975f4e1dadb82cb, type: 3}
+  cinematicCamera: {fileID: 2258924206195054053}
 --- !u!114 &3189800342365189778
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1317,6 +1389,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDeathHandler
   deathStateName: Base Layer.Boss_Death
+--- !u!114 &6936300022463704949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f3a367aeb3366f64990ef859a393ecdf, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::BossIntroController
+  introStateName: Base Layer.Boss_Intro
+  cameraPriority: 100
+  maxIntroDuration: 30
+--- !u!114 &2706786381688388156
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a5f694712eaa3f4a864f86d8bc4b002, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::AIBrainStimulusLinker
+  pendingBoolKey: HasPendingStimulus
+  sourceObjectKey: StimulusSource
+  positionKey: StimulusPosition
+  typeKey: StimulusType
 --- !u!1 &6051072652957990657
 GameObject:
   m_ObjectHideFlags: 0
