@@ -32,9 +32,7 @@ public class TrainCharacterSkillNode : MonoBehaviour
 
             if (skillIcon != null)
             {
-                string iconPath = System.IO.Path.GetFileNameWithoutExtension(skillData.resourceIcon);
-                Sprite loadedSprite = Resources.Load<Sprite>($"skill/{iconPath}");
-                if (loadedSprite == null) loadedSprite = Resources.Load<Sprite>(iconPath);
+                Sprite loadedSprite = SkillIconLoader.Load(skillData.resourceIcon);
                 
                 if (loadedSprite != null)
                 {

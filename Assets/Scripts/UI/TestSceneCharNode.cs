@@ -157,9 +157,7 @@ namespace Scavenger.UI
             var skillData = DataManager.Instance.GetData<SkillData>("Skill", skillId);
             if (skillData != null && !string.IsNullOrEmpty(skillData.resourceIcon))
             {
-                string path = skillData.resourceIcon.Replace(".png", "");
-                Sprite skillSprite = Resources.Load<Sprite>($"skill/{path}");
-                if (skillSprite == null) skillSprite = Resources.Load<Sprite>(path);
+                Sprite skillSprite = SkillIconLoader.Load(skillData.resourceIcon);
                 
                 if (skillSprite != null)
                 {

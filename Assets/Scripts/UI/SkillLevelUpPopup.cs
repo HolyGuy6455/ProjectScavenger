@@ -39,9 +39,7 @@ public class SkillLevelUpPopup : MonoBehaviour
 
         if (skillIcon != null)
         {
-            string iconPath = System.IO.Path.GetFileNameWithoutExtension(displaySkill.resourceIcon);
-            Sprite loadedSprite = Resources.Load<Sprite>($"skill/{iconPath}");
-            if (loadedSprite == null) loadedSprite = Resources.Load<Sprite>(iconPath);
+            Sprite loadedSprite = SkillIconLoader.Load(displaySkill.resourceIcon);
             skillIcon.sprite = loadedSprite;
         }
 

@@ -30,9 +30,7 @@ public class SkillLevelUpCelebrationPopup : MonoBehaviour
 
         if (skillIcon != null)
         {
-            string iconPath = System.IO.Path.GetFileNameWithoutExtension(newSkillData.resourceIcon);
-            Sprite loadedSprite = Resources.Load<Sprite>($"skill/{iconPath}");
-            if (loadedSprite == null) loadedSprite = Resources.Load<Sprite>(iconPath);
+            Sprite loadedSprite = SkillIconLoader.Load(newSkillData.resourceIcon);
             skillIcon.sprite = loadedSprite;
         }
 

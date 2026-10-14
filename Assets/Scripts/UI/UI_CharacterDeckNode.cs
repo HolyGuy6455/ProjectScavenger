@@ -102,10 +102,7 @@ namespace Scavenger.UI
                                 continue;
                             }
 
-                            string iconPath = skillData.resourceIcon.Replace(".png", "");
-                            if (!iconPath.StartsWith("skill/")) iconPath = "skill/" + iconPath;
-                            
-                            Sprite icon = Resources.Load<Sprite>(iconPath);
+                            Sprite icon = SkillIconLoader.Load(skillData.resourceIcon);
                             skillIcons[i].sprite = icon;
                             skillIcons[i].enabled = icon != null;
                         }
