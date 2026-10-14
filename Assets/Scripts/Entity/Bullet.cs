@@ -124,7 +124,8 @@ public class Bullet : NetworkBehaviour
             float moveDistance = speed * Time.deltaTime;
 
             // 이동하기 전에 Raycast를 쏘아 충돌을 미리 감지 (총알이 얇은 벽을 뚫는 현상 방지)
-            if (Physics.Raycast(transform.position, moveDirection, out RaycastHit hit, moveDistance))
+            if (Physics.Raycast(transform.position, moveDirection, out RaycastHit hit, moveDistance,
+                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
             {
                 HitTarget(hit.collider.gameObject, hit.point, hit.normal);
             }
@@ -198,6 +199,8 @@ public class Bullet : NetworkBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (!IsServer) return;
+        // 보스룸/탈출 구역 같은 감지용 영역은 탄을 막지 않습니다.
+        if (other.isTrigger) return;
 
         // 이미 발사자가 자신이 쏜 총알에 맞는 것 방지 (원한다면 레이어 설정으로도 가능)
         if (other.transform.root.gameObject == attacker) return;

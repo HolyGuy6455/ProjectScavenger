@@ -64,10 +64,12 @@ public class Shooter : NetworkBehaviour
     private float currentSpread = 0f;
 
     private IShooterAnimationReceiver animReceiver;
+    private PlayerController playerController;
 
     private void Awake()
     {
         animReceiver = GetComponentInParent<IShooterAnimationReceiver>();
+        playerController = GetComponentInParent<PlayerController>();
     }
 
     public override void OnNetworkSpawn()
@@ -255,6 +257,7 @@ public class Shooter : NetworkBehaviour
     public bool TryShoot(Vector3 direction, Vector3 targetPosition = default)
     {
         if (!IsSpawned || !IsOwner) return false; // 발사 요청은 소유자(Owner)만 할 수 있습니다.
+        if (playerController != null && playerController.IsInputLocked) return false;
 
         if (currentAmmoData == null || isReloading || CurrentAmmo <= 0) return false;
         if (Time.time - clientLastFireTime < currentAmmoData.fireRate) return false;
@@ -277,6 +280,8 @@ public class Shooter : NetworkBehaviour
     [ServerRpc]
     private void CmdShootServerRpc(Vector3 direction, Vector3 targetPosition)
     {
+        // 연출 시작 직전에 전송된 발사 요청도 서버에서 차단합니다.
+        if (playerController != null && playerController.IsInputLocked) return;
         // 서버 측에서 한 번 더 검증 (해킹 방지)
         if (currentAmmoData == null || isReloading || CurrentAmmo <= 0 || Time.time - serverLastFireTime < currentAmmoData.fireRate)
             return;
