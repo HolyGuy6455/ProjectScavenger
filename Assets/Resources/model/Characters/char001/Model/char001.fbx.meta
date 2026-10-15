@@ -7,6 +7,11 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Char001_Face_Atlas
+    second: {fileID: 2100000, guid: 9c00c404ec0383a4994e464d23414506, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: ClosedEyeSkin_Left_Skin
     second: {fileID: 2100000, guid: 536bc44d07df40f4b9109b0e0e4d087b, type: 2}
   - first:
@@ -19,6 +24,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: ClosedEyes_Lash
     second: {fileID: 2100000, guid: 1c428a9f64fa6344dad77587e83594b9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material_tripo_node_311f5b9d-efc8-4d28-ab58-497e38cb79f1
+    second: {fileID: 2100000, guid: 6e45be3bf5aa02448b19f89a2d35688c, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
@@ -271,9 +281,300 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Armature.001|Armature.001|entering
-      takeName: Armature.001|Armature.001|entering
-      internalID: 3789786366090136245
+      name: death
+      takeName: Armature.001|death
+      internalID: 3757268224982703029
+      firstFrame: 0
+      lastFrame: 71
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 1
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 1
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature.001
+        weight: 1
+      - path: Armature.001/CameraAim
+        weight: 1
+      - path: Armature.001/CameraAim/CameraAim_end
+        weight: 1
+      - path: Armature.001/CameraAim/CameraLookAt
+        weight: 1
+      - path: Armature.001/CameraPosition
+        weight: 1
+      - path: Armature.001/CameraPosition/CameraPosition
+        weight: 1
+      - path: Armature.001/CameraPosition/CameraPosition_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:LeftUpLeg
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg/mixamorig:LeftFoot
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg/mixamorig:LeftFoot/mixamorig:LeftToeBase
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg/mixamorig:LeftFoot/mixamorig:LeftToeBase/mixamorig:LeftToe_End
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg/mixamorig:LeftFoot/mixamorig:LeftToeBase/mixamorig:LeftToe_End/mixamorig:LeftToe_End_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg/mixamorig:LeftFoot/mixamorig:LeftToeBase/mixamorig:LeftToe_End/mixamorig:LeftToe_End_end/mixamorig:LeftToe_End_end_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:RightUpLeg
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:RightUpLeg/mixamorig:RightLeg
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:RightUpLeg/mixamorig:RightLeg/mixamorig:RightFoot
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:RightUpLeg/mixamorig:RightLeg/mixamorig:RightFoot/mixamorig:RightToeBase
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:RightUpLeg/mixamorig:RightLeg/mixamorig:RightFoot/mixamorig:RightToeBase/mixamorig:RightToe_End
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:RightUpLeg/mixamorig:RightLeg/mixamorig:RightFoot/mixamorig:RightToeBase/mixamorig:RightToe_End/mixamorig:RightToe_End_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:RightUpLeg/mixamorig:RightLeg/mixamorig:RightFoot/mixamorig:RightToeBase/mixamorig:RightToe_End/mixamorig:RightToe_End_end/mixamorig:RightToe_End_end_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandIndex1
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandIndex1/mixamorig:LeftHandIndex2
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandIndex1/mixamorig:LeftHandIndex2/mixamorig:LeftHandIndex3
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandIndex1/mixamorig:LeftHandIndex2/mixamorig:LeftHandIndex3/mixamorig:LeftHandIndex4
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandIndex1/mixamorig:LeftHandIndex2/mixamorig:LeftHandIndex3/mixamorig:LeftHandIndex4/mixamorig:LeftHandIndex4_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandIndex1/mixamorig:LeftHandIndex2/mixamorig:LeftHandIndex3/mixamorig:LeftHandIndex4/mixamorig:LeftHandIndex4_end/mixamorig:LeftHandIndex4_end_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandRing1
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandRing1/mixamorig:LeftHandRing2
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandRing1/mixamorig:LeftHandRing2/mixamorig:LeftHandRing3
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandRing1/mixamorig:LeftHandRing2/mixamorig:LeftHandRing3/mixamorig:LeftHandRing4
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandRing1/mixamorig:LeftHandRing2/mixamorig:LeftHandRing3/mixamorig:LeftHandRing4/mixamorig:LeftHandRing4_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandRing1/mixamorig:LeftHandRing2/mixamorig:LeftHandRing3/mixamorig:LeftHandRing4/mixamorig:LeftHandRing4_end/mixamorig:LeftHandRing4_end_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandThumb1
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandThumb1/mixamorig:LeftHandThumb2
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandThumb1/mixamorig:LeftHandThumb2/mixamorig:LeftHandThumb3
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandThumb1/mixamorig:LeftHandThumb2/mixamorig:LeftHandThumb3/mixamorig:LeftHandThumb4
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandThumb1/mixamorig:LeftHandThumb2/mixamorig:LeftHandThumb3/mixamorig:LeftHandThumb4/mixamorig:LeftHandThumb4_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandThumb1/mixamorig:LeftHandThumb2/mixamorig:LeftHandThumb3/mixamorig:LeftHandThumb4/mixamorig:LeftHandThumb4_end/mixamorig:LeftHandThumb4_end_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck/mixamorig:Head
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck/mixamorig:Head/ClosedEyes_Control
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck/mixamorig:Head/ClosedEyes_Control/ClosedEyes_Control_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck/mixamorig:Head/mixamorig:HeadTop_End
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck/mixamorig:Head/mixamorig:HeadTop_End/mixamorig:HeadTop_End_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck/mixamorig:Head/mixamorig:HeadTop_End/mixamorig:HeadTop_End_end/mixamorig:HeadTop_End_end_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck/mixamorig:Head/OpenEyes_Control
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine/tripo_part_2
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine/tripo_part_2/tripo_part_9
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine/tripo_part_2/tripo_part_23
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine/tripo_part_2/tripo_part_30
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine/tripo_part_2/tripo_part_31
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine/tripo_part_2/tripo_part_32
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine/tripo_part_2/tripo_part_33
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_0
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_1
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_3
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_4
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_5
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_6
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_7
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_8
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_10
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_11
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_12
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_13
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_14
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_15
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_16
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_17
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_18
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_19
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_20
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_21
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_22
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_24
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_25
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_26
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_27
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_28
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_29
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_34
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_35
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_36
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_37
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_38
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_39
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_40
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_41
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_43
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandIndex1
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandIndex1/mixamorig:RightHandIndex2
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandIndex1/mixamorig:RightHandIndex2/mixamorig:RightHandIndex3
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandIndex1/mixamorig:RightHandIndex2/mixamorig:RightHandIndex3/mixamorig:RightHandIndex4
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandIndex1/mixamorig:RightHandIndex2/mixamorig:RightHandIndex3/mixamorig:RightHandIndex4/mixamorig:RightHandIndex4_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandIndex1/mixamorig:RightHandIndex2/mixamorig:RightHandIndex3/mixamorig:RightHandIndex4/mixamorig:RightHandIndex4_end/mixamorig:RightHandIndex4_end_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandRing1
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandRing1/mixamorig:RightHandRing2
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandRing1/mixamorig:RightHandRing2/mixamorig:RightHandRing3
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandRing1/mixamorig:RightHandRing2/mixamorig:RightHandRing3/mixamorig:RightHandRing4
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandRing1/mixamorig:RightHandRing2/mixamorig:RightHandRing3/mixamorig:RightHandRing4/mixamorig:RightHandRing4_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandRing1/mixamorig:RightHandRing2/mixamorig:RightHandRing3/mixamorig:RightHandRing4/mixamorig:RightHandRing4_end/mixamorig:RightHandRing4_end_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandThumb1
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandThumb1/mixamorig:RightHandThumb2
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandThumb1/mixamorig:RightHandThumb2/mixamorig:RightHandThumb3
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandThumb1/mixamorig:RightHandThumb2/mixamorig:RightHandThumb3/mixamorig:RightHandThumb4
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandThumb1/mixamorig:RightHandThumb2/mixamorig:RightHandThumb3/mixamorig:RightHandThumb4/mixamorig:RightHandThumb4_end
+        weight: 1
+      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandThumb1/mixamorig:RightHandThumb2/mixamorig:RightHandThumb3/mixamorig:RightHandThumb4/mixamorig:RightHandThumb4_end/mixamorig:RightHandThumb4_end_end
+        weight: 1
+      - path: Armature.001/ultimate_bottle
+        weight: 1
+      - path: Armature.001/ultimate_bottle/tripo_7e5ab766_7a09_40da_a2d2_ec5c5fae2e89
+        weight: 1
+      - path: Armature.001/ultimate_bottle/ultimate_bottle_end
+        weight: 1
+      - path: Armature.001/ultimate_cap
+        weight: 1
+      - path: Armature.001/ultimate_cap/Ultimate_BottleCap
+        weight: 1
+      - path: Armature.001/ultimate_cap/ultimate_cap_end
+        weight: 1
+      - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
+        weight: 1
+      maskType: 1
+      maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: entering
+      takeName: Armature.001|entering
+      internalID: -9027252261036801
       firstFrame: 0
       lastFrame: 107
       wrapMode: 0
@@ -556,29 +857,17 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
       maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|Armature.001|exit
-      takeName: Armature.001|Armature.001|exit
-      internalID: 3159101251174993489
+      name: exit
+      takeName: Armature.001|exit
+      internalID: 6599963198308608111
       firstFrame: 0
-      lastFrame: 155
+      lastFrame: 143
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -859,27 +1148,15 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
       maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|Armature.001|hit
-      takeName: Armature.001|Armature.001|hit
-      internalID: -6259300686630964039
+      name: hit
+      takeName: Armature.001|hit
+      internalID: -7680550711890105428
       firstFrame: 0
       lastFrame: 13
       wrapMode: 0
@@ -1162,27 +1439,15 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
       maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|Armature.001|idle
-      takeName: Armature.001|Armature.001|idle
-      internalID: 2702158855603823183
+      name: idle
+      takeName: Armature.001|idle
+      internalID: 9163257287205964719
       firstFrame: 0
       lastFrame: 93
       wrapMode: 0
@@ -1465,27 +1730,15 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
       maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|Armature.001|reloading
-      takeName: Armature.001|Armature.001|reloading
-      internalID: -7580166758023420506
+      name: reloading
+      takeName: Armature.001|reloading
+      internalID: -3729344355350905985
       firstFrame: 0
       lastFrame: 99
       wrapMode: 0
@@ -1768,27 +2021,15 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
       maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|Armature.001|roll
-      takeName: Armature.001|Armature.001|roll
-      internalID: 6350340616383706203
+      name: roll
+      takeName: Armature.001|roll
+      internalID: -2136425304685977164
       firstFrame: 0
       lastFrame: 35.2
       wrapMode: 0
@@ -2071,27 +2312,15 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
       maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|Armature.001|run_backward
-      takeName: Armature.001|Armature.001|run_backward
-      internalID: -4151352843748276923
+      name: run_backward
+      takeName: Armature.001|run_backward
+      internalID: 2138544464966986851
       firstFrame: 0
       lastFrame: 16
       wrapMode: 0
@@ -2374,27 +2603,15 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
       maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|Armature.001|run_forward
-      takeName: Armature.001|Armature.001|run_forward
-      internalID: 1048107304989441014
+      name: run_forward
+      takeName: Armature.001|run_forward
+      internalID: -895201996066259300
       firstFrame: 0
       lastFrame: 21
       wrapMode: 0
@@ -2677,27 +2894,15 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
       maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|Armature.001|run_left
-      takeName: Armature.001|Armature.001|run_left
-      internalID: 604120921887763263
+      name: run_left
+      takeName: Armature.001|run_left
+      internalID: -5753816515591467484
       firstFrame: 0
       lastFrame: 16
       wrapMode: 0
@@ -2980,27 +3185,15 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
       maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|Armature.001|run_right
-      takeName: Armature.001|Armature.001|run_right
-      internalID: 4142547803736950034
+      name: run_right
+      takeName: Armature.001|run_right
+      internalID: -4260850764203864468
       firstFrame: 0
       lastFrame: 20
       wrapMode: 0
@@ -3283,27 +3476,15 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
       maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|Armature.001|shoot
-      takeName: Armature.001|Armature.001|shoot
-      internalID: -2232629476507048129
+      name: shoot
+      takeName: Armature.001|shoot
+      internalID: 767248506783460767
       firstFrame: 0
       lastFrame: 8
       wrapMode: 0
@@ -3586,330 +3767,15 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
       maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|Armature.001|throw
-      takeName: Armature.001|Armature.001|throw
-      internalID: -2629520945866786357
-      firstFrame: 0
-      lastFrame: 86
-      wrapMode: 0
-      orientationOffsetY: 0
-      level: 0
-      cycleOffset: 0
-      loop: 0
-      hasAdditiveReferencePose: 0
-      loopTime: 0
-      loopBlend: 0
-      loopBlendOrientation: 1
-      loopBlendPositionY: 1
-      loopBlendPositionXZ: 1
-      keepOriginalOrientation: 1
-      keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 1
-      heightFromFeet: 0
-      mirror: 0
-      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves: []
-      events: []
-      transformMask:
-      - path: 
-        weight: 1
-      - path: Armature.001
-        weight: 1
-      - path: Armature.001/CameraAim
-        weight: 1
-      - path: Armature.001/CameraAim/CameraAim_end
-        weight: 1
-      - path: Armature.001/CameraAim/CameraLookAt
-        weight: 1
-      - path: Armature.001/CameraPosition
-        weight: 1
-      - path: Armature.001/CameraPosition/CameraPosition
-        weight: 1
-      - path: Armature.001/CameraPosition/CameraPosition_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:LeftUpLeg
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg/mixamorig:LeftFoot
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg/mixamorig:LeftFoot/mixamorig:LeftToeBase
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg/mixamorig:LeftFoot/mixamorig:LeftToeBase/mixamorig:LeftToe_End
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg/mixamorig:LeftFoot/mixamorig:LeftToeBase/mixamorig:LeftToe_End/mixamorig:LeftToe_End_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg/mixamorig:LeftFoot/mixamorig:LeftToeBase/mixamorig:LeftToe_End/mixamorig:LeftToe_End_end/mixamorig:LeftToe_End_end_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:RightUpLeg
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:RightUpLeg/mixamorig:RightLeg
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:RightUpLeg/mixamorig:RightLeg/mixamorig:RightFoot
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:RightUpLeg/mixamorig:RightLeg/mixamorig:RightFoot/mixamorig:RightToeBase
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:RightUpLeg/mixamorig:RightLeg/mixamorig:RightFoot/mixamorig:RightToeBase/mixamorig:RightToe_End
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:RightUpLeg/mixamorig:RightLeg/mixamorig:RightFoot/mixamorig:RightToeBase/mixamorig:RightToe_End/mixamorig:RightToe_End_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:RightUpLeg/mixamorig:RightLeg/mixamorig:RightFoot/mixamorig:RightToeBase/mixamorig:RightToe_End/mixamorig:RightToe_End_end/mixamorig:RightToe_End_end_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandIndex1
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandIndex1/mixamorig:LeftHandIndex2
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandIndex1/mixamorig:LeftHandIndex2/mixamorig:LeftHandIndex3
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandIndex1/mixamorig:LeftHandIndex2/mixamorig:LeftHandIndex3/mixamorig:LeftHandIndex4
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandIndex1/mixamorig:LeftHandIndex2/mixamorig:LeftHandIndex3/mixamorig:LeftHandIndex4/mixamorig:LeftHandIndex4_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandIndex1/mixamorig:LeftHandIndex2/mixamorig:LeftHandIndex3/mixamorig:LeftHandIndex4/mixamorig:LeftHandIndex4_end/mixamorig:LeftHandIndex4_end_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandRing1
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandRing1/mixamorig:LeftHandRing2
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandRing1/mixamorig:LeftHandRing2/mixamorig:LeftHandRing3
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandRing1/mixamorig:LeftHandRing2/mixamorig:LeftHandRing3/mixamorig:LeftHandRing4
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandRing1/mixamorig:LeftHandRing2/mixamorig:LeftHandRing3/mixamorig:LeftHandRing4/mixamorig:LeftHandRing4_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandRing1/mixamorig:LeftHandRing2/mixamorig:LeftHandRing3/mixamorig:LeftHandRing4/mixamorig:LeftHandRing4_end/mixamorig:LeftHandRing4_end_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandThumb1
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandThumb1/mixamorig:LeftHandThumb2
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandThumb1/mixamorig:LeftHandThumb2/mixamorig:LeftHandThumb3
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandThumb1/mixamorig:LeftHandThumb2/mixamorig:LeftHandThumb3/mixamorig:LeftHandThumb4
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandThumb1/mixamorig:LeftHandThumb2/mixamorig:LeftHandThumb3/mixamorig:LeftHandThumb4/mixamorig:LeftHandThumb4_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:LeftShoulder/mixamorig:LeftArm/mixamorig:LeftForeArm/mixamorig:LeftHand/mixamorig:LeftHandThumb1/mixamorig:LeftHandThumb2/mixamorig:LeftHandThumb3/mixamorig:LeftHandThumb4/mixamorig:LeftHandThumb4_end/mixamorig:LeftHandThumb4_end_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck/mixamorig:Head
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck/mixamorig:Head/ClosedEyes_Control
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck/mixamorig:Head/ClosedEyes_Control/ClosedEyes_Control_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck/mixamorig:Head/mixamorig:HeadTop_End
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck/mixamorig:Head/mixamorig:HeadTop_End/mixamorig:HeadTop_End_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck/mixamorig:Head/mixamorig:HeadTop_End/mixamorig:HeadTop_End_end/mixamorig:HeadTop_End_end_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:Neck/mixamorig:Head/OpenEyes_Control
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine/tripo_part_2
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine/tripo_part_2/tripo_part_9
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine/tripo_part_2/tripo_part_23
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine/tripo_part_2/tripo_part_30
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine/tripo_part_2/tripo_part_31
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine/tripo_part_2/tripo_part_32
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Magazine/tripo_part_2/tripo_part_33
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_0
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_1
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_3
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_4
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_5
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_6
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_7
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_8
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_10
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_11
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_12
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_13
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_14
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_15
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_16
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_17
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_18
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_19
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_20
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_21
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_22
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_24
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_25
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_26
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_27
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_28
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_29
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_34
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_35
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_36
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_37
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_38
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_39
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_40
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_41
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/Char001_WeaponMount/Char001_Weapon/tripo_part_43
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandIndex1
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandIndex1/mixamorig:RightHandIndex2
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandIndex1/mixamorig:RightHandIndex2/mixamorig:RightHandIndex3
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandIndex1/mixamorig:RightHandIndex2/mixamorig:RightHandIndex3/mixamorig:RightHandIndex4
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandIndex1/mixamorig:RightHandIndex2/mixamorig:RightHandIndex3/mixamorig:RightHandIndex4/mixamorig:RightHandIndex4_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandIndex1/mixamorig:RightHandIndex2/mixamorig:RightHandIndex3/mixamorig:RightHandIndex4/mixamorig:RightHandIndex4_end/mixamorig:RightHandIndex4_end_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandRing1
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandRing1/mixamorig:RightHandRing2
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandRing1/mixamorig:RightHandRing2/mixamorig:RightHandRing3
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandRing1/mixamorig:RightHandRing2/mixamorig:RightHandRing3/mixamorig:RightHandRing4
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandRing1/mixamorig:RightHandRing2/mixamorig:RightHandRing3/mixamorig:RightHandRing4/mixamorig:RightHandRing4_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandRing1/mixamorig:RightHandRing2/mixamorig:RightHandRing3/mixamorig:RightHandRing4/mixamorig:RightHandRing4_end/mixamorig:RightHandRing4_end_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandThumb1
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandThumb1/mixamorig:RightHandThumb2
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandThumb1/mixamorig:RightHandThumb2/mixamorig:RightHandThumb3
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandThumb1/mixamorig:RightHandThumb2/mixamorig:RightHandThumb3/mixamorig:RightHandThumb4
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandThumb1/mixamorig:RightHandThumb2/mixamorig:RightHandThumb3/mixamorig:RightHandThumb4/mixamorig:RightHandThumb4_end
-        weight: 1
-      - path: Armature.001/mixamorig:Hips/mixamorig:Spine/mixamorig:Spine1/mixamorig:Spine2/mixamorig:RightShoulder/mixamorig:RightArm/mixamorig:RightForeArm/mixamorig:RightHand/mixamorig:RightHandThumb1/mixamorig:RightHandThumb2/mixamorig:RightHandThumb3/mixamorig:RightHandThumb4/mixamorig:RightHandThumb4_end/mixamorig:RightHandThumb4_end_end
-        weight: 1
-      - path: Armature.001/ultimate_bottle
-        weight: 1
-      - path: Armature.001/ultimate_bottle/tripo_7e5ab766_7a09_40da_a2d2_ec5c5fae2e89
-        weight: 1
-      - path: Armature.001/ultimate_bottle/ultimate_bottle_end
-        weight: 1
-      - path: Armature.001/ultimate_cap
-        weight: 1
-      - path: Armature.001/ultimate_cap/Ultimate_BottleCap
-        weight: 1
-      - path: Armature.001/ultimate_cap/ultimate_cap_end
-        weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
-      - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
-        weight: 1
-      maskType: 1
-      maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
-      additiveReferencePoseFrame: 0
-    - serializedVersion: 16
-      name: Armature.001|Armature.001|ultimate
-      takeName: Armature.001|Armature.001|ultimate
-      internalID: -5734538679389945731
+      name: ultimate
+      takeName: Armature.001|ultimate
+      internalID: 7090255107463444031
       firstFrame: 0
       lastFrame: 69
       wrapMode: 0
@@ -4192,27 +4058,15 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
       maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|Armature.001|walk_backward
-      takeName: Armature.001|Armature.001|walk_backward
-      internalID: 2066288186785794892
+      name: walk_backward
+      takeName: Armature.001|walk_backward
+      internalID: 7893866256509290524
       firstFrame: 0
       lastFrame: 42
       wrapMode: 0
@@ -4495,27 +4349,15 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
       maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|Armature.001|walk_forward
-      takeName: Armature.001|Armature.001|walk_forward
-      internalID: 8386350758950021235
+      name: walk_forward
+      takeName: Armature.001|walk_forward
+      internalID: -280684011239254669
       firstFrame: 0
       lastFrame: 41
       wrapMode: 0
@@ -4798,27 +4640,15 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
       maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|Armature.001|walk_left
-      takeName: Armature.001|Armature.001|walk_left
-      internalID: 1834132527144171574
+      name: walk_left
+      takeName: Armature.001|walk_left
+      internalID: -1018036069561753331
       firstFrame: 0
       lastFrame: 29
       wrapMode: 0
@@ -5101,27 +4931,15 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
       maskSource: {fileID: 31900000, guid: 438f87f3d630c3c408dd5960fcba3e54, type: 2}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature.001|Armature.001|walk_right
-      takeName: Armature.001|Armature.001|walk_right
-      internalID: -4092431234083175150
+      name: walk_right
+      takeName: Armature.001|walk_right
+      internalID: -2852647913048679520
       firstFrame: 0
       lastFrame: 43
       wrapMode: 0
@@ -5404,18 +5222,6 @@ ModelImporter:
         weight: 1
       - path: Armature.001/ultimate_cap/ultimate_cap_end
         weight: 1
-      - path: ClosedEyeLine_Left
-        weight: 1
-      - path: ClosedEyeLine_Right
-        weight: 1
-      - path: ClosedEyeSkin_Left
-        weight: 1
-      - path: ClosedEyeSkin_Right
-        weight: 1
-      - path: OpenEyes_Left
-        weight: 1
-      - path: OpenEyes_Right
-        weight: 1
       - path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
         weight: 1
       maskType: 1
@@ -5446,7 +5252,7 @@ ModelImporter:
     skinWeightsMode: 0
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
-    optimizeBones: 1
+    optimizeBones: 0
     generateMeshLods: 0
     meshLodGenerationFlags: 0
     maximumMeshLod: -1

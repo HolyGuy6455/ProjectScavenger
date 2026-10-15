@@ -1,0 +1,445 @@
+{
+  "schemaVersion": 1,
+  "characterId": "char001",
+  "atlasTexture": "Char001_FaceAtlas.png",
+  "atlasSizePixels": [
+    4608,
+    3072
+  ],
+  "grid": [
+    3,
+    2
+  ],
+  "tileSizePixels": 1536,
+  "paddingPixels": 24,
+  "propertyPath": "Armature.001[\"face_expression\"]",
+  "material": "Char001_Face_Atlas",
+  "materialSlot": 1,
+  "uvChannel": "Attribute",
+  "uvOrigin": "bottom-left",
+  "layoutMode": "base-tile-uv",
+  "sourceRect": [
+    0,
+    0,
+    0.3333333333333333,
+    0.5
+  ],
+  "sourceArtworkRectPixels": [
+    2048,
+    0,
+    1536,
+    1536
+  ],
+  "sourceArtworkRotationDegrees": 90,
+  "defaultExpressionId": "normal",
+  "outOfRangePolicy": "clamp",
+  "entries": [
+    {
+      "index": 0,
+      "id": "normal",
+      "displayName": "평소",
+      "rect": [
+        0.0,
+        0.0,
+        0.3333333333333333,
+        0.5
+      ],
+      "offset": [
+        0.0,
+        0.0
+      ],
+      "contentRect": [
+        0.005208333333333333,
+        0.0078125,
+        0.3229166666666667,
+        0.484375
+      ]
+    },
+    {
+      "index": 1,
+      "id": "smile",
+      "displayName": "가벼운 즐거움",
+      "rect": [
+        0.3333333333333333,
+        0.0,
+        0.3333333333333333,
+        0.5
+      ],
+      "offset": [
+        0.3333333333333333,
+        0.0
+      ],
+      "contentRect": [
+        0.3385416666666667,
+        0.0078125,
+        0.3229166666666667,
+        0.484375
+      ]
+    },
+    {
+      "index": 2,
+      "id": "joyful",
+      "displayName": "격렬한 즐거움",
+      "rect": [
+        0.6666666666666666,
+        0.0,
+        0.3333333333333333,
+        0.5
+      ],
+      "offset": [
+        0.6666666666666666,
+        0.0
+      ],
+      "contentRect": [
+        0.671875,
+        0.0078125,
+        0.3229166666666667,
+        0.484375
+      ]
+    },
+    {
+      "index": 3,
+      "id": "drink",
+      "displayName": "음료 마시기",
+      "rect": [
+        0.0,
+        0.5,
+        0.3333333333333333,
+        0.5
+      ],
+      "offset": [
+        0.0,
+        0.5
+      ],
+      "contentRect": [
+        0.005208333333333333,
+        0.5078125,
+        0.3229166666666667,
+        0.484375
+      ]
+    },
+    {
+      "index": 4,
+      "id": "dazed",
+      "displayName": "넋 나감 (사망)",
+      "rect": [
+        0.3333333333333333,
+        0.5,
+        0.3333333333333333,
+        0.5
+      ],
+      "offset": [
+        0.3333333333333333,
+        0.5
+      ],
+      "contentRect": [
+        0.3385416666666667,
+        0.5078125,
+        0.3229166666666667,
+        0.484375
+      ]
+    },
+    {
+      "index": 5,
+      "id": "side_glance",
+      "displayName": "딴 데 보기",
+      "rect": [
+        0.6666666666666666,
+        0.5,
+        0.3333333333333333,
+        0.5
+      ],
+      "offset": [
+        0.6666666666666666,
+        0.5
+      ],
+      "contentRect": [
+        0.671875,
+        0.5078125,
+        0.3229166666666667,
+        0.484375
+      ]
+    }
+  ],
+  "animationBindings": {
+    "ultimate": {
+      "expressionId": "drink",
+      "startFrame": 24,
+      "endFrameExclusive": 38
+    },
+    "death": {
+      "expressionId": "dazed",
+      "startFrame": 9,
+      "endFrameInclusive": 72,
+      "status": "implemented"
+    }
+  },
+  "unityNotes": "For UV0 already packed in tile0: texture scale=(1,1), offset=entry.offset. Do not scale UV0 again. For normalized UVs use entry.contentRect.",
+  "texture": "Char001_FaceAtlas.png",
+  "textureSize": [
+    4608,
+    3072
+  ],
+  "defaultId": "normal",
+  "mesh": "tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001",
+  "uvLayer": "Attribute",
+  "unityUvChannel": 0,
+  "uvBasis": "base-tile-uv",
+  "backupOriginalUvLayer": "Char001_OriginalUV",
+  "blender": {
+    "object": "Armature.001",
+    "property": "face_expression",
+    "materialMappingNode": "Char001_ExpressionOffset",
+    "keyInterpolation": "CONSTANT"
+  },
+  "clipExpressions": {
+    "entering": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 24,
+        "id": "smile"
+      },
+      {
+        "frame": 42,
+        "id": "joyful"
+      },
+      {
+        "frame": 65,
+        "id": "normal"
+      },
+      {
+        "frame": 78,
+        "id": "smile"
+      },
+      {
+        "frame": 90,
+        "id": "normal"
+      },
+      {
+        "frame": 108,
+        "id": "normal"
+      }
+    ],
+    "exit": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 16,
+        "id": "joyful"
+      },
+      {
+        "frame": 44,
+        "id": "normal"
+      },
+      {
+        "frame": 70,
+        "id": "smile"
+      },
+      {
+        "frame": 88,
+        "id": "joyful"
+      },
+      {
+        "frame": 114,
+        "id": "smile"
+      },
+      {
+        "frame": 144,
+        "id": "smile"
+      }
+    ],
+    "hit": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 14.0,
+        "id": "normal"
+      }
+    ],
+    "idle": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 94.0,
+        "id": "normal"
+      }
+    ],
+    "reloading": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 100.0,
+        "id": "normal"
+      }
+    ],
+    "roll": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 36.20000076293945,
+        "id": "normal"
+      }
+    ],
+    "run_backward": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 17.0,
+        "id": "normal"
+      }
+    ],
+    "run_forward": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 22.0,
+        "id": "normal"
+      }
+    ],
+    "run_left": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 17.0,
+        "id": "normal"
+      }
+    ],
+    "run_right": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 21.0,
+        "id": "normal"
+      }
+    ],
+    "shoot": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 9.0,
+        "id": "normal"
+      }
+    ],
+    "ultimate": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 5,
+        "id": "smile"
+      },
+      {
+        "frame": 24,
+        "id": "drink"
+      },
+      {
+        "frame": 38,
+        "id": "joyful"
+      },
+      {
+        "frame": 70,
+        "id": "joyful"
+      }
+    ],
+    "walk_backward": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 43.0,
+        "id": "normal"
+      }
+    ],
+    "walk_forward": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 42.0,
+        "id": "normal"
+      }
+    ],
+    "walk_left": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 30.0,
+        "id": "normal"
+      }
+    ],
+    "walk_right": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 44.0,
+        "id": "normal"
+      }
+    ],
+    "death": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 8,
+        "id": "normal"
+      },
+      {
+        "frame": 9,
+        "id": "dazed"
+      },
+      {
+        "frame": 72,
+        "id": "dazed"
+      }
+    ],
+    "z_미사용_throw": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 87.0,
+        "id": "normal"
+      }
+    ]
+  },
+  "previewClip": "z_테스트_expression_preview",
+  "futureRuntimeContract": {
+    "method": "SetExpression(string id)",
+    "unknownIdFallback": "normal",
+    "onClipWithoutExpression": "normal",
+    "uvTransform": "scale = targetRect.size / sourceRect.size; offset = targetRect.min - sourceRect.min * scale",
+    "exportNote": "Blender material drivers do not transfer as Unity animation automatically. Bind this profile and clipExpressions to the future Unity expression controller."
+  }
+}

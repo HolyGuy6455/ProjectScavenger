@@ -269,17 +269,5 @@ AvatarMask:
     m_Weight: 1
   - m_Path: Armature.001/ultimate_cap/ultimate_cap_end
     m_Weight: 1
-  - m_Path: ClosedEyeLine_Left
-    m_Weight: 1
-  - m_Path: ClosedEyeLine_Right
-    m_Weight: 1
-  - m_Path: ClosedEyeSkin_Left
-    m_Weight: 1
-  - m_Path: ClosedEyeSkin_Right
-    m_Weight: 1
-  - m_Path: OpenEyes_Left
-    m_Weight: 1
-  - m_Path: OpenEyes_Right
-    m_Weight: 1
   - m_Path: tripo_8cadebb2_cdf2_4ac7_817d_22a69ab96f09.001
     m_Weight: 1

@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a37cd16fb6db2f4b94e4a79d22224ce, type: 3}
+  m_Name: Char001_Expressions
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterExpressionProfile
+  characterId: char001
+  atlasTexture: {fileID: 2800000, guid: f750fc603a3310543969806a4803590a, type: 3}
+  sourceRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0.33333334
+    height: 0.5
+  defaultId: normal
+  entries:
+  - index: 0
+    id: normal
+    displayName: "\uD3C9\uC18C"
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0.33333334
+      height: 0.5
+  - index: 1
+    id: smile
+    displayName: "\uAC00\uBCBC\uC6B4 \uC990\uAC70\uC6C0"
+    rect:
+      serializedVersion: 2
+      x: 0.33333334
+      y: 0
+      width: 0.33333334
+      height: 0.5
+  - index: 2
+    id: joyful
+    displayName: "\uACA9\uB82C\uD55C \uC990\uAC70\uC6C0"
+    rect:
+      serializedVersion: 2
+      x: 0.6666667
+      y: 0
+      width: 0.33333334
+      height: 0.5
+  - index: 3
+    id: drink
+    displayName: "\uC74C\uB8CC \uB9C8\uC2DC\uAE30"
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 0.5
+      width: 0.33333334
+      height: 0.5
+  - index: 4
+    id: dazed
+    displayName: "\uB10B \uB098\uAC10 (\uC0AC\uB9DD)"
+    rect:
+      serializedVersion: 2
+      x: 0.33333334
+      y: 0.5
+      width: 0.33333334
+      height: 0.5
+  - index: 5
+    id: side_glance
+    displayName: "\uB534 \uB370 \uBCF4\uAE30"
+    rect:
+      serializedVersion: 2
+      x: 0.6666667
+      y: 0.5
+      width: 0.33333334
+      height: 0.5
