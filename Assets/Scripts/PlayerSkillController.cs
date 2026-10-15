@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
+using Scavenger.Manager;
 
 public class PlayerSkillController : NetworkBehaviour
 {
@@ -11,6 +12,18 @@ public class PlayerSkillController : NetworkBehaviour
     private CharData currentCharData;
     private Shooter cachedShooter;
     private PlayerController cachedPlayerController;
+    private Health cachedHealth;
+
+    private bool HasDied
+    {
+        get
+        {
+            if (cachedPlayerController == null) cachedPlayerController = GetComponent<PlayerController>();
+            if (cachedHealth == null) cachedHealth = GetComponent<Health>();
+            return (cachedPlayerController != null && cachedPlayerController.IsDeathPresented)
+                || (cachedHealth != null && (cachedHealth.IsDead || cachedHealth.CurrentHealth <= 0f));
+        }
+    }
 
     private bool IsInputLocked
     {
@@ -18,6 +31,17 @@ public class PlayerSkillController : NetworkBehaviour
         {
             if (cachedPlayerController == null) cachedPlayerController = GetComponent<PlayerController>();
             return cachedPlayerController != null && cachedPlayerController.IsInputLocked;
+        }
+    }
+
+    private bool HasGameEnded
+    {
+        get
+        {
+            if (cachedHealth == null) cachedHealth = GetComponent<Health>();
+            return (cachedHealth != null && cachedHealth.IsClearProtected)
+                || (GameFlowManager.Instance != null
+                    && GameFlowManager.Instance.CurrentState != GameResultState.None);
         }
     }
 
@@ -47,18 +71,15 @@ public class PlayerSkillController : NetworkBehaviour
 
     public CharacterState GetSkillState(int charId)
     {
-        if (CharacterStateManager.Instance != null)
-        {
-            return CharacterStateManager.Instance.GetState(charId);
-        }
-        return null;
+        if (cachedPlayerController == null) cachedPlayerController = GetComponent<PlayerController>();
+        return cachedPlayerController != null ? cachedPlayerController.GetCharacterState(charId) : null;
     }
 
     public bool IsReloading()
     {
-        if (currentCharData == null) return false;
+        if (HasDied || currentCharData == null) return false;
         CharacterState state = GetSkillState(currentCharData.id);
-        if (state == null) return false;
+        if (state == null || state.normalSkills == null) return false;
 
         foreach (var skill in state.normalSkills)
         {
@@ -82,7 +103,7 @@ public class PlayerSkillController : NetworkBehaviour
                 {
                     // Instant 스킬은 발동 직후 duration 시간 동안을 재장전 중(진행 중)으로 간주
                     float elapsed = data.cooltime - skill.currentCooldown;
-                    if (skill.currentCooldown > 0f && elapsed < data.duration)
+                    if (!skill.isInstantOffExecuted && skill.currentCooldown > 0f && elapsed < data.duration)
                     {
                         return true;
                     }
@@ -90,6 +111,33 @@ public class PlayerSkillController : NetworkBehaviour
             }
         }
         return false;
+    }
+
+    /// <summary>Stops this player's pending skill effects; spent resources and cooldowns are retained.</summary>
+    public void CancelActiveActions()
+    {
+        // CharacterStateManager contains the local party, not other network players' skill state.
+        if (!IsOwner) return;
+
+        if (currentCharData != null) CancelStateActions(GetSkillState(currentCharData.id));
+        if (cachedPlayerController == null) cachedPlayerController = GetComponent<PlayerController>();
+        if (cachedPlayerController == null) return;
+
+        var deck = cachedPlayerController.GetLocalDeck();
+        for (int slot = 0; slot < 4; slot++)
+        {
+            int charId = deck.GetCharId(slot);
+            if (charId > 0) CancelStateActions(GetSkillState(charId));
+        }
+    }
+
+    private static void CancelStateActions(CharacterState state)
+    {
+        if (state == null || state.normalSkills == null) return;
+        foreach (var skill in state.normalSkills)
+        {
+            skill?.CancelActiveAction();
+        }
     }
 
     private void OnEnable()
@@ -104,6 +152,7 @@ public class PlayerSkillController : NetworkBehaviour
 
     private void HandleCharacterChanged(CharData charData)
     {
+        if (!IsOwner) return;
         Shooter playerShooter = GetShooter();
 
         // 1. 기존 캐릭터의 현재 무기 잔탄 저장
@@ -141,37 +190,49 @@ public class PlayerSkillController : NetworkBehaviour
         }
     }
 
+    // Remote players use their own replicated selection, never the local party's UI event.
+    public void RefreshRemoteCharacterData()
+    {
+        if (cachedPlayerController == null) cachedPlayerController = GetComponent<PlayerController>();
+        if (cachedPlayerController == null || cachedPlayerController.IsOwner || DataManager.Instance == null) return;
+        int charId = cachedPlayerController.GetLocalDeck().GetCharId(cachedPlayerController.ActiveSlotIndex);
+        currentCharData = DataManager.Instance.GetData<CharData>("Char", charId);
+    }
+
     private Shooter GetShooter()
     {
-        if (cachedShooter == null) cachedShooter = FindObjectOfType<Shooter>();
+        if (cachedShooter == null) cachedShooter = GetComponent<Shooter>();
         return cachedShooter;
     }
 
     private void Update()
     {
+        if (!IsOwner) return;
+        if (HasDied)
+        {
+            CancelActiveActions();
+            return;
+        }
         if (currentCharData == null) return;
 
-        if (IsOwner)
+        var keyboard = Keyboard.current;
+        if (keyboard != null)
         {
-            var keyboard = Keyboard.current;
-            if (keyboard != null)
-            {
-                HandleSkillInput(keyboard);
-            }
+            HandleSkillInput(keyboard);
         }
 
         // 현재 캐릭터의 Continuous 스킬 로직만 처리 (쿨타임 감소는 CharacterStateManager가 일괄 처리함)
         CharacterState currentState = GetSkillState(currentCharData.id);
-        if (currentState != null)
+        if (currentState != null && currentState.normalSkills != null)
         {
             foreach (var skill in currentState.normalSkills)
             {
                 if (skill == null || skill.skillId == 0) continue;
 
                 // UI가 숨겨져 PointerUp을 받지 못해도 누르고 있던 스킬을 정리합니다.
-                if (IsOwner && IsInputLocked && skill.isCharging)
+                if (IsInputLocked && skill.isCharging)
                 {
-                    skill.ReleaseUse(GetShooter());
+                    skill.CancelActiveAction();
                 }
 
                 if (skill.isContinuousRunning)
@@ -199,7 +260,7 @@ public class PlayerSkillController : NetworkBehaviour
     [ServerRpc]
     public void CmdUseUltimateServerRpc()
     {
-        if (IsInputLocked) return;
+        if (HasGameEnded || HasDied || IsInputLocked) return;
         // 서버(데디케이티드 서버)에는 UI가 없으므로 currentCharData나 CharacterStateManager가 
         // 클라이언트와 동일하게 세팅되어 있지 않습니다.
         // 클라이언트에서 쿨타임 검증을 마치고 보냈으므로, 여기서는 모든 클라이언트에게 연출을 지시합니다.
@@ -209,17 +270,22 @@ public class PlayerSkillController : NetworkBehaviour
     [ClientRpc]
     private void RpcPlayUltimateClientRpc()
     {
-        if (IsInputLocked) return;
+        if (HasGameEnded || HasDied || IsInputLocked) return;
         var playerController = GetComponent<PlayerController>();
-        if (playerController != null)
+        BaseUltimateSkill activeUlt = playerController != null
+            ? playerController.GetActiveUltimateSkill() : null;
+        if (activeUlt == null)
         {
-            BaseUltimateSkill activeUlt = playerController.GetActiveUltimateSkill();
-            if (activeUlt != null)
-            {
-                var data = DataManager.Instance.GetData<SkillData>("Skill", currentCharData.ultimateSkill);
-                activeUlt.OnClientExecute(data, IsOwner);
-            }
+            Debug.LogError($"[PlayerSkillController] {name}: 궁극기 연출을 시작할 수 없습니다. PlayerController와 활성 캐릭터의 BaseUltimateSkill 설정을 확인하세요.", this);
+            return;
         }
+        if (DataManager.Instance == null || currentCharData == null)
+        {
+            Debug.LogError($"[PlayerSkillController] {name}: 궁극기 실행 시 캐릭터/스킬 데이터가 준비되지 않았습니다.", this);
+            return;
+        }
+        var data = DataManager.Instance.GetData<SkillData>("Skill", currentCharData.ultimateSkill);
+        activeUlt.OnClientExecute(data, IsOwner);
     }
 
     /// <summary>
@@ -227,7 +293,7 @@ public class PlayerSkillController : NetworkBehaviour
     /// </summary>
     public void OnUltimateAnimationEvent(int eventId)
     {
-        if (IsOwner && !IsInputLocked)
+        if (IsOwner && CanExecuteUltimateEvent())
         {
             CmdExecuteUltimateActionServerRpc(eventId);
         }
@@ -236,7 +302,7 @@ public class PlayerSkillController : NetworkBehaviour
     [ServerRpc]
     private void CmdExecuteUltimateActionServerRpc(int eventId)
     {
-        if (IsInputLocked) return;
+        if (!CanExecuteUltimateEvent()) return;
         var playerController = GetComponent<PlayerController>();
         if (playerController != null)
         {
@@ -249,9 +315,24 @@ public class PlayerSkillController : NetworkBehaviour
         }
     }
 
+    private bool CanExecuteUltimateEvent()
+    {
+        if (HasDied) return false;
+        // Dedicated servers do not play the cinematic. A clear input lock must not
+        // discard animation events from the ultimate already running on its client.
+        if (IsServer && !IsClient && cachedHealth != null && cachedHealth.IsClearProtected) return true;
+        if (!IsInputLocked) return true;
+
+        // A clear/exit wait blocks new input, but the ultimate already in progress must finish.
+        if (cachedPlayerController == null) cachedPlayerController = GetComponent<PlayerController>();
+        BaseUltimateSkill activeUltimate = cachedPlayerController != null
+            ? cachedPlayerController.GetActiveUltimateSkill() : null;
+        return activeUltimate != null && activeUltimate.IsPresentationPlaying;
+    }
+
     public void OnSkillPointerDown(int skillSlotIndex)
     {
-        if (IsInputLocked || currentCharData == null) return;
+        if (HasGameEnded || HasDied || IsInputLocked || currentCharData == null) return;
         CharacterState state = GetSkillState(currentCharData.id);
         if (state == null) return;
         if (skillSlotIndex < 0 || skillSlotIndex >= state.normalSkills.Length) return;
@@ -272,6 +353,11 @@ public class PlayerSkillController : NetworkBehaviour
         SkillInstance skill = state.normalSkills[skillSlotIndex];
         if (skill == null || skill.skillId == 0) return;
 
+        if (HasGameEnded || HasDied || IsInputLocked)
+        {
+            skill.CancelActiveAction();
+            return;
+        }
         skill.ReleaseUse(GetShooter());
     }
 

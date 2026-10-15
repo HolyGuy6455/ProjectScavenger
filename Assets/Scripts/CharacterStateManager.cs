@@ -54,13 +54,57 @@ public class CharacterStateManager : MonoBehaviour
 
     public void ChangeCharacter(int id)
     {
-        if (PlayerController.LocalInstance != null && PlayerController.LocalInstance.IsInputLocked) return;
+        if (PlayerController.LocalInstance != null)
+        {
+            // Selection, HP and UI change only after the server accepts the slot.
+            PlayerController.LocalInstance.TryChangeCharacter(id);
+            return;
+        }
+        var state = GetState(id);
+        if (state == null || state.currentHealth <= 0f) return;
         if (DataManager.Instance == null) return;
         CharData data = DataManager.Instance.GetData<CharData>("Char", id);
         if (data == null) return;
 
         CurrentCharData = data;
         HandleCharacterChanged(data);
+        OnCharacterChanged?.Invoke(data);
+    }
+
+    public void ApplyPartyHealth(PlayerController player, PlayerController.PartyHealthState party)
+    {
+        if (player == null || !player.IsOwner) return;
+        if (playerHealth != null) playerHealth.OnHealthChanged -= HandleHealthChanged;
+        playerHealth = player.GetComponent<Health>();
+        var deck = player.GetLocalDeck();
+        for (int slot = 0; slot < 4; slot++)
+        {
+            var state = GetState(deck.GetCharId(slot));
+            if (state == null) continue;
+            bool changed = state.currentHealth != party.Health[slot] || state.maxHealth != party.MaxHealth[slot];
+            bool hungerChanged = state.currentHunger != party.Hunger[slot];
+            bool thirstChanged = state.currentThirst != party.Thirst[slot];
+            state.currentHealth = party.Health[slot];
+            state.maxHealth = party.MaxHealth[slot];
+            state.currentHunger = party.Hunger[slot];
+            state.currentThirst = party.Thirst[slot];
+            if (changed) OnCharacterHealthChanged?.Invoke(state.charId, state.currentHealth, state.maxHealth);
+            if (hungerChanged) OnCharacterHungerChanged?.Invoke(state.charId, state.currentHunger, state.maxHunger);
+            if (thirstChanged) OnCharacterThirstChanged?.Invoke(state.charId, state.currentThirst, state.maxThirst);
+        }
+
+        int charId = deck.GetCharId(party.ActiveSlot);
+        if (charId <= 0 || DataManager.Instance == null) return;
+        var data = DataManager.Instance.GetData<CharData>("Char", charId);
+        if (data == null || (currentCharId == charId && CurrentCharData != null)) return;
+        currentCharId = charId;
+        CurrentCharData = data;
+        var activeState = GetState(charId);
+        if (activeState != null)
+        {
+            OnCharacterHungerChanged?.Invoke(charId, activeState.currentHunger, activeState.maxHunger);
+            OnCharacterThirstChanged?.Invoke(charId, activeState.currentThirst, activeState.maxThirst);
+        }
         OnCharacterChanged?.Invoke(data);
     }
 
@@ -98,6 +142,13 @@ public class CharacterStateManager : MonoBehaviour
 
     private void ConnectPlayerHealth()
     {
+        // Network party snapshots identify the correct owner and slot together.
+        // A raw Health callback can arrive before the new slot's network update.
+        if (PlayerController.LocalInstance != null)
+        {
+            PlayerController.LocalInstance.RefreshLocalParty();
+            return;
+        }
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
@@ -246,6 +297,11 @@ public class CharacterStateManager : MonoBehaviour
             if (state != null)
             {
                 state.UpdateAllCooldowns(dt);
+                // The server advances every player's party, including reserves.
+                // Clients use the replicated snapshot for HP and survival UI.
+                if (PlayerController.LocalInstance != null) continue;
+                // 클리어 연출 중에는 허기 피해도 체력을 낮추지 않습니다.
+                if (playerHealth != null && playerHealth.IsClearProtected) continue;
                 
                 // 생존 스탯(배고픔, 체력) 업데이트
                 bool statsChanged = state.UpdateSurvivalStats(dt);
@@ -264,6 +320,7 @@ public class CharacterStateManager : MonoBehaviour
                         OnCharacterHungerChanged?.Invoke(currentCharId, state.currentHunger, state.maxHunger);
                         OnCharacterHealthChanged?.Invoke(currentCharId, state.currentHealth, state.maxHealth);
                     }
+                    else OnCharacterHealthChanged?.Invoke(state.charId, state.currentHealth, state.maxHealth);
                 }
             }
         }
@@ -271,6 +328,11 @@ public class CharacterStateManager : MonoBehaviour
 
     public void ModifyHunger(int charId, float amount)
     {
+        if (PlayerController.LocalInstance != null)
+        {
+            PlayerController.LocalInstance.ModifyCharacterSurvivalStats(charId, amount, 0f);
+            return;
+        }
         CharacterState state = GetState(charId);
         if (state != null)
         {
@@ -281,6 +343,11 @@ public class CharacterStateManager : MonoBehaviour
 
     public void ModifyThirst(int charId, float amount)
     {
+        if (PlayerController.LocalInstance != null)
+        {
+            PlayerController.LocalInstance.ModifyCharacterSurvivalStats(charId, 0f, amount);
+            return;
+        }
         CharacterState state = GetState(charId);
         if (state != null)
         {

@@ -38,6 +38,7 @@ public class CharacterState
 
     public bool UpdateSurvivalStats(float deltaTime)
     {
+        if (currentHealth <= 0f) return false;
         bool changed = false;
         
         float oldHealth = currentHealth;

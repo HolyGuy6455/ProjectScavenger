@@ -37,6 +37,8 @@ public class PlayerInventory : NetworkBehaviour
                 Debug.LogWarning("[PlayerInventory] 로컬 플레이어 인벤토리가 이미 존재하여 기존 Instance를 덮어씁니다.");
             }
             Instance = this;
+            if (CharacterStateManager.Instance.CurrentCharData != null)
+                HandleCharacterChanged(CharacterStateManager.Instance.CurrentCharData);
         }
     }
 
@@ -52,6 +54,7 @@ public class PlayerInventory : NetworkBehaviour
 
     private void HandleCharacterChanged(CharData charData)
     {
+        if (!IsOwner) return;
         if (!charInventories.TryGetValue(charData.id, out CharacterInventory inv))
         {
             inv = new CharacterInventory(charData.id, MaxSlots);

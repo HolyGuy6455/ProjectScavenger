@@ -28,6 +28,26 @@ namespace Scavenger.Manager
         public event Action<int> OnAlivePlayersChanged;
 
         private int _lastAlivePlayersCount = -1;
+        private bool _gameEndedNotified;
+        private bool _returnToMainMenuStarted;
+        private bool _menuPresentationInterrupted;
+        private bool _clearFlowActive;
+        private int _clearGeneration;
+        private PlayerController _clearPlayer;
+        private BaseUltimateSkill _clearUltimate;
+        private bool _clearHasPlayer;
+        private bool _clearHadUltimate;
+        private bool _clearWaitedForUltimate;
+        private bool _clearExitStarted;
+        private bool _clearInputLocked;
+        private bool _clearPlayerWasSpawned;
+        private bool _clearPlayerWasOwner;
+        private int _clearPlayerPresentationVersion;
+        private int _clearUltimatePresentationVersion;
+        private NetworkManager _clearNetwork;
+        private bool _clearNetworkWasListening;
+        private ulong _clearLocalClientId;
+        private Scavenger.Network.NetworkGameResultSender _clearResultSender;
 
         public void NotifyExtractionState(Scavenger.Environment.ExtractionZone zone, bool isExtracting)
         {
@@ -48,6 +68,12 @@ namespace Scavenger.Manager
 
         private void Update()
         {
+            if (_clearFlowActive)
+            {
+                if (!IsClearContextValid(_clearGeneration)) CancelClearFlow();
+                else if (_clearHasPlayer && !_clearExitStarted && !_gameEndedNotified) TryStartClearExit();
+            }
+
             // 방장(서버) 혹은 오프라인 상태에서만 생존자 수 추적
             bool isOffline = NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening;
             if (isOffline || NetworkManager.Singleton.IsServer)
@@ -93,30 +119,169 @@ namespace Scavenger.Manager
 
         public void OnGameCleared()
         {
-            if (CurrentState != GameResultState.None) return;
+            if (CurrentState != GameResultState.None || !isActiveAndEnabled) return;
 
             Debug.Log("[GameFlowManager] 게임 클리어 상태로 전환됩니다.");
             CurrentState = GameResultState.Clear;
-            
-            // 시네마틱 시작 전, ClearResultPanel을 투명하게 미리 켭니다.
-            var menuToggle = FindObjectOfType<MenuToggleController>();
-            if (menuToggle != null)
+
+            _clearGeneration++;
+            _clearFlowActive = true;
+            _clearPlayer = PlayerController.LocalInstance;
+            _clearHasPlayer = _clearPlayer != null;
+            _clearNetwork = NetworkManager.Singleton;
+            _clearNetworkWasListening = _clearNetwork != null && _clearNetwork.IsListening;
+            if (_clearNetworkWasListening)
             {
-                menuToggle.PrepareClearResultUI();
+                _clearLocalClientId = _clearNetwork.LocalClientId;
+                _clearNetwork.OnClientDisconnectCallback += HandleClearClientDisconnected;
             }
 
-            // 로컬 플레이어가 존재하면 클리어 연출(exit) 재생 후 EndGame 호출, 없으면 바로 호출
-            if (PlayerController.LocalInstance != null)
+            // 처음부터 로컬 플레이어가 없었던 경우에는 기존 즉시 완료 흐름을 유지합니다.
+            if (!_clearHasPlayer)
             {
-                PlayerController.LocalInstance.PlayCinematic("Exit", false, () => 
-                {
-                    EndGame(GameResultState.Clear);
-                });
-            }
-            else
-            {
+                PrepareClearUI();
                 EndGame(GameResultState.Clear);
+                return;
             }
+
+            _clearPlayerPresentationVersion = _clearPlayer.PresentationVersion;
+            _clearPlayerWasSpawned = _clearPlayer.IsSpawned;
+            _clearPlayerWasOwner = _clearPlayer.IsOwner;
+            _clearUltimate = _clearPlayer.GetActiveUltimateSkill();
+            _clearHadUltimate = _clearUltimate != null;
+            _clearUltimatePresentationVersion = _clearHadUltimate ? _clearUltimate.PresentationVersion : 0;
+            _clearWaitedForUltimate = _clearHadUltimate && _clearUltimate.IsPresentationPlaying;
+            _clearPlayer.PresentationInterrupted += HandleClearPresentationInterrupted;
+            _clearInputLocked = true;
+            _clearPlayer.SetCinematicInputLocked(this, true);
+            TryStartClearExit();
+        }
+
+        private void TryStartClearExit()
+        {
+            int generation = _clearGeneration;
+            if (!IsClearContextValid(generation))
+            {
+                CancelClearFlow();
+                return;
+            }
+            if (_clearExitStarted) return;
+            if (_clearWaitedForUltimate)
+            {
+                if (_clearUltimate.IsPresentationPlaying) return;
+                if (!_clearUltimate.LastPresentationCompleted)
+                {
+                    CancelClearFlow();
+                    return;
+                }
+            }
+
+            // 이 클라이언트의 진행 중이던 궁극기만 기다립니다. 파티원의 연출과는 동기화하지 않습니다.
+            _clearExitStarted = true;
+            PrepareClearUI();
+            if (!IsClearContextValid(generation))
+            {
+                CancelClearFlow();
+                return;
+            }
+            _clearPlayer.PlayCinematic("Exit", false,
+                () => CompleteClearExit(generation), () => CancelClearFlow(generation));
+        }
+
+        private void CompleteClearExit(int generation)
+        {
+            if (!IsClearContextValid(generation))
+            {
+                CancelClearFlow(generation);
+                return;
+            }
+            EndGame(GameResultState.Clear);
+        }
+
+        private bool IsClearContextValid(int generation)
+        {
+            if (!_clearFlowActive || generation != _clearGeneration
+                || !isActiveAndEnabled || CurrentState != GameResultState.Clear) return false;
+            if (HasClearConnectionChanged()) return false;
+            if (!_clearHasPlayer) return true;
+            if (_clearPlayer == null || !ReferenceEquals(PlayerController.LocalInstance, _clearPlayer)
+                || !_clearPlayer.isActiveAndEnabled || _clearPlayer.IsDeathPresented
+                || _clearPlayer.PresentationVersion != _clearPlayerPresentationVersion
+                || (_clearPlayerWasSpawned && !_clearPlayer.IsSpawned)
+                || (_clearPlayerWasOwner && !_clearPlayer.IsOwner)) return false;
+            if (!ReferenceEquals(_clearPlayer.GetActiveUltimateSkill(), _clearUltimate)) return false;
+            if (_clearHadUltimate && (_clearUltimate == null || !_clearUltimate.isActiveAndEnabled
+                || _clearUltimate.PresentationVersion != _clearUltimatePresentationVersion)) return false;
+            return true;
+        }
+
+        private bool HasClearConnectionChanged()
+        {
+            return _clearNetworkWasListening && (_clearNetwork == null
+                || !ReferenceEquals(NetworkManager.Singleton, _clearNetwork) || !_clearNetwork.IsListening);
+        }
+
+        private static void PrepareClearUI()
+        {
+            var menuToggle = FindObjectOfType<MenuToggleController>();
+            if (menuToggle != null) menuToggle.PrepareClearResultUI();
+        }
+
+        private void HandleClearPresentationInterrupted() => CancelClearFlow();
+
+        private void HandleClearClientDisconnected(ulong clientId)
+        {
+            if (clientId == _clearLocalClientId) CancelClearFlow(interruptPresentation: true);
+        }
+
+        private void ReleaseClearInputLock()
+        {
+            if (!_clearInputLocked) return;
+            _clearInputLocked = false;
+            if (_clearPlayer != null) _clearPlayer.SetCinematicInputLocked(this, false);
+        }
+
+        private void UnsubscribeClearResult()
+        {
+            if (!ReferenceEquals(_clearResultSender, null))
+                _clearResultSender.OnGameResultReceived -= HandleGameResultReceived;
+            _clearResultSender = null;
+        }
+
+        private void CancelClearFlow(int generation)
+        {
+            if (generation == _clearGeneration) CancelClearFlow();
+        }
+
+        private void CancelClearFlow(bool interruptPresentation = false)
+        {
+            // 연결 종료나 매니저 해제는 플레이어 despawn을 기다리지 않고 진행 중인 연출도 중단합니다.
+            // 이미 완료한 Clear 또는 다른 수명의 플레이어 연출에는 관여하지 않습니다.
+            var playerToInterrupt = _clearFlowActive && !_gameEndedNotified
+                && (interruptPresentation || HasClearConnectionChanged())
+                && _clearPlayer != null && _clearPlayer.PresentationVersion == _clearPlayerPresentationVersion
+                ? _clearPlayer : null;
+            _clearGeneration++;
+            _clearFlowActive = false;
+            if (!ReferenceEquals(_clearPlayer, null))
+                _clearPlayer.PresentationInterrupted -= HandleClearPresentationInterrupted;
+            if (!ReferenceEquals(_clearNetwork, null))
+                _clearNetwork.OnClientDisconnectCallback -= HandleClearClientDisconnected;
+            ReleaseClearInputLock();
+            UnsubscribeClearResult();
+            _clearPlayer = null;
+            _clearUltimate = null;
+            _clearNetwork = null;
+            // 취소 콜백이 재진입하기 전에 위에서 세대와 구독을 무효화합니다.
+            if (playerToInterrupt != null) playerToInterrupt.InterruptPresentation();
+        }
+
+        private void OnDisable() => CancelClearFlow(interruptPresentation: true);
+
+        private void OnDestroy()
+        {
+            CancelClearFlow(interruptPresentation: true);
+            if (Instance == this) Instance = null;
         }
 
         public void OnGameFailed()
@@ -130,17 +295,32 @@ namespace Scavenger.Manager
 
         public void OnGameExited()
         {
-            if (CurrentState != GameResultState.None) return;
+            if (_returnToMainMenuStarted || CurrentState == GameResultState.Exit
+                || CurrentState == GameResultState.Fail) return;
+            CancelClearFlow();
 
             Debug.Log("[GameFlowManager] 사용자가 메뉴로 이탈합니다.");
             CurrentState = GameResultState.Exit;
-            EndGame(GameResultState.Exit);
+            InterruptForMenuExit();
+            // Clear가 이미 보고됐더라도 메뉴 이탈은 즉시 처리하되 결과 이벤트는 중복 발행하지 않습니다.
+            if (_gameEndedNotified) ReturnToMainMenu();
+            else EndGame(GameResultState.Exit);
         }
 
         private void EndGame(GameResultState result)
         {
+            if (_gameEndedNotified) return;
+            int generation = _clearGeneration;
+            if (result == GameResultState.Clear && !IsClearContextValid(generation))
+            {
+                CancelClearFlow();
+                return;
+            }
+            _gameEndedNotified = true;
+            ReleaseClearInputLock();
             // 여기서 이벤트를 발생시키면 서버로 결과를 전송하는 로직 등이 실행됩니다.
             OnGameEnded?.Invoke(result);
+            if (!isActiveAndEnabled) return;
 
             // 이벤트 송신이 완료된 후 후속 처리
             // 1. 클리어가 아니면 즉시 로비로 복귀
@@ -150,10 +330,18 @@ namespace Scavenger.Manager
                 return;
             }
 
-            // 2. 서버 응답을 기다립니다. NetworkGameResultSender 이벤트 구독.
-            if (Scavenger.Network.NetworkGameResultSender.Instance != null)
+            // 이벤트 구독자가 화면을 떠나거나 플레이어를 교체한 경우 후속 UI를 열지 않습니다.
+            if (!IsClearContextValid(generation))
             {
-                Scavenger.Network.NetworkGameResultSender.Instance.OnGameResultReceived += HandleGameResultReceived;
+                CancelClearFlow(generation);
+                return;
+            }
+
+            // 2. 서버 응답을 기다립니다. NetworkGameResultSender 이벤트 구독.
+            _clearResultSender = Scavenger.Network.NetworkGameResultSender.Instance;
+            if (_clearResultSender != null)
+            {
+                _clearResultSender.OnGameResultReceived += HandleGameResultReceived;
             }
             else
             {
@@ -172,10 +360,12 @@ namespace Scavenger.Manager
 
         private void HandleGameResultReceived(Scavenger.Network.DTOs.GameResultResponse response)
         {
-            if (Scavenger.Network.NetworkGameResultSender.Instance != null)
+            if (!_gameEndedNotified || !IsClearContextValid(_clearGeneration))
             {
-                Scavenger.Network.NetworkGameResultSender.Instance.OnGameResultReceived -= HandleGameResultReceived;
+                CancelClearFlow();
+                return;
             }
+            UnsubscribeClearResult();
 
             // LootInfo 파싱
             List<Scavenger.UI.LootInfo> loots = new List<Scavenger.UI.LootInfo>();
@@ -246,10 +436,16 @@ namespace Scavenger.Manager
             {
                 MenuToggleController.Instance.SetupClearResultData(loots, charExpList, playerExp);
             }
+            // 응답까지 처리한 뒤에는 플레이어/네트워크 수명 감시도 해제합니다.
+            CancelClearFlow();
         }
 
         private void ReturnToMainMenu()
         {
+            if (_returnToMainMenuStarted) return;
+            _returnToMainMenuStarted = true;
+            CancelClearFlow();
+            InterruptForMenuExit();
             var uiSystem = FindObjectOfType<Scavenger.UI.UI_SystemActions>();
             if (uiSystem != null)
             {
@@ -259,6 +455,14 @@ namespace Scavenger.Manager
             {
                 Debug.LogWarning("[GameFlowManager] UI_SystemActions를 찾을 수 없어 로비로 돌아갈 수 없습니다.");
             }
+        }
+
+        private void InterruptForMenuExit()
+        {
+            if (_menuPresentationInterrupted) return;
+            _menuPresentationInterrupted = true;
+            var player = PlayerController.LocalInstance;
+            if (player != null) player.InterruptPresentation();
         }
     }
 }

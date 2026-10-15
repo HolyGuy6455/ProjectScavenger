@@ -77,11 +77,9 @@ public class CharSelectorUI : MonoBehaviour
             slots[i].OnSlotClickedEvent += HandleCharacterSelected;
         }
 
-        // 초기 선택 (첫 번째 캐릭터)
-        if (charDatas.Count > 0)
-        {
-            HandleCharacterSelected(charDatas[0]);
-        }
+        // UI may load after a death/selection. Render the confirmed character.
+        var selected = CharacterStateManager.Instance.CurrentCharData;
+        if (selected != null) UpdateUIOnCharacterChange(selected);
     }
 
     private void HandleCharacterSelected(CharData charData)

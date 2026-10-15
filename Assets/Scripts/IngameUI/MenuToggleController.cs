@@ -10,6 +10,7 @@ public class MenuToggleController : MonoBehaviour
     [SerializeField] private GameObject ingameUI;
     [SerializeField] private GameObject pauseMenuUI;
     [SerializeField] private ClearResultPanel clearResultPanel;
+    public bool HasClearResultPanel => clearResultPanel != null;
 
     [Header("Buttons")]
     [Tooltip("일시정지 메뉴를 열거나 토글하는 버튼 (예: 인게임 햄버거 메뉴 버튼)")]

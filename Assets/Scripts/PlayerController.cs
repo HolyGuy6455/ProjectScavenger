@@ -31,8 +31,26 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     private bool _isShooting = false;
     private bool _isCinematicPlaying = false;
     private bool _isRolling = false;
+    private Coroutine _cinematicRoutine;
+    private CharacterAnimationPresenter _animationPresenter;
+    private CharacterCinematicController _activeCinematicController;
+    private int _cinematicCameraToken;
+    private int _cinematicAnimationToken;
+    private System.Action _cinematicOnComplete;
+    private System.Action _cinematicOnCancelled;
+    private Coroutine _rollRoutine;
+    private bool _deathHandled;
+    private bool _interruptingPresentation;
+    public int PresentationVersion => _presentationInterruptionVersion;
+    public bool IsDeathPresented => _deathHandled;
+    public event System.Action PresentationInterrupted;
+    private int _presentationInterruptionVersion;
+    public bool IsRolling => _isRolling;
     private readonly HashSet<UnityEngine.Object> _cinematicInputLocks = new HashSet<UnityEngine.Object>();
-    public bool IsInputLocked => _isCinematicPlaying || _cinematicInputLocks.Count > 0;
+    public bool HasCleared => _health != null && _health.IsClearProtected;
+    public bool IsInputLocked => _deathHandled || HasCleared || _isCinematicPlaying || _cinematicInputLocks.Count > 0
+        || (IsOwner && !IsServer && _receivedStateSlot != ActiveSlotIndex);
+    public bool CanChangeCharacter => !IsInputLocked && !(GetActiveUltimateSkill()?.IsPresentationPlaying ?? false);
     private Health _health;
     private SectorIndicator _sectorIndicator;
 
@@ -40,8 +58,11 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     private NetworkVariable<Vector2> _netAnimInput = new NetworkVariable<Vector2>(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     
     // 캐릭터 동적 교체를 위한 변수
-    private NetworkVariable<int> _activeSlotIndex = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    private NetworkVariable<int> _activeSlotIndex = new NetworkVariable<int>(0);
     public int ActiveSlotIndex => _activeSlotIndex.Value;
+    private readonly CharacterState[] _characterStates = new CharacterState[4];
+    private int _receivedStateSlot = -1;
+    private float _nextStateSync;
     
     private GameObject[] _characterModels = new GameObject[4];
     
@@ -126,11 +147,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         if (shooter == null) shooter = GetComponent<Shooter>();
         if (shooter != null) shooter.SetTrigger(false);
         if (IsOwner && IsSpawned) _netAnimInput.Value = Vector2.zero;
-        if (_animator != null)
-        {
-            _animator.SetFloat("InputX", 0f);
-            _animator.SetFloat("InputY", 0f);
-        }
+        GetAnimationPresenter()?.SetMovement(Vector2.zero);
         if (_rb != null && !_rb.isKinematic)
         {
             _rb.linearVelocity = Vector3.zero;
@@ -147,12 +164,108 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         _inputActions = new PlayerInputActions();
     }
 
+    private void OnEnable()
+    {
+        if (_health == null) _health = GetComponent<Health>();
+        if (_health == null) return;
+        _health.OnDeath += HandleDeath;
+        _health.OnDamageTaken += HandleDamage;
+        _health.OnHealthChanged += HandleCharacterHealthChanged;
+    }
+
+    private void OnDisable()
+    {
+        if (_health != null)
+        {
+            _health.OnDeath -= HandleDeath;
+            _health.OnDamageTaken -= HandleDamage;
+            _health.OnHealthChanged -= HandleCharacterHealthChanged;
+        }
+        CancelGameplayActions();
+        InterruptPresentation();
+    }
+
+    private void HandleDamage(DamageInfo damage)
+    {
+        var presenter = GetAnimationPresenter();
+        if (presenter == null || !presenter.HandlesDamageAnimations || IsInputLocked || _isRolling) return;
+        if (_health != null && (_health.IsDead || _health.CurrentHealth <= 0f)) return;
+        var ultimate = GetActiveUltimateSkill();
+        if (ultimate != null && ultimate.IsPresentationPlaying) return;
+        var skills = GetComponent<PlayerSkillController>();
+        bool reloading = (shooter != null && shooter.IsReloading) || (skills != null && skills.IsReloading());
+        presenter.PlayHit(reloading);
+    }
+
+    private void HandleDeath(DamageInfo damage)
+    {
+        if (_deathHandled) return;
+        _deathHandled = true;
+        SetCinematicInputLocked(this, true);
+        CancelGameplayActions();
+        InterruptPresentation();
+        GetAnimationPresenter()?.PlayDeath();
+    }
+
+    private void CancelGameplayActions()
+    {
+        if (shooter == null) shooter = GetComponent<Shooter>();
+        if (shooter != null)
+        {
+            shooter.SetTrigger(false);
+            shooter.CancelReload();
+        }
+        GetComponent<PlayerSkillController>()?.CancelActiveActions();
+        StopRoll();
+    }
+
+    private void StopRoll()
+    {
+        if (_rollRoutine != null) StopCoroutine(_rollRoutine);
+        _rollRoutine = null;
+        if (_isRolling && _health != null) _health.IsInvincible = false;
+        _isRolling = false;
+    }
+
+    private CharacterAnimationPresenter GetAnimationPresenter()
+    {
+        if (_animationPresenter != null) return _animationPresenter;
+        GameObject model = GetActiveCharacterModel();
+        if (model == null && _animator != null) model = _animator.gameObject;
+        BindAnimationPresenter(CharacterAnimationPresenter.GetOrCreate(model));
+        return _animationPresenter;
+    }
+
+    private GameObject GetActiveCharacterModel()
+    {
+        int slot = ActiveSlotIndex;
+        return slot >= 0 && slot < _characterModels.Length ? _characterModels[slot] : null;
+    }
+
+    private void BindAnimationPresenter(CharacterAnimationPresenter presenter)
+    {
+        if (_animationPresenter == presenter) return;
+        if (_animationPresenter != null) _animationPresenter.PresentationDisabled -= HandlePresentationDisabled;
+        _animationPresenter = presenter;
+        if (_animationPresenter != null) _animationPresenter.PresentationDisabled += HandlePresentationDisabled;
+    }
+
+    private void HandlePresentationDisabled(CharacterAnimationPresenter presenter)
+    {
+        if (presenter != _animationPresenter) return;
+        // Ordinary slot changes unbind first; an unexpected model removal must cancel pending gameplay too.
+        CancelGameplayActions();
+        InterruptPresentation();
+    }
+
     // 접속 승인 시 임시로 덱 데이터를 저장하는 딕셔너리
     public static System.Collections.Generic.Dictionary<ulong, CharacterDeckData> PendingClientDecks = new System.Collections.Generic.Dictionary<ulong, CharacterDeckData>();
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        _deathHandled = false;
+        _cinematicInputLocks.Clear();
         if (IsOwner) LocalInstance = this;
         
         Debug.Log($"[PlayerController] OnNetworkSpawn 호출됨! (OwnerClientId: {OwnerClientId}, IsServer: {IsServer}, IsOwner: {IsOwner})");
@@ -184,13 +297,12 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
         // 스폰 시 최초 렌더링 동기화 시도 (이미 값이 세팅되어 있을 경우 대비)
         LoadCharacterModels(_netSquadCharIds.Value);
+        if (IsOwner && !IsServer) RequestCharacterStatesServerRpc();
         // -----------------------------------------------------------
         
         // 내 캐릭터일 때만 입력을 활성화합니다.
         if (IsOwner)
         {
-            CharacterStateManager.Instance.OnCharacterChanged += HandleCharacterChangedUI;
-
             _inputActions.Player.Enable();
             _inputActions.Player.Move.performed += OnMove;
             _inputActions.Player.Move.canceled += OnMove;
@@ -208,6 +320,8 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
     public override void OnNetworkDespawn()
     {
+        CancelGameplayActions();
+        InterruptPresentation();
         base.OnNetworkDespawn();
         _cinematicInputLocks.Clear();
         if (IsOwner) LocalInstance = null;
@@ -217,30 +331,9 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
         if (IsOwner)
         {
-            CharacterStateManager.Instance.OnCharacterChanged -= HandleCharacterChangedUI;
-
             _inputActions.Player.Move.performed -= OnMove;
             _inputActions.Player.Move.canceled -= OnMove;
             _inputActions.Player.Disable();
-        }
-    }
-
-    private void HandleCharacterChangedUI(CharData charData)
-    {
-        // 덱 배열에서 이 캐릭터 ID가 몇 번 슬롯에 있는지 찾습니다.
-        int slotIndex = -1;
-        for (int i = 0; i < 4; i++)
-        {
-            if (_netSquadCharIds.Value.GetCharId(i) == charData.id)
-            {
-                slotIndex = i;
-                break;
-            }
-        }
-        
-        if (slotIndex >= 0)
-        {
-            ChangeCharacterSlotServerRpc(slotIndex);
         }
     }
 
@@ -252,15 +345,23 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
     private void LoadCharacterModels(CharacterDeckData deckData)
     {
+        InitializeCharacterStates(deckData);
         if (IsOwner)
         {
             int[] deckIds = new int[] { deckData.char1, deckData.char2, deckData.char3, deckData.char4 };
             if (CharacterStateManager.Instance != null)
             {
+                CharacterStateManager.Instance.BindCharacterStates(_characterStates);
                 CharacterStateManager.Instance.InitializeDeckStates(deckIds);
             }
         }
 
+        if (_animationPresenter != null)
+        {
+            CancelGameplayActions();
+            InterruptPresentation();
+            BindAnimationPresenter(null);
+        }
         // 기존 모델 파괴
         for (int i = 0; i < 4; i++)
         {
@@ -294,11 +395,21 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         }
 
         // 새 모델이 생성되었으므로 현재 활성 슬롯에 맞게 다시 활성화
-        OnActiveSlotChanged(-1, _activeSlotIndex.Value);
+        OnActiveSlotChanged(-1, ActiveSlotIndex);
     }
 
     private void OnActiveSlotChanged(int previousValue, int newValue)
     {
+        GetComponent<PlayerSkillController>()?.RefreshRemoteCharacterData();
+        if (previousValue >= 0 && previousValue != newValue)
+        {
+            bool wasPresenting = _isCinematicPlaying
+                || (_animationPresenter != null && _animationPresenter.IsFullBodyPlaying);
+            CancelGameplayActions();
+            ClearGameplayInput();
+            InterruptPresentation(wasPresenting);
+            BindAnimationPresenter(null);
+        }
         for (int i = 0; i < 4; i++)
         {
             if (_characterModels[i] != null)
@@ -309,25 +420,153 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
                 if (isActive)
                 {
                     _animator = _characterModels[i].GetComponentInChildren<Animator>();
-                    if (_animator != null)
-                    {
-                        _animator.SetFloat("InputX", _netAnimInput.Value.x);
-                        _animator.SetFloat("InputY", _netAnimInput.Value.y);
-                    }
+                    BindAnimationPresenter(CharacterAnimationPresenter.GetOrCreate(_characterModels[i]));
+                    _animationPresenter?.SetMovement(_netAnimInput.Value);
+                    if (_deathHandled) _animationPresenter?.PlayDeath();
                 }
             }
         }
+        RefreshLocalParty();
     }
 
     [ServerRpc]
     private void ChangeCharacterSlotServerRpc(int slotIndex)
     {
-        if (IsInputLocked) return;
-        if (slotIndex >= 0 && slotIndex < 4)
+        TryChangeCharacterSlot(slotIndex);
+    }
+
+    private void InitializeCharacterStates(CharacterDeckData deck)
+    {
+        for (int slot = 0; slot < 4; slot++)
         {
-            _activeSlotIndex.Value = slotIndex;
+            int id = deck.GetCharId(slot);
+            if (id <= 0) { _characterStates[slot] = null; continue; }
+            if (_characterStates[slot]?.charId == id) continue;
+            _characterStates[slot] = new CharacterState(new CharData { id = id })
+                { currentHealth = _health.MaxHealth, maxHealth = _health.MaxHealth };
+        }
+        if (IsServer && _characterStates[ActiveSlotIndex] == null)
+            for (int slot = 0; slot < 4; slot++)
+                if (_characterStates[slot] != null) { _activeSlotIndex.Value = slot; break; }
+    }
+
+    public CharacterState GetCharacterState(int charId)
+        => System.Array.Find(_characterStates, state => state != null && state.charId == charId);
+
+    public bool IsCharacterAlive(int charId) => GetCharacterState(charId)?.currentHealth > 0f;
+
+    public bool TryChangeCharacter(int charId)
+    {
+        if ((!IsOwner && !IsServer) || !CanChangeCharacter || !IsCharacterAlive(charId)) return false;
+        int slot = System.Array.FindIndex(_characterStates, state => state != null && state.charId == charId);
+        if (IsServer) return TryChangeCharacterSlot(slot);
+        if (!IsSpawned) return false;
+        ChangeCharacterSlotServerRpc(slot);
+        return true;
+    }
+
+    private bool TryChangeCharacterSlot(int slot)
+    {
+        if (!IsServer || !CanChangeCharacter || slot < 0 || slot >= 4
+            || _characterStates[slot] == null || _characterStates[slot].currentHealth <= 0f) return false;
+        if (slot != ActiveSlotIndex) SwitchCharacterSlot(slot);
+        return true;
+    }
+
+    public bool TrySwitchToLivingCharacter()
+    {
+        if (!IsServer || _health.CurrentHealth > 0f || _characterStates[ActiveSlotIndex] == null) return false;
+        _characterStates[ActiveSlotIndex].currentHealth = 0f;
+        for (int offset = 1; offset < 4; offset++)
+        {
+            int slot = (ActiveSlotIndex + offset) % 4;
+            if (_characterStates[slot] == null || _characterStates[slot].currentHealth <= 0f) continue;
+            SwitchCharacterSlot(slot);
+            return true;
+        }
+        return false;
+    }
+
+    private void SwitchCharacterSlot(int slot)
+    {
+        HandleCharacterHealthChanged(_health.CurrentHealth, _health.MaxHealth);
+        CancelGameplayActions();
+        InterruptPresentation();
+        _activeSlotIndex.Value = slot;
+        var state = _characterStates[slot];
+        _health.SetHealth(state.currentHealth, state.maxHealth);
+        SendCharacterStates();
+    }
+
+    private void HandleCharacterHealthChanged(float hp, float maxHp)
+    {
+        var state = _characterStates[ActiveSlotIndex];
+        if (!IsServer || state == null) return;
+        state.currentHealth = Mathf.Max(0f, hp);
+        state.maxHealth = maxHp;
+    }
+
+    private void UpdateCharacterStates(float deltaTime)
+    {
+        if (!IsServer || _health == null || _health.IsDead || HasCleared) return;
+        // Resolve all reserves before selecting a replacement for a starving character.
+        foreach (var state in _characterStates) state?.UpdateSurvivalStats(deltaTime);
+        var active = _characterStates[ActiveSlotIndex];
+        if (active == null) return;
+        _health.SetHealth(active.currentHealth, active.maxHealth);
+        RefreshLocalParty();
+        if (Time.unscaledTime >= _nextStateSync)
+        {
+            _nextStateSync = Time.unscaledTime + .1f;
+            SendCharacterStates();
         }
     }
+
+    public void RefreshLocalParty()
+    {
+        if (IsOwner && (IsServer || _receivedStateSlot == ActiveSlotIndex))
+            CharacterStateManager.Instance.RefreshCharacterStates(GetLocalDeck().GetCharId(ActiveSlotIndex));
+    }
+
+    [ServerRpc]
+    private void RequestCharacterStatesServerRpc() => SendCharacterStates();
+
+    private void SendCharacterStates()
+    {
+        if (!IsServer || !IsSpawned || IsOwner) return;
+        SyncCharacterStatesClientRpc(ActiveSlotIndex, System.Array.FindAll(_characterStates, state => state != null),
+            new ClientRpcParams { Send = new ClientRpcSendParams { TargetClientIds = new[] { OwnerClientId } } });
+    }
+
+    [ClientRpc]
+    private void SyncCharacterStatesClientRpc(int activeSlot, CharacterState[] states, ClientRpcParams rpcParams = default)
+    {
+        if (!IsOwner || IsServer) return;
+        foreach (var state in states) GetCharacterState(state.charId)?.CopyVitalsFrom(state);
+        _receivedStateSlot = activeSlot;
+        RefreshLocalParty(); // Wait for both the slot and its stats, whichever arrives first.
+    }
+
+    public void ModifyCharacterSurvivalStats(int charId, float hungerDelta, float thirstDelta)
+    {
+        if (!IsServer)
+        {
+            if (IsOwner && IsSpawned) ModifySurvivalStatsServerRpc(charId, hungerDelta, thirstDelta);
+            return;
+        }
+        var state = GetCharacterState(charId);
+        if (state == null || state.currentHealth <= 0f || HasCleared
+            || float.IsNaN(hungerDelta) || float.IsInfinity(hungerDelta)
+            || float.IsNaN(thirstDelta) || float.IsInfinity(thirstDelta)) return;
+        state.currentHunger = Mathf.Clamp(state.currentHunger + hungerDelta, 0f, state.maxHunger);
+        state.currentThirst = Mathf.Clamp(state.currentThirst + thirstDelta, 0f, state.maxThirst);
+        RefreshLocalParty();
+        SendCharacterStates();
+    }
+
+    [ServerRpc]
+    private void ModifySurvivalStatsServerRpc(int charId, float hungerDelta, float thirstDelta)
+        => ModifyCharacterSurvivalStats(charId, hungerDelta, thirstDelta);
 
     private System.Collections.IEnumerator WaitAndLinkUIRoutine()
     {
@@ -407,6 +646,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
     private void Update()
     {
+        UpdateCharacterStates(Time.deltaTime);
         if (IsOwner && !IsInputLocked)
         {
             // 테스트용 캐릭터 스왑 (숫자키 1~4)
@@ -420,12 +660,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         }
 
         // 애니메이션은 모든 클라이언트에서 동일하게 재생되어야 하므로 IsOwner 체크 밖에서 처리
-        if (_animator != null)
-        {
-            Vector2 animInput = IsInputLocked ? Vector2.zero : _netAnimInput.Value;
-            _animator.SetFloat("InputX", animInput.x);
-            _animator.SetFloat("InputY", animInput.y);
-        }
+        GetAnimationPresenter()?.SetMovement(IsInputLocked ? Vector2.zero : _netAnimInput.Value);
     }
 
     private void OnMove(InputAction.CallbackContext ctx)
@@ -708,12 +943,15 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
     public void StartRoll(float duration, float distance, float invincibleTime)
     {
-        if (_isRolling || !IsOwner || IsInputLocked) return;
-        StartCoroutine(RollRoutine(duration, distance, invincibleTime));
+        if (_isRolling || !IsOwner || IsInputLocked || duration <= 0f) return;
+        _rollRoutine = StartCoroutine(RollRoutine(duration, distance, invincibleTime));
     }
 
     private System.Collections.IEnumerator RollRoutine(float duration, float distance, float invincibleTime)
     {
+        int interruptionVersion = _presentationInterruptionVersion;
+        var rollPresenter = GetAnimationPresenter();
+        int rollPlayback = rollPresenter != null ? rollPresenter.PlayRoll(duration) : 0;
         _isRolling = true;
         if (_health != null) _health.IsInvincible = true;
 
@@ -723,23 +961,6 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         {
             combinedInput.Normalize();
             rollDir = new Vector3(combinedInput.x, 0f, combinedInput.y);
-        }
-
-        float originalAnimSpeed = 1f;
-        if (_animator != null)
-        {
-            originalAnimSpeed = _animator.speed;
-            _animator.Play("Roll", 0, 0f);
-            
-            // Play 직후 상태를 갱신하여 애니메이션 길이를 가져옵니다.
-            _animator.Update(0f);
-            AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
-            
-            if (stateInfo.IsName("Roll") && duration > 0f)
-            {
-                // 구르기 시간(duration) 동안 애니메이션 1회가 정확히 끝나도록 배속 설정
-                _animator.speed = stateInfo.length / duration;
-            }
         }
 
         if (shooter != null && _isShooting)
@@ -755,7 +976,8 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         Vector3 localMoveDir = transform.InverseTransformDirection(rollDir);
         _netAnimInput.Value = new Vector2(localMoveDir.x, localMoveDir.z);
 
-        while (elapsedTime < duration && !IsInputLocked)
+        while (elapsedTime < duration && !IsInputLocked
+            && interruptionVersion == _presentationInterruptionVersion)
         {
             elapsedTime += Time.fixedDeltaTime;
             
@@ -776,19 +998,17 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
             yield return new WaitForFixedUpdate();
         }
 
-        if (_animator != null)
-        {
-            // 구르기 종료 후 원래 애니메이션 속도로 복구
-            _animator.speed = originalAnimSpeed;
-        }
+        if (rollPresenter != null && interruptionVersion == _presentationInterruptionVersion)
+            rollPresenter.FinishFullBody(rollPlayback, true);
 
         if (_health != null) _health.IsInvincible = false;
         _isRolling = false;
+        _rollRoutine = null;
     }
 
     public BaseUltimateSkill GetActiveUltimateSkill()
     {
-        int activeIndex = _activeSlotIndex.Value;
+        int activeIndex = ActiveSlotIndex;
         if (activeIndex >= 0 && activeIndex < _characterModels.Length)
         {
             GameObject activeModel = _characterModels[activeIndex];
@@ -802,107 +1022,161 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
     public void PlayShootAnimation()
     {
-        if (_animator != null)
-        {
-            // 레이어 1 (UpperBody Layer)에서 처음(0f)부터 사격 애니메이션을 재생합니다.
-            _animator.Play("Armature|shoot", 1, 0f);
-        }
+        if (!IsInputLocked) GetAnimationPresenter()?.PlayShoot();
     }
 
     public void PlayReloadAnimation()
     {
-        if (_animator != null)
-        {
-            // 레이어 1 (UpperBody Layer)에서 처음(0f)부터 장전 애니메이션을 재생합니다.
-            _animator.Play("Armature|reloading", 1, 0f);
-        }
+        if (!IsInputLocked) GetAnimationPresenter()?.PlayReload();
     }
 
-    public void PlayCinematic(string stateName, bool restoreState, System.Action onComplete)
+    public void PlayCinematic(string stateName, bool restoreState, System.Action onComplete,
+        System.Action onCancelled = null)
     {
-        if (!IsOwner) return;
-        StartCoroutine(PlayCinematicRoutine(stateName, restoreState, onComplete));
+        if (!IsOwner) { onCancelled?.Invoke(); return; }
+        if (!isActiveAndEnabled || _deathHandled)
+        {
+            Debug.LogError($"[PlayerController] {stateName} 연출을 시작할 수 없습니다. active={isActiveAndEnabled}, dead={_deathHandled}", this);
+            onCancelled?.Invoke();
+            return;
+        }
+        // GameFlowManager waits for a running ultimate before requesting Exit.
+        var ultimate = GetActiveUltimateSkill();
+        if (ultimate != null && ultimate.IsPresentationPlaying)
+        {
+            Debug.LogError($"[PlayerController] 궁극기 완료 전에 {stateName} 연출이 요청됐습니다.", this);
+            onCancelled?.Invoke();
+            return;
+        }
+        if (_cinematicRoutine != null) InterruptPresentation();
+        if (!isActiveAndEnabled) { onCancelled?.Invoke(); return; }
+        _cinematicOnComplete = onComplete;
+        _cinematicOnCancelled = onCancelled;
+        _cinematicRoutine = StartCoroutine(PlayCinematicRoutine(stateName, restoreState));
     }
 
-    private System.Collections.IEnumerator PlayCinematicRoutine(string stateName, bool restoreState, System.Action onComplete)
+    /// <summary>Abnormal interruption never invokes the successful-completion callback.</summary>
+    public void InterruptPresentation() => InterruptPresentation(true);
+
+    private void InterruptPresentation(bool clearGameplayInput)
+    {
+        if (_interruptingPresentation) return;
+        _interruptingPresentation = true;
+        try
+        {
+            ++_presentationInterruptionVersion;
+            if (clearGameplayInput) ClearGameplayInput();
+            StopRoll();
+            CancelCinematic();
+            GetActiveUltimateSkill()?.CancelPresentation();
+            _animationPresenter?.StopPlayback();
+            PresentationInterrupted?.Invoke();
+        }
+        finally { _interruptingPresentation = false; }
+    }
+
+    private void CancelCinematic()
+    {
+        bool wasPlaying = _isCinematicPlaying;
+        if (_cinematicRoutine != null) StopCoroutine(_cinematicRoutine);
+        _cinematicRoutine = null;
+        _activeCinematicController?.CancelCinematic();
+        _activeCinematicController = null;
+        _animationPresenter?.CancelFullBody(_cinematicAnimationToken);
+        _cinematicAnimationToken = 0;
+        _cinematicCameraToken = 0;
+        _isCinematicPlaying = false;
+        if (wasPlaying && IsOwner && MenuToggleController.Instance != null)
+            MenuToggleController.Instance.SetUIVisibility(true);
+        var cancelled = _cinematicOnCancelled;
+        _cinematicOnComplete = null;
+        _cinematicOnCancelled = null;
+        cancelled?.Invoke();
+    }
+
+    private System.Collections.IEnumerator PlayCinematicRoutine(string stateName, bool restoreState)
     {
         _isCinematicPlaying = true;
-        
-        // 시네마틱 재생 시 UI 숨김
-        if (MenuToggleController.Instance != null)
-        {
-            MenuToggleController.Instance.SetUIVisibility(false);
-        }
-        
-        // 이동/입력 초기화
+        if (MenuToggleController.Instance != null) MenuToggleController.Instance.SetUIVisibility(false);
         ClearGameplayInput();
+        // Ensure the coroutine handle is recorded before any cancellation path can run.
+        yield return null;
 
-        // 애니메이션 재생 전 -z 방향을 바라보도록 강제 회전
+        var presenter = GetAnimationPresenter();
+        var model = GetActiveCharacterModel();
+        if (model == null && presenter != null) model = presenter.gameObject;
+        if (presenter == null || model == null)
+        {
+            FailCinematic(stateName, "활성 캐릭터 모델 또는 Animator/CharacterAnimationPresenter가 없습니다.");
+            yield break;
+        }
+        _cinematicAnimationToken = presenter.PlayFullBody(stateName);
+        if (_cinematicAnimationToken == 0)
+        {
+            FailCinematic(stateName, $"Animator 상태가 없거나 재생할 수 없습니다. model={model.name}");
+            yield break;
+        }
+        int playback = _cinematicAnimationToken;
+
         transform.rotation = Quaternion.LookRotation(Vector3.back);
-        if (_rb != null)
+        if (_rb != null) _rb.rotation = transform.rotation;
+        _activeCinematicController = model.GetComponent<CharacterCinematicController>();
+        if (_activeCinematicController == null || _activeCinematicController.CinematicCamera == null)
         {
-            _rb.rotation = transform.rotation;
+            FailCinematic(stateName, $"CharacterCinematicController 또는 시네마틱 카메라가 없습니다. model={model.name}");
+            yield break;
+        }
+        _cinematicCameraToken = _activeCinematicController.BeginCinematic(stateName, IsOwner);
+        if (_cinematicCameraToken == 0)
+        {
+            FailCinematic(stateName, $"시네마틱 카메라를 시작하지 못했습니다. model={model.name}");
+            yield break;
+        }
+        float waitTime = 2f;
+        bool durationResolved = false;
+        float returnLead = _activeCinematicController.CameraReturnLeadSeconds;
+        yield return presenter.WaitForDuration(playback, duration => { waitTime = duration; durationResolved = true; });
+        if (!presenter.IsCurrentPlayback(playback))
+        {
+            FailCinematic(stateName, "길이 확인 중 애니메이션 재생이 중단됐습니다.");
+            yield break;
+        }
+        if (!durationResolved)
+            Debug.LogError($"[PlayerController] {stateName} 애니메이션 길이를 확인하지 못해 임시로 2초를 사용합니다. model={model.name}", this);
+
+        returnLead = Mathf.Clamp(returnLead, 0f, waitTime);
+        yield return new WaitForSeconds(Mathf.Max(0f, waitTime - returnLead));
+        if (!presenter.IsCurrentPlayback(playback))
+        {
+            FailCinematic(stateName, "정상 완료 전에 애니메이션 재생이 중단됐습니다.");
+            yield break;
+        }
+        if (restoreState) _activeCinematicController?.EndCinematic(_cinematicCameraToken);
+        if (returnLead > 0f) yield return new WaitForSeconds(returnLead);
+        if (!presenter.IsCurrentPlayback(playback))
+        {
+            FailCinematic(stateName, "카메라 복귀 중 애니메이션 재생이 중단됐습니다.");
+            yield break;
         }
 
-        Cinemachine.CinemachineVirtualCamera cinematicCamera = null;
-        float waitTime = 2.0f; // 기본 대기 시간
-
-        if (_activeSlotIndex.Value >= 0 && _activeSlotIndex.Value < _characterModels.Length)
-        {
-            GameObject activeModel = _characterModels[_activeSlotIndex.Value];
-            if (activeModel != null)
-            {
-                var cinematicCtrl = activeModel.GetComponent<CharacterCinematicController>();
-                if (cinematicCtrl != null && cinematicCtrl.CinematicCamera != null)
-                {
-                    cinematicCamera = cinematicCtrl.CinematicCamera;
-                    cinematicCamera.Priority = 20; // 카메라 뷰 뺏어오기
-                }
-
-                if (_animator != null)
-                {
-                    // 상반신 레이어 무력화
-                    if (_animator.layerCount > 1) _animator.SetLayerWeight(1, 0f);
-                    
-                    _animator.Play(stateName, 0, 0f);
-                    
-                    // 프레임 대기 후 애니메이션 길이 계산
-                    yield return null;
-                    AnimatorStateInfo stateInfo = _animator.GetCurrentAnimatorStateInfo(0);
-                    if (stateInfo.IsName(stateName))
-                    {
-                        waitTime = stateInfo.length;
-                    }
-                }
-            }
-        }
-
-        // 연출 시간만큼 대기 (종료 1초 전에 카메라 복구 처리를 위해 분할 대기)
-        yield return new WaitForSeconds(Mathf.Max(0f, waitTime - 1.0f));
-
-        // 카메라 복구 (restoreState가 true일 때만)
-        if (restoreState && cinematicCamera != null)
-        {
-            cinematicCamera.Priority = 0;
-        }
-
-        yield return new WaitForSeconds(1.0f);
-
-        // 애니메이션 및 레이어 복구 (restoreState가 true일 때만)
-        if (restoreState && _animator != null)
-        {
-            if (_animator.layerCount > 1) _animator.SetLayerWeight(1, 1f);
-            _animator.Play("Movement", 0, 0f); // 기본 상태로 복귀
-        }
-
+        presenter.FinishFullBody(playback, restoreState);
+        if (!restoreState) _activeCinematicController?.EndCinematic(_cinematicCameraToken, false);
         _isCinematicPlaying = false;
-        
-        // UI 원상 복구 (restoreState가 true일 때만 - exit 연출은 결과창을 띄우므로 복구 안함)
+        _cinematicRoutine = null;
+        _cinematicAnimationToken = 0;
+        _cinematicCameraToken = 0;
+        // Keep the controller reference so abnormal teardown can release a held Exit view.
+        var completed = _cinematicOnComplete;
+        _cinematicOnComplete = null;
+        _cinematicOnCancelled = null;
         if (restoreState && MenuToggleController.Instance != null)
-        {
             MenuToggleController.Instance.SetUIVisibility(true);
-        }
-        
-        onComplete?.Invoke();
+        completed?.Invoke();
+    }
+
+    private void FailCinematic(string stateName, string reason)
+    {
+        Debug.LogError($"[PlayerController] {stateName} 연출 오류: {reason}", this);
+        CancelCinematic();
     }
 }
