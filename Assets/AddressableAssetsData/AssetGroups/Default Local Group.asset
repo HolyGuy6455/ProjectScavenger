@@ -65,6 +65,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8fa8330c955f5845ba1a7b7b4b0b6897
+    m_Address: SoundCatalog
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c93c1d49b4fe5f6478aae34f92b91e58
     m_Address: Stage001
     m_ReadOnly: 0

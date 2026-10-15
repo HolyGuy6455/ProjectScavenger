@@ -1,0 +1,6 @@
+{
+    "name": "Scavenger.Audio",
+    "rootNamespace": "Scavenger.Audio",
+    "references": ["FMODUnity", "Unity.Addressables", "Unity.ResourceManager"],
+    "autoReferenced": true
+}
