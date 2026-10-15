@@ -25,7 +25,8 @@ namespace Scavenger.UI
         CharacterLevelUpCelebration,
         SkillLevelUpCelebration,
         SkillLevelUp,
-        SkillSelect
+        SkillSelect,
+        ItemInfo
     }
 
     public class OutGameUIManager : MonoBehaviour
@@ -54,6 +55,7 @@ namespace Scavenger.UI
         [SerializeField] private GameObject skillLevelUpCelebrationPopupPrefab;
         [SerializeField] private GameObject skillLevelUpPopupPrefab;
         [SerializeField] private GameObject skillSelectPopupPrefab;
+        [SerializeField] private GameObject itemInfoPopupPrefab;
 
         // [Header("Persistent UI")]
         // [SerializeField] private GameObject persistentPartyListUI; // 파티 리스트 패널
@@ -63,7 +65,7 @@ namespace Scavenger.UI
         private OutGamePanelType _currentPanelType;
         private Dictionary<OutGamePopupType, GameObject> _cachedPopups = new Dictionary<OutGamePopupType, GameObject>();
         private Stack<GameObject> _activePopups = new Stack<GameObject>();
-        private Transform _inactivePanelRoot;
+        private Transform _inactiveUIRoot;
 
         private bool IsPartyScope(OutGamePanelType type)
         {
@@ -140,7 +142,7 @@ namespace Scavenger.UI
                 if (prefabToLoad != null && canvasTransform != null)
                 {
                     GameObject newPanel = beforeEnable != null
-                        ? InstantiatePanelInactive(prefabToLoad)
+                        ? InstantiateInactive(prefabToLoad)
                         : Instantiate(prefabToLoad, canvasTransform, false);
                     RectTransform rect = newPanel.GetComponent<RectTransform>();
                     if (rect != null)
@@ -163,21 +165,21 @@ namespace Scavenger.UI
             _currentPanelType = panelType;
         }
 
-        private GameObject InstantiatePanelInactive(GameObject prefab)
+        private GameObject InstantiateInactive(GameObject prefab)
         {
-            if (_inactivePanelRoot == null)
+            if (_inactiveUIRoot == null)
             {
-                var root = new GameObject("InactivePanelRoot");
+                var root = new GameObject("InactiveUIRoot");
                 root.transform.SetParent(canvasTransform, false);
                 root.SetActive(false);
-                _inactivePanelRoot = root.transform;
+                _inactiveUIRoot = root.transform;
             }
 
             // 활성 프리팹도 OnEnable이 실행되기 전에 초기값을 전달할 수 있게 합니다.
-            GameObject panel = Instantiate(prefab, _inactivePanelRoot, false);
-            panel.SetActive(false);
-            panel.transform.SetParent(canvasTransform, false);
-            return panel;
+            GameObject instance = Instantiate(prefab, _inactiveUIRoot, false);
+            instance.SetActive(false);
+            instance.transform.SetParent(canvasTransform, false);
+            return instance;
         }
 
         public void GoToQuestShortcut(string shortcut, string shortcutValue)
@@ -214,19 +216,26 @@ namespace Scavenger.UI
 
         public T ShowPopup<T>(OutGamePopupType popupType) where T : MonoBehaviour
         {
+            return ShowPopup<T>(popupType, null);
+        }
+
+        // beforeEnable에서는 팝업을 직접 열지 않고 초기값만 설정합니다.
+        public T ShowPopup<T>(OutGamePopupType popupType, Action<T> beforeEnable) where T : MonoBehaviour
+        {
             GameObject popupObj = null;
 
             if (_cachedPopups.TryGetValue(popupType, out GameObject cachedPopup) && cachedPopup != null)
             {
                 popupObj = cachedPopup;
-                popupObj.SetActive(true);
             }
             else
             {
                 GameObject prefabToLoad = GetPopupPrefabByType(popupType);
                 if (prefabToLoad != null && canvasTransform != null)
                 {
-                    popupObj = Instantiate(prefabToLoad, canvasTransform, false);
+                    popupObj = beforeEnable != null
+                        ? InstantiateInactive(prefabToLoad)
+                        : Instantiate(prefabToLoad, canvasTransform, false);
                     RectTransform rect = popupObj.GetComponent<RectTransform>();
                     if (rect != null)
                     {
@@ -234,7 +243,6 @@ namespace Scavenger.UI
                         rect.localScale = Vector3.one;
                     }
                     _cachedPopups[popupType] = popupObj;
-                    popupObj.SetActive(true);
                 }
                 else
                 {
@@ -243,13 +251,36 @@ namespace Scavenger.UI
                 }
             }
 
+            T popup = popupObj.GetComponent<T>();
+            if (beforeEnable != null)
+            {
+                if (popup == null)
+                {
+                    Debug.LogError($"[OutGameUIManager] 팝업에 {typeof(T).Name} 컴포넌트가 없습니다. ({popupType})");
+                    return null;
+                }
+
+                // 이미 열린 팝업을 재사용해도 새 인자로 OnEnable이 실행되게 합니다.
+                popupObj.SetActive(false);
+                beforeEnable(popup);
+            }
+
+            popupObj.SetActive(true);
             popupObj.transform.SetAsLastSibling();
             if (_activePopups.Count == 0 || _activePopups.Peek() != popupObj)
             {
                 _activePopups.Push(popupObj);
             }
 
-            return popupObj.GetComponent<T>();
+            return popup;
+        }
+
+        public ItemInfoPopup ShowItemInfoPopup(int itemId)
+        {
+            if (itemId <= 0) return null;
+
+            return ShowPopup<ItemInfoPopup>(OutGamePopupType.ItemInfo,
+                popup => popup.SetItemForNextOpen(itemId));
         }
 
         public void GoBack()
@@ -334,6 +365,10 @@ namespace Scavenger.UI
                 case OutGamePopupType.SkillLevelUpCelebration: return skillLevelUpCelebrationPopupPrefab;
                 case OutGamePopupType.SkillLevelUp: return skillLevelUpPopupPrefab;
                 case OutGamePopupType.SkillSelect: return skillSelectPopupPrefab;
+                case OutGamePopupType.ItemInfo:
+                    return itemInfoPopupPrefab != null
+                        ? itemInfoPopupPrefab
+                        : Resources.Load<GameObject>("UIPrefabs/Popups/ItemInfoPopup");
             }
             return null;
         }

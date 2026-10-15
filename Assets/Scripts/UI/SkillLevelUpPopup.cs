@@ -93,7 +93,7 @@ public class SkillLevelUpPopup : MonoBehaviour
                     var slotWrapper = slotGo.GetComponent<ItemSlotWrapper>();
                     if (slotWrapper != null)
                     {
-                        slotWrapper.SetData(itemIcon, itemName, requiredAmount, currentAmount);
+                        slotWrapper.SetData(itemIcon, itemName, requiredAmount, currentAmount, itemId);
                     }
                     }
                 }

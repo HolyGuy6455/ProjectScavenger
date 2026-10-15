@@ -341,6 +341,7 @@ MonoBehaviour:
   itemIcon: {fileID: 22872716022145171}
   itemNameText: {fileID: 1084365715706120733}
   itemAmountText: {fileID: 1013693137818626114}
+  itemInfoButton: {fileID: 6323718733208199639}
   sufficientColor: {r: 0.3764706, g: 0.3372549, b: 0.3137255, a: 1}
   insufficientColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &7129724226874027901
@@ -787,8 +788,29 @@ PrefabInstance:
     - {fileID: 8779151162718895455, guid: 77f7700d3a0133245a0558a495727dca, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4757625836159977775, guid: 77f7700d3a0133245a0558a495727dca, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6323718733208199639}
   m_SourcePrefab: {fileID: 100100000, guid: 77f7700d3a0133245a0558a495727dca, type: 3}
+--- !u!1 &4461512176737799564 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4757625836159977775, guid: 77f7700d3a0133245a0558a495727dca, type: 3}
+  m_PrefabInstance: {fileID: 9217745640249885859}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6323718733208199639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4461512176737799564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd0613d16c5dae046838e88bccc760a0, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_ItemInfoButton
+  itemId: 0
 --- !u!224 &4690622128982433235 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4536370756532410736, guid: 77f7700d3a0133245a0558a495727dca, type: 3}

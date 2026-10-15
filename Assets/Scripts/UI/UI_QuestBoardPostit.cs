@@ -92,7 +92,8 @@ namespace Scavenger.UI
                     {
                         rewardSlots[i].gameObject.SetActive(true);
                         var rewardInfo = _masterData.Rewards[i];
-                        rewardSlots[i].SetRewardData(LoadRewardIcon(rewardInfo), rewardInfo.Count);
+                        rewardSlots[i].SetRewardData(LoadRewardIcon(rewardInfo), rewardInfo.Count,
+                            rewardInfo.Type == "ITEM" ? rewardInfo.Id : 0);
                     }
                     else
                     {

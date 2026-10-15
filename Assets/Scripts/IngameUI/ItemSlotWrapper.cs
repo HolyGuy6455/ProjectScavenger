@@ -1,19 +1,23 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Scavenger.UI;
 
 public class ItemSlotWrapper : MonoBehaviour
 {
     [SerializeField] private Image itemIcon;
     [SerializeField] private TextMeshProUGUI itemNameText;
     [SerializeField] private TextMeshProUGUI itemAmountText;
+    [SerializeField] private UI_ItemInfoButton itemInfoButton;
 
     [Header("Colors")]
     [SerializeField] private Color sufficientColor = Color.white;
     [SerializeField] private Color insufficientColor = Color.red;
 
-    public void SetData(Sprite icon, string name, int requiredAmount, int currentAmount)
+    public void SetData(Sprite icon, string name, int requiredAmount, int currentAmount, int itemId = 0)
     {
+        itemInfoButton?.SetItemId(itemId);
+
         if (itemIcon != null && icon != null)
         {
             itemIcon.sprite = icon;
@@ -41,8 +45,10 @@ public class ItemSlotWrapper : MonoBehaviour
         }
     }
 
-    public void SetRewardData(Sprite icon, int amount)
+    public void SetRewardData(Sprite icon, int amount, int itemId = 0)
     {
+        itemInfoButton?.SetItemId(itemId);
+
         if (itemIcon != null)
         {
             itemIcon.sprite = icon;
