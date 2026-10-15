@@ -30,8 +30,11 @@ namespace Scavenger.Audio
         private static SoundManager current;
         private static bool quitting;
         private static bool dedicatedServer;
+        private static bool sceneTransition;
 
         private readonly List<SoundHandle> loops = new List<SoundHandle>();
+        // These have already been released to FMOD, but remain stoppable while playing.
+        private readonly List<EventInstance> spatialOneShots = new List<EventInstance>();
         private readonly List<string> ownedBanks = new List<string>();
         private readonly HashSet<string> warnings = new HashSet<string>();
         private Dictionary<SoundKey, EventReference> events;
@@ -40,6 +43,12 @@ namespace Scavenger.Audio
         private bool initialized;
         private bool initializationFailed;
         private bool shuttingDown;
+        private SoundListenerRig listenerRig;
+
+        public static bool IsAudioEnabled => Application.isPlaying && !quitting && !dedicatedServer;
+
+        public static bool IsWorldListenerReady => IsAudioEnabled && !sceneTransition
+            && current != null && current.listenerRig != null && current.listenerRig.IsWorldReady;
 
         public static bool IsInitialized => current != null && current.initialized
             && !quitting && RuntimeManager.IsInitialized;
@@ -56,6 +65,7 @@ namespace Scavenger.Audio
             }
             current = null;
             quitting = false;
+            sceneTransition = false;
 #if UNITY_SERVER
             dedicatedServer = true;
 #else
@@ -113,6 +123,76 @@ namespace Scavenger.Audio
         /// <summary>Plays a 3D one-shot at a fixed world position.</summary>
         public static bool PlayAt(SoundKey key, Vector3 position) => PlayOneShot(key, true, position);
 
+        /// <summary>
+        /// Called after moving the local player's camera. The caller checks local client ownership;
+        /// emitters have no ownership restriction. Distance uses the supplied focus, panning the camera.
+        /// </summary>
+        public static bool SetWorldListener(Camera camera, Vector3 attenuationPosition)
+        {
+            if (sceneTransition || camera == null || !camera.isActiveAndEnabled)
+                return false;
+            SoundManager manager = GetManager();
+            if (manager == null)
+                return false;
+            try
+            {
+                if (manager.listenerRig == null)
+                    manager.listenerRig = new SoundListenerRig(manager.transform);
+                if (manager.listenerRig.HasWorldListener && !manager.listenerRig.UsesCamera(camera))
+                    manager.StopWorldSounds();
+                manager.listenerRig.SetWorld(camera, attenuationPosition);
+                return true;
+            }
+            catch (Exception exception)
+            {
+                manager.WarnOnce($"Cannot set world listener: {exception.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>A stale camera cannot detach a newer camera's listener.</summary>
+        public static void ClearWorldListener(Camera camera)
+        {
+            if (current != null && current.listenerRig != null && current.listenerRig.UsesCamera(camera))
+                current.ClearWorldListener();
+        }
+
+        /// <summary>Loading keeps 2D audio available and stops all owned 3D audio.</summary>
+        public static void BeginSceneTransition()
+        {
+            sceneTransition = true;
+            if (current != null)
+                current.ClearWorldListener();
+        }
+
+        /// <summary>World audio still waits for a local gameplay camera after loading completes.</summary>
+        public static void CompleteSceneTransition() => sceneTransition = false;
+
+        private void ClearWorldListener()
+        {
+            StopWorldSounds();
+            if (!quitting && !shuttingDown)
+                listenerRig?.ClearWorld();
+        }
+
+        private void StopWorldSounds()
+        {
+            foreach (SoundHandle handle in loops)
+            {
+                if (handle.IsSpatial)
+                    handle.Stop(true);
+            }
+            if (RuntimeManager.IsInitialized)
+            {
+                foreach (EventInstance instance in spatialOneShots)
+                {
+                    if (instance.isValid())
+                        instance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+                }
+            }
+            spatialOneShots.Clear();
+        }
+
         /// <summary>Plays a 2D loop; stop the returned handle when finished.</summary>
         public static SoundHandle PlayLoop(SoundKey key, SoundLifetime lifetime = SoundLifetime.Scene)
             => StartLoop(key, false, default, null, lifetime);
@@ -161,7 +241,7 @@ namespace Scavenger.Audio
 
         private static SoundManager GetManager()
         {
-            if (!Application.isPlaying || quitting || dedicatedServer)
+            if (!IsAudioEnabled)
                 return null;
             if (current == null)
                 new GameObject("SoundManager").AddComponent<SoundManager>();
@@ -207,6 +287,9 @@ namespace Scavenger.Audio
                 }
 
                 // FMOD's auto-load setting may already own these banks. Only acquire missing ones.
+                if (listenerRig == null)
+                    listenerRig = new SoundListenerRig(transform);
+                listenerRig.EnsureFallback();
                 foreach (string bank in RequiredBanks)
                 {
                     if (!RuntimeManager.HasBankLoaded(bank) && !ownedBanks.Contains(bank))
@@ -234,6 +317,8 @@ namespace Scavenger.Audio
             Transform emitter, out EventInstance instance)
         {
             instance = default;
+            if (spatial && !IsWorldListenerReady)
+                return false;
             if (!EnsureInitialized())
                 return false;
             if (!events.TryGetValue(key, out EventReference reference))
@@ -286,6 +371,8 @@ namespace Scavenger.Audio
             bool started = manager.Check(instance.start(), $"Start: {key}");
             // A released one-shot finishes naturally; a failed start must still release its instance.
             manager.Check(instance.release(), $"Release: {key}");
+            if (started && spatial)
+                manager.spatialOneShots.Add(instance);
             return started;
         }
 
@@ -303,19 +390,29 @@ namespace Scavenger.Audio
                 return SoundHandle.Invalid;
             }
             int sceneHandle = emitter != null ? emitter.gameObject.scene.handle : SceneManager.GetActiveScene().handle;
-            var handle = new SoundHandle(manager, instance, lifetime, sceneHandle, emitter);
+            var handle = new SoundHandle(manager, instance, lifetime, sceneHandle, emitter, spatial);
             manager.loops.Add(handle);
             return handle;
         }
 
         private void Update()
         {
+            if (listenerRig != null && listenerRig.HasWorldListener && !listenerRig.IsWorldReady)
+                ClearWorldListener();
             if (!initialized && !initializationFailed && (catalogLoad.IsValid() || events != null))
                 EnsureInitialized();
             for (int i = loops.Count - 1; i >= 0; i--)
             {
                 if (!loops[i].Tick())
                     loops.RemoveAt(i);
+            }
+            for (int i = spatialOneShots.Count - 1; i >= 0; i--)
+            {
+                EventInstance instance = spatialOneShots[i];
+                if (!RuntimeManager.IsInitialized || !instance.isValid()
+                    || instance.getPlaybackState(out PLAYBACK_STATE state) != FMOD.RESULT.OK
+                    || state == PLAYBACK_STATE.STOPPED)
+                    spatialOneShots.RemoveAt(i);
             }
         }
 
@@ -369,6 +466,9 @@ namespace Scavenger.Audio
         {
             if (shuttingDown)
                 return;
+            listenerRig?.Dispose();
+            listenerRig = null;
+            StopWorldSounds();
             SceneManager.sceneUnloaded -= OnSceneUnloaded;
             foreach (SoundHandle handle in loops)
                 handle.Stop(true);

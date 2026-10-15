@@ -1,3 +1,4 @@
+using Scavenger.Audio;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -20,6 +21,8 @@ namespace Scavenger.Core
         public static void LoadSceneWithIntent(LoadingIntent intent, string loadingSceneName = "LoadingScene")
         {
             CurrentIntent = intent;
+            // 이전 씬 카메라가 로딩 중 다시 리스너를 등록하지 못하게 막습니다.
+            SoundManager.BeginSceneTransition();
             Debug.Log($"[SceneTransition] 로딩 씬으로 이동합니다. 인텐트: {intent}");
             SceneManager.LoadScene(loadingSceneName);
         }

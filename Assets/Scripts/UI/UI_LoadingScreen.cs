@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Scavenger.Audio;
 using Scavenger.Core;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -15,6 +16,8 @@ namespace Scavenger.UI
 
         private void Start()
         {
+            // 로딩 씬을 직접 실행한 경우에도 월드 리스너를 차단합니다.
+            SoundManager.BeginSceneTransition();
             if (transform.root != null)
             {
                 DontDestroyOnLoad(transform.root.gameObject);
@@ -36,6 +39,7 @@ namespace Scavenger.UI
             string expectedMap = PlayerPrefs.GetString("SelectedMap", "Stage002");
             if (scene.name == expectedMap)
             {
+                SoundManager.CompleteSceneTransition();
                 Destroy(transform.root.gameObject);
             }
         }
@@ -334,6 +338,7 @@ namespace Scavenger.UI
             yield return new WaitForSeconds(0.4f);
             
             // 목표 씬 로드
+            SoundManager.CompleteSceneTransition();
             SceneManager.LoadScene(targetSceneName);
 
             // 로딩 화면 자기 자신도 파괴 (Test 씬 등에 이미 배치되어 있을 경우 중복 방지)

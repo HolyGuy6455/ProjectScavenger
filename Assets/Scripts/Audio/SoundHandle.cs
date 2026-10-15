@@ -27,15 +27,17 @@ namespace Scavenger.Audio
 
         internal int SceneHandle { get; private set; }
         internal SoundLifetime Lifetime { get; }
+        internal bool IsSpatial { get; }
 
         private SoundHandle() { }
 
         internal SoundHandle(SoundManager manager, EventInstance instance,
-            SoundLifetime lifetime, int sceneHandle, Transform followTarget)
+            SoundLifetime lifetime, int sceneHandle, Transform followTarget, bool spatial)
         {
             this.manager = manager;
             this.instance = instance;
             Lifetime = lifetime;
+            IsSpatial = spatial;
             SceneHandle = sceneHandle;
             this.followTarget = followTarget;
             followsTarget = followTarget != null;
