@@ -1,0 +1,299 @@
+{
+  "schemaVersion": 1,
+  "characterId": "char003",
+  "defaultId": "normal",
+  "texture": "Char003_Face_Atlas.png",
+  "textureSize": [
+    2048,
+    2048
+  ],
+  "uvOrigin": "bottom-left",
+  "mesh": "tripo_3cc9457d_125a_4cb0_ae38_2f9935d19560",
+  "material": "Char003_Face_Expression",
+  "materialSlot": 1,
+  "uvLayer": "Attribute",
+  "unityUvChannel": 0,
+  "uvBasis": "normalized-face",
+  "sourceRect": [
+    0,
+    0,
+    1,
+    1
+  ],
+  "backupOriginalUvLayer": "OriginalBodyUV",
+  "faceUvCopyLayer": "FaceExpressionUV",
+  "entries": [
+    {
+      "id": "normal",
+      "displayName": "평소",
+      "index": 0,
+      "rect": [
+        0.0078125,
+        0.5078125,
+        0.484375,
+        0.484375
+      ]
+    },
+    {
+      "id": "smile",
+      "displayName": "싱긋",
+      "index": 1,
+      "rect": [
+        0.5078125,
+        0.5078125,
+        0.484375,
+        0.484375
+      ]
+    },
+    {
+      "id": "troubled",
+      "displayName": "곤란",
+      "index": 2,
+      "rect": [
+        0.0078125,
+        0.0078125,
+        0.484375,
+        0.484375
+      ]
+    }
+  ],
+  "blender": {
+    "object": "Armature",
+    "property": "face_expression",
+    "materialMappingNode": "Face Expression UV Rect",
+    "keyInterpolation": "CONSTANT"
+  },
+  "clipExpressions": {
+    "death": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 12.0,
+        "id": "troubled"
+      },
+      {
+        "frame": 72.0,
+        "id": "troubled"
+      }
+    ],
+    "entering": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 20.0,
+        "id": "smile"
+      },
+      {
+        "frame": 56.0,
+        "id": "normal"
+      },
+      {
+        "frame": 130.0,
+        "id": "normal"
+      }
+    ],
+    "exit": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 84.0,
+        "id": "smile"
+      },
+      {
+        "frame": 140.0,
+        "id": "smile"
+      }
+    ],
+    "hit": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 14.0,
+        "id": "normal"
+      }
+    ],
+    "idle": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 94.0,
+        "id": "normal"
+      }
+    ],
+    "pump": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 11.0,
+        "id": "normal"
+      }
+    ],
+    "reloading_end": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 9.0,
+        "id": "normal"
+      }
+    ],
+    "reloading_loop": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 29.0,
+        "id": "normal"
+      }
+    ],
+    "reloading_start": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 7.0,
+        "id": "normal"
+      }
+    ],
+    "run_backward": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 17.0,
+        "id": "normal"
+      }
+    ],
+    "run_forward": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 22.0,
+        "id": "normal"
+      }
+    ],
+    "run_left": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 17.0,
+        "id": "normal"
+      }
+    ],
+    "run_right": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 21.0,
+        "id": "normal"
+      }
+    ],
+    "shoot": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 9.0,
+        "id": "normal"
+      }
+    ],
+    "skill": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 37.0,
+        "id": "normal"
+      }
+    ],
+    "ultimate": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 49.0,
+        "id": "smile"
+      },
+      {
+        "frame": 80.0,
+        "id": "normal"
+      },
+      {
+        "frame": 116.0,
+        "id": "normal"
+      }
+    ],
+    "walk_backward": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 43.0,
+        "id": "normal"
+      }
+    ],
+    "walk_forward": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 42.0,
+        "id": "normal"
+      }
+    ],
+    "walk_left": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 30.0,
+        "id": "normal"
+      }
+    ],
+    "walk_right": [
+      {
+        "frame": 1.0,
+        "id": "normal"
+      },
+      {
+        "frame": 44.0,
+        "id": "normal"
+      }
+    ]
+  },
+  "futureRuntimeContract": {
+    "method": "SetExpression(string id)",
+    "unknownIdFallback": "normal",
+    "onClipWithoutExpression": "normal",
+    "uvTransform": "scale = targetRect.size / sourceRect.size; offset = targetRect.min - sourceRect.min * scale",
+    "exportNote": "Blender material drivers do not transfer as Unity animation automatically. Bind this profile and clipExpressions to the future Unity expression controller."
+  }
+}

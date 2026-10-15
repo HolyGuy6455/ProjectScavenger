@@ -1,0 +1,1171 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3352690993342107665
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5119631350182610515}
+  - component: {fileID: 2284322674441756385}
+  - component: {fileID: 4141913203043186047}
+  - component: {fileID: 470951508462546496}
+  - component: {fileID: 4144137073153207476}
+  - component: {fileID: 7974548379153223876}
+  - component: {fileID: 6431676689691969295}
+  - component: {fileID: 6562970792634560255}
+  - component: {fileID: 4077538838715650970}
+  - component: {fileID: 3329716278140738751}
+  - component: {fileID: 3740663875958802845}
+  - component: {fileID: 7792384174823996096}
+  - component: {fileID: 8852904549050535663}
+  - component: {fileID: 1157677472319441215}
+  - component: {fileID: 2468933159735407793}
+  - component: {fileID: 3431112817465683280}
+  m_Layer: 7
+  m_Name: SecurityRobot
+  m_TagString: Enemy
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5119631350182610515
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3118564621816984661}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &2284322674441756385
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 5
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 80
+  m_CollisionDetection: 0
+--- !u!136 &4141913203043186047
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.42
+  m_Height: 0.98
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.49, z: 0}
+--- !u!114 &470951508462546496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 1956395829
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+--- !u!114 &4144137073153207476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Components::Unity.Netcode.Components.NetworkTransform
+  UseUnreliableDeltas: 0
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
+--- !u!114 &7974548379153223876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Components::Unity.Netcode.Components.NetworkRigidbody
+--- !u!114 &6431676689691969295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b43764360b850f44a9fc9b4affde7b22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Health
+  maxHealth: 30
+  destroyOnDeath: 0
+  destroyDelay: 0
+  NetworkCurrentHealth:
+    m_InternalValue: 100
+  onHealthChangedUnityEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onDamageTakenUnityEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onHealedUnityEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeathUnityEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8852904549050535663}
+        m_TargetAssemblyTypeName: EnemyDeathHandler, Assembly-CSharp
+        m_MethodName: BeginDeath
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &6562970792634560255
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dee19920f0c951e499a1e66156efd787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EntityMovement
+  moveSpeed: 2
+  rotationSpeed: 720
+  stoppingDistance: 0.1
+  syncMovementAndFacing: 1
+--- !u!114 &4077538838715650970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e2d3c79cf9b0b44c8a4cb773395bb65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootDropper
+--- !u!114 &3329716278140738751
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e460bbecbd7a2c4bb17698d73b58e32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimator
+  movementStateName: Base Layer.Move
+  movementRoot: {fileID: 5119631350182610515}
+  facingReference: {fileID: 5119631350182610515}
+  movementSpeedThreshold: 0.1
+  movementStopDelay: 0.1
+  teleportDistanceThreshold: 5
+  shootStateName: Shooting.SecurityRobot_Shoot
+  shootLayer: 1
+  shootEmptyStateName: Shooting.Empty
+  reloadStateName: 
+  reloadLayer: 0
+--- !u!114 &3740663875958802845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a12101140b8287419c23828ae488b0b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Shooter
+  bulletPrefab: {fileID: 7553329409341646764, guid: 4ccd0f3de8d06f641966a21cccc3f5f6, type: 3}
+  firePoint: {fileID: 5853066097510493237}
+  currentAmmoData:
+    id: 8
+    SearchRadius: 10
+    SearchAngle: 120
+    ExplosionRadius: 0
+    damage: 5
+    bulletsPerShot: 1
+    bulletDegree: 0
+    fireRate: 0.8
+    spreadPerShot: 2
+    maxSpread: 4
+    spreadRecoveryRate: 8
+    maxAmmo: 10000
+    specialBuff: 0
+  currentShotType: 0
+  isReloading: 0
+--- !u!114 &7792384174823996096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 935df63b07486184694625ec2484a3c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  enemyId: 4
+--- !u!114 &8852904549050535663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b662a709cdc7c4045b931e3df6b37936, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDeathHandler
+  deathStateName: Base Layer.Death
+--- !u!114 &1157677472319441215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 905f14e2cba7d204792077dcc4567a00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthBarSpawner
+  healthBarPrefab: {fileID: 4891483080001246480, guid: 0977d689f837f9e4fa1b0ab55cc36be0, type: 3}
+  parentTransform: {fileID: 0}
+  targetHealth: {fileID: 6431676689691969295}
+  targetTransform: {fileID: 5119631350182610515}
+  worldOffset: {x: 0, y: 1.25, z: 0}
+  useCustomColor: 0
+  barColor: {r: 1, g: 0, b: 0, a: 1}
+--- !u!114 &2468933159735407793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba93fb69bb17b5c41a602fb0358664eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIBrain
+  rootNode:
+    rid: 5831856210622283881
+  blackboard:
+  - rid: 5831856210622283882
+  - rid: 5831856210622283883
+  - rid: 5831856210622283884
+  - rid: 5831856210622283885
+  - rid: 5831856210622283886
+  - rid: 5831856210622283887
+  - rid: 5831856210622283888
+  - rid: 5831856210622283889
+  - rid: 5831856210622283890
+  - rid: 5831856210622283891
+  - rid: 5831856210622283892
+  - rid: 5831856210622283893
+  - rid: 5831856210622283894
+  references:
+    version: 2
+    RefIds:
+    - rid: 5831856210622283881
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uACBD\uBE44 \uB85C\uBD07: \uCD08\uAE30\uD654, \uC790\uADF9, \uAD50\uC804,
+          \uADC0\uD658"
+        nodeMemo: 
+        children:
+        - rid: 5831856210622283895
+        - rid: 5831856210622283896
+        - rid: 5831856210622283897
+        - rid: 5831856210622283898
+    - rid: 5831856210622283882
+      type: {class: BTSharedGameObject, ns: , asm: Assembly-CSharp}
+      data:
+        key: MySelf
+        value: {fileID: 3352690993342107665}
+    - rid: 5831856210622283883
+      type: {class: BTSharedBoolean, ns: , asm: Assembly-CSharp}
+      data:
+        key: IsInitialized
+        value: 0
+    - rid: 5831856210622283884
+      type: {class: BTSharedVector3, ns: , asm: Assembly-CSharp}
+      data:
+        key: StartPos
+        value: {x: 0, y: 0, z: 0}
+    - rid: 5831856210622283885
+      type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
+      data:
+        key: Home/LeashDistance
+        value: 18
+    - rid: 5831856210622283886
+      type: {class: BTSharedBoolean, ns: , asm: Assembly-CSharp}
+      data:
+        key: IsReturning
+        value: 0
+    - rid: 5831856210622283887
+      type: {class: BTSharedGameObject, ns: , asm: Assembly-CSharp}
+      data:
+        key: Player/GameObj
+        value: {fileID: 0}
+    - rid: 5831856210622283888
+      type: {class: BTSharedVector3, ns: , asm: Assembly-CSharp}
+      data:
+        key: Player/LastPos
+        value: {x: 0, y: 0, z: 0}
+    - rid: 5831856210622283889
+      type: {class: BTSharedBoolean, ns: , asm: Assembly-CSharp}
+      data:
+        key: HasLastPos
+        value: 0
+    - rid: 5831856210622283890
+      type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
+      data:
+        key: Shoot/Range
+        value: 7
+    - rid: 5831856210622283891
+      type: {class: BTSharedBoolean, ns: , asm: Assembly-CSharp}
+      data:
+        key: HasPendingStimulus
+        value: 0
+    - rid: 5831856210622283892
+      type: {class: BTSharedGameObject, ns: , asm: Assembly-CSharp}
+      data:
+        key: StimulusSource
+        value: {fileID: 0}
+    - rid: 5831856210622283893
+      type: {class: BTSharedVector3, ns: , asm: Assembly-CSharp}
+      data:
+        key: StimulusPosition
+        value: {x: 0, y: 0, z: 0}
+    - rid: 5831856210622283894
+      type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
+      data:
+        key: StimulusType
+        value: 0
+    - rid: 5831856210622283895
+      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uCC98\uC74C \uC0DD\uC131\uB41C \uC704\uCE58\uB97C \uD55C \uBC88\uB9CC
+          \uAE30\uC5B5"
+        nodeMemo: 
+        children:
+        - rid: 5831856210622283899
+        - rid: 5831856210622283900
+    - rid: 5831856210622283896
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uD53C\uACA9 \uC704\uCE58 \uAE30\uC5B5"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283901
+    - rid: 5831856210622283897
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC18C\uB9AC \uC704\uCE58 \uAE30\uC5B5"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283902
+    - rid: 5831856210622283898
+      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uD589\uB3D9 \uC120\uD0DD"
+        nodeMemo: 
+        children:
+        - rid: 5831856210622283903
+        - rid: 5831856210622283904
+        - rid: 5831856210622283905
+        - rid: 5831856210622283906
+    - rid: 5831856210622283899
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: IsInitialized == True
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283907
+    - rid: 5831856210622283900
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC2DC\uC791 \uC704\uCE58 \uCD08\uAE30\uD654"
+        nodeMemo: 
+        children:
+        - rid: 5831856210622283908
+        - rid: 5831856210622283909
+    - rid: 5831856210622283901
+      type: {class: BTActRememberStimulus, ns: , asm: Assembly-CSharp}
+      data:
+        pendingBoolKey: HasPendingStimulus
+        stimulusTypeKey: StimulusType
+        stimulusPositionKey: StimulusPosition
+        acceptedType: 0
+        outPositionKey: Player/LastPos
+        hasPositionBoolKey: HasLastPos
+    - rid: 5831856210622283902
+      type: {class: BTActRememberStimulus, ns: , asm: Assembly-CSharp}
+      data:
+        pendingBoolKey: HasPendingStimulus
+        stimulusTypeKey: StimulusType
+        stimulusPositionKey: StimulusPosition
+        acceptedType: 1
+        outPositionKey: Player/LastPos
+        hasPositionBoolKey: HasLastPos
+    - rid: 5831856210622283903
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uD65C\uB3D9 \uBC94\uC704 \uC774\uD0C8 \uB610\uB294 \uC774\uB3D9
+          \uC2E4\uD328 \uC2DC \uB05D\uAE4C\uC9C0 \uADC0\uD658"
+        nodeMemo: "\uADC0\uD658 \uB3C4\uC911\uC5D0\uB294 \uC2DC\uC57C \uAC80\uC0AC\uC640
+          \uC0AC\uACA9\uC744 \uC2E4\uD589\uD558\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4. \uACBD\uB85C
+          \uC2E4\uD328 \uC2DC \uC815\uC9C0\uD558\uACE0 \uAE30\uC874 SmartMoveTo\uC758
+          1\uCD08 \uC7AC\uC2DC\uB3C4 \uC81C\uD55C\uC744 \uC9C0\uD0A4\uBA70 \uADC0\uD658\uC744
+          \uACC4\uC18D \uC2DC\uB3C4\uD569\uB2C8\uB2E4."
+        children:
+        - rid: 5831856210622283910
+        - rid: 5831856210622283911
+        - rid: 5831856210622283912
+        - rid: 5831856210622283913
+    - rid: 5831856210622283904
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uD50C\uB808\uC774\uC5B4\uAC00 \uBCF4\uC774\uBA74 \uAE30\uC5B5\uD558\uACE0
+          \uAD50\uC804"
+        nodeMemo: "\uBCBD \uB9C8\uC2A4\uD06C 257\uC740 \uAE30\uC874 \uBA67\uB3FC\uC9C0\uC640
+          \uAC19\uC740 Default + Wall\uC785\uB2C8\uB2E4. LookAt(Position)\uC774 \uBD84\uAE30
+          \uC9C4\uC785 \uC2DC \uC774\uB3D9\uC744 \uBA48\uCD94\uACE0, Shoot\uAC00
+          \uB9E4 \uD2F1 \uBAA9\uD45C \uBC29\uD5A5\uC744 \uAC31\uC2E0\uD569\uB2C8\uB2E4.
+          \uD0C4\uC57D \uC18C\uC9C4 \uC2DC \uADF8\uB300\uB85C \uC0AC\uACA9 \uC2DC\uB3C4\uB9CC
+          \uC720\uC9C0\uD569\uB2C8\uB2E4."
+        children:
+        - rid: 5831856210622283914
+        - rid: 5831856210622283915
+        - rid: 5831856210622283916
+        - rid: 5831856210622283917
+    - rid: 5831856210622283905
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC2DC\uC57C\uB97C \uC783\uC73C\uBA74 \uB9C8\uC9C0\uB9C9 \uC704\uCE58
+          \uD655\uC778"
+        nodeMemo: "\uCD94\uACA9 \uC911\uC5D0\uB3C4 \uC55E\uCABD \uC2DC\uC57C \uAC80\uC0AC\uB97C
+          \uB9E4 \uD2F1 \uB2E4\uC2DC \uC2E4\uD589\uD569\uB2C8\uB2E4. \uB3C4\uCC29
+          \uB610\uB294 \uC774\uB3D9 \uC2E4\uD328 \uD6C4 \uAE30\uC5B5\uC744 \uC9C0\uC6B0\uACE0
+          \uAE30\uBCF8 \uADC0\uD658\uC73C\uB85C \uB118\uC5B4\uAC11\uB2C8\uB2E4. \uAE30\uBCF8
+          \uADC0\uD658 \uC911 \uD50C\uB808\uC774\uC5B4\uB97C \uB2E4\uC2DC \uBCF4\uBA74
+          \uAD50\uC804\uC744 \uC7AC\uAC1C\uD569\uB2C8\uB2E4."
+        children:
+        - rid: 5831856210622283918
+        - rid: 5831856210622283919
+        - rid: 5831856210622283920
+    - rid: 5831856210622283906
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uAD50\uC804\uD560 \uB300\uC0C1\uC774 \uC5C6\uC73C\uBA74 \uC2DC\uC791
+          \uC704\uCE58\uB85C \uBCF5\uADC0\uD558\uACE0 \uB300\uAE30"
+        nodeMemo: 
+        children:
+        - rid: 5831856210622283921
+        - rid: 5831856210622283922
+    - rid: 5831856210622283907
+      type: {class: BTActCheckBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsInitialized
+        successIfTrue: 1
+    - rid: 5831856210622283908
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC0DD\uC131 \uC704\uCE58 \uAE30\uC5B5"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283923
+    - rid: 5831856210622283909
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: IsInitialized = True
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283924
+    - rid: 5831856210622283910
+      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uADC0\uD658 \uC911\uC774\uAC70\uB098 \uC2DC\uC791\uC810\uC5D0\uC11C
+          18m \uC774\uC0C1 \uC774\uD0C8"
+        nodeMemo: 
+        children:
+        - rid: 5831856210622283925
+        - rid: 5831856210622283926
+    - rid: 5831856210622283911
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: HasLastPos = False
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283927
+    - rid: 5831856210622283912
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC774\uB3D9 \uBC29\uD5A5 \uBC14\uB77C\uBCF4\uAE30"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283928
+    - rid: 5831856210622283913
+      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uB3C4\uCC29\uD558\uBA74 \uC7A0\uAE08 \uD574\uC81C, \uACBD\uB85C
+          \uC2E4\uD328 \uC2DC \uADC0\uD658 \uC720\uC9C0"
+        nodeMemo: 
+        children:
+        - rid: 5831856210622283929
+        - rid: 5831856210622283930
+    - rid: 5831856210622283914
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "14m / 120\uB3C4 \uC2DC\uC57C \uAC80\uC0AC"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283931
+    - rid: 5831856210622283915
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uBC1C\uACAC \uC704\uCE58 \uAC31\uC2E0"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283932
+    - rid: 5831856210622283916
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: HasLastPos = True
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283933
+    - rid: 5831856210622283917
+      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "7m \uC548\uC5D0\uC11C\uB294 \uC0AC\uACA9, \uBC16\uC5D0\uC11C\uB294
+          \uCD94\uACA9"
+        nodeMemo: 
+        children:
+        - rid: 5831856210622283934
+        - rid: 5831856210622283935
+    - rid: 5831856210622283918
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: HasLastPos == True
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283936
+    - rid: 5831856210622283919
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC774\uB3D9 \uBC29\uD5A5 \uBC14\uB77C\uBCF4\uAE30"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283937
+    - rid: 5831856210622283920
+      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uAE30\uC5B5 \uC704\uCE58\uC5D0 \uB3C4\uCC29\uD558\uAC70\uB098
+          \uAE38\uC774 \uC5C6\uC73C\uBA74 \uAE30\uC5B5 \uD574\uC81C"
+        nodeMemo: 
+        children:
+        - rid: 5831856210622283938
+        - rid: 5831856210622283939
+    - rid: 5831856210622283921
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC774\uB3D9 \uBC29\uD5A5 \uBC14\uB77C\uBCF4\uAE30"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283940
+    - rid: 5831856210622283922
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC2DC\uC791 \uC704\uCE58\uB85C \uC774\uB3D9\uD558\uACE0 \uC815\uC9C0"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283941
+    - rid: 5831856210622283923
+      type: {class: BTActCopyPos, ns: , asm: Assembly-CSharp}
+      data:
+        targetObjectKey: MySelf
+        outPositionKey: StartPos
+    - rid: 5831856210622283924
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsInitialized
+        setToValue: 1
+    - rid: 5831856210622283925
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: IsReturning == True
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283942
+    - rid: 5831856210622283926
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uADC0\uD658 \uC7A0\uAE08 \uC2DC\uC791"
+        nodeMemo: 
+        children:
+        - rid: 5831856210622283943
+        - rid: 5831856210622283944
+    - rid: 5831856210622283927
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: HasLastPos
+        setToValue: 0
+    - rid: 5831856210622283928
+      type: {class: BTActLookAt, ns: , asm: Assembly-CSharp}
+      data:
+        mySelfKey: MySelf
+        mode: 2
+        targetPositionKey: 
+        yawOffset: 45
+    - rid: 5831856210622283929
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC2DC\uC791 \uC704\uCE58\uAE4C\uC9C0 \uADC0\uD658"
+        nodeMemo: 
+        children:
+        - rid: 5831856210622283945
+        - rid: 5831856210622283946
+    - rid: 5831856210622283930
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: IsReturning == True
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283947
+    - rid: 5831856210622283931
+      type: {class: BTActFindTarget_LineOfSight, ns: , asm: Assembly-CSharp}
+      data:
+        targetTag: Player
+        maxDistance: 14
+        fieldOfView: 120
+        obstacleLayer:
+          serializedVersion: 2
+          m_Bits: 257
+        mySelfKey: MySelf
+        outGameObjectKey: Player/GameObj
+        returnRunningIfNotFound: 0
+    - rid: 5831856210622283932
+      type: {class: BTActCopyPos, ns: , asm: Assembly-CSharp}
+      data:
+        targetObjectKey: Player/GameObj
+        outPositionKey: Player/LastPos
+    - rid: 5831856210622283933
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: HasLastPos
+        setToValue: 1
+    - rid: 5831856210622283934
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC81C\uC790\uB9AC\uC5D0 \uBA48\uCDB0 \uB2E8\uBC1C \uC0AC\uACA9"
+        nodeMemo: 
+        children:
+        - rid: 5831856210622283948
+        - rid: 5831856210622283949
+        - rid: 5831856210622283950
+    - rid: 5831856210622283935
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC0AC\uAC70\uB9AC \uBC16\uC758 \uD50C\uB808\uC774\uC5B4 \uCD94\uACA9"
+        nodeMemo: 
+        children:
+        - rid: 5831856210622283951
+        - rid: 5831856210622283952
+    - rid: 5831856210622283936
+      type: {class: BTActCheckBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: HasLastPos
+        successIfTrue: 1
+    - rid: 5831856210622283937
+      type: {class: BTActLookAt, ns: , asm: Assembly-CSharp}
+      data:
+        mySelfKey: MySelf
+        mode: 2
+        targetPositionKey: 
+        yawOffset: 45
+    - rid: 5831856210622283938
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uB9C8\uC9C0\uB9C9 \uC704\uCE58\uAE4C\uC9C0 \uC774\uB3D9"
+        nodeMemo: 
+        children:
+        - rid: 5831856210622283953
+        - rid: 5831856210622283954
+    - rid: 5831856210622283939
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: HasLastPos = False
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283955
+    - rid: 5831856210622283940
+      type: {class: BTActLookAt, ns: , asm: Assembly-CSharp}
+      data:
+        mySelfKey: MySelf
+        mode: 2
+        targetPositionKey: 
+        yawOffset: 45
+    - rid: 5831856210622283941
+      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: StartPos
+        mySelfKey: MySelf
+        stuckTimeout: 2
+        minProgressDistance: 0.1
+        retryDelay: 1
+    - rid: 5831856210622283942
+      type: {class: BTActCheckBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsReturning
+        successIfTrue: 1
+    - rid: 5831856210622283943
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC9C0\uC815 \uAC70\uB9AC \uBC16\uC778\uAC00?"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283956
+    - rid: 5831856210622283944
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: IsReturning = True
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283957
+    - rid: 5831856210622283945
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC2DC\uC791 \uC704\uCE58\uB85C \uC774\uB3D9"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283958
+    - rid: 5831856210622283946
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: IsReturning = False
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283959
+    - rid: 5831856210622283947
+      type: {class: BTActCheckBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsReturning
+        successIfTrue: 1
+    - rid: 5831856210622283948
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC9C0\uC815 \uAC70\uB9AC \uC548\uC778\uAC00?"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283960
+    - rid: 5831856210622283949
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uBA48\uCD94\uACE0 \uC0AC\uACA9 \uB300\uC0C1 \uBC14\uB77C\uBCF4\uAE30"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283961
+    - rid: 5831856210622283950
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "0.8\uCD08 \uAC04\uACA9 \uC0AC\uACA9"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283962
+    - rid: 5831856210622283951
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC774\uB3D9 \uBC29\uD5A5 \uBC14\uB77C\uBCF4\uAE30"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283963
+    - rid: 5831856210622283952
+      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uCD94\uACA9\uD558\uAC70\uB098 \uACBD\uB85C \uC2E4\uD328 \uC2DC
+          \uADC0\uD658 \uC2DC\uC791"
+        nodeMemo: 
+        children:
+        - rid: 5831856210622283964
+        - rid: 5831856210622283965
+    - rid: 5831856210622283953
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uAE30\uC5B5\uD55C \uC704\uCE58\uB85C \uC774\uB3D9"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283966
+    - rid: 5831856210622283954
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: HasLastPos = False
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283967
+    - rid: 5831856210622283955
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: HasLastPos
+        setToValue: 0
+    - rid: 5831856210622283956
+      type: {class: BTActDistanceCheck, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: StartPos
+        mySelfKey: MySelf
+        distanceKey: Home/LeashDistance
+        successIfCloser: 0
+        horizontalOnly: 1
+    - rid: 5831856210622283957
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsReturning
+        setToValue: 1
+    - rid: 5831856210622283958
+      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: StartPos
+        mySelfKey: MySelf
+        stuckTimeout: 2
+        minProgressDistance: 0.1
+        retryDelay: 1
+    - rid: 5831856210622283959
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsReturning
+        setToValue: 0
+    - rid: 5831856210622283960
+      type: {class: BTActDistanceCheck, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Player/LastPos
+        mySelfKey: MySelf
+        distanceKey: Shoot/Range
+        successIfCloser: 1
+        horizontalOnly: 1
+    - rid: 5831856210622283961
+      type: {class: BTActLookAt, ns: , asm: Assembly-CSharp}
+      data:
+        mySelfKey: MySelf
+        mode: 0
+        targetPositionKey: Player/LastPos
+        yawOffset: 45
+    - rid: 5831856210622283962
+      type: {class: BTActShoot, ns: , asm: Assembly-CSharp}
+      data:
+        mySelfKey: MySelf
+        targetPositionKey: Player/LastPos
+        shotInterval: 0.8
+    - rid: 5831856210622283963
+      type: {class: BTActLookAt, ns: , asm: Assembly-CSharp}
+      data:
+        mySelfKey: MySelf
+        mode: 2
+        targetPositionKey: 
+        yawOffset: 45
+    - rid: 5831856210622283964
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uBC1C\uACAC \uC704\uCE58\uB85C \uC774\uB3D9"
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283968
+    - rid: 5831856210622283965
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: IsReturning = True
+        nodeMemo: 
+        logic:
+          rid: 5831856210622283969
+    - rid: 5831856210622283966
+      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Player/LastPos
+        mySelfKey: MySelf
+        stuckTimeout: 2
+        minProgressDistance: 0.1
+        retryDelay: 1
+    - rid: 5831856210622283967
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: HasLastPos
+        setToValue: 0
+    - rid: 5831856210622283968
+      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Player/LastPos
+        mySelfKey: MySelf
+        stuckTimeout: 2
+        minProgressDistance: 0.1
+        retryDelay: 1
+    - rid: 5831856210622283969
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsReturning
+        setToValue: 1
+--- !u!114 &3431112817465683280
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a5f694712eaa3f4a864f86d8bc4b002, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIBrainStimulusLinker
+  pendingBoolKey: HasPendingStimulus
+  sourceObjectKey: StimulusSource
+  positionKey: StimulusPosition
+  typeKey: StimulusType
+--- !u!1 &3988485360831649573
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5853066097510493237}
+  m_Layer: 7
+  m_Name: FirePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5853066097510493237
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3988485360831649573}
+  serializedVersion: 2
+  m_LocalRotation: {x: -3.5527137e-15, y: -1, z: -0.000000029802322, w: -0.00000004371139}
+  m_LocalPosition: {x: 0.23780005, y: 0.8280999, z: -0.5149997}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6087649398133295004}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &3228491033331176382
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5119631350182610515}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.00000004371139
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -6159627601847077290, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      propertyPath: m_Name
+      value: Visual
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7697305101690852655, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 8698222893343314978, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5853066097510493237}
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5657730618627754837}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6257876037487649762}
+  m_SourcePrefab: {fileID: 100100000, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+--- !u!1 &2309377581376351983 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+  m_PrefabInstance: {fileID: 3228491033331176382}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &5657730618627754837
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2309377581376351983}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 2deacce6a1e50884591dae73ce705a78, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &6257876037487649762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2309377581376351983}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0774520edebafe24dbe56af7d44e2b6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AnimationEventForwarder
+--- !u!4 &3118564621816984661 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+  m_PrefabInstance: {fileID: 3228491033331176382}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6087649398133295004 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8698222893343314978, guid: e0919262004a24148ae2b67ffbdd603b, type: 3}
+  m_PrefabInstance: {fileID: 3228491033331176382}
+  m_PrefabAsset: {fileID: 0}

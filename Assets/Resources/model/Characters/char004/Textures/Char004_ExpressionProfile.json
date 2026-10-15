@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 1,
+  "characterId": "char004",
+  "defaultId": "original",
+  "uvOrigin": "bottom-left",
+  "unityUvChannel": 0,
+  "sourceRect": [
+    0,
+    0,
+    0.3333333333333333,
+    0.5
+  ],
+  "entries": [
+    {
+      "index": 0,
+      "id": "original",
+      "displayName": "기본",
+      "rect": [
+        0.0,
+        0.0,
+        0.3333333333333333,
+        0.5
+      ]
+    },
+    {
+      "index": 1,
+      "id": "irritated",
+      "displayName": "짜증",
+      "rect": [
+        0.3333333333333333,
+        0.0,
+        0.3333333333333333,
+        0.5
+      ]
+    },
+    {
+      "index": 2,
+      "id": "surprised",
+      "displayName": "놀람",
+      "rect": [
+        0.6666666666666666,
+        0.0,
+        0.3333333333333333,
+        0.5
+      ]
+    },
+    {
+      "index": 3,
+      "id": "squeezed",
+      "displayName": "눈 질끈",
+      "rect": [
+        0.0,
+        0.5,
+        0.3333333333333333,
+        0.5
+      ]
+    },
+    {
+      "index": 4,
+      "id": "wary",
+      "displayName": "눈치 보기",
+      "rect": [
+        0.3333333333333333,
+        0.5,
+        0.3333333333333333,
+        0.5
+      ]
+    }
+  ],
+  "clipExpressions": {
+    "death": [
+      {
+        "frame": 1.0,
+        "id": "squeezed"
+      },
+      {
+        "frame": 72.0,
+        "id": "squeezed"
+      }
+    ],
+    "entering": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 108.0,
+        "id": "original"
+      }
+    ],
+    "exit": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 152.0,
+        "id": "original"
+      }
+    ],
+    "hit": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 14.0,
+        "id": "original"
+      }
+    ],
+    "idle": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 94.0,
+        "id": "original"
+      }
+    ],
+    "reloading": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 37.0,
+        "id": "original"
+      }
+    ],
+    "reloading_end": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 13.0,
+        "id": "original"
+      }
+    ],
+    "reloading_start": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 13.0,
+        "id": "original"
+      }
+    ],
+    "run_backward": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 17.0,
+        "id": "original"
+      }
+    ],
+    "run_forward": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 22.0,
+        "id": "original"
+      }
+    ],
+    "run_left": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 17.0,
+        "id": "original"
+      }
+    ],
+    "run_right": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 21.0,
+        "id": "original"
+      }
+    ],
+    "shoot": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 9.0,
+        "id": "original"
+      }
+    ],
+    "skill": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 54.0,
+        "id": "original"
+      }
+    ],
+    "ultimate": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 78.0,
+        "id": "original"
+      }
+    ],
+    "walk_backward": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 43.0,
+        "id": "original"
+      }
+    ],
+    "walk_forward": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 42.0,
+        "id": "original"
+      }
+    ],
+    "walk_left": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 30.0,
+        "id": "original"
+      }
+    ],
+    "walk_right": [
+      {
+        "frame": 1.0,
+        "id": "original"
+      },
+      {
+        "frame": 44.0,
+        "id": "original"
+      }
+    ]
+  },
+  "mesh": "tripo_71aabc64_61bf_4b88_a00b_03616caa3a55.001",
+  "material": "Char004_Face_Atlas",
+  "materialSlot": 1,
+  "texture": "Char004_FaceAtlas.png"
+}

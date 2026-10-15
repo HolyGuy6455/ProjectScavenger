@@ -32,6 +32,9 @@ public class ItemData : IData
     public int quantityShowType;
     public int serverFunc;
     public int serverValue;
+    // Numbered TSV columns (shortcut_1, shortcut_value_1, ...) keep matching array indices.
+    public string[] shortcut;
+    public string[] shortcut_value;
     public QuantityShowType QuantityShowType => (QuantityShowType)quantityShowType;
     public ItemCategory Category => (ItemCategory)category;
 

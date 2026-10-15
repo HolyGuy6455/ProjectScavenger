@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public enum CharRole
 {
     None = 0,
-    Infiltrator = 1,  // 침투
+    Infiltrator = 1,  // 수색
     Striker = 2,      // 타격
     Anchor = 3,       // 방호
     Suppressor = 4    // 제압

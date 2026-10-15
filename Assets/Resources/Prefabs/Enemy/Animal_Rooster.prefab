@@ -73,10 +73,10 @@ CapsuleCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 1
-  m_Height: 2
+  m_Radius: 0.25
+  m_Height: 0.7
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.35, z: 0}
 --- !u!54 &921170705562535445
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -302,6 +302,7 @@ MonoBehaviour:
         mySelfKey: MySelf
         distanceKey: Start/InRange
         successIfCloser: 0
+        horizontalOnly: 0
     - rid: 2871842154846355671
       type: {class: BTAction, ns: , asm: Assembly-CSharp}
       data:
@@ -439,6 +440,7 @@ MonoBehaviour:
   moveSpeed: 4
   rotationSpeed: 720
   stoppingDistance: 0.1
+  syncMovementAndFacing: 1
 --- !u!114 &-441924815081087731
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -506,6 +508,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e460bbecbd7a2c4bb17698d73b58e32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimator
+  movementStateName: Run
+  movementRoot: {fileID: 0}
+  facingReference: {fileID: 0}
+  movementSpeedThreshold: 0.1
+  movementStopDelay: 0.1
+  teleportDistanceThreshold: 5
+  shootStateName: 
+  shootLayer: 1
+  shootEmptyStateName: 
+  reloadStateName: 
+  reloadLayer: 0
 --- !u!114 &6806687160027039604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -533,6 +546,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AIBrainStimulusLinker
   pendingBoolKey: IsAttacked
   sourceObjectKey: Attacker
+  positionKey: StimulusPosition
+  typeKey: StimulusType
 --- !u!1001 &5297562618735421684
 PrefabInstance:
   m_ObjectHideFlags: 0

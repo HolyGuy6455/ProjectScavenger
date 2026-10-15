@@ -495,7 +495,8 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 836b7779965b4db4819731b28cc6b7ce, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Char001Presentation
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterAnimationPresenter
+  enableDamageAnimations: 1
   deathStateName: Death
   hitStateName: Armature|hit
 --- !u!1 &473415342030304152

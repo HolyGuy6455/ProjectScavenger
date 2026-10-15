@@ -23,6 +23,8 @@ GameObject:
   - component: {fileID: 1877874696352170484}
   - component: {fileID: 8129919451694431373}
   - component: {fileID: 6806687160027039604}
+  - component: {fileID: 7305242824573215916}
+  - component: {fileID: 5953236933251563774}
   m_Layer: 7
   m_Name: Animal_Boar
   m_TagString: Enemy
@@ -154,9 +156,9 @@ MonoBehaviour:
   onDeathUnityEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 273470665313786195}
-        m_TargetAssemblyTypeName: Health, Assembly-CSharp
-        m_MethodName: DeathAnimationDone
+      - m_Target: {fileID: 5953236933251563774}
+        m_TargetAssemblyTypeName: EnemyDeathHandler, Assembly-CSharp
+        m_MethodName: BeginDeath
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -198,73 +200,693 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AIBrain
   rootNode:
-    rid: 3558163897100009576
+    rid: 1000
   blackboard:
   - rid: 3558163897100009580
   - rid: 3558163961612599431
-  - rid: 3558163897100009581
   - rid: 3558163961612599389
   - rid: 3558163961612599432
   - rid: 3558163961612599399
-  - rid: 2871842154846355669
-  - rid: 2871842154846355659
   - rid: 3558163961612599400
   - rid: 3558163961612599419
-  - rid: 3558163961612599423
   - rid: 2871842154846355615
   - rid: 2871842154846355611
   - rid: 2871842154846355613
   - rid: 2871842154846355621
+  - rid: 1001
+  - rid: 1002
+  - rid: 1003
+  - rid: 1004
+  - rid: 1005
+  - rid: 1006
   references:
     version: 2
     RefIds:
-    - rid: 2395884903716880526
-      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+    - rid: 1000
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
       data:
-        targetPositionKey: Player/LastPos
-        mySelfKey: MySelf
-    - rid: 2395884903716880527
-      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+        nodeName: "\uC790\uADF9 \uCC98\uB9AC \uD6C4 \uD589\uB3D9 \uC120\uD0DD"
+        nodeMemo: 
+        children:
+        - rid: 1007
+        - rid: 1008
+        - rid: 1009
+    - rid: 1001
+      type: {class: BTSharedBoolean, ns: , asm: Assembly-CSharp}
       data:
-        targetPositionKey: Start/Pos
-        mySelfKey: MySelf
-    - rid: 2395884903716880528
-      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+        key: IsReturning
+        value: 0
+    - rid: 1002
+      type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
       data:
-        targetPositionKey: Player/LastPos
-        mySelfKey: MySelf
-    - rid: 2395884903716880529
-      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+        key: Player/ArrivalDistance
+        value: 0.25
+    - rid: 1003
+      type: {class: BTSharedBoolean, ns: , asm: Assembly-CSharp}
       data:
-        targetPositionKey: Start/Pos
-        mySelfKey: MySelf
-    - rid: 2871842154846355598
+        key: HasPendingStimulus
+        value: 0
+    - rid: 1004
+      type: {class: BTSharedGameObject, ns: , asm: Assembly-CSharp}
+      data:
+        key: StimulusSource
+        value: {fileID: 0}
+    - rid: 1005
+      type: {class: BTSharedVector3, ns: , asm: Assembly-CSharp}
+      data:
+        key: StimulusPosition
+        value: {x: 0, y: 0, z: 0}
+    - rid: 1006
+      type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
+      data:
+        key: StimulusType
+        value: 0
+    - rid: 1007
       type: {class: BTAction, ns: , asm: Assembly-CSharp}
       data:
-        nodeName: FindPlayer LineOfSight
-        nodeMemo: "\uBCF4\uC774\uB294 \uBC94\uC704\uC5D0 \uD50C\uB808\uC774\uC5B4\uAC00
-          \uC788\uB294\uC9C0 \uD655\uC778"
+        nodeName: "\uD53C\uACA9 \uC704\uCE58 \uAE30\uC5B5"
+        nodeMemo: 
         logic:
-          rid: 2871842154846355599
-    - rid: 2871842154846355599
+          rid: 1010
+    - rid: 1008
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC18C\uB9AC \uC704\uCE58 \uAE30\uC5B5"
+        nodeMemo: 
+        logic:
+          rid: 1011
+    - rid: 1009
+      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uD589\uB3D9 \uC120\uD0DD"
+        nodeMemo: 
+        children:
+        - rid: 3558163961612599390
+        - rid: 2871842154846355600
+        - rid: 1012
+        - rid: 1013
+        - rid: 1014
+        - rid: 1015
+        - rid: 1016
+    - rid: 1010
+      type: {class: BTActRememberStimulus, ns: , asm: Assembly-CSharp}
+      data:
+        pendingBoolKey: HasPendingStimulus
+        stimulusTypeKey: StimulusType
+        stimulusPositionKey: StimulusPosition
+        acceptedType: 0
+        outPositionKey: Player/LastPos
+        hasPositionBoolKey: 'HasLastPos '
+    - rid: 1011
+      type: {class: BTActRememberStimulus, ns: , asm: Assembly-CSharp}
+      data:
+        pendingBoolKey: HasPendingStimulus
+        stimulusTypeKey: StimulusType
+        stimulusPositionKey: StimulusPosition
+        acceptedType: 1
+        outPositionKey: Player/LastPos
+        hasPositionBoolKey: 'HasLastPos '
+    - rid: 1012
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uD65C\uB3D9 \uBC94\uC704\uB97C \uBC97\uC5B4\uB098\uBA74 \uB05D\uAE4C\uC9C0
+          \uADC0\uD658"
+        nodeMemo: 
+        children:
+        - rid: 1017
+        - rid: 1018
+        - rid: 1019
+        - rid: 1020
+    - rid: 1013
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uBCF4\uC774\uB294 \uD50C\uB808\uC774\uC5B4 \uAE30\uC5B5\xB7\uB3CC\uC9C4\xB7\uCD94\uACA9"
+        nodeMemo: 
+        children:
+        - rid: 1021
+        - rid: 1022
+        - rid: 1023
+        - rid: 1024
+    - rid: 1014
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC2DC\uC57C\uB97C \uC783\uC73C\uBA74 \uAE30\uC5B5\uD55C \uC704\uCE58\uAE4C\uC9C0
+          \uCD94\uACA9"
+        nodeMemo: 
+        children:
+        - rid: 1025
+        - rid: 1026
+        - rid: 1027
+        - rid: 1028
+    - rid: 1015
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uB9C8\uC9C0\uB9C9 \uC704\uCE58\uC5D0\uC11C 3\uCD08 \uB3D9\uC548
+          \uC8FC\uBCC0 \uC218\uC0C9"
+        nodeMemo: 
+        children:
+        - rid: 1029
+        - rid: 1030
+        - rid: 1031
+        - rid: 1032
+        - rid: 1033
+        - rid: 1034
+        - rid: 1035
+        - rid: 1036
+        - rid: 1037
+    - rid: 1016
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uD560 \uC77C\uC774 \uC5C6\uC73C\uBA74 \uC9D1\uC73C\uB85C \uBCF5\uADC0"
+        nodeMemo: 
+        children:
+        - rid: 1038
+        - rid: 1039
+    - rid: 1017
+      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uADC0\uD658 \uC911 \uB610\uB294 \uD65C\uB3D9 \uBC94\uC704 \uC774\uD0C8"
+        nodeMemo: 
+        children:
+        - rid: 1040
+        - rid: 1041
+    - rid: 1018
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: HasLastPos  = False
+        nodeMemo: 
+        logic:
+          rid: 1042
+    - rid: 1019
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC774\uB3D9 \uBC29\uD5A5 \uBC14\uB77C\uBCF4\uAE30"
+        nodeMemo: 
+        logic:
+          rid: 1043
+    - rid: 1020
+      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uADC0\uD658 \uC774\uB3D9 \uB610\uB294 \uC2E4\uD328 \uB300\uAE30"
+        nodeMemo: 
+        children:
+        - rid: 1044
+        - rid: 1045
+    - rid: 1021
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uD50C\uB808\uC774\uC5B4\uAC00 \uC2DC\uC57C \uC548\uC5D0 \uC788\uB294\uAC00?"
+        nodeMemo: 
+        logic:
+          rid: 1046
+    - rid: 1022
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uBC1C\uACAC\uD55C \uC704\uCE58 \uAE30\uC5B5"
+        nodeMemo: 
+        logic:
+          rid: 1047
+    - rid: 1023
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: HasLastPos  = True
+        nodeMemo: 
+        logic:
+          rid: 1048
+    - rid: 1024
+      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uAC00\uAE4C\uC6B0\uBA74 \uB3CC\uC9C4, \uBA40\uBA74 \uCD94\uACA9"
+        nodeMemo: 
+        children:
+        - rid: 1049
+        - rid: 1050
+    - rid: 1025
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: HasLastPos  == True
+        nodeMemo: 
+        logic:
+          rid: 1051
+    - rid: 1026
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uAE30\uC5B5\uD55C \uC704\uCE58\uC5D0 \uC544\uC9C1 \uB3C4\uCC29\uD558\uC9C0
+          \uC54A\uC558\uB294\uAC00?"
+        nodeMemo: 
+        logic:
+          rid: 1052
+    - rid: 1027
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC774\uB3D9 \uBC29\uD5A5 \uBC14\uB77C\uBCF4\uAE30"
+        nodeMemo: 
+        logic:
+          rid: 1053
+    - rid: 1028
+      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uCD94\uACA9 \uC774\uB3D9 \uB610\uB294 \uAE30\uC5B5 \uD3EC\uAE30"
+        nodeMemo: 
+        children:
+        - rid: 1054
+        - rid: 1055
+    - rid: 1029
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: HasLastPos  == True
+        nodeMemo: 
+        logic:
+          rid: 1056
+    - rid: 1030
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uAE30\uC5B5\uD55C \uC704\uCE58\uC5D0 \uB3C4\uCC29\uD588\uB294\uAC00?"
+        nodeMemo: 
+        logic:
+          rid: 1057
+    - rid: 1031
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uBA48\uCD94\uACE0 \uC815\uBA74 \uBCF4\uAE30"
+        nodeMemo: 
+        logic:
+          rid: 1058
+    - rid: 1032
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC815\uBA74 1\uCD08 \uB300\uAE30"
+        nodeMemo: 
+        logic:
+          rid: 1059
+    - rid: 1033
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC67C\uCABD \uBCF4\uAE30 (-60\uB3C4)"
+        nodeMemo: 
+        logic:
+          rid: 1060
+    - rid: 1034
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC67C\uCABD 1\uCD08 \uB300\uAE30"
+        nodeMemo: 
+        logic:
+          rid: 1061
+    - rid: 1035
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC624\uB978\uCABD \uBCF4\uAE30 (+120\uB3C4)"
+        nodeMemo: 
+        logic:
+          rid: 1062
+    - rid: 1036
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC624\uB978\uCABD 1\uCD08 \uB300\uAE30"
+        nodeMemo: 
+        logic:
+          rid: 1063
+    - rid: 1037
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: HasLastPos  = False
+        nodeMemo: 
+        logic:
+          rid: 1064
+    - rid: 1038
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC774\uB3D9 \uBC29\uD5A5 \uBC14\uB77C\uBCF4\uAE30"
+        nodeMemo: 
+        logic:
+          rid: 1065
+    - rid: 1039
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC2DC\uC791 \uC704\uCE58\uB85C \uC774\uB3D9"
+        nodeMemo: 
+        logic:
+          rid: 1066
+    - rid: 1040
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: IsReturning == True
+        nodeMemo: 
+        logic:
+          rid: 1067
+    - rid: 1041
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uADC0\uD658 \uC2DC\uC791"
+        nodeMemo: 
+        children:
+        - rid: 1068
+        - rid: 1069
+    - rid: 1042
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: 'HasLastPos '
+        setToValue: 0
+    - rid: 1043
+      type: {class: BTActLookAt, ns: , asm: Assembly-CSharp}
+      data:
+        mySelfKey: MySelf
+        mode: 2
+        targetPositionKey: 
+        yawOffset: 45
+    - rid: 1044
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC9D1\uC5D0 \uB3C4\uCC29\uD558\uBA74 \uADC0\uD658 \uC644\uB8CC"
+        nodeMemo: 
+        children:
+        - rid: 1070
+        - rid: 1071
+    - rid: 1045
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uADC0\uD658 \uC2E4\uD328 \uD6C4 \uC7AC\uC2DC\uB3C4 \uB300\uAE30"
+        nodeMemo: 
+        logic:
+          rid: 1072
+    - rid: 1046
       type: {class: BTActFindTarget_LineOfSight, ns: , asm: Assembly-CSharp}
       data:
         targetTag: Player
+        maxDistance: 20
+        fieldOfView: 120
         obstacleLayer:
           serializedVersion: 2
-          m_Bits: 0
+          m_Bits: 257
         mySelfKey: MySelf
         outGameObjectKey: Player/GameObj
         returnRunningIfNotFound: 0
+    - rid: 1047
+      type: {class: BTActCopyPos, ns: , asm: Assembly-CSharp}
+      data:
+        targetObjectKey: Player/GameObj
+        outPositionKey: Player/LastPos
+    - rid: 1048
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: 'HasLastPos '
+        setToValue: 1
+    - rid: 1049
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uBCF4\uC774\uB294 \uB300\uC0C1\uC5D0\uAC8C \uB3CC\uC9C4 \uC608\uC57D"
+        nodeMemo: 
+        children:
+        - rid: 1073
+        - rid: 1074
+        - rid: 1075
+    - rid: 1050
+      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uBC1C\uACAC\uD55C \uC704\uCE58\uAE4C\uC9C0 \uCD94\uACA9"
+        nodeMemo: 
+        children:
+        - rid: 1076
+        - rid: 1077
+    - rid: 1051
+      type: {class: BTActCheckBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: 'HasLastPos '
+        successIfTrue: 1
+    - rid: 1052
+      type: {class: BTActDistanceCheck, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Player/LastPos
+        mySelfKey: MySelf
+        distanceKey: Player/ArrivalDistance
+        successIfCloser: 0
+        horizontalOnly: 1
+    - rid: 1053
+      type: {class: BTActLookAt, ns: , asm: Assembly-CSharp}
+      data:
+        mySelfKey: MySelf
+        mode: 2
+        targetPositionKey: 
+        yawOffset: 45
+    - rid: 1054
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uAE30\uC5B5\uD55C \uC704\uCE58\uB85C \uC774\uB3D9"
+        nodeMemo: 
+        logic:
+          rid: 1078
+    - rid: 1055
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: HasLastPos  = False
+        nodeMemo: 
+        logic:
+          rid: 1079
+    - rid: 1056
+      type: {class: BTActCheckBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: 'HasLastPos '
+        successIfTrue: 1
+    - rid: 1057
+      type: {class: BTActDistanceCheck, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Player/LastPos
+        mySelfKey: MySelf
+        distanceKey: Player/ArrivalDistance
+        successIfCloser: 1
+        horizontalOnly: 1
+    - rid: 1058
+      type: {class: BTActLookAt, ns: , asm: Assembly-CSharp}
+      data:
+        mySelfKey: MySelf
+        mode: 1
+        targetPositionKey: 
+        yawOffset: 0
+    - rid: 1059
+      type: {class: BTActWait, ns: , asm: Assembly-CSharp}
+      data:
+        waitTimeMin: 1
+        waitTimeMax: 1
+    - rid: 1060
+      type: {class: BTActLookAt, ns: , asm: Assembly-CSharp}
+      data:
+        mySelfKey: MySelf
+        mode: 1
+        targetPositionKey: 
+        yawOffset: -60
+    - rid: 1061
+      type: {class: BTActWait, ns: , asm: Assembly-CSharp}
+      data:
+        waitTimeMin: 1
+        waitTimeMax: 1
+    - rid: 1062
+      type: {class: BTActLookAt, ns: , asm: Assembly-CSharp}
+      data:
+        mySelfKey: MySelf
+        mode: 1
+        targetPositionKey: 
+        yawOffset: 120
+    - rid: 1063
+      type: {class: BTActWait, ns: , asm: Assembly-CSharp}
+      data:
+        waitTimeMin: 1
+        waitTimeMax: 1
+    - rid: 1064
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: 'HasLastPos '
+        setToValue: 0
+    - rid: 1065
+      type: {class: BTActLookAt, ns: , asm: Assembly-CSharp}
+      data:
+        mySelfKey: MySelf
+        mode: 2
+        targetPositionKey: 
+        yawOffset: 45
+    - rid: 1066
+      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Start/Pos
+        mySelfKey: MySelf
+        stuckTimeout: 2
+        minProgressDistance: 0.1
+        retryDelay: 1
+    - rid: 1067
+      type: {class: BTActCheckBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsReturning
+        successIfTrue: 1
+    - rid: 1068
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC9D1\uC5D0\uC11C 20m \uC774\uC0C1 \uBA40\uC5B4\uC84C\uB294\uAC00?"
+        nodeMemo: 
+        logic:
+          rid: 1080
+    - rid: 1069
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: IsReturning = True
+        nodeMemo: 
+        logic:
+          rid: 1081
+    - rid: 1070
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC2DC\uC791 \uC704\uCE58\uB85C \uADC0\uD658"
+        nodeMemo: 
+        logic:
+          rid: 1082
+    - rid: 1071
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: IsReturning = False
+        nodeMemo: 
+        logic:
+          rid: 1083
+    - rid: 1072
+      type: {class: BTActWait, ns: , asm: Assembly-CSharp}
+      data:
+        waitTimeMin: 1
+        waitTimeMax: 1
+    - rid: 1073
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uB3CC\uC9C4 \uC0AC\uAC70\uB9AC \uC548\uC778\uAC00?"
+        nodeMemo: 
+        logic:
+          rid: 1084
+    - rid: 1074
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uB3CC\uC9C4 \uBAA9\uD45C \uC704\uCE58 \uACE0\uC815"
+        nodeMemo: 
+        logic:
+          rid: 1085
+    - rid: 1075
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: IsAttacking  = True
+        nodeMemo: 
+        logic:
+          rid: 1086
+    - rid: 1076
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uC774\uB3D9 \uBC29\uD5A5 \uBC14\uB77C\uBCF4\uAE30"
+        nodeMemo: 
+        logic:
+          rid: 1087
+    - rid: 1077
+      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uCD94\uACA9 \uC774\uB3D9 \uB610\uB294 \uAE30\uC5B5 \uD3EC\uAE30"
+        nodeMemo: 
+        children:
+        - rid: 1088
+        - rid: 1089
+    - rid: 1078
+      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Player/LastPos
+        mySelfKey: MySelf
+        stuckTimeout: 2
+        minProgressDistance: 0.1
+        retryDelay: 1
+    - rid: 1079
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: 'HasLastPos '
+        setToValue: 0
+    - rid: 1080
+      type: {class: BTActDistanceCheck, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Start/Pos
+        mySelfKey: MySelf
+        distanceKey: Start/Dist
+        successIfCloser: 0
+        horizontalOnly: 1
+    - rid: 1081
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsReturning
+        setToValue: 1
+    - rid: 1082
+      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Start/Pos
+        mySelfKey: MySelf
+        stuckTimeout: 2
+        minProgressDistance: 0.1
+        retryDelay: 1
+    - rid: 1083
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: IsReturning
+        setToValue: 0
+    - rid: 1084
+      type: {class: BTActDistanceCheck, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Player/LastPos
+        mySelfKey: MySelf
+        distanceKey: Player/InRange
+        successIfCloser: 1
+        horizontalOnly: 1
+    - rid: 1085
+      type: {class: BTActCopyValue, ns: , asm: Assembly-CSharp}
+      data:
+        sourceKey: Player/LastPos
+        targetKey: Target/Pos
+    - rid: 1086
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: 'IsAttacking '
+        setToValue: 1
+    - rid: 1087
+      type: {class: BTActLookAt, ns: , asm: Assembly-CSharp}
+      data:
+        mySelfKey: MySelf
+        mode: 2
+        targetPositionKey: 
+        yawOffset: 45
+    - rid: 1088
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: "\uAE30\uC5B5\uD55C \uC704\uCE58\uB85C \uC774\uB3D9"
+        nodeMemo: 
+        logic:
+          rid: 1090
+    - rid: 1089
+      type: {class: BTAction, ns: , asm: Assembly-CSharp}
+      data:
+        nodeName: HasLastPos  = False
+        nodeMemo: 
+        logic:
+          rid: 1091
+    - rid: 1090
+      type: {class: BTActSmartMoveTo, ns: , asm: Assembly-CSharp}
+      data:
+        targetPositionKey: Player/LastPos
+        mySelfKey: MySelf
+        stuckTimeout: 2
+        minProgressDistance: 0.1
+        retryDelay: 1
+    - rid: 1091
+      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
+      data:
+        targetBoolKey: 'HasLastPos '
+        setToValue: 0
     - rid: 2871842154846355600
       type: {class: BTSequence, ns: , asm: Assembly-CSharp}
       data:
-        nodeName: "\uB3CC\uC9C4 \uACF5\uACA9"
-        nodeMemo: 
+        nodeName: "\uC900\uBE44\xB7\uB3CC\uC9C4\xB7\uD6C4\uB51C\uC774 \uB05D\uB0A0
+          \uB54C\uAE4C\uC9C0"
+        nodeMemo: "\uC2DC\uC791\uD55C \uB3CC\uC9C4\uC740 \uB05D\uAE4C\uC9C0 \uC9C4\uD589\uD569\uB2C8\uB2E4.
+          \uC900\uBE44\uC640 \uD6C4\uB51C\uC740 BoarChargeSkill\uC5D0\uC11C \uAD00\uB9AC\uD569\uB2C8\uB2E4."
         children:
         - rid: 2871842154846355616
         - rid: 2871842154846355618
-        - rid: 2871842154846355628
         - rid: 2871842154846355630
     - rid: 2871842154846355611
       type: {class: BTSharedBoolean, ns: , asm: Assembly-CSharp}
@@ -306,24 +928,19 @@ MonoBehaviour:
         mySelfKey: MySelf
         targetObjectKey: Player/GameObj
         targetPositionKey: Target/Pos
+        skillIdInput:
+          useDirectValue: 0
+          blackboardKey: Charge
+          directValue: 
+        useDirectSkillId: 0
         skillIdToUse: Charge
+        directSkillId: 
+        _skillIdInputMigrated: 1
     - rid: 2871842154846355621
       type: {class: BTSharedString, ns: , asm: Assembly-CSharp}
       data:
         key: Charge
         value: Charge
-    - rid: 2871842154846355628
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: BTActWait
-        nodeMemo: 
-        logic:
-          rid: 2871842154846355629
-    - rid: 2871842154846355629
-      type: {class: BTActWait, ns: , asm: Assembly-CSharp}
-      data:
-        waitTimeMin: 1.5
-        waitTimeMax: 1.5
     - rid: 2871842154846355630
       type: {class: BTAction, ns: , asm: Assembly-CSharp}
       data:
@@ -336,269 +953,11 @@ MonoBehaviour:
       data:
         targetBoolKey: 'IsAttacking '
         setToValue: 0
-    - rid: 2871842154846355632
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: BTActSetBool
-        nodeMemo: 
-        logic:
-          rid: 2871842154846355633
-    - rid: 2871842154846355633
-      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
-      data:
-        targetBoolKey: 'HasLastPos '
-        setToValue: 0
-    - rid: 2871842154846355634
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: BTActSmartMoveTo
-        nodeMemo: 
-        logic:
-          rid: 2395884903716880527
-    - rid: 2871842154846355636
-      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: Attack Or Chase
-        nodeMemo: 
-        children:
-        - rid: 2871842154846355637
-        - rid: 2871842154846355638
-    - rid: 2871842154846355637
-      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: Attack
-        nodeMemo: 
-        children:
-        - rid: 2871842154846355639
-        - rid: 2871842154846355646
-        - rid: 2871842154846355641
-    - rid: 2871842154846355638
-      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: Chase
-        nodeMemo: 
-        children:
-        - rid: 2871842154846355658
-        - rid: 2871842154846355643
-    - rid: 2871842154846355639
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: Is It Close In Range?
-        nodeMemo: 
-        logic:
-          rid: 2871842154846355640
-    - rid: 2871842154846355640
-      type: {class: BTActDistanceCheck, ns: , asm: Assembly-CSharp}
-      data:
-        targetPositionKey: Player/LastPos
-        mySelfKey: MySelf
-        distanceKey: Player/InRange
-        successIfCloser: 1
-    - rid: 2871842154846355641
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: I WIll Attack
-        nodeMemo: 
-        logic:
-          rid: 2871842154846355642
-    - rid: 2871842154846355642
-      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
-      data:
-        targetBoolKey: 'IsAttacking '
-        setToValue: 1
-    - rid: 2871842154846355643
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: BTActSmartMoveTo
-        nodeMemo: 
-        logic:
-          rid: 2395884903716880526
-    - rid: 2871842154846355645
-      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: "\uC218\uC0C9"
-        nodeMemo: 
-        children:
-        - rid: 2871842154846355649
-        - rid: 2871842154846355651
-    - rid: 2871842154846355646
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: TargetPos is PlayerPos
-        nodeMemo: 
-        logic:
-          rid: 2871842154846355648
-    - rid: 2871842154846355648
-      type: {class: BTActCopyValue, ns: , asm: Assembly-CSharp}
-      data:
-        sourceKey: Player/LastPos
-        targetKey: Target/Pos
-    - rid: 2871842154846355649
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: BTActCheckBool
-        nodeMemo: 
-        logic:
-          rid: 2871842154846355650
-    - rid: 2871842154846355650
-      type: {class: BTActCheckBool, ns: , asm: Assembly-CSharp}
-      data:
-        targetBoolKey: 'HasLastPos '
-        successIfTrue: 1
-    - rid: 2871842154846355651
-      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: "\uD50C\uB808\uC774\uC5B4 \uB9C8\uC9C0\uB9C9 \uC704\uCE58 \uD655\uC778"
-        nodeMemo: 
-        children:
-        - rid: 2871842154846355652
-        - rid: 2871842154846355653
-    - rid: 2871842154846355652
-      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: "\uAC00\uBD24\uB294\uB370 \uC5C6\uB2E4?"
-        nodeMemo: 
-        children:
-        - rid: 2871842154846355654
-        - rid: 2871842154846355656
-    - rid: 2871842154846355653
-      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: "\uAC00\uB294\uC911"
-        nodeMemo: 
-        children:
-        - rid: 2871842154846355663
-    - rid: 2871842154846355654
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: Is LastPos Close In Sight?
-        nodeMemo: 
-        logic:
-          rid: 2871842154846355655
-    - rid: 2871842154846355655
-      type: {class: BTActDistanceCheck, ns: , asm: Assembly-CSharp}
-      data:
-        targetPositionKey: Player/LastPos
-        mySelfKey: MySelf
-        distanceKey: Player/InSight
-        successIfCloser: 1
-    - rid: 2871842154846355656
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: HasLastPos Is False
-        nodeMemo: 
-        logic:
-          rid: 2871842154846355657
-    - rid: 2871842154846355657
-      type: {class: BTActSetBool, ns: , asm: Assembly-CSharp}
-      data:
-        targetBoolKey: 'HasLastPos '
-        setToValue: 0
-    - rid: 2871842154846355658
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: Is It Clost In Sight?
-        nodeMemo: 
-        logic:
-          rid: 2871842154846355660
-    - rid: 2871842154846355659
-      type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
-      data:
-        key: Player/InSight
-        value: 10
-    - rid: 2871842154846355660
-      type: {class: BTActDistanceCheck, ns: , asm: Assembly-CSharp}
-      data:
-        targetPositionKey: Player/LastPos
-        mySelfKey: MySelf
-        distanceKey: Player/InSight
-        successIfCloser: 1
-    - rid: 2871842154846355663
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: BTActSmartMoveTo
-        nodeMemo: 
-        logic:
-          rid: 2395884903716880528
-    - rid: 2871842154846355668
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: BTActDistanceCheck
-        nodeMemo: 
-        logic:
-          rid: 2871842154846355670
-    - rid: 2871842154846355669
-      type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
-      data:
-        key: Start/InRange
-        value: 2
-    - rid: 2871842154846355670
-      type: {class: BTActDistanceCheck, ns: , asm: Assembly-CSharp}
-      data:
-        targetPositionKey: Start/Pos
-        mySelfKey: MySelf
-        distanceKey: Start/InRange
-        successIfCloser: 0
-    - rid: 2871842154846355671
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: BTActSmartMoveTo
-        nodeMemo: 
-        logic:
-          rid: 2395884903716880529
-    - rid: 3558163897100009576
-      type: {class: BTSelector, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: "\uC120\uD0DD"
-        nodeMemo: 
-        children:
-        - rid: 3558163961612599390
-        - rid: 2871842154846355600
-        - rid: 3558163961612599379
-        - rid: 3558163961612599411
-        - rid: 2871842154846355645
-        - rid: 3558163961612599374
     - rid: 3558163897100009580
       type: {class: BTSharedGameObject, ns: , asm: Assembly-CSharp}
       data:
         key: MySelf
         value: {fileID: 1226158920139408715}
-    - rid: 3558163897100009581
-      type: {class: BTSharedNumeric, ns: , asm: Assembly-CSharp}
-      data:
-        key: Target/Dist
-        value: 5
-    - rid: 3558163961612599374
-      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: "\uC9D1\uC73C\uB85C \uBCF5\uADC0 (\uD560\uAC8C \uC5C6\uC74C)"
-        nodeMemo: 
-        children:
-        - rid: 2871842154846355668
-        - rid: 2871842154846355671
-    - rid: 3558163961612599379
-      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: "\uC9D1\uC73C\uB85C \uBCF5\uADC0"
-        nodeMemo: 
-        children:
-        - rid: 3558163961612599380
-        - rid: 2871842154846355632
-        - rid: 2871842154846355634
-    - rid: 3558163961612599380
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: IsItClose ToStart?
-        nodeMemo: 
-        logic:
-          rid: 3558163961612599381
-    - rid: 3558163961612599381
-      type: {class: BTActDistanceCheck, ns: , asm: Assembly-CSharp}
-      data:
-        targetPositionKey: Start/Pos
-        mySelfKey: MySelf
-        distanceKey: Start/Dist
-        successIfCloser: 0
     - rid: 3558163961612599389
       type: {class: BTSharedBoolean, ns: , asm: Assembly-CSharp}
       data:
@@ -659,37 +1018,11 @@ MonoBehaviour:
       data:
         key: Player/InRange
         value: 5
-    - rid: 3558163961612599411
-      type: {class: BTSequence, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: "\uD50C\uB808\uC774\uC5B4 \uD0D0\uC0C9"
-        nodeMemo: 
-        children:
-        - rid: 2871842154846355598
-        - rid: 3558163961612599426
-        - rid: 2871842154846355636
     - rid: 3558163961612599419
       type: {class: BTSharedGameObject, ns: , asm: Assembly-CSharp}
       data:
         key: Player/GameObj
         value: {fileID: 0}
-    - rid: 3558163961612599423
-      type: {class: BTSharedString, ns: , asm: Assembly-CSharp}
-      data:
-        key: Player/Tag
-        value: Player
-    - rid: 3558163961612599426
-      type: {class: BTAction, ns: , asm: Assembly-CSharp}
-      data:
-        nodeName: Commit PlayerPos
-        nodeMemo: 
-        logic:
-          rid: 3558163961612599427
-    - rid: 3558163961612599427
-      type: {class: BTActCopyPos, ns: , asm: Assembly-CSharp}
-      data:
-        targetObjectKey: Player/GameObj
-        outPositionKey: Player/LastPos
     - rid: 3558163961612599431
       type: {class: BTSharedVector3, ns: , asm: Assembly-CSharp}
       data:
@@ -715,6 +1048,7 @@ MonoBehaviour:
   moveSpeed: 4
   rotationSpeed: 720
   stoppingDistance: 0.1
+  syncMovementAndFacing: 1
 --- !u!114 &-441924815081087731
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -782,8 +1116,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c7d5cad79558e9429bd382a7aaf6fc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoarChargeSkill
+  preparationTime: 1
   chargeSpeed: 8
   maxChargeTime: 1.5
+  recoveryTime: 1.5
+  prepareStateName: Base Layer.Boar_ChargePrepare
+  chargeStateName: Base Layer.Boar_Charge
+  recoverStateName: Base Layer.Boar_ChargeRecover
   attackDamage: 15
   attackRadius: 1.2
   attackOffset: {x: 0, y: 0.5, z: 1}
@@ -802,6 +1141,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e460bbecbd7a2c4bb17698d73b58e32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAnimator
+  movementStateName: Run
+  movementRoot: {fileID: 0}
+  facingReference: {fileID: 0}
+  movementSpeedThreshold: 0.1
+  movementStopDelay: 0.1
+  teleportDistanceThreshold: 5
+  shootStateName: 
+  shootLayer: 1
+  shootEmptyStateName: 
+  reloadStateName: 
+  reloadLayer: 0
 --- !u!114 &6806687160027039604
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -815,6 +1165,35 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   enemyId: 0
+--- !u!114 &7305242824573215916
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a5f694712eaa3f4a864f86d8bc4b002, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AIBrainStimulusLinker
+  pendingBoolKey: HasPendingStimulus
+  sourceObjectKey: StimulusSource
+  positionKey: StimulusPosition
+  typeKey: StimulusType
+--- !u!114 &5953236933251563774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b662a709cdc7c4045b931e3df6b37936, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDeathHandler
+  deathStateName: Base Layer.Boar_Death
 --- !u!1001 &8017058706133763299
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -946,6 +1325,30 @@ PrefabInstance:
     - target: {fileID: -4559795462676235758, guid: 271064153d47ae640ae898bdf42090f9, type: 3}
       propertyPath: m_Layer
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: -4420358912557114108, guid: 271064153d47ae640ae898bdf42090f9, type: 3}
+      propertyPath: m_AABB.m_Center.x
+      value: 0.0738329
+      objectReference: {fileID: 0}
+    - target: {fileID: -4420358912557114108, guid: 271064153d47ae640ae898bdf42090f9, type: 3}
+      propertyPath: m_AABB.m_Center.y
+      value: -0.011422217
+      objectReference: {fileID: 0}
+    - target: {fileID: -4420358912557114108, guid: 271064153d47ae640ae898bdf42090f9, type: 3}
+      propertyPath: m_AABB.m_Center.z
+      value: 0.38114884
+      objectReference: {fileID: 0}
+    - target: {fileID: -4420358912557114108, guid: 271064153d47ae640ae898bdf42090f9, type: 3}
+      propertyPath: m_AABB.m_Extent.x
+      value: 0.45550227
+      objectReference: {fileID: 0}
+    - target: {fileID: -4420358912557114108, guid: 271064153d47ae640ae898bdf42090f9, type: 3}
+      propertyPath: m_AABB.m_Extent.y
+      value: 0.5637969
+      objectReference: {fileID: 0}
+    - target: {fileID: -4420358912557114108, guid: 271064153d47ae640ae898bdf42090f9, type: 3}
+      propertyPath: m_AABB.m_Extent.z
+      value: 0.4316636
       objectReference: {fileID: 0}
     - target: {fileID: -4265609248416629115, guid: 271064153d47ae640ae898bdf42090f9, type: 3}
       propertyPath: m_Layer

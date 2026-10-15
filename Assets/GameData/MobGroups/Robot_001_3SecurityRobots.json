@@ -1,0 +1,48 @@
+{
+    "GroupID": "Robot_001_3SecurityRobots",
+    "Memo": "",
+    "Category": 2,
+    "DangerLevel": 1,
+    "AreaSize": 3.0,
+    "SpawnInfos": [
+        {
+            "MobID": "SecurityRobot",
+            "LocalPosition": {
+                "x": 0.0,
+                "y": -0.5,
+                "z": 2.0
+            },
+            "LocalEulerAngles": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+            }
+        },
+        {
+            "MobID": "SecurityRobot",
+            "LocalPosition": {
+                "x": -1.5399999618530274,
+                "y": -0.6750903129577637,
+                "z": -0.9700000286102295
+            },
+            "LocalEulerAngles": {
+                "x": 0.0,
+                "y": 235.104736328125,
+                "z": 0.0
+            }
+        },
+        {
+            "MobID": "SecurityRobot",
+            "LocalPosition": {
+                "x": 1.6799999475479127,
+                "y": -0.6750903129577637,
+                "z": -0.9300000071525574
+            },
+            "LocalEulerAngles": {
+                "x": 0.0,
+                "y": 137.41162109375,
+                "z": 0.0
+            }
+        }
+    ]
+}
