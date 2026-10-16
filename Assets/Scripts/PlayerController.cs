@@ -43,13 +43,13 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     private bool _interruptingPresentation;
     public int PresentationVersion => _presentationInterruptionVersion;
     public bool IsDeathPresented => _deathHandled;
+    public bool IsWaitingForDeathAnimation { get; private set; }
     public event System.Action PresentationInterrupted;
     private int _presentationInterruptionVersion;
     public bool IsRolling => _isRolling;
     private readonly HashSet<UnityEngine.Object> _cinematicInputLocks = new HashSet<UnityEngine.Object>();
     public bool HasCleared => _health != null && _health.IsClearProtected;
     public bool IsInputLocked => _deathHandled || HasCleared || _isCinematicPlaying || _cinematicInputLocks.Count > 0
-        || (IsOwner && !IsServer && _receivedStateSlot != ActiveSlotIndex);
         || (IsOwner && IsSpawned && !IsServer && _receivedStateSlot != ActiveSlotIndex);
     public bool CanChangeCharacter => !IsInputLocked && !(GetActiveUltimateSkill()?.IsPresentationPlaying ?? false);
     private Health _health;
@@ -176,6 +176,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
     private void OnDisable()
     {
+        IsWaitingForDeathAnimation = false;
         if (_health != null)
         {
             _health.OnDeath -= HandleDeath;
@@ -202,10 +203,21 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     {
         if (_deathHandled) return;
         _deathHandled = true;
+        IsWaitingForDeathAnimation = true;
         SetCinematicInputLocked(this, true);
         CancelGameplayActions();
         InterruptPresentation();
         GetAnimationPresenter()?.PlayDeath();
+        RefreshLocalParty();
+        SendCharacterStates();
+    }
+
+    private void UpdateDeathAnimation()
+    {
+        if (!IsWaitingForDeathAnimation
+            || GetAnimationPresenter()?.IsDeathAnimationPlaying == true) return;
+        if (IsServer) TrySwitchToLivingCharacter();
+        IsWaitingForDeathAnimation = false;
     }
 
     private void CancelGameplayActions()
@@ -237,7 +249,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         return _animationPresenter;
     }
 
-    private GameObject GetActiveCharacterModel()
+    public GameObject GetActiveCharacterModel()
     {
         int slot = ActiveSlotIndex;
         return slot >= 0 && slot < _characterModels.Length ? _characterModels[slot] : null;
@@ -266,7 +278,11 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     {
         base.OnNetworkSpawn();
         _deathHandled = false;
+        IsWaitingForDeathAnimation = false;
         _cinematicInputLocks.Clear();
+        System.Array.Clear(_characterStates, 0, _characterStates.Length);
+        _receivedStateSlot = -1;
+        if (IsServer) _activeSlotIndex.Value = 0;
         if (IsOwner) LocalInstance = this;
         
         Debug.Log($"[PlayerController] OnNetworkSpawn 호출됨! (OwnerClientId: {OwnerClientId}, IsServer: {IsServer}, IsOwner: {IsOwner})");
@@ -321,6 +337,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
     public override void OnNetworkDespawn()
     {
+        IsWaitingForDeathAnimation = false;
         CancelGameplayActions();
         InterruptPresentation();
         base.OnNetworkDespawn();
@@ -410,6 +427,9 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
             ClearGameplayInput();
             InterruptPresentation(wasPresenting);
             BindAnimationPresenter(null);
+            _deathHandled = false;
+            IsWaitingForDeathAnimation = false;
+            SetCinematicInputLocked(this, false);
         }
         for (int i = 0; i < 4; i++)
         {
@@ -476,7 +496,8 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
     public bool TrySwitchToLivingCharacter()
     {
-        if (!IsServer || _health.CurrentHealth > 0f || _characterStates[ActiveSlotIndex] == null) return false;
+        if (!IsServer || _health.CurrentHealth > 0f || _characterStates[ActiveSlotIndex] == null
+            || GetAnimationPresenter()?.IsDeathAnimationPlaying == true) return false;
         _characterStates[ActiveSlotIndex].currentHealth = 0f;
         for (int offset = 1; offset < 4; offset++)
         {
@@ -485,6 +506,8 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
             SwitchCharacterSlot(slot);
             return true;
         }
+        RefreshLocalParty();
+        SendCharacterStates();
         return false;
     }
 
@@ -647,6 +670,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
     private void Update()
     {
+        UpdateDeathAnimation();
         UpdateCharacterStates(Time.deltaTime);
         if (IsOwner && !IsInputLocked)
         {
@@ -1030,6 +1054,15 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     {
         if (!IsInputLocked) GetAnimationPresenter()?.PlayReload();
     }
+
+    public bool PlayReloadAnimation(float duration, bool firstRound)
+    {
+        return !IsInputLocked && GetAnimationPresenter()?.PlayReload(duration, firstRound) == true;
+    }
+
+    public void FinishReloadAnimation() => GetAnimationPresenter()?.FinishReload();
+    public void CancelReloadAnimation() => GetAnimationPresenter()?.CancelReload();
+    public bool IsReloadPoseActive() => GetAnimationPresenter()?.IsReloadPoseActive() == true;
 
     public void PlayCinematic(string stateName, bool restoreState, System.Action onComplete,
         System.Action onCancelled = null)

@@ -524,4 +524,12 @@ public class Shooter : NetworkBehaviour
     {
         animReceiver?.PlayReloadAnimation();
     }
+
+    public bool TriggerReloadAnimation(float duration, bool firstRound)
+    {
+        return playerController != null && playerController.PlayReloadAnimation(duration, firstRound);
+    }
+
+    public void FinishReloadAnimation() => playerController?.FinishReloadAnimation();
+    public void CancelReloadAnimation() => playerController?.CancelReloadAnimation();
 }

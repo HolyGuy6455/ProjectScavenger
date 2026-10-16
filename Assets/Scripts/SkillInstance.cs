@@ -60,7 +60,7 @@ public class SkillInstance
         switch (data.activeType)
         {
             case SkillActiveType.Instant:
-                ExecuteSkillBeginFunc(data.func, shooter, data.funcValue);
+                if (!ExecuteSkillBeginFunc(data.func, shooter, data.funcValue)) return;
                 ReduceRemain(shooter);
                 isInstantOffExecuted = false;
                 currentCooldown = data.cooltime;
@@ -88,8 +88,10 @@ public class SkillInstance
                 {
                     if (CanExecuteSkillFunc(data.func, shooter))
                     {
+                        // The first shell includes the opening pose; ammunition is committed at Finish.
+                        if (data.func == 6 && !ExecuteSkillBeginFunc(data.func, shooter, data.funcValue)) return;
                         isContinuousRunning = true;
-                        continuousTimer = data.duration;
+                        continuousTimer = data.func == 6 ? 0f : data.duration;
                     }
                 }
                 break;
@@ -102,7 +104,9 @@ public class SkillInstance
 
         if (state != null)
         {
-            state.currentThirst -= data.thirst;
+            var player = shooter != null ? shooter.GetComponent<PlayerController>() : null;
+            if (player != null) player.ModifyCharacterSurvivalStats(state.charId, 0f, -data.thirst);
+            else state.currentThirst -= data.thirst;
         }
     }
 
@@ -120,9 +124,20 @@ public class SkillInstance
         }
     }
 
-    public void ExecuteSkillBeginFunc(int funcCode, Shooter playerShooter, params float[] funcValues)
+    /// <summary>Abandons pending effects without firing release/completion logic or refunding costs.</summary>
+    public void CancelActiveAction(Shooter shooter = null)
     {
-        if (funcCode == 0) return;
+        if (isContinuousRunning && Data?.func == 6) shooter?.CancelReloadAnimation();
+        isCharging = false;
+        isContinuousRunning = false;
+        isToggledOn = false;
+        continuousTimer = 0f;
+        isInstantOffExecuted = true;
+    }
+
+    public bool ExecuteSkillBeginFunc(int funcCode, Shooter playerShooter, params float[] funcValues)
+    {
+        if (funcCode == 0) return true;
 
         switch (funcCode)
         {
@@ -143,15 +158,10 @@ public class SkillInstance
                 if (playerShooter != null) playerShooter.TriggerReloadAnimation();
                 break;
             case 6: // 재장전 (1발)
-                if (playerShooter != null)
-                {
-                    playerShooter.TriggerReloadAnimation();
-                    int amount = (funcValues != null && funcValues.Length > 0 && funcValues[0] > 0) ? (int)funcValues[0] : 1;
-                    int ammoId = (funcValues != null && funcValues.Length > 1) ? (int)funcValues[1] : -1;
-                    playerShooter.LoadAmmo(amount, ammoId);
-                }
-                break;
+                return playerShooter != null && Data != null
+                    && playerShooter.TriggerReloadAnimation(Data.duration, !isContinuousRunning);
         }
+        return true;
     }
 
     private void RefundChamberAmmo(Shooter playerShooter)
@@ -211,6 +221,15 @@ public class SkillInstance
                     }
                 }
                 break;
+            case 6: // 재장전 (1발): 삽입 동작이 끝난 시점에만 탄약 추가
+                if (playerShooter != null)
+                {
+                    int amount = GetShellLoadAmount(funcValues);
+                    if (Data?.remainCostType == RemainCostType.Ammo) amount = Mathf.Min(amount, remainAmount);
+                    int ammoId = (funcValues != null && funcValues.Length > 1) ? (int)funcValues[1] : -1;
+                    playerShooter.LoadAmmo(amount, ammoId);
+                }
+                break;
         }
     }
 
@@ -258,6 +277,29 @@ public class SkillInstance
         {
             continuousTimer = 0f;
 
+            if (data.func == 6)
+            {
+                if (!CanExecuteSkillFunc(data.func, shooter))
+                {
+                    FinishContinuousReload(shooter, data);
+                    return;
+                }
+
+                int space = shooter.CurrentAmmoData.maxAmmo - shooter.CurrentAmmo;
+                int loaded = Mathf.Min(GetShellLoadAmount(data.funcValue), space);
+                if (data.remainCostType == RemainCostType.Ammo) loaded = Mathf.Min(loaded, remainAmount);
+                // A client receives the updated ammo queue later, so decide fullness before the RPC.
+                bool fillsMagazine = loaded >= space;
+                ExecuteSkillFinishFunc(data.func, shooter, data.funcValue);
+                if (data.remainCostType == RemainCostType.Ammo) remainAmount -= loaded;
+                else ReduceRemain(shooter);
+
+                if (fillsMagazine || !CanExecuteSkillFunc(data.func, shooter)
+                    || !ExecuteSkillBeginFunc(data.func, shooter, data.funcValue))
+                    FinishContinuousReload(shooter, data);
+                return;
+            }
+
             if (CanExecuteSkillFunc(data.func, shooter))
             {
                 ExecuteSkillBeginFunc(data.func, shooter, data.funcValue);
@@ -276,6 +318,16 @@ public class SkillInstance
                 currentCooldown = data.cooltime; // 종료 후 쿨타임 시작
             }
         }
+    }
+
+    private static int GetShellLoadAmount(float[] values) =>
+        values != null && values.Length > 0 && values[0] >= 1f ? (int)values[0] : 1;
+
+    private void FinishContinuousReload(Shooter shooter, SkillData data)
+    {
+        isContinuousRunning = false;
+        currentCooldown = data.cooltime;
+        shooter?.FinishReloadAnimation();
     }
 
     public void UpdateCooldown(float deltaTime)

@@ -7,6 +7,9 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public sealed class CharacterAnimationPresenter : MonoBehaviour
 {
+    private const string ReloadingParameter = "IsReloading";
+    private const string ReloadSpeedParameter = "ReloadSpeed";
+
     [SerializeField] private bool enableDamageAnimations;
     [SerializeField] private string deathStateName = "Death";
     [SerializeField] private string hitStateName = "Armature|hit";
@@ -20,6 +23,17 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
 
     public bool HandlesDamageAnimations => enableDamageAnimations;
     public bool IsDeathPresented { get; private set; }
+    public bool IsDeathAnimationPlaying
+    {
+        get
+        {
+            if (!IsDeathPresented || !isActiveAndEnabled || animator == null || !animator.isActiveAndEnabled
+                || !HasState(0, deathStateName)) return false;
+            var state = animator.GetCurrentAnimatorStateInfo(0);
+            // Animator.Play is evaluated on the next animation update.
+            return !state.IsName(deathStateName) || state.normalizedTime < 1f;
+        }
+    }
     public bool IsFullBodyPlaying => fullBodyPlayback != 0;
     public event Action<CharacterAnimationPresenter> PresentationDisabled;
 
@@ -64,18 +78,104 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
     public void PlayShoot() => PlayUpperBody("Armature|shoot");
     public void PlayReload() => PlayUpperBody("Armature|reloading");
 
+    public bool PlayReload(float duration, bool firstRound)
+    {
+        if (!isActiveAndEnabled || IsDeathPresented || IsFullBodyPlaying || animator == null) return false;
+        if (!IsPositiveFinite(duration))
+        {
+            Debug.LogError($"[CharacterAnimationPresenter] Reload duration must be finite and positive: {duration}.", this);
+            return false;
+        }
+
+        if (!HasState(1, "ReloadStart") || !HasState(1, "ReloadLoop") || !HasState(1, "ReloadEnd"))
+        {
+            if (!HasState(1, "Armature|reloading")) return false;
+            PlayReload();
+            return true;
+        }
+
+        if (!HasParameter(ReloadingParameter, AnimatorControllerParameterType.Bool)
+            || !HasParameter(ReloadSpeedParameter, AnimatorControllerParameterType.Float)
+            || !TryGetReloadLengths(out float startLength, out float loopLength))
+        {
+            Debug.LogError("[CharacterAnimationPresenter] Phased reload requires IsReloading, ReloadSpeed and unique upper-body reload clips.", this);
+            return false;
+        }
+
+        float insertionDuration = duration - (firstRound ? startLength : 0f);
+        float speed = loopLength / insertionDuration;
+        if (!IsPositiveFinite(insertionDuration) || !IsPositiveFinite(speed))
+        {
+            Debug.LogError($"[CharacterAnimationPresenter] Reload duration {duration} must exceed the opening clip duration {startLength} on the first round.", this);
+            return false;
+        }
+
+        // Only the insertion state changes speed; locomotion and opening/closing keep their authored timing.
+        animator.SetFloat(ReloadSpeedParameter, speed);
+        animator.SetBool(ReloadingParameter, true);
+        animator.Play(firstRound ? "ReloadStart" : "ReloadLoop", 1, 0f);
+        return true;
+    }
+
+    public void FinishReload()
+    {
+        if (HasParameter(ReloadingParameter, AnimatorControllerParameterType.Bool))
+            animator.SetBool(ReloadingParameter, false);
+    }
+
+    public void CancelReload()
+    {
+        FinishReload();
+        if (HasParameter(ReloadSpeedParameter, AnimatorControllerParameterType.Float))
+            animator.SetFloat(ReloadSpeedParameter, 1f);
+        if (isActiveAndEnabled && !IsDeathPresented && !IsFullBodyPlaying
+            && HasState(1, "Armature|idle"))
+            animator.Play("Armature|idle", 1, 0f);
+    }
+
+    private bool TryGetReloadLengths(out float startLength, out float loopLength)
+    {
+        startLength = loopLength = 0f;
+        AnimationClip start = null;
+        AnimationClip loop = null;
+        foreach (var clip in animator.runtimeAnimatorController.animationClips)
+        {
+            if (clip.name.EndsWith("_upperbody_reloading_start", StringComparison.Ordinal))
+            {
+                if (start != null && start != clip) return false;
+                start = clip;
+            }
+            else if (clip.name.EndsWith("_upperbody_reloading_loop", StringComparison.Ordinal)
+                || clip.name.EndsWith("_upperbody_reloading", StringComparison.Ordinal))
+            {
+                if (loop != null && loop != clip) return false;
+                loop = clip;
+            }
+        }
+        if (start == null || loop == null) return false;
+        startLength = start.length;
+        loopLength = loop.length;
+        return IsPositiveFinite(startLength) && IsPositiveFinite(loopLength);
+    }
+
+    private static bool IsPositiveFinite(float value) => value > 0f && !float.IsNaN(value) && !float.IsInfinity(value);
+
     public void PlayHit(bool gameplayReloadInProgress)
     {
         if (!enableDamageAnimations || gameplayReloadInProgress || IsReloadPoseActive()) return;
         PlayUpperBody(hitStateName);
     }
 
-    private bool IsReloadPoseActive()
+    public bool IsReloadPoseActive()
     {
         if (animator == null || animator.layerCount < 2) return false;
-        return animator.GetCurrentAnimatorStateInfo(1).IsName("Armature|reloading")
-            || (animator.IsInTransition(1) && animator.GetNextAnimatorStateInfo(1).IsName("Armature|reloading"));
+        return IsReloadState(animator.GetCurrentAnimatorStateInfo(1))
+            || (animator.IsInTransition(1) && IsReloadState(animator.GetNextAnimatorStateInfo(1)));
     }
+
+    private static bool IsReloadState(AnimatorStateInfo state) => state.IsTag("Reload")
+        || state.IsName("Armature|reloading") || state.IsName("ReloadStart")
+        || state.IsName("ReloadLoop") || state.IsName("ReloadEnd");
 
     private void PlayUpperBody(string stateName)
     {
@@ -87,6 +187,7 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
     public int PlayFullBody(string stateName)
     {
         if (!isActiveAndEnabled || IsDeathPresented || !HasState(0, stateName)) return 0;
+        CancelReload();
         fullBodyPlayback = ++generation;
         fullBodyState = stateName;
         animator.speed = 1f;
@@ -125,6 +226,14 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
     public bool IsCurrentPlayback(int token) => token != 0 && token == fullBodyPlayback
         && isActiveAndEnabled && !IsDeathPresented;
 
+    public void FinishSkill(int token)
+    {
+        if (!IsCurrentPlayback(token)) return;
+        fullBodyPlayback = 0;
+        fullBodyState = null;
+        if (animator.layerCount > 1) animator.SetLayerWeight(1, 1f);
+    }
+
     public void FinishFullBody(int token, bool restoreMovement)
     {
         if (!IsCurrentPlayback(token)) return;
@@ -162,6 +271,7 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
 
     private void InvalidatePlayback()
     {
+        CancelReload();
         ++generation;
         fullBodyPlayback = 0;
         fullBodyState = null;
@@ -171,6 +281,7 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
     private void RestoreMovement()
     {
         if (animator == null || IsDeathPresented) return;
+        CancelReload();
         animator.speed = 1f;
         if (HasState(0, "Movement")) animator.Play("Movement", 0, 0f);
         if (animator.layerCount > 1)
@@ -186,5 +297,13 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
         return animator != null && animator.runtimeAnimatorController != null && layer < animator.layerCount
             && !string.IsNullOrEmpty(name)
             && animator.HasState(layer, Animator.StringToHash(animator.GetLayerName(layer) + "." + name));
+    }
+
+    private bool HasParameter(string name, AnimatorControllerParameterType type)
+    {
+        if (animator == null || animator.runtimeAnimatorController == null) return false;
+        foreach (var parameter in animator.parameters)
+            if (parameter.name == name && parameter.type == type) return true;
+        return false;
     }
 }
