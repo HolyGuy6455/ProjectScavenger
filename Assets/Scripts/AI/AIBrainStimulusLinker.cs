@@ -57,10 +57,15 @@ public class AIBrainStimulusLinker : MonoBehaviour
 
     private void HandleDamageTaken(DamageInfo info)
     {
-        // 공격자가 없는 피해에서는 공격 위치를 알 수 없습니다.
-        // hitPoint는 피격자의 위치이므로 공격자의 위치로 사용하지 않습니다.
-        if (info.attacker == null) return;
-        ReportStimulus(AIStimulusType.Damage, info.attacker.transform.position, info.attacker);
+        if (info.attacker != null)
+        {
+            ReportStimulus(AIStimulusType.Damage, info.attacker.transform.position, info.attacker);
+        }
+        else if (info.sourcePosition.HasValue)
+        {
+            // 발사 후 사라진 지뢰 등은 발사 당시 위치만 조사합니다.
+            ReportStimulus(AIStimulusType.Damage, info.sourcePosition.Value);
+        }
     }
 
     /// <summary>

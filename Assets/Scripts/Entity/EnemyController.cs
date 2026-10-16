@@ -12,6 +12,11 @@ public class EnemyController : NetworkBehaviour, ILootTableProvider
     private EnemyData myData;
     private Coroutine dataInitialization;
 
+    private void Awake()
+    {
+        if (TryGetComponent<Shooter>(out var shooter)) shooter.Target = BulletTarget.Player;
+    }
+
     public void SetEnemyId(int id)
     {
         enemyId = id;
