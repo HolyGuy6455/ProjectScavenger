@@ -9,6 +9,7 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
 {
     private const string ReloadingParameter = "IsReloading";
     private const string ReloadSpeedParameter = "ReloadSpeed";
+    private const string SkillSpeedParameter = "SkillSpeed";
 
     [SerializeField] private bool enableDamageAnimations;
     [SerializeField] private string deathStateName = "Death";
@@ -225,6 +226,23 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
 
     public bool IsCurrentPlayback(int token) => token != 0 && token == fullBodyPlayback
         && isActiveAndEnabled && !IsDeathPresented;
+
+    public int PlaySkill(float duration)
+    {
+        if (!isActiveAndEnabled || IsDeathPresented || animator == null || !HasState(0, "Skill")) return 0;
+        var clip = Array.Find(animator.runtimeAnimatorController.animationClips,
+            item => item.name.EndsWith("_skill", StringComparison.Ordinal)
+                && !item.name.EndsWith("_upperbody_skill", StringComparison.Ordinal));
+        if (!IsPositiveFinite(duration) || clip == null || !IsPositiveFinite(clip.length / duration)
+            || !HasParameter(SkillSpeedParameter, AnimatorControllerParameterType.Float))
+        {
+            Debug.LogError("[CharacterAnimationPresenter] Skill requires a positive duration, a full-body skill clip and SkillSpeed.", this);
+            return 0;
+        }
+
+        animator.SetFloat(SkillSpeedParameter, clip.length / duration);
+        return PlayFullBody("Skill");
+    }
 
     public void FinishSkill(int token)
     {

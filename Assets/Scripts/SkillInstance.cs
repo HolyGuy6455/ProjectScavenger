@@ -135,7 +135,7 @@ public class SkillInstance
         isInstantOffExecuted = true;
     }
 
-    public bool ExecuteSkillBeginFunc(int funcCode, Shooter playerShooter, params float[] funcValues)
+    public virtual bool ExecuteSkillBeginFunc(int funcCode, Shooter playerShooter, params float[] funcValues)
     {
         if (funcCode == 0) return true;
 

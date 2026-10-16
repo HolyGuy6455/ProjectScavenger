@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 1698462064478171986}
   - component: {fileID: 7917902695277357669}
   - component: {fileID: 1224847714417122198}
+  - component: {fileID: 892002002002002001}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -280,6 +281,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Components::Unity.Netcode.Components.NetworkRigidbody
+--- !u!114 &892002002002002001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2760713653355842673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b428917e1256a0498534bd777d18489, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Char002ClaymoreSkillNetwork
 --- !u!1 &4400775269835697234
 GameObject:
   m_ObjectHideFlags: 0

@@ -156,7 +156,9 @@ public class CharacterState : INetworkSerializable
                 var skillData = DataManager.Instance.GetData<SkillData>("Skill", skillId);
                 if (skillData != null)
                 {
-                    normalSkills[i] = new SkillInstance(skillId);
+                    normalSkills[i] = charId == 2 && skillData.charId == 2 && skillData.func == 7
+                        ? new Char002ClaymoreSkillInstance(skillId)
+                        : new SkillInstance(skillId);
                 }
             }
         }

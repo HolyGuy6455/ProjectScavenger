@@ -1892,6 +1892,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &3057701978408236049
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4176792712128079914}
+  m_Layer: 0
+  m_Name: ClaymorePlacementPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4176792712128079914
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3057701978408236049}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.041474603, y: 0.00000006135632, z: 0.22057346}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6906998685106730274}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3069878515502435818
 GameObject:
   m_ObjectHideFlags: 0
@@ -5833,6 +5864,7 @@ GameObject:
   - component: {fileID: 1291582324034516297}
   - component: {fileID: 2651882496639887819}
   - component: {fileID: 7145043144220197299}
+  - component: {fileID: 5181464407353619846}
   m_Layer: 6
   m_Name: char002
   m_TagString: Untagged
@@ -5857,6 +5889,7 @@ Transform:
   - {fileID: 223779096562669218}
   - {fileID: 757830871131168482}
   - {fileID: 210633818932057185}
+  - {fileID: 4176792712128079914}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &4432339610615925614
@@ -5953,3 +5986,18 @@ MonoBehaviour:
   overrideFieldOfView: 1
   enteringExitFieldOfView: 70
   ultimateFieldOfView: 40
+--- !u!114 &5181464407353619846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9209994513278423197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd9023d1016c5174d878c2bb8aa3136a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Char002ClaymoreSkill
+  minePrefab: {fileID: 5712016815395557313, guid: 49b6544bf36e27145b3dcaa30506a773, type: 3}
+  placementPoint: {fileID: 4176792712128079914}
+  carriedMine: {fileID: 8389613594896259978}

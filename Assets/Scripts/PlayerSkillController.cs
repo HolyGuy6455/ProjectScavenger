@@ -7,6 +7,7 @@ using Scavenger.Manager;
 public class PlayerSkillController : NetworkBehaviour
 {
     public static PlayerSkillController Instance { get; private set; }
+    public event System.Action ActiveActionsCancelled;
 
     private List<int> partyCharIds = new List<int>();
     private CharData currentCharData;
@@ -117,6 +118,7 @@ public class PlayerSkillController : NetworkBehaviour
     /// <summary>Stops this player's pending skill effects; spent resources and cooldowns are retained.</summary>
     public void CancelActiveActions()
     {
+        ActiveActionsCancelled?.Invoke();
         // CharacterStateManager contains the local party, not other network players' skill state.
         if (!IsOwner) return;
 
