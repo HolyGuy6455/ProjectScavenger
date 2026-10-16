@@ -71,40 +71,31 @@ public class CharacterStateManager : MonoBehaviour
         OnCharacterChanged?.Invoke(data);
     }
 
-    public void ApplyPartyHealth(PlayerController player, PlayerController.PartyHealthState party)
+    public void BindCharacterStates(CharacterState[] states)
     {
-        if (player == null || !player.IsOwner) return;
         if (playerHealth != null) playerHealth.OnHealthChanged -= HandleHealthChanged;
-        playerHealth = player.GetComponent<Health>();
-        var deck = player.GetLocalDeck();
-        for (int slot = 0; slot < 4; slot++)
-        {
-            var state = GetState(deck.GetCharId(slot));
-            if (state == null) continue;
-            bool changed = state.currentHealth != party.Health[slot] || state.maxHealth != party.MaxHealth[slot];
-            bool hungerChanged = state.currentHunger != party.Hunger[slot];
-            bool thirstChanged = state.currentThirst != party.Thirst[slot];
-            state.currentHealth = party.Health[slot];
-            state.maxHealth = party.MaxHealth[slot];
-            state.currentHunger = party.Hunger[slot];
-            state.currentThirst = party.Thirst[slot];
-            if (changed) OnCharacterHealthChanged?.Invoke(state.charId, state.currentHealth, state.maxHealth);
-            if (hungerChanged) OnCharacterHungerChanged?.Invoke(state.charId, state.currentHunger, state.maxHunger);
-            if (thirstChanged) OnCharacterThirstChanged?.Invoke(state.charId, state.currentThirst, state.maxThirst);
-        }
+        playerHealth = null;
+        charStates = states;
+        isInitialized = true;
+    }
 
-        int charId = deck.GetCharId(party.ActiveSlot);
-        if (charId <= 0 || DataManager.Instance == null) return;
+    public void RefreshCharacterStates(int charId)
+    {
+        foreach (var state in charStates)
+        {
+            if (state == null) continue;
+            OnCharacterHealthChanged?.Invoke(state.charId, state.currentHealth, state.maxHealth);
+            if (state.charId == charId)
+            {
+                OnCharacterHungerChanged?.Invoke(state.charId, state.currentHunger, state.maxHunger);
+                OnCharacterThirstChanged?.Invoke(state.charId, state.currentThirst, state.maxThirst);
+            }
+        }
+        if (charId <= 0 || DataManager.Instance == null || (currentCharId == charId && CurrentCharData != null)) return;
         var data = DataManager.Instance.GetData<CharData>("Char", charId);
-        if (data == null || (currentCharId == charId && CurrentCharData != null)) return;
+        if (data == null) return;
         currentCharId = charId;
         CurrentCharData = data;
-        var activeState = GetState(charId);
-        if (activeState != null)
-        {
-            OnCharacterHungerChanged?.Invoke(charId, activeState.currentHunger, activeState.maxHunger);
-            OnCharacterThirstChanged?.Invoke(charId, activeState.currentThirst, activeState.maxThirst);
-        }
         OnCharacterChanged?.Invoke(data);
     }
 
@@ -241,7 +232,8 @@ public class CharacterStateManager : MonoBehaviour
                 var charData = DataManager.Instance.GetData<CharData>("Char", deckCharIds[i]);
                 if (charData != null)
                 {
-                    charStates[i] = new CharacterState(charData);
+                    if (charStates[i] == null || charStates[i].charId != charData.id)
+                        charStates[i] = new CharacterState(charData);
                     
                     if (isTestMode)
                     {

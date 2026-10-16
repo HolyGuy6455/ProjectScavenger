@@ -50,6 +50,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     public bool HasCleared => _health != null && _health.IsClearProtected;
     public bool IsInputLocked => _deathHandled || HasCleared || _isCinematicPlaying || _cinematicInputLocks.Count > 0
         || (IsOwner && !IsServer && _receivedStateSlot != ActiveSlotIndex);
+        || (IsOwner && IsSpawned && !IsServer && _receivedStateSlot != ActiveSlotIndex);
     public bool CanChangeCharacter => !IsInputLocked && !(GetActiveUltimateSkill()?.IsPresentationPlaying ?? false);
     private Health _health;
     private SectorIndicator _sectorIndicator;

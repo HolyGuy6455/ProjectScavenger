@@ -16,6 +16,8 @@ public class Health : NetworkBehaviour, IDamageable
     public NetworkVariable<float> NetworkCurrentHealth = new NetworkVariable<float>(
         100f, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+    private NetworkVariable<bool> clearProtected = new NetworkVariable<bool>(false);
+
     // 기존 코드 호환을 위한 프로퍼티
     public float CurrentHealth
     {
@@ -28,6 +30,7 @@ public class Health : NetworkBehaviour, IDamageable
     public float MaxHealth => maxHealth;
     public bool IsDead { get; private set; }
     public bool IsInvincible { get; set; }
+    public bool IsClearProtected => clearProtected.Value;
 
     #region C# Actions (스크립트용 이벤트)
     public event System.Action<float, float> OnHealthChanged; // (현재 체력, 최대 체력)
@@ -53,6 +56,7 @@ public class Health : NetworkBehaviour, IDamageable
     {
         if (IsServer)
         {
+            clearProtected.Value = false;
             ResetHealth();
         }
 
@@ -73,7 +77,7 @@ public class Health : NetworkBehaviour, IDamageable
     /// </summary>
     public void TakeDamage(DamageInfo damageInfo)
     {
-        if (IsInvincible) return; // 무적 상태일 때는 데미지 무시
+        if (IsInvincible || IsClearProtected) return; // 구르기 무적 종료가 클리어 보호를 해제하지 않습니다.
         if (!IsServer) return; // 서버만 데미지 처리 가능
         if (IsDead) return;
         if (damageInfo.amount <= 0) return;
@@ -101,13 +105,24 @@ public class Health : NetworkBehaviour, IDamageable
         onDamageTakenUnityEvent?.Invoke(damageInfo);
 
         // 클라이언트들에게 피격 연출(이벤트)을 재생하라고 명령
-        TakeDamageClientRpc(damageInfo.amount, damageInfo.hitPoint, damageInfo.hitNormal);
+        if (IsSpawned) TakeDamageClientRpc(damageInfo.amount, damageInfo.hitPoint, damageInfo.hitNormal);
 
         if (CurrentHealth <= 0)
         {
             CurrentHealth = 0;
             Die(damageInfo);
         }
+    }
+
+    /// <summary>탈출 확정 시 서버가 부여하며, 다음 네트워크 스폰까지 유지합니다.</summary>
+    public void GrantClearProtection()
+    {
+        if (!IsServer)
+        {
+            Debug.LogError($"[Health] 클리어 보호는 서버에서 부여해야 합니다: {name}", this);
+            return;
+        }
+        clearProtected.Value = true;
     }
 
     [ClientRpc]
@@ -172,9 +187,13 @@ public class Health : NetworkBehaviour, IDamageable
     public void SetHealth(float hp, float maxHp)
     {
         if (!IsServer) return;
+        bool wasDead = IsDead;
         maxHealth = maxHp;
         CurrentHealth = Mathf.Clamp(hp, 0f, maxHealth);
-        IsDead = CurrentHealth <= 0;
+        if (CurrentHealth <= 0f && !wasDead && GetComponent<PlayerController>() != null)
+            Die(new DamageInfo(0f, null, transform.position, Vector3.up));
+        else
+            IsDead = CurrentHealth <= 0f;
     }
 
     /// <summary>
@@ -182,12 +201,14 @@ public class Health : NetworkBehaviour, IDamageable
     /// </summary>
     private void Die(DamageInfo damageInfo)
     {
+        var player = GetComponent<PlayerController>();
+        if (player != null && player.TrySwitchToLivingCharacter()) return;
         IsDead = true;
 
         OnDeath?.Invoke(damageInfo);
         onDeathUnityEvent?.Invoke(damageInfo);
 
-        DieClientRpc();
+        if (IsSpawned) DieClientRpc();
 
         if (destroyOnDeath && IsServer)
         {

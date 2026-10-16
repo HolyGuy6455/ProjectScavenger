@@ -196,6 +196,18 @@ namespace Scavenger.Environment
                     if (currentExtractionTimer.Value >= extractionTime)
                     {
                         isExtracting.Value = false;
+                        // 클라이언트 연출 통지보다 먼저 서버의 피해 판정을 차단합니다.
+                        foreach (var client in NetworkManager.ConnectedClientsList)
+                        {
+                            var health = client.PlayerObject != null
+                                ? client.PlayerObject.GetComponent<Health>() : null;
+                            if (health == null)
+                            {
+                                Debug.LogError($"[ExtractionZone] 클리어 보호에 필요한 Player/Health가 없습니다. ClientId={client.ClientId}", this);
+                                return;
+                            }
+                            health.GrantClearProtection();
+                        }
                         ExtractAllPlayersClientRpc();
                     }
                 }

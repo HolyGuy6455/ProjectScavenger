@@ -25,7 +25,9 @@ public class Char01_Ultimate : BaseUltimateSkill
     public override void OnClientExecute(SkillData data, bool isOwner)
     {
         // 부모의 시네마틱 연출(카메라) 코루틴 실행
+        int previousVersion = PresentationVersion;
         base.OnClientExecute(data, isOwner);
+        if (!IsPresentationPlaying || PresentationVersion == previousVersion) return;
 
         Debug.Log($"[Char01_Ultimate] (클라이언트) 궁극기 이펙트 발동! IsOwner: {isOwner}");
 
@@ -45,5 +47,10 @@ public class Char01_Ultimate : BaseUltimateSkill
         {
             ultimateEffect.Stop();
         }
+    }
+
+    protected override void OnUltimateCancelledClient()
+    {
+        if (ultimateEffect != null) ultimateEffect.Stop();
     }
 }

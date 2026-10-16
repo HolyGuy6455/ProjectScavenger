@@ -1,9 +1,10 @@
 using UnityEngine;
+using Unity.Netcode;
 
 
 
 [System.Serializable]
-public class CharacterState
+public class CharacterState : INetworkSerializable
 {
     public int charId;
     public SkillInstance[] normalSkills;
@@ -18,6 +19,31 @@ public class CharacterState
     public float maxThirst;
     
     public System.Collections.Generic.List<AmmoGroup> savedChamber = new System.Collections.Generic.List<AmmoGroup>();
+
+    public CharacterState() : this(new CharData()) { }
+
+    // Only authoritative survival values cross the network; skills and ammunition
+    // retain their existing local state when a server update arrives.
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref charId);
+        serializer.SerializeValue(ref currentHealth);
+        serializer.SerializeValue(ref maxHealth);
+        serializer.SerializeValue(ref currentHunger);
+        serializer.SerializeValue(ref maxHunger);
+        serializer.SerializeValue(ref currentThirst);
+        serializer.SerializeValue(ref maxThirst);
+    }
+
+    public void CopyVitalsFrom(CharacterState source)
+    {
+        currentHealth = source.currentHealth;
+        maxHealth = source.maxHealth;
+        currentHunger = source.currentHunger;
+        maxHunger = source.maxHunger;
+        currentThirst = source.currentThirst;
+        maxThirst = source.maxThirst;
+    }
 
     public CharacterState(CharData charData)
     {

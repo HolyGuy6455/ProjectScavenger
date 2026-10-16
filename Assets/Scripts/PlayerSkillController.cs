@@ -110,7 +110,8 @@ public class PlayerSkillController : NetworkBehaviour
                 }
             }
         }
-        return false;
+        // Keep aiming/fire blocked while the closing motion finishes after the last shell.
+        return cachedPlayerController != null && cachedPlayerController.IsReloadPoseActive();
     }
 
     /// <summary>Stops this player's pending skill effects; spent resources and cooldowns are retained.</summary>
@@ -131,12 +132,12 @@ public class PlayerSkillController : NetworkBehaviour
         }
     }
 
-    private static void CancelStateActions(CharacterState state)
+    private void CancelStateActions(CharacterState state)
     {
         if (state == null || state.normalSkills == null) return;
         foreach (var skill in state.normalSkills)
         {
-            skill?.CancelActiveAction();
+            skill?.CancelActiveAction(GetShooter());
         }
     }
 
@@ -229,10 +230,12 @@ public class PlayerSkillController : NetworkBehaviour
             {
                 if (skill == null || skill.skillId == 0) continue;
 
-                // UI가 숨겨져 PointerUp을 받지 못해도 누르고 있던 스킬을 정리합니다.
-                if (IsInputLocked && skill.isCharging)
+                // A full-body action replaces the reload pose, so do not commit its unfinished shell.
+                bool reloadInterrupted = skill.isContinuousRunning && skill.Data?.func == 6
+                    && (IsInputLocked || (cachedPlayerController != null && cachedPlayerController.IsRolling));
+                if ((IsInputLocked && skill.isCharging) || reloadInterrupted)
                 {
-                    skill.CancelActiveAction();
+                    skill.CancelActiveAction(GetShooter());
                 }
 
                 if (skill.isContinuousRunning)
@@ -340,6 +343,9 @@ public class PlayerSkillController : NetworkBehaviour
         SkillInstance skill = state.normalSkills[skillSlotIndex];
         if (skill == null || skill.skillId == 0) return;
 
+        // Different ammo skills share the same weapon and reload animation.
+        if ((skill.Data?.func == 5 || skill.Data?.func == 6) && IsReloading()) return;
+
         skill.Use(state, GetShooter());
     }
 
@@ -355,7 +361,7 @@ public class PlayerSkillController : NetworkBehaviour
 
         if (HasGameEnded || HasDied || IsInputLocked)
         {
-            skill.CancelActiveAction();
+            skill.CancelActiveAction(GetShooter());
             return;
         }
         skill.ReleaseUse(GetShooter());

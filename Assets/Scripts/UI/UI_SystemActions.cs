@@ -11,9 +11,10 @@ namespace Scavenger.UI
         /// </summary>
         public void ReturnToMainMenu()
         {
-            // GameFlowManager가 존재하고 게임이 아직 끝나지 않은 상태라면 게임 이탈 처리로 넘김
+            // 클리어 연출 대기 중인 경우도 매니저가 먼저 취소한 뒤 이탈하도록 넘깁니다.
             if (Scavenger.Manager.GameFlowManager.Instance != null && 
-                Scavenger.Manager.GameFlowManager.Instance.CurrentState == Scavenger.Manager.GameResultState.None)
+                (Scavenger.Manager.GameFlowManager.Instance.CurrentState == Scavenger.Manager.GameResultState.None ||
+                 Scavenger.Manager.GameFlowManager.Instance.CurrentState == Scavenger.Manager.GameResultState.Clear))
             {
                 Scavenger.Manager.GameFlowManager.Instance.OnGameExited();
                 return;

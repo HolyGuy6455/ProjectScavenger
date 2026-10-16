@@ -44,7 +44,7 @@ namespace Scavenger.Network
         {
             if (NetworkAuthManager.Instance == null || string.IsNullOrEmpty(NetworkAuthManager.Instance.AuthToken))
             {
-                Debug.LogWarning("[NetworkGameResultSender] 서버 인증 토큰이 없습니다. 결과를 송신하지 않습니다.");
+                Debug.LogError("[NetworkGameResultSender] 서버 인증 토큰이 없습니다. 결과를 송신하지 않습니다.", this);
                 yield break;
             }
 
@@ -87,7 +87,7 @@ namespace Scavenger.Network
 
                 yield return request.SendWebRequest();
 
-                if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+                if (request.result != UnityWebRequest.Result.Success)
                 {
                     Debug.LogError($"[NetworkGameResultSender] 결과 송신 실패: {request.error} / {request.downloadHandler.text}");
                 }
@@ -108,6 +108,10 @@ namespace Scavenger.Network
                                 }
                             }
                             OnGameResultReceived?.Invoke(response);
+                        }
+                        else
+                        {
+                            Debug.LogError("[NetworkGameResultSender] 결과 응답을 파싱했지만 데이터가 null입니다.", this);
                         }
                     }
                     catch (System.Exception e)

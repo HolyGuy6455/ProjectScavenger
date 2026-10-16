@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections;
-using Cinemachine;
+using Scavenger.Manager;
 
 public abstract class BaseUltimateSkill : MonoBehaviour
 {
@@ -12,10 +12,21 @@ public abstract class BaseUltimateSkill : MonoBehaviour
     [Tooltip("궁극기 사용 중 메인 UI를 잠시 숨길지 여부입니다.")]
     [SerializeField] protected bool hideUIDuringUltimate = true;
 
-    [Tooltip("궁극기 발동 시 재생할 애니메이션 상태 이름 (비워두면 재생하지 않음)")]
+    [Tooltip("궁극기 발동 시 재생할 필수 애니메이션 상태 이름")]
     [SerializeField] protected string ultimateAnimStateName = "Ultimate";
 
     protected SkillData currentData;
+    private Coroutine presentationRoutine;
+    private bool presentationPlaying;
+    private bool presentationIsOwner;
+    private CharacterAnimationPresenter animationPresenter;
+    private CharacterCinematicController cinematicController;
+    private int animationToken;
+    private int cinematicToken;
+
+    public bool IsPresentationPlaying => presentationPlaying;
+    public bool LastPresentationCompleted { get; private set; }
+    public int PresentationVersion { get; private set; }
 
     protected virtual void Awake()
     {
@@ -42,28 +53,54 @@ public abstract class BaseUltimateSkill : MonoBehaviour
     /// </summary>
     public virtual void OnClientExecute(SkillData data, bool isOwner)
     {
-        currentData = data;
-        
-        // 애니메이션 재생
-        Animator anim = GetComponentInChildren<Animator>();
-        if (anim != null && !string.IsNullOrEmpty(ultimateAnimStateName))
+        // A request already in transit must not start a new ultimate after the game ends.
+        if (GameFlowManager.Instance != null
+            && GameFlowManager.Instance.CurrentState != GameResultState.None) return;
+        if (presentationPlaying)
         {
-            // 궁극기 도중 상반신 레이어(UpperBody) 애니메이션 덮어쓰기 방지
-            if (anim.layerCount > 1)
-            {
-                anim.SetLayerWeight(1, 0f);
-            }
-            
-            anim.Play(ultimateAnimStateName, 0, 0f);
+            Debug.LogError($"[BaseUltimateSkill] {name}: 궁극기 실행 요청이 중복되었습니다. 현재 연출을 유지하고 새 요청을 무시합니다.", this);
+            return;
+        }
+        LastPresentationCompleted = false;
+        if (!isActiveAndEnabled)
+        {
+            Debug.LogError($"[BaseUltimateSkill] {name}: 비활성화된 캐릭터에 궁극기 실행을 요청했습니다.", this);
+            return;
+        }
+        animationPresenter = CharacterAnimationPresenter.GetOrCreate(gameObject);
+        if (animationPresenter == null || string.IsNullOrWhiteSpace(ultimateAnimStateName))
+        {
+            Debug.LogError($"[BaseUltimateSkill] {name}: 궁극기 연출을 시작할 수 없습니다. 캐릭터의 Animator와 궁극기 상태 이름('{ultimateAnimStateName}') 설정을 확인하세요.", this);
+            return;
         }
 
-        StartCoroutine(UltimateSequenceRoutine(isOwner));
+        unchecked { PresentationVersion++; }
+        int version = PresentationVersion;
+        currentData = data;
+        presentationPlaying = true;
+        presentationIsOwner = isOwner;
+        animationPresenter.PresentationDisabled += OnPresenterDisabled;
+        animationToken = animationPresenter.PlayFullBody(ultimateAnimStateName);
+        if (animationToken == 0)
+        {
+            FailPresentation($"궁극기 상태 '{ultimateAnimStateName}'를 재생하지 못했습니다. Animator Controller의 Base Layer 상태와 캐릭터 활성/사망 상태를 확인하세요.");
+            return;
+        }
+        cinematicController = GetComponent<CharacterCinematicController>();
+        cinematicToken = cinematicController != null
+            ? cinematicController.BeginCinematic(ultimateAnimStateName, isOwner)
+            : 0;
+
+        Coroutine routine = StartCoroutine(UltimateSequenceRoutine(isOwner));
+        if (presentationPlaying && PresentationVersion == version) presentationRoutine = routine;
+        else if (routine != null) StopCoroutine(routine);
     }
 
     protected virtual IEnumerator UltimateSequenceRoutine(bool isOwner)
     {
-        CharacterCinematicController cinematicCtrl = GetComponent<CharacterCinematicController>();
-        CinemachineVirtualCamera cinematicCamera = cinematicCtrl != null ? cinematicCtrl.CinematicCamera : null;
+        int version = PresentationVersion;
+        CharacterAnimationPresenter presenter = animationPresenter;
+        int playbackToken = animationToken;
 
         // 궁극기 연출 중 UI 숨김
         if (isOwner && hideUIDuringUltimate && MenuToggleController.Instance != null)
@@ -71,31 +108,33 @@ public abstract class BaseUltimateSkill : MonoBehaviour
             MenuToggleController.Instance.SetUIVisibility(false);
         }
 
-        // 궁극기를 쓴 본인 화면에서만 카메라 클로즈업 연출을 합니다.
-        if (isOwner && cinematicCamera != null)
-        {
-            cinematicCamera.Priority = 20;
-        }
-
-        Animator anim = GetComponentInChildren<Animator>();
         float waitTime = cinematicDuration;
 
         // cinematicDuration이 0 이하로 설정되어 있다면 애니메이션 길이 자동 계산
-        if (waitTime <= 0f && anim != null)
+        if (waitTime <= 0f)
         {
-            // Play() 직후 상태가 갱신될 때까지 한 프레임 대기
-            yield return null; 
-            
-            AnimatorStateInfo stateInfo = anim.GetCurrentAnimatorStateInfo(0);
-            if (stateInfo.IsName(ultimateAnimStateName))
+            if (presenter != null && playbackToken != 0)
             {
-                waitTime = stateInfo.length;
+                yield return presenter.WaitForDuration(playbackToken, duration => waitTime = duration);
+            }
+            else
+            {
+                yield return null;
+            }
+            if (!IsCurrentPresentation(version)) yield break;
+            if (!IsPlaybackAvailable())
+            {
+                FailPresentation("길이를 확인하는 동안 궁극기 애니메이션 재생이 중단되었습니다.");
+                yield break;
+            }
+            if (waitTime > 0f)
+            {
                 Debug.Log($"[BaseUltimateSkill] 궁극기 애니메이션({ultimateAnimStateName}) 자동 길이 계산: {waitTime}초");
             }
             else
             {
                 waitTime = 2.0f; // 상태를 찾지 못했을 때의 기본값
-                Debug.LogWarning($"[BaseUltimateSkill] 궁극기 상태를 찾을 수 없어 기본값(2.0초)을 사용합니다.");
+                Debug.LogError($"[BaseUltimateSkill] {name}: 궁극기 상태 '{ultimateAnimStateName}'의 재생 시간을 확인할 수 없어 임시값 2.0초를 사용합니다. 애니메이션 클립과 상태 설정을 확인하세요.", this);
             }
         }
         else
@@ -105,34 +144,100 @@ public abstract class BaseUltimateSkill : MonoBehaviour
             yield return null;
         }
 
-        // 3. 연출 시간 동안 대기
-        yield return new WaitForSeconds(waitTime);
-
-        // 4. 연출 종료 및 카메라 복귀 (우선순위를 다시 낮춤)
-        if (isOwner && cinematicCamera != null)
+        float elapsed = 0f;
+        while (elapsed < waitTime)
         {
-            cinematicCamera.Priority = 0;
+            if (!IsCurrentPresentation(version)) yield break;
+            if (!IsPlaybackAvailable())
+            {
+                FailPresentation("정상 완료 전에 궁극기 애니메이션 재생이 중단되었습니다.");
+                yield break;
+            }
+            yield return null;
+            elapsed += Time.deltaTime;
         }
 
-        // UI 복구
-        if (isOwner && hideUIDuringUltimate && MenuToggleController.Instance != null)
+        CompletePresentation(version);
+    }
+
+    private bool IsCurrentPresentation(int version)
+    {
+        return presentationPlaying && PresentationVersion == version;
+    }
+
+    private bool IsPlaybackAvailable()
+    {
+        return animationPresenter != null && animationPresenter.IsCurrentPlayback(animationToken);
+    }
+
+    private void FailPresentation(string reason)
+    {
+        Debug.LogError($"[BaseUltimateSkill] {name}: {reason}", this);
+        CancelPresentation();
+    }
+
+    private void OnPresenterDisabled(CharacterAnimationPresenter presenter)
+    {
+        if (presentationPlaying && presenter == animationPresenter) CancelPresentation();
+    }
+
+    private void CompletePresentation(int version)
+    {
+        if (!IsCurrentPresentation(version)) return;
+        if (!IsPlaybackAvailable())
+        {
+            FailPresentation("궁극기 완료 처리 시 애니메이션 재생 상태가 유효하지 않습니다.");
+            return;
+        }
+        if (animationPresenter != null) animationPresenter.FinishFullBody(animationToken, true);
+        if (!IsCurrentPresentation(version)) return;
+        if (cinematicController != null) cinematicController.EndCinematic(cinematicToken);
+        if (presentationIsOwner && hideUIDuringUltimate && MenuToggleController.Instance != null)
         {
             MenuToggleController.Instance.SetUIVisibility(true);
         }
 
-        // 애니메이션 복구 (위에서 선언한 anim 재사용)
-        if (anim != null)
-        {
-            // 상반신 레이어 가중치 원상복구
-            if (anim.layerCount > 1)
-            {
-                anim.SetLayerWeight(1, 1f);
-            }
-            // 멈춰있지 않고 원래의 걷기/대기 상태(Movement)로 돌아가도록 강제 이동
-            anim.Play("Movement", 0, 0f);
-        }
-
+        if (!IsCurrentPresentation(version)) return;
+        ClearPresentationState();
+        LastPresentationCompleted = true;
         OnUltimateEndClient();
+    }
+
+    private void ClearPresentationState()
+    {
+        if (animationPresenter != null) animationPresenter.PresentationDisabled -= OnPresenterDisabled;
+        presentationPlaying = false;
+        presentationRoutine = null;
+        presentationIsOwner = false;
+        animationPresenter = null;
+        cinematicController = null;
+        animationToken = 0;
+        cinematicToken = 0;
+    }
+
+    /// <summary>Ends presentation and effects without replacing a death or hit pose.</summary>
+    public void CancelPresentation()
+    {
+        unchecked { PresentationVersion++; }
+        LastPresentationCompleted = false;
+        if (!presentationPlaying) return;
+
+        Coroutine routine = presentationRoutine;
+        CharacterAnimationPresenter presenter = animationPresenter;
+        CharacterCinematicController cameraController = cinematicController;
+        int playbackToken = animationToken;
+        int cameraToken = cinematicToken;
+        bool wasOwner = presentationIsOwner;
+        ClearPresentationState();
+
+        if (routine != null) StopCoroutine(routine);
+        if (presenter != null) presenter.CancelFullBody(playbackToken);
+        if (cameraController != null) cameraController.EndCinematic(cameraToken);
+        if (wasOwner && hideUIDuringUltimate && MenuToggleController.Instance != null)
+        {
+            MenuToggleController.Instance.SetUIVisibility(true);
+        }
+        OnUltimateCancelledClient();
     }
 
     /// <summary>
@@ -141,18 +246,7 @@ public abstract class BaseUltimateSkill : MonoBehaviour
     /// </summary>
     protected virtual void OnDisable()
     {
-        CharacterCinematicController cinematicCtrl = GetComponent<CharacterCinematicController>();
-        if (cinematicCtrl != null && cinematicCtrl.CinematicCamera != null)
-        {
-            cinematicCtrl.CinematicCamera.Priority = 0;
-        }
-
-        // 도중에 꺼졌을 경우를 대비해 상반신 레이어 원상복구
-        Animator anim = GetComponentInChildren<Animator>();
-        if (anim != null && anim.layerCount > 1)
-        {
-            anim.SetLayerWeight(1, 1f);
-        }
+        CancelPresentation();
     }
 
     /// <summary>
@@ -166,5 +260,10 @@ public abstract class BaseUltimateSkill : MonoBehaviour
     protected virtual void OnUltimateEndClient()
     {
         // 기본적으로 아무것도 하지 않음. 필요한 자식 클래스에서 오버라이드.
+    }
+
+    /// <summary>Releases visual effects after interruption without reporting completion.</summary>
+    protected virtual void OnUltimateCancelledClient()
+    {
     }
 }
