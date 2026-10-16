@@ -159,6 +159,8 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
     private void Awake()
     {
+        if (shooter == null) shooter = GetComponent<Shooter>();
+        if (shooter != null) shooter.Target = BulletTarget.Enemy;
         _rb = GetComponent<Rigidbody>();
         _health = GetComponent<Health>();
         // Awake에서는 InputSystem을 미리 생성해둡니다.

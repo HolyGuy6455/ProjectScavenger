@@ -33,6 +33,7 @@ public class Shooter : NetworkBehaviour
     [Tooltip("총알이 생성될 위치 (지정하지 않으면 이 게임 오브젝트의 위치를 사용합니다)")]
     [SerializeField] private Transform firePoint;
     public Transform FirePoint => firePoint != null ? firePoint : transform;
+    public BulletTarget Target { get; set; } = BulletTarget.Enemy;
 
     [Header("Current Status (Debug)")]
     [SerializeField] private AmmoData currentAmmoData;
@@ -381,11 +382,11 @@ public class Shooter : NetworkBehaviour
 
             if (currentShotType == 2)
             {
-                newBullet.InitializeParabola(targetPosition, gameObject, shotData.ExplosionRadius, shotData);
+                newBullet.InitializeParabola(targetPosition, gameObject, shotData.ExplosionRadius, Target, shotData);
             }
             else
             {
-                newBullet.Initialize(direction, gameObject, shotData);
+                newBullet.Initialize(direction, gameObject, Target, shotData);
             }
         }
         else
@@ -406,11 +407,11 @@ public class Shooter : NetworkBehaviour
 
                 if (currentShotType == 2)
                 {
-                    newBullet.InitializeParabola(targetPosition, gameObject, shotData.ExplosionRadius, shotData);
+                    newBullet.InitializeParabola(targetPosition, gameObject, shotData.ExplosionRadius, Target, shotData);
                 }
                 else
                 {
-                    newBullet.Initialize(rotatedDir, gameObject, shotData);
+                    newBullet.Initialize(rotatedDir, gameObject, Target, shotData);
                 }
             }
         }
