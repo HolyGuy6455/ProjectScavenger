@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 1157677472319441215}
   - component: {fileID: 2468933159735407793}
   - component: {fileID: 3431112817465683280}
+  - component: {fileID: 8263270480612944749}
   m_Layer: 7
   m_Name: SecurityRobot
   m_TagString: Enemy
@@ -1011,6 +1012,18 @@ MonoBehaviour:
   sourceObjectKey: StimulusSource
   positionKey: StimulusPosition
   typeKey: StimulusType
+--- !u!114 &8263270480612944749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3352690993342107665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27372421bcbc08b49bf58afa221fe82e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::BuffController
 --- !u!1 &3988485360831649573
 GameObject:
   m_ObjectHideFlags: 0

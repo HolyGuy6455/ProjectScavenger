@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 8129919451694431373}
   - component: {fileID: 6806687160027039604}
   - component: {fileID: 9139889782215874437}
+  - component: {fileID: 8050706577575790102}
   m_Layer: 7
   m_Name: Animal_Rooster
   m_TagString: Enemy
@@ -548,6 +549,18 @@ MonoBehaviour:
   sourceObjectKey: Attacker
   positionKey: StimulusPosition
   typeKey: StimulusType
+--- !u!114 &8050706577575790102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27372421bcbc08b49bf58afa221fe82e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::BuffController
 --- !u!1001 &5297562618735421684
 PrefabInstance:
   m_ObjectHideFlags: 0

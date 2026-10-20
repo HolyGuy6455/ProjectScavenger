@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: -441924815081087731}
   - component: {fileID: -1046192047035558958}
   - component: {fileID: -2828825535598470214}
+  - component: {fileID: 5468889870335572250}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Enemy
@@ -568,6 +569,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e2d3c79cf9b0b44c8a4cb773395bb65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootDropper
+--- !u!114 &5468889870335572250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1226158920139408715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27372421bcbc08b49bf58afa221fe82e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::BuffController
 --- !u!1 &5709097323135882136
 GameObject:
   m_ObjectHideFlags: 0

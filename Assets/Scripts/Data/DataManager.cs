@@ -45,6 +45,7 @@ public class DataManager : MonoBehaviour
 
         // 어드레서블 주소(Address)는 에디터에서 세팅한 주소(보통 확장자가 빠진 이름)를 사용합니다.
         yield return StartCoroutine(LoadDataAsync<AmmoDataList, AmmoData>("Ammo", "AmmoData"));
+        yield return StartCoroutine(LoadDataAsync<BuffDataList, BuffData>("Buff", "BuffData"));
         yield return StartCoroutine(LoadDataAsync<ItemDataList, ItemData>("Item", "ItemData"));
         yield return StartCoroutine(LoadDataAsync<UserCurrencyDataList, UserCurrencyData>("UserCurrency", "UserCurrencyData"));
         yield return StartCoroutine(LoadDataAsync<CharDataList, CharData>("Char", "CharData"));
