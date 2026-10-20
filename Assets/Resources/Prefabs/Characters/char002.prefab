@@ -166,6 +166,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6100803676388955588}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &319171384212295143
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7926473809848307272}
+  m_Layer: 0
+  m_Name: RearRight
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7926473809848307272
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 319171384212295143}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.86602545, z: 0, w: 0.49999997}
+  m_LocalPosition: {x: 0.6928203, y: 0, z: -0.4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 988029262624272136}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &339784159553555048
 GameObject:
   m_ObjectHideFlags: 0
@@ -1548,6 +1579,37 @@ Transform:
   m_Children:
   - {fileID: 1951019415361916766}
   m_Father: {fileID: 11255625557115713}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2516378586947634043
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6412261942679226001}
+  m_Layer: 0
+  m_Name: Front
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6412261942679226001
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2516378586947634043}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.8}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 988029262624272136}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2557713941076363747
 GameObject:
@@ -3681,6 +3743,40 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &6633332244127007743
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 988029262624272136}
+  m_Layer: 0
+  m_Name: SandbagPlacementPoints
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &988029262624272136
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6633332244127007743}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7926473809848307272}
+  - {fileID: 6148488419817194760}
+  - {fileID: 6412261942679226001}
+  m_Father: {fileID: 6906998685106730274}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6683668462853238114
 GameObject:
   m_ObjectHideFlags: 0
@@ -4353,6 +4449,37 @@ Transform:
   m_Children:
   - {fileID: 11255625557115713}
   m_Father: {fileID: 6438139978775784959}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &7390859801427782740
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6148488419817194760}
+  m_Layer: 0
+  m_Name: RearLeft
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6148488419817194760
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7390859801427782740}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.8660254, z: 0, w: -0.50000006}
+  m_LocalPosition: {x: -0.6928203, y: 0, z: -0.4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 988029262624272136}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7498578545282790390
 GameObject:
@@ -5862,9 +5989,9 @@ GameObject:
   - component: {fileID: 4432339610615925614}
   - component: {fileID: 7129780556831869182}
   - component: {fileID: 1291582324034516297}
-  - component: {fileID: 2651882496639887819}
   - component: {fileID: 7145043144220197299}
   - component: {fileID: 5181464407353619846}
+  - component: {fileID: 2197032528172402982}
   m_Layer: 6
   m_Name: char002
   m_TagString: Untagged
@@ -5890,6 +6017,7 @@ Transform:
   - {fileID: 757830871131168482}
   - {fileID: 210633818932057185}
   - {fileID: 4176792712128079914}
+  - {fileID: 988029262624272136}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &4432339610615925614
@@ -5954,21 +6082,6 @@ MonoBehaviour:
   enableDamageAnimations: 1
   deathStateName: Death
   hitStateName: Armature|hit
---- !u!114 &2651882496639887819
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9209994513278423197}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 438a7266b49dbe44880f94e9b02a0010, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PresentationOnlyUltimateSkill
-  cinematicDuration: -1
-  hideUIDuringUltimate: 1
-  ultimateAnimStateName: Ultimate
 --- !u!114 &7145043144220197299
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6001,3 +6114,27 @@ MonoBehaviour:
   minePrefab: {fileID: 5712016815395557313, guid: 49b6544bf36e27145b3dcaa30506a773, type: 3}
   placementPoint: {fileID: 4176792712128079914}
   carriedMine: {fileID: 8389613594896259978}
+--- !u!114 &2197032528172402982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9209994513278423197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7eae2dd27c3bf784dbf7f667b748508c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Char002SandbagUltimate
+  cinematicDuration: -1
+  hideUIDuringUltimate: 1
+  ultimateAnimStateName: Ultimate
+  sandbagPrefab: {fileID: 2609036742284505667, guid: 367f6ed2cf4231c41aa6421018ee8f1f, type: 3}
+  placementPoints:
+  - {fileID: 7926473809848307272}
+  - {fileID: 6148488419817194760}
+  - {fileID: 6412261942679226001}
+  animatedSandbags:
+  - {fileID: 6583137323736362830}
+  - {fileID: 8994720766827408295}
+  - {fileID: 1357549443806399668}

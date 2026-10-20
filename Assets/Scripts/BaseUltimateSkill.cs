@@ -25,6 +25,7 @@ public abstract class BaseUltimateSkill : MonoBehaviour
     private int cinematicToken;
 
     public bool IsPresentationPlaying => presentationPlaying;
+    public SkillData CurrentData => currentData;
     public bool LastPresentationCompleted { get; private set; }
     public int PresentationVersion { get; private set; }
 
@@ -40,12 +41,13 @@ public abstract class BaseUltimateSkill : MonoBehaviour
     /// </summary>
     public void TriggerAnimationEvent(int eventId = 0)
     {
-        // PlayerSkillController에게 서버로의 호출(RPC)을 위임합니다.
-        if (PlayerSkillController.Instance != null)
-        {
-            PlayerSkillController.Instance.OnUltimateAnimationEvent(eventId);
-        }
+        // 원격 캐릭터의 이벤트도 자신의 플레이어에게 전달합니다. 소유자만 RPC를 보냅니다.
+        if (presentationPlaying)
+            GetComponentInParent<PlayerSkillController>()?.OnUltimateAnimationEvent(eventId);
     }
+
+    /// <summary>서버에서 이번 시전의 스킬 데이터를 보관하고 효과를 준비합니다.</summary>
+    public virtual void OnServerBegin(SkillData data) => currentData = data;
 
     /// <summary>
     /// 클라이언트(모든 플레이어 화면)에서 실행되는 연출용 로직입니다.

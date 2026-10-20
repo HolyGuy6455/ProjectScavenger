@@ -263,17 +263,24 @@ public class PlayerSkillController : NetworkBehaviour
     }
 
     [ServerRpc]
-    public void CmdUseUltimateServerRpc()
+    public void CmdUseUltimateServerRpc(int skillId)
     {
         if (HasGameEnded || HasDied || IsInputLocked) return;
-        // 서버(데디케이티드 서버)에는 UI가 없으므로 currentCharData나 CharacterStateManager가 
-        // 클라이언트와 동일하게 세팅되어 있지 않습니다.
-        // 클라이언트에서 쿨타임 검증을 마치고 보냈으므로, 여기서는 모든 클라이언트에게 연출을 지시합니다.
-        RpcPlayUltimateClientRpc();
+        var player = GetComponent<PlayerController>();
+        var ultimate = player != null ? player.GetActiveUltimateSkill() : null;
+        var data = DataManager.Instance != null ? DataManager.Instance.GetData<SkillData>("Skill", skillId) : null;
+        if (ultimate == null || data == null || data.func != 1
+            || data.charId != player.GetLocalDeck().GetCharId(player.ActiveSlotIndex))
+        {
+            Debug.LogError($"[PlayerSkillController] 활성 캐릭터의 궁극기 또는 SkillData {skillId} 설정이 올바르지 않습니다.", this);
+            return;
+        }
+        ultimate.OnServerBegin(data);
+        RpcPlayUltimateClientRpc(skillId);
     }
 
     [ClientRpc]
-    private void RpcPlayUltimateClientRpc()
+    private void RpcPlayUltimateClientRpc(int skillId)
     {
         if (HasGameEnded || HasDied || IsInputLocked) return;
         var playerController = GetComponent<PlayerController>();
@@ -284,12 +291,12 @@ public class PlayerSkillController : NetworkBehaviour
             Debug.LogError($"[PlayerSkillController] {name}: 궁극기 연출을 시작할 수 없습니다. PlayerController와 활성 캐릭터의 BaseUltimateSkill 설정을 확인하세요.", this);
             return;
         }
-        if (DataManager.Instance == null || currentCharData == null)
+        var data = DataManager.Instance != null ? DataManager.Instance.GetData<SkillData>("Skill", skillId) : null;
+        if (data == null)
         {
             Debug.LogError($"[PlayerSkillController] {name}: 궁극기 실행 시 캐릭터/스킬 데이터가 준비되지 않았습니다.", this);
             return;
         }
-        var data = DataManager.Instance.GetData<SkillData>("Skill", currentCharData.ultimateSkill);
         activeUlt.OnClientExecute(data, IsOwner);
     }
 
@@ -312,10 +319,9 @@ public class PlayerSkillController : NetworkBehaviour
         if (playerController != null)
         {
             BaseUltimateSkill activeUlt = playerController.GetActiveUltimateSkill();
-            if (activeUlt != null && currentCharData != null)
+            if (activeUlt != null && activeUlt.CurrentData != null)
             {
-                var data = DataManager.Instance.GetData<SkillData>("Skill", currentCharData.ultimateSkill);
-                activeUlt.OnServerExecute(data, eventId);
+                activeUlt.OnServerExecute(activeUlt.CurrentData, eventId);
             }
         }
     }

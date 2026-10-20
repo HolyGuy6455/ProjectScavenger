@@ -12,7 +12,7 @@ public class ObstacleController : NetworkBehaviour, ILootTableProvider
 
         // 자신의 프리팹 이름을 기반으로 DataManager에서 데이터를 검색합니다.
         // 유니티 인스턴스화 시 붙는 " (Clone)" 등을 제거합니다.
-        string cleanName = gameObject.name.Split(' ')[0];
+        string cleanName = gameObject.name.Replace("(Clone)", "").Trim().Split(' ')[0];
         
         var allObstacles = DataManager.Instance.GetAllData<ObstacleData>("Obstacle");
         foreach (var obs in allObstacles)

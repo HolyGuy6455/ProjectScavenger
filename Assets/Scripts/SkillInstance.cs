@@ -144,7 +144,7 @@ public class SkillInstance
             case 1: // 궁극기
                 if (PlayerSkillController.Instance != null)
                 {
-                    PlayerSkillController.Instance.CmdUseUltimateServerRpc();
+                    PlayerSkillController.Instance.CmdUseUltimateServerRpc(skillId);
                 }
                 break;
             case 3: // 구르기

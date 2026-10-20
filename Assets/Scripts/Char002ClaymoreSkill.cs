@@ -77,6 +77,7 @@ public sealed class Char002ClaymoreSkill : MonoBehaviour
         }
         // This root-relative point also works on a dedicated server that does not animate the hand.
         var mine = Instantiate(minePrefab, placementPoint.position, placementPoint.rotation);
+        mine.transform.localScale = Vector3.Scale(minePrefab.transform.localScale, placementPoint.lossyScale);
         mine.Spawn(true);
         mine.GetComponent<ClaymoreMine>().Arm(ammo);
         return mine;
