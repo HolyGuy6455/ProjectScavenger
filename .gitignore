@@ -33,6 +33,7 @@
 .Trashes
 ehthumbs.db
 Thumbs.db
+Thumbs.db.meta
 desktop.ini
 
 # Visual Studio / Rider cache
@@ -149,3 +150,18 @@ output/
 # Keep integration source and project settings; do not publish native libraries.
 /Assets/Plugins/FMOD/platforms/*/lib/
 /Assets/Plugins/FMOD/platforms/*/lib.meta
+
+# FMOD recreates its editor cache and log locally.
+/Assets/Plugins/FMOD/Cache/
+/Assets/Plugins/FMOD/Cache.meta
+/fmod_editor.log
+
+# Keep local recovery scenes and build-state snapshots out of source control.
+/Assets/_Recovery/
+/Assets/_Recovery.meta
+/Assets/AddressableAssetsData/Android/
+/Assets/AddressableAssetsData/Android.meta
+/Assets/AddressableAssetsData/Linux/
+/Assets/AddressableAssetsData/Linux.meta
+/Assets/AddressableAssetsData/Windows/
+/Assets/AddressableAssetsData/Windows.meta
