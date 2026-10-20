@@ -144,3 +144,8 @@ output/
 # These integration tests need local FMOD banks excluded above.
 /Assets/Tests/Audio/PlayMode/SoundOwnershipTests.cs
 /Assets/Tests/Audio/PlayMode/SoundOwnershipTests.cs.meta
+
+# FMOD engine libraries are installed locally from the official Unity package.
+# Keep integration source and project settings; do not publish native libraries.
+/Assets/Plugins/FMOD/platforms/*/lib/
+/Assets/Plugins/FMOD/platforms/*/lib.meta
