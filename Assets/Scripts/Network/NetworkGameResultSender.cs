@@ -56,10 +56,10 @@ namespace Scavenger.Network
                 KilledMonsters = new List<KilledMonsterDto>() // TODO: Replace with actual killed monsters list
             };
 
-            // 인벤토리 아이템 취합
-            if (PlayerInventory.Instance != null && PlayerInventory.Instance.Items != null)
+            // 모든 캐릭터의 인벤토리 아이템 취합
+            if (PlayerInventory.Instance != null)
             {
-                foreach (var item in PlayerInventory.Instance.Items)
+                foreach (var item in PlayerInventory.Instance.GetAllItems())
                 {
                     if (item != null && !item.IsEmpty)
                     {

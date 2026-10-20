@@ -14,6 +14,13 @@ public class PlayerInventory : NetworkBehaviour
 
     public InventoryItem[] Items => currentInventory?.Items;
 
+    public IEnumerable<InventoryItem> GetAllItems()
+    {
+        foreach (var inventory in charInventories.Values)
+            foreach (var item in inventory.Items)
+                yield return item;
+    }
+
     public event Action OnInventoryChanged;
     public event Action<int> OnSlotSelected;
 
