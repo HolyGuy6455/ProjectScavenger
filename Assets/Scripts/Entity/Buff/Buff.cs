@@ -12,12 +12,18 @@ public class Buff
 
     public Buff(BuffData data)
     {
+        Refresh(data);
+        this.lastTickTime = 0f;
+    }
+
+    /// <summary>남은 시간과 수치를 갱신하며, 진행 중인 틱 주기는 유지합니다.</summary>
+    public void Refresh(BuffData data)
+    {
         this.id = data.id;
         this.maxLifeTime = data.duration;
         this.lifeTime = data.duration;
         this.value = data.value;
         this.tickInterval = data.tickInterval;
-        this.lastTickTime = 0f;
     }
 
     /// <summary>

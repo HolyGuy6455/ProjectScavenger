@@ -575,9 +575,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 431937702807140913}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 438a7266b49dbe44880f94e9b02a0010, type: 3}
+  m_Script: {fileID: 11500000, guid: c9a6b8979d4c7f54fa900ef22a016210, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PresentationOnlyUltimateSkill
+  m_EditorClassIdentifier: Assembly-CSharp::Char03_Ultimate
   cinematicDuration: -1
   hideUIDuringUltimate: 1
   ultimateAnimStateName: Ultimate

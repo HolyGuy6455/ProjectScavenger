@@ -6,6 +6,8 @@ public class BuffController : NetworkBehaviour
 {
     // 스쿼드 4명 각각의 버프 리스트 (몬스터의 경우 0번 슬롯만 사용)
     private List<Buff>[] squadBuffs = new List<Buff>[4];
+    // 캐릭터를 교체해도 현재 활동 중인 캐릭터에게 적용되는 효과
+    private readonly List<Buff> sharedBuffs = new List<Buff>();
 
     private void Awake()
     {
@@ -17,35 +19,52 @@ public class BuffController : NetworkBehaviour
 
     private void Update()
     {
-        float dt = Time.deltaTime;
+        if (!IsServer) return;
 
-        // 4개의 슬롯(비활성된 캐릭터 포함)을 매 프레임 순회하며 버프 연산
+        float dt = Time.deltaTime;
+        PlayerController player = GetComponent<PlayerController>();
+        int activeSlot = player != null ? player.ActiveSlotIndex : 0;
+
         for (int i = 0; i < 4; i++)
         {
-            List<Buff> buffs = squadBuffs[i];
-            for (int j = buffs.Count - 1; j >= 0; j--)
-            {
-                Buff buff = buffs[j];
-                
-                // 수명 깎기 (duration이 0 이하면 무한 지속 패시브로 취급)
-                if (buff.maxLifeTime > 0f)
-                {
-                    buff.lifeTime -= dt;
-                    if (buff.lifeTime <= 0f)
-                    {
-                        buffs.RemoveAt(j);
-                        continue;
-                    }
-                }
+            UpdateBuffs(squadBuffs[i], dt, i == activeSlot);
+        }
+        UpdateBuffs(sharedBuffs, dt, true);
+    }
 
-                // 틱 연산 (예: 도트 힐, 독 데미지 등)
-                // 서버에서만 틱을 실행하여 중복 연산 및 비동기화 방지
-                if (IsServer)
-                {
-                    buff.OnTick(this.gameObject, dt);
-                }
+    private void UpdateBuffs(List<Buff> buffs, float dt, bool tickActive)
+    {
+        for (int i = buffs.Count - 1; i >= 0; i--)
+        {
+            Buff buff = buffs[i];
+            bool expires = buff.maxLifeTime > 0f;
+            float activeTime = expires ? Mathf.Min(dt, Mathf.Max(0f, buff.lifeTime)) : dt;
+
+            // 대기 캐릭터도 수명은 흐르지만 회복을 누적하지 않습니다.
+            // 만료 시점의 마지막 틱까지 처리한 뒤 제거합니다.
+            if (tickActive && activeTime > 0f) buff.OnTick(gameObject, activeTime);
+            if (expires)
+            {
+                buff.lifeTime -= dt;
+                if (buff.lifeTime <= 0f) buffs.RemoveAt(i);
             }
         }
+    }
+
+    /// <summary>플레이어 공용 버프를 부여합니다. 같은 효과는 중첩 없이 갱신합니다.</summary>
+    public void AddSharedBuff(BuffData data)
+    {
+        if (!IsServer || data == null) return;
+
+        Buff existing = sharedBuffs.Find(buff => buff.id == data.id);
+        if (existing != null)
+        {
+            existing.Refresh(data);
+            return;
+        }
+
+        Buff newBuff = BuffFactory.CreateBuff(data);
+        if (newBuff != null) sharedBuffs.Add(newBuff);
     }
 
     /// <summary>
@@ -83,6 +102,10 @@ public class BuffController : NetworkBehaviour
         {
             total += buff.GetAdditionalMoveSpeedMultiplier();
         }
+        foreach (var buff in sharedBuffs)
+        {
+            total += buff.GetAdditionalMoveSpeedMultiplier();
+        }
         return total;
     }
 
@@ -95,6 +118,10 @@ public class BuffController : NetworkBehaviour
 
         float total = 1f;
         foreach (var buff in squadBuffs[slotIndex])
+        {
+            total += buff.GetAdditionalHealMultiplier();
+        }
+        foreach (var buff in sharedBuffs)
         {
             total += buff.GetAdditionalHealMultiplier();
         }

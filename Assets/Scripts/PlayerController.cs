@@ -444,6 +444,9 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
                 {
                     _animator = _characterModels[i].GetComponentInChildren<Animator>();
                     BindAnimationPresenter(CharacterAnimationPresenter.GetOrCreate(_characterModels[i]));
+                    // 서버는 살아 있는 캐릭터로만 교대를 허용합니다. 부활 후 남은 사망 자세를 해제합니다.
+                    if (previousValue >= 0 && previousValue != newValue)
+                        _animationPresenter?.ResetDeathPresentation();
                     _animationPresenter?.SetMovement(_netAnimInput.Value);
                     if (_deathHandled) _animationPresenter?.PlayDeath();
                 }
@@ -571,6 +574,29 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         foreach (var state in states) GetCharacterState(state.charId)?.CopyVitalsFrom(state);
         _receivedStateSlot = activeSlot;
         RefreshLocalParty(); // Wait for both the slot and its stats, whichever arrives first.
+    }
+
+    /// <summary>서버에서 대기 캐릭터까지 회복합니다. 전투 불능 캐릭터는 지정 체력으로 부활합니다.</summary>
+    public void RestoreParty(float healthAmount, float hungerAmount, float thirstAmount, float revivedHealth)
+    {
+        if (!IsServer || !IsSpawned) return;
+        HandleCharacterHealthChanged(_health.CurrentHealth, _health.MaxHealth);
+        var buffs = GetComponent<BuffController>();
+        for (int slot = 0; slot < _characterStates.Length; slot++)
+        {
+            var state = _characterStates[slot];
+            if (state == null) continue;
+            float hp = state.currentHealth <= 0f
+                ? revivedHealth
+                : state.currentHealth + healthAmount * (buffs != null ? buffs.GetTotalHealMultiplier(slot) : 1f);
+            state.currentHealth = Mathf.Clamp(hp, 0f, state.maxHealth);
+            state.currentHunger = Mathf.Clamp(state.currentHunger + hungerAmount, 0f, state.maxHunger);
+            state.currentThirst = Mathf.Clamp(state.currentThirst + thirstAmount, 0f, state.maxThirst);
+        }
+        var active = _characterStates[ActiveSlotIndex];
+        _health.SetHealth(active.currentHealth, active.maxHealth);
+        RefreshLocalParty();
+        SendCharacterStates();
     }
 
     public void ModifyCharacterSurvivalStats(int charId, float hungerDelta, float thirstDelta)

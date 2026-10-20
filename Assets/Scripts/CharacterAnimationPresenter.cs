@@ -78,6 +78,7 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
 
     public void PlayShoot() => PlayUpperBody("Armature|shoot");
     public void PlayReload() => PlayUpperBody("Armature|reloading");
+    public bool PlayUpperBodySkill() => PlayUpperBody("Skill");
 
     public bool PlayReload(float duration, bool firstRound)
     {
@@ -178,11 +179,12 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
         || state.IsName("Armature|reloading") || state.IsName("ReloadStart")
         || state.IsName("ReloadLoop") || state.IsName("ReloadEnd");
 
-    private void PlayUpperBody(string stateName)
+    private bool PlayUpperBody(string stateName)
     {
-        if (!isActiveAndEnabled || IsDeathPresented || IsFullBodyPlaying || !HasState(1, stateName)) return;
+        if (!isActiveAndEnabled || IsDeathPresented || IsFullBodyPlaying || !HasState(1, stateName)) return false;
         // Each upper-body action returns to idle through its Animator exit-time transition.
         animator.Play(stateName, 1, 0f);
+        return true;
     }
 
     public int PlayFullBody(string stateName)
@@ -285,6 +287,13 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
     public void StopPlayback()
     {
         InvalidatePlayback();
+    }
+
+    public void ResetDeathPresentation()
+    {
+        if (!IsDeathPresented) return;
+        IsDeathPresented = false;
+        RestoreMovement();
     }
 
     private void InvalidatePlayback()

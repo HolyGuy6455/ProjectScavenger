@@ -158,6 +158,8 @@ public class CharacterState : INetworkSerializable
                 {
                     normalSkills[i] = charId == 2 && skillData.charId == 2 && skillData.func == 7
                         ? new Char002ClaymoreSkillInstance(skillId)
+                        : charId == 3 && skillData.charId == 3 && skillData.func == 4
+                        ? new Char003HealSkillInstance(skillId)
                         : new SkillInstance(skillId);
                 }
             }

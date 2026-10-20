@@ -63,6 +63,7 @@ public class Health : NetworkBehaviour, IDamageable
         // 체력 변경 시 UI 등 업데이트 트리거
         NetworkCurrentHealth.OnValueChanged += (oldValue, newValue) =>
         {
+            if (newValue > 0f) IsDead = false;
             OnHealthChanged?.Invoke(newValue, maxHealth);
             onHealthChangedUnityEvent?.Invoke(newValue, maxHealth);
         };
