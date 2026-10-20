@@ -8,23 +8,34 @@ namespace Scavenger.Network
     public class DedicatedServerBootstrapper : MonoBehaviour
     {
         private float _serverStartupTime;
+        private bool _isServerStarted = false;
         private bool _hasAnyClientConnected = false;
         private const float EMPTY_SERVER_TIMEOUT = 60f; // 60초 대기
+
+        public static bool IsDedicatedServer()
+        {
+            // 유니티 실행 인자에 -server 가 포함되어 있으면 서버로 간주
+            string[] args = System.Environment.GetCommandLineArgs();
+            return args.Contains("-server");
+        }
+
+        private void Awake()
+        {
+            if (IsDedicatedServer())
+            {
+                // Headless 환경에서 무제한 FPS로 인한 CPU 100% 점유 방지 (60 FPS 고정)
+                Application.targetFrameRate = 60;
+                DontDestroyOnLoad(gameObject);
+            }
+        }
 
         private void Start()
         {
             if (IsDedicatedServer())
             {
-                DontDestroyOnLoad(gameObject);
+                _serverStartupTime = Time.realtimeSinceStartup;
                 StartCoroutine(StartAsServerRoutine());
             }
-        }
-
-        private bool IsDedicatedServer()
-        {
-            // 유니티 실행 인자에 -server 가 포함되어 있으면 서버로 간주
-            string[] args = System.Environment.GetCommandLineArgs();
-            return args.Contains("-server");
         }
 
         private System.Collections.IEnumerator StartAsServerRoutine()
@@ -60,6 +71,8 @@ namespace Scavenger.Network
 
             if (NetworkManager.Singleton.StartServer())
             {
+                _isServerStarted = true;
+                _serverStartupTime = Time.realtimeSinceStartup;
                 Debug.Log("[NGO] 전용 서버 구동 성공. InGameScene으로 동기화합니다.");
                 
                 // NGO가 Addressable 씬(Stage002)을 클라이언트에게 동기화하려다 해시를 찾지 못해 터지는 것을 방지합니다.
@@ -70,7 +83,6 @@ namespace Scavenger.Network
                 };
                 
                 NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
-                _serverStartupTime = Time.realtimeSinceStartup;
 
                 NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += (sceneName, loadSceneMode, clientsCompleted, clientsTimedOut) =>
                 {
@@ -97,7 +109,8 @@ namespace Scavenger.Network
             }
             else
             {
-                Debug.LogError("[NGO] 서버 구동 실패.");
+                Debug.LogError("[NGO] 서버 구동 실패. 프로세스를 종료합니다.");
+                Application.Quit();
             }
         }
 
@@ -171,26 +184,35 @@ namespace Scavenger.Network
 
         private void Update()
         {
-            if (!IsDedicatedServer() || NetworkManager.Singleton == null || !NetworkManager.Singleton.IsServer) 
+            if (!IsDedicatedServer())
                 return;
 
+            // 1. 처음 구동 후 60초 동안 아무도 접속하지 않으면 자동 종료
             if (!_hasAnyClientConnected)
             {
-                // 1. 처음 구동 후 60초 동안 아무도 접속하지 않으면 자동 종료
                 if (Time.realtimeSinceStartup - _serverStartupTime > EMPTY_SERVER_TIMEOUT)
                 {
                     Debug.Log("[NGO] 60초 내에 접속한 클라이언트가 없어 데디케이티드 서버를 자동 종료합니다.");
                     Application.Quit();
+                    return;
                 }
             }
             else
             {
                 // 2. 한 명이라도 접속했었는데, 현재 접속자가 0명이 되면 자동 종료
-                if (NetworkManager.Singleton.ConnectedClientsIds.Count == 0)
+                if (NetworkManager.Singleton != null && NetworkManager.Singleton.ConnectedClientsIds.Count == 0)
                 {
                     Debug.Log("[NGO] 모든 클라이언트가 퇴장하여 데디케이티드 서버를 자동 종료합니다.");
                     Application.Quit();
+                    return;
                 }
+            }
+
+            // 3. 서버가 시작된 이후 NetworkManager가 비정상적으로 리스닝을 중단했거나 셧다운된 경우 자동 종료
+            if (_isServerStarted && (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening))
+            {
+                Debug.LogWarning("[NGO] NetworkManager 리스닝이 중단되어 데디케이티드 서버를 종료합니다.");
+                Application.Quit();
             }
         }
     }

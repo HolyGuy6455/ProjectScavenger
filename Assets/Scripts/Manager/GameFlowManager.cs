@@ -28,6 +28,7 @@ namespace Scavenger.Manager
         public event Action<int> OnAlivePlayersChanged;
 
         private int _lastAlivePlayersCount = -1;
+        private bool _hasHadAlivePlayers;
         private bool _gameEndedNotified;
         private bool _returnToMainMenuStarted;
         private bool _menuPresentationInterrupted;
@@ -79,12 +80,18 @@ namespace Scavenger.Manager
             if (isOffline || NetworkManager.Singleton.IsServer)
             {
                 int currentAlive = GetAlivePlayersCount();
+                if (currentAlive > 0)
+                {
+                    _hasHadAlivePlayers = true;
+                }
+
                 if (currentAlive != _lastAlivePlayersCount)
                 {
                     _lastAlivePlayersCount = currentAlive;
                     OnAlivePlayersChanged?.Invoke(currentAlive);
 
-                    if (currentAlive == 0 && CurrentState == GameResultState.None)
+                    // 최소 한 명 이상의 플레이어가 참여/생존한 적이 있을 때만 전멸(currentAlive == 0) 패배 처리
+                    if (_hasHadAlivePlayers && currentAlive == 0 && CurrentState == GameResultState.None)
                     {
                         OnGameFailed();
                     }
@@ -448,6 +455,15 @@ namespace Scavenger.Manager
             _returnToMainMenuStarted = true;
             CancelClearFlow();
             InterruptForMenuExit();
+
+            // 데디케이티드 서버 환경인 경우 UI가 없으므로 메뉴로 이동하지 않고 서버 프로세스를 정상 종료
+            if (Scavenger.Network.DedicatedServerBootstrapper.IsDedicatedServer())
+            {
+                Debug.Log("[GameFlowManager] 데디케이티드 서버 환경이므로 게임 종료 후 프로세스를 종료합니다.");
+                Application.Quit();
+                return;
+            }
+
             var uiSystem = FindObjectOfType<Scavenger.UI.UI_SystemActions>();
             if (uiSystem != null)
             {

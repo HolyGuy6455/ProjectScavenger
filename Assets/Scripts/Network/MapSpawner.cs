@@ -8,6 +8,12 @@ namespace Scavenger.Core
     {
         public static void SpawnMapObjects()
         {
+            if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
+            {
+                Debug.LogWarning("[MapSpawner] NetworkManager가 리스닝 중이 아니므로 맵 오브젝트 스폰을 건너뜁니다.");
+                return;
+            }
+
             var spawnPoints = Object.FindObjectsOfType<NetworkSpawnPoint>();
             int spawnedCount = 0;
 
