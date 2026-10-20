@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Scavenger.Audio;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -48,9 +49,11 @@ public class Bullet : NetworkBehaviour
     private Vector3 previousPos;
     private float explosionRadius;
     private int specialBuffId = 0;
+    private SoundKey impactSoundKey = SoundKey.None;
 
     public void Initialize(Vector3 direction, GameObject shooter, BulletTarget target, AmmoData ammoData = null)
     {
+        impactSoundKey = ammoData != null ? ammoData.impactSoundKey : SoundKey.None;
         if (ammoData != null)
         {
             this.damage = ammoData.damage;
@@ -73,6 +76,7 @@ public class Bullet : NetworkBehaviour
     /// </summary>
     public void InitializeParabola(Vector3 targetPos, GameObject shooter, float expRadius, BulletTarget target, AmmoData ammoData = null)
     {
+        impactSoundKey = ammoData != null ? ammoData.impactSoundKey : SoundKey.None;
         if (ammoData != null)
         {
             this.damage = ammoData.damage;
@@ -192,7 +196,7 @@ public class Bullet : NetworkBehaviour
         if (despawnOnHit) isInitialized = false;
 
         // 클라이언트들에게 피격/폭발 이펙트 재생 명령
-        SpawnHitEffectClientRpc(hitPoint, hitNormal, isParabola);
+        SpawnHitEffectClientRpc(hitPoint, hitNormal, isParabola, impactSoundKey);
 
         if (isParabola)
         {
@@ -234,8 +238,11 @@ public class Bullet : NetworkBehaviour
     }
 
     [ClientRpc]
-    private void SpawnHitEffectClientRpc(Vector3 position, Vector3 normal, bool explosion)
+    private void SpawnHitEffectClientRpc(Vector3 position, Vector3 normal, bool explosion, SoundKey soundKey)
     {
+        if (soundKey != SoundKey.None)
+            SoundManager.PlayAt(soundKey, position);
+
         GameObject prefab = explosion ? explosionEffectPrefab : hitEffectPrefab;
         if (prefab != null)
         {

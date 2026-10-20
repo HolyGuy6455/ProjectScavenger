@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Scavenger.Audio;
 using Scavenger.Network;
 
 namespace Scavenger.UI
@@ -10,7 +11,10 @@ namespace Scavenger.UI
         [SerializeField] private TextMeshProUGUI statusText;
         [SerializeField] private Button startButton;
 
-        private void Start()
+        private bool loginSucceeded;
+        private bool soundInitializationFinished;
+
+        private async void Start()
         {
             statusText.text = "Login...";
             startButton.interactable = false;
@@ -31,10 +35,31 @@ namespace Scavenger.UI
                     NetworkAuthManager.Instance.OnLoginComplete += HandleLoginComplete;
                 }
             }
+
+            // 임시 초기화 진입점. 추후 앱 부트스트랩으로 옮깁니다.
+            // 로그인 이벤트를 먼저 구독하여 사운드를 기다리는 동안의 로그인 완료도 받습니다.
+            try
+            {
+                if (SoundManager.IsAudioEnabled)
+                    await SoundManager.InitializeAsync();
+                // 초기화 실패는 SoundManager가 기록하며, 로그인 자체는 무음으로 계속 진행합니다.
+            }
+            catch (System.Exception exception)
+            {
+                Debug.LogException(exception);
+            }
+
+            if (this == null)
+                return;
+
+            soundInitializationFinished = true;
+            RefreshStartState();
         }
 
         private void OnDestroy()
         {
+            if (startButton != null)
+                startButton.onClick.RemoveListener(OnClickStart);
             if (NetworkAuthManager.Instance != null)
             {
                 NetworkAuthManager.Instance.OnLoginComplete -= HandleLoginComplete;
@@ -43,19 +68,24 @@ namespace Scavenger.UI
 
         private void HandleLoginComplete(bool success)
         {
-            if (success)
-            {
-                statusText.text = "Touch to Start";
-                startButton.interactable = true;
-            }
-            else
-            {
+            loginSucceeded = success;
+            if (!success)
                 statusText.text = "Login Failed";
-            }
+
+            RefreshStartState();
+        }
+
+        private void RefreshStartState()
+        {
+            startButton.interactable = loginSucceeded && soundInitializationFinished;
+            if (loginSucceeded)
+                statusText.text = soundInitializationFinished ? "Touch to Start" : "Loading...";
         }
 
         private void OnClickStart()
         {
+            if (!loginSucceeded || !soundInitializationFinished)
+                return;
             if (OutGameUIManager.Instance != null)
             {
                 OutGameUIManager.Instance.ShowPanel(OutGamePanelType.MainLobby);

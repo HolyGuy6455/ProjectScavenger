@@ -1086,22 +1086,22 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 188242162792850693, guid: 77f7700d3a0133245a0558a495727dca, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 188242162792850693, guid: 77f7700d3a0133245a0558a495727dca, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 8900551704149049726}
-    - target: {fileID: 188242162792850693, guid: 77f7700d3a0133245a0558a495727dca, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 188242162792850693, guid: 77f7700d3a0133245a0558a495727dca, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 8900551704149049726}
+    - target: {fileID: 188242162792850693, guid: 77f7700d3a0133245a0558a495727dca, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 188242162792850693, guid: 77f7700d3a0133245a0558a495727dca, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
       value: OnClickShortcut
       objectReference: {fileID: 0}
     - target: {fileID: 188242162792850693, guid: 77f7700d3a0133245a0558a495727dca, type: 3}
-      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
       value: Scavenger.UI.ItemInfoShortcutNode, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 4536370756532410736, guid: 77f7700d3a0133245a0558a495727dca, type: 3}

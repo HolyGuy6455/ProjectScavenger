@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
+using Scavenger.Audio;
 using Scavenger.Network.DTOs;
 
 public class DataConverterEditor : EditorWindow
@@ -566,8 +567,7 @@ public class DataConverterEditor : EditorWindow
                         }
                         else if (field.FieldType.IsEnum)
                         {
-                            if (val == "_") field.SetValue(obj, System.Enum.ToObject(field.FieldType, 0));
-                            else field.SetValue(obj, System.Enum.ToObject(field.FieldType, int.Parse(val)));
+                            field.SetValue(obj, ParseEnumValue(field.FieldType, val));
                         }
                         else if (field.FieldType == typeof(int[]))
                         {
@@ -592,6 +592,10 @@ public class DataConverterEditor : EditorWindow
                     }
                     catch (System.Exception e)
                     {
+                        // A typo must not silently replace an existing sound with None in exported data.
+                        if (field.FieldType == typeof(SoundKey))
+                            throw new System.FormatException($"Invalid SoundKey '{val}' in {typeof(T).Name}, row {i + 1}, column '{header}'. Conversion aborted before writing files.", e);
+
                         Debug.LogWarning($"Failed to parse field {header} with value {val} in class {typeof(T).Name}. Error: {e.Message}");
                     }
                 }
@@ -630,7 +634,7 @@ public class DataConverterEditor : EditorWindow
                                         }
                                         else if (elementType.IsEnum)
                                         {
-                                            parsedValue = val == "_" ? System.Enum.ToObject(elementType, 0) : System.Enum.ToObject(elementType, int.Parse(val));
+                                            parsedValue = ParseEnumValue(elementType, val);
                                         }
 
                                         if (parsedValue != null)
@@ -640,6 +644,9 @@ public class DataConverterEditor : EditorWindow
                                     }
                                     catch (System.Exception e)
                                     {
+                                        if (elementType == typeof(SoundKey))
+                                            throw new System.FormatException($"Invalid SoundKey '{val}' in {typeof(T).Name}, row {i + 1}, column '{header}'. Conversion aborted before writing files.", e);
+
                                         Debug.LogWarning($"Failed to parse array element {header} with value {val} in class {typeof(T).Name}. Error: {e.Message}");
                                     }
                                 }
@@ -657,5 +664,18 @@ public class DataConverterEditor : EditorWindow
             list.Add(obj);
         }
         return list;
+    }
+
+    private static object ParseEnumValue(System.Type enumType, string value)
+    {
+        object parsed = value == "_"
+            ? System.Enum.ToObject(enumType, 0)
+            : System.Enum.Parse(enumType, value);
+
+        // Sound keys are individual registered IDs; other enums retain legacy numeric/flags support.
+        if (enumType == typeof(SoundKey) && (value.Contains(",") || !System.Enum.IsDefined(enumType, parsed)))
+            throw new System.FormatException($"'{value}' is not a registered SoundKey.");
+
+        return parsed;
     }
 }

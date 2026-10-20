@@ -461,6 +461,7 @@ GameObject:
   - component: {fileID: 2473554304300133679}
   - component: {fileID: 3022407176686957905}
   - component: {fileID: 7624344499275816750}
+  - component: {fileID: 8465281904700000003}
   m_Layer: 6
   m_Name: char003
   m_TagString: Untagged
@@ -5364,3 +5365,16 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &8465281904700000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 431937702807140913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dee53988429a4294806bc44329f4eee4, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterFootstepSound
+  soundKey: 4

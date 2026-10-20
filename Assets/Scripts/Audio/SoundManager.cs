@@ -26,7 +26,8 @@ namespace Scavenger.Audio
     [AddComponentMenu("")]
     public sealed class SoundManager : MonoBehaviour
     {
-        private static readonly string[] RequiredBanks = { "Master.strings", "Master", "SFX", "Music" };
+        // Music is optional; public distributions omit the licensed BGM bank.
+        private static readonly string[] RequiredBanks = { "Master.strings", "Master", "SFX" };
         private static SoundManager current;
         private static bool quitting;
         private static bool dedicatedServer;
@@ -44,6 +45,8 @@ namespace Scavenger.Audio
         private bool initializationFailed;
         private bool shuttingDown;
         private SoundListenerRig listenerRig;
+        private SoundKey musicKey;
+        private SoundHandle music;
 
         public static bool IsAudioEnabled => Application.isPlaying && !quitting && !dedicatedServer;
 
@@ -66,7 +69,7 @@ namespace Scavenger.Audio
             current = null;
             quitting = false;
             sceneTransition = false;
-#if UNITY_SERVER
+#if UNITY_SERVER && !UNITY_EDITOR
             dedicatedServer = true;
 #else
             dedicatedServer = Array.Exists(System.Environment.GetCommandLineArgs(),
@@ -209,12 +212,56 @@ namespace Scavenger.Audio
             return StartLoop(key, true, emitter.position, emitter, SoundLifetime.Scene);
         }
 
+        /// <summary>Plays one music loop owned by the active scene. Repeated requests keep its position.</summary>
+        public static bool PlayMusic(SoundKey key) => PlayMusic(key, SceneManager.GetActiveScene());
+
+        /// <summary>
+        /// Plays one 2D music loop until the supplied scene unloads. Capture that scene before awaiting
+        /// initialization; loading an additive scene must not change which scene owns the music.
+        /// Invalid requests leave the previous music playing.
+        /// </summary>
+        public static bool PlayMusic(SoundKey key, Scene ownerScene)
+        {
+            if (!ownerScene.IsValid() || !ownerScene.isLoaded)
+                return false;
+            SoundManager manager = GetManager();
+            if (manager == null)
+                return false;
+            if (manager.musicKey == key && manager.music != null && manager.music.IsPlaying)
+                return true;
+
+            SoundHandle next = StartLoop(key, false, default, null, SoundLifetime.Scene, ownerScene.handle);
+            if (!next.IsValid)
+                return false;
+
+            manager.music?.Stop();
+            manager.musicKey = key;
+            manager.music = next;
+            return true;
+        }
+
+        /// <summary>Stops the current music, allowing its authored fade-out by default.</summary>
+        public static void StopMusic(bool immediately = false)
+        {
+            if (current == null)
+                return;
+            current.music?.Stop(immediately);
+            current.ClearMusic();
+        }
+
+        private void ClearMusic()
+        {
+            musicKey = SoundKey.None;
+            music = null;
+        }
+
         public static void StopAllLoops(bool immediately = false)
         {
             if (current == null)
                 return;
             foreach (SoundHandle handle in current.loops)
                 handle.Stop(immediately);
+            current.ClearMusic();
         }
 
         /// <summary>Sets a bus volume in the range 0–1. Saving settings is the caller's responsibility.</summary>
@@ -321,6 +368,9 @@ namespace Scavenger.Audio
                 return false;
             if (!EnsureInitialized())
                 return false;
+            // Keep UI and gameplay audio available when the optional BGM is not distributed.
+            if (key == SoundKey.LobbyMusic && !RuntimeManager.HasBankLoaded("Music"))
+                return false;
             if (!events.TryGetValue(key, out EventReference reference))
             {
                 WarnOnce($"Unknown sound key: {key}.");
@@ -377,7 +427,7 @@ namespace Scavenger.Audio
         }
 
         private static SoundHandle StartLoop(SoundKey key, bool spatial, Vector3 position,
-            Transform emitter, SoundLifetime lifetime)
+            Transform emitter, SoundLifetime lifetime, int? ownerSceneHandle = null)
         {
             if (lifetime != SoundLifetime.Scene && lifetime != SoundLifetime.Persistent)
                 return SoundHandle.Invalid;
@@ -389,7 +439,8 @@ namespace Scavenger.Audio
                 instance.release();
                 return SoundHandle.Invalid;
             }
-            int sceneHandle = emitter != null ? emitter.gameObject.scene.handle : SceneManager.GetActiveScene().handle;
+            int sceneHandle = emitter != null ? emitter.gameObject.scene.handle
+                : ownerSceneHandle ?? SceneManager.GetActiveScene().handle;
             var handle = new SoundHandle(manager, instance, lifetime, sceneHandle, emitter, spatial);
             manager.loops.Add(handle);
             return handle;
@@ -404,7 +455,11 @@ namespace Scavenger.Audio
             for (int i = loops.Count - 1; i >= 0; i--)
             {
                 if (!loops[i].Tick())
+                {
+                    if (ReferenceEquals(loops[i], music))
+                        ClearMusic();
                     loops.RemoveAt(i);
+                }
             }
             for (int i = spatialOneShots.Count - 1; i >= 0; i--)
             {
@@ -418,6 +473,8 @@ namespace Scavenger.Audio
 
         private void OnSceneUnloaded(Scene scene)
         {
+            if (music != null && music.BelongsToScene(scene.handle))
+                ClearMusic();
             foreach (SoundHandle handle in loops)
             {
                 if (handle.BelongsToScene(scene.handle))
@@ -473,6 +530,7 @@ namespace Scavenger.Audio
             foreach (SoundHandle handle in loops)
                 handle.Stop(true);
             loops.Clear();
+            ClearMusic();
             // Releasing a pending handle also releases its asset when the asynchronous load completes.
             ReleaseCatalogLoad();
             // Never resurrect FMOD while Unity is tearing objects down.

@@ -381,6 +381,7 @@ GameObject:
   - component: {fileID: 8074990354925623494}
   - component: {fileID: 5112677141361432654}
   - component: {fileID: 7472392216336142386}
+  - component: {fileID: 8465281904700000001}
   m_Layer: 6
   m_Name: char001
   m_TagString: Untagged
@@ -7254,3 +7255,16 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2864179589793607519}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8465281904700000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 431937702807140913}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dee53988429a4294806bc44329f4eee4, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterFootstepSound
+  soundKey: 4

@@ -1,4 +1,5 @@
 using System;
+using Scavenger.Audio;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -415,6 +416,18 @@ public class Shooter : NetworkBehaviour
                 }
             }
         }
+
+        // A shot can create several pellets, but its firing sound is emitted only once.
+        // Use the consumed ammo and copy the position before a mine can despawn itself.
+        if (shotData.fireSoundKey != SoundKey.None)
+            PlayFireSoundClientRpc(shotData.fireSoundKey, spawnPosition);
+    }
+
+    [ClientRpc(Delivery = RpcDelivery.Reliable)]
+    private void PlayFireSoundClientRpc(SoundKey key, Vector3 position)
+    {
+        // The host also hears this through the RPC; other clients must not be filtered by IsOwner.
+        SoundManager.PlayAt(key, position);
     }
 
     /// <summary>

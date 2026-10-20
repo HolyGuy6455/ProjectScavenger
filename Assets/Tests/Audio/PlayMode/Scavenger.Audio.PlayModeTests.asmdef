@@ -1,0 +1,7 @@
+{
+    "name": "Scavenger.Audio.PlayModeTests",
+    "rootNamespace": "Scavenger.Audio.Tests",
+    "references": ["Scavenger.Audio", "FMODUnity", "Unity.Addressables", "Unity.ResourceManager"],
+    "optionalUnityReferences": ["TestAssemblies"],
+    "autoReferenced": false
+}

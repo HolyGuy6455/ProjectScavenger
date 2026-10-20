@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Scavenger.Audio;
 
 [System.Serializable]
 public class AmmoData : IData
@@ -17,6 +18,8 @@ public class AmmoData : IData
     public float spreadRecoveryRate = 1f;
     public int maxAmmo;
     public int specialBuff;
+    public SoundKey fireSoundKey = SoundKey.None;
+    public SoundKey impactSoundKey = SoundKey.None;
 
     public int GetId()
     {

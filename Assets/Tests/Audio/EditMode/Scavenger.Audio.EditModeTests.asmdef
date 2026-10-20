@@ -1,0 +1,8 @@
+{
+    "name": "Scavenger.Audio.EditModeTests",
+    "rootNamespace": "Scavenger.Audio.Tests",
+    "references": ["Scavenger.Audio", "FMODUnity", "Unity.Addressables.Editor"],
+    "includePlatforms": ["Editor"],
+    "optionalUnityReferences": ["TestAssemblies"],
+    "autoReferenced": false
+}

@@ -68,3 +68,79 @@ pastLog/
 
 # 출력 결과물 폴더
 output/
+
+# Audio sources and generated FMOD banks stay out of the public repository.
+# Match mixed-case extensions on both Windows and Linux.
+*.[wW][aA][vV]
+*.[wW][aA][vV].meta
+*.[wW][aA][vV][eE]
+*.[wW][aA][vV][eE].meta
+*.[oO][gG][gG]
+*.[oO][gG][gG].meta
+*.[oO][gG][aA]
+*.[oO][gG][aA].meta
+*.[mM][pP][33]
+*.[mM][pP][33].meta
+*.[mM][pP][22]
+*.[mM][pP][22].meta
+*.[fF][lL][aA][cC]
+*.[fF][lL][aA][cC].meta
+*.[aA][iI][fF]
+*.[aA][iI][fF].meta
+*.[aA][iI][fF][fF]
+*.[aA][iI][fF][fF].meta
+*.[aA][aA][cC]
+*.[aA][aA][cC].meta
+*.[mM][44][aA]
+*.[mM][44][aA].meta
+*.[oO][pP][uU][sS]
+*.[oO][pP][uU][sS].meta
+*.[wW][mM][aA]
+*.[wW][mM][aA].meta
+*.[mM][iI][dD]
+*.[mM][iI][dD].meta
+*.[mM][iI][dD][iI]
+*.[mM][iI][dD][iI].meta
+
+# FMOD banks, sample banks, and encoded Studio cache.
+*.[bB][aA][nN][kK]
+*.[bB][aA][nN][kK].meta
+*.[fF][sS][bB]
+*.[fF][sS][bB].meta
+*.[fF][oO][bB][jJ]
+*.[fF][oO][bB][jJ].meta
+*.[bB][aA][nN][kK].[bB][yY][tT][eE][sS]
+*.[bB][aA][nN][kK].[bB][yY][tT][eE][sS].meta
+
+# FMOD AssetBundle import output. Keep game-data *.bytes files elsewhere.
+/Assets/FMODBanks/
+/Assets/FMODBanks.meta
+
+# Generated Addressables output may embed audio or banks.
+/Assets/StreamingAssets/aa/
+/Assets/StreamingAssets/aa.meta
+/ServerData/
+
+# Unity-chan assets are excluded from the public repository.
+/Assets/Resources/SD Unity-chan 3D Model Data_v3.0a.unitypackage
+/Assets/Resources/SD Unity-chan 3D Model Data_v3.0a.unitypackage.meta
+/Assets/UnityChan/
+/Assets/UnityChan.meta
+
+# Local validation, character import/setup tools, and preview scenes.
+/Assets/Editor/*Validation.cs
+/Assets/Editor/*Validation.cs.meta
+/Assets/Editor/Char*Migration.cs
+/Assets/Editor/Char*Migration.cs.meta
+/Assets/Editor/Char*Setup.cs
+/Assets/Editor/Char*Setup.cs.meta
+/Assets/Editor/Char*UnityPreview.cs
+/Assets/Editor/Char*UnityPreview.cs.meta
+/Assets/Editor/CharacterExpressionProfileImporter.cs
+/Assets/Editor/CharacterExpressionProfileImporter.cs.meta
+/Assets/Scenes/CharacterPreviews/
+/Assets/Scenes/CharacterPreviews.meta
+
+# These integration tests need local FMOD banks excluded above.
+/Assets/Tests/Audio/PlayMode/SoundOwnershipTests.cs
+/Assets/Tests/Audio/PlayMode/SoundOwnershipTests.cs.meta

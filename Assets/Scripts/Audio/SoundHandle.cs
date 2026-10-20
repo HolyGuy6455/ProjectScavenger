@@ -46,9 +46,10 @@ namespace Scavenger.Audio
         public bool IsValid => manager != null && manager.OwnsLiveHandles
             && RuntimeManager.IsInitialized && instance.isValid();
 
-        public bool IsPlaying => IsValid
+        /// <summary>False once playback stops or begins fading out; the handle still owns a fading instance.</summary>
+        public bool IsPlaying => !stopping && IsValid
             && instance.getPlaybackState(out PLAYBACK_STATE state) == FMOD.RESULT.OK
-            && state != PLAYBACK_STATE.STOPPED;
+            && state != PLAYBACK_STATE.STOPPED && state != PLAYBACK_STATE.STOPPING;
 
         /// <summary>Allows the event's authored fade-out by default.</summary>
         public void Stop(bool immediately = false)

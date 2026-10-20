@@ -5992,6 +5992,7 @@ GameObject:
   - component: {fileID: 7145043144220197299}
   - component: {fileID: 5181464407353619846}
   - component: {fileID: 2197032528172402982}
+  - component: {fileID: 8465281904700000002}
   m_Layer: 6
   m_Name: char002
   m_TagString: Untagged
@@ -6138,3 +6139,16 @@ MonoBehaviour:
   - {fileID: 6583137323736362830}
   - {fileID: 8994720766827408295}
   - {fileID: 1357549443806399668}
+--- !u!114 &8465281904700000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9209994513278423197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dee53988429a4294806bc44329f4eee4, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterFootstepSound
+  soundKey: 4

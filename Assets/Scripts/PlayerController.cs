@@ -46,7 +46,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     public bool IsWaitingForDeathAnimation { get; private set; }
     public event System.Action PresentationInterrupted;
     private int _presentationInterruptionVersion;
-    public bool IsRolling => _isRolling;
+    public bool IsRolling => _isRolling || _netIsRolling.Value;
     private readonly HashSet<UnityEngine.Object> _cinematicInputLocks = new HashSet<UnityEngine.Object>();
     public bool HasCleared => _health != null && _health.IsClearProtected;
     public bool IsInputLocked => _deathHandled || HasCleared || _isCinematicPlaying || _cinematicInputLocks.Count > 0
@@ -59,6 +59,9 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
     // 네트워크 동기화를 위한 변수 (오너가 쓰고 모두가 읽음)
     private NetworkVariable<Vector2> _netAnimInput = new NetworkVariable<Vector2>(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    // Remote clients also suppress walking sounds while the owner is rolling.
+    private NetworkVariable<bool> _netIsRolling = new NetworkVariable<bool>(false,
+        NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     
     // 캐릭터 동적 교체를 위한 변수
     private NetworkVariable<int> _activeSlotIndex = new NetworkVariable<int>(0);
@@ -249,7 +252,13 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         if (_rollRoutine != null) StopCoroutine(_rollRoutine);
         _rollRoutine = null;
         if (_isRolling && _health != null) _health.IsInvincible = false;
-        _isRolling = false;
+        SetRolling(false);
+    }
+
+    private void SetRolling(bool rolling)
+    {
+        _isRolling = rolling;
+        if (IsSpawned && IsOwner) _netIsRolling.Value = rolling;
     }
 
     private CharacterAnimationPresenter GetAnimationPresenter()
@@ -289,6 +298,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        if (IsOwner) SetRolling(false);
         _deathHandled = false;
         IsWaitingForDeathAnimation = false;
         _cinematicInputLocks.Clear();
@@ -1029,7 +1039,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         int interruptionVersion = _presentationInterruptionVersion;
         var rollPresenter = GetAnimationPresenter();
         int rollPlayback = rollPresenter != null ? rollPresenter.PlayRoll(duration) : 0;
-        _isRolling = true;
+        SetRolling(true);
         if (_health != null) _health.IsInvincible = true;
 
         Vector2 combinedInput = _keyboardInput + _joystickInput;
@@ -1079,7 +1089,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
             rollPresenter.FinishFullBody(rollPlayback, true);
 
         if (_health != null) _health.IsInvincible = false;
-        _isRolling = false;
+        SetRolling(false);
         _rollRoutine = null;
     }
 
