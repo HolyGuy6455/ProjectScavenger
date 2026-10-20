@@ -22,7 +22,7 @@ namespace Scavenger.Editor
         [MenuItem("Build/1. Build Windows Client")]
         public static void BuildWindowsClient()
         {
-            string buildPath = "Builds/Windows/ScavengerClient.exe";
+            string buildPath = "Builds/Windows/ProjectScavenger.exe";
             EnsureDirectoryExists(buildPath);
 
             EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
@@ -45,7 +45,7 @@ namespace Scavenger.Editor
         [MenuItem("Build/2. Build Android Client")]
         public static void BuildAndroidClient()
         {
-            string buildPath = "Builds/Android/ScavengerClient.apk";
+            string buildPath = "Builds/Android/ProjectScavenger.apk";
             EnsureDirectoryExists(buildPath);
 
             EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android);
@@ -114,7 +114,7 @@ namespace Scavenger.Editor
         {
             UnityEngine.Debug.Log("[AutoBuilder] WSL을 통해 AWS 서버 배포를 시작합니다. 팝업되는 콘솔 창을 확인해주세요.");
             
-            // Unity 프로젝트의 최상위 폴더 (ClaudePractice)
+            // Unity 프로젝트의 최상위 폴더
             string projectRoot = Path.GetDirectoryName(UnityEngine.Application.dataPath);
             
             // Windows에서 wsl 명령어 실행
