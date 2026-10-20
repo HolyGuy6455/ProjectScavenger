@@ -1,18 +1,27 @@
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 멧돼지 전용 돌진 스킬 컴포넌트입니다.
+/// 목표 방향을 고정하고 준비, 돌진, 후딜 순서로 실행하는 멧돼지 스킬입니다.
 /// </summary>
 [RequireComponent(typeof(EntityMovement))]
 public class BoarChargeSkill : EnemySkill
 {
-    // 스킬 고유 ID 하드코딩
+    public enum ChargePhase { Idle, Preparing, Charging, Recovering }
+
     public override string SkillId => "Charge";
+    public ChargePhase CurrentPhase { get; private set; }
 
     [Header("Charge Settings")]
+    [Min(0f)] public float preparationTime = 1f;
     public float chargeSpeed = 8f;
-    public float maxChargeTime = 1.5f;
+    [Min(0f)] public float maxChargeTime = 1.5f;
+    [Min(0f)] public float recoveryTime = 1.5f;
+
+    [Header("Animations")]
+    [SerializeField] private string prepareStateName = "Base Layer.Boar_ChargePrepare";
+    [SerializeField] private string chargeStateName = "Base Layer.Boar_Charge";
+    [SerializeField] private string recoverStateName = "Base Layer.Boar_ChargeRecover";
     
     [Header("Attack Settings")]
     public float attackDamage = 15f;
@@ -21,94 +30,176 @@ public class BoarChargeSkill : EnemySkill
     public LayerMask targetLayer = ~0;
 
     private EntityMovement _movement;
-    private Animator _animator;
-    private Coroutine _chargeCoroutine;
+    private Rigidbody _body;
+    private Health _health;
+    private EnemyAnimator _enemyAnimator;
+    private Vector3 _chargeDirection;
+    private float _phaseEndTime;
+    private bool _movementWasEnabled;
+    private bool _syncMovementAndFacingWasEnabled;
+    private readonly HashSet<Health> _hitTargets = new HashSet<Health>();
 
     private void Awake()
     {
         _movement = GetComponent<EntityMovement>();
-        _animator = GetComponentInChildren<Animator>();
+        _body = GetComponent<Rigidbody>();
+        _health = GetComponent<Health>();
+        _enemyAnimator = GetComponent<EnemyAnimator>();
     }
 
     public override void ExecuteSkill(GameObject targetObj, Vector3 targetPos)
     {
-        if (IsExecuting) return;
+        if (IsExecuting || !isActiveAndEnabled || !CanExecute()) return;
+        if (_movement == null || !_movement.enabled) return;
+
+        // 준비 중 플레이어가 움직여도 시전 시점의 방향은 바꾸지 않습니다.
+        _chargeDirection = targetPos - transform.position;
+        _chargeDirection.y = 0f;
+        if (_chargeDirection.sqrMagnitude < 0.01f)
+        {
+            _chargeDirection = transform.forward;
+            _chargeDirection.y = 0f;
+        }
+        _chargeDirection = _chargeDirection.sqrMagnitude > 0.001f
+            ? _chargeDirection.normalized : Vector3.forward;
 
         IsExecuting = true;
-        
-        // 1. 전달받은 목표 좌표(targetPos)를 향해 돌진 방향을 계산합니다.
-        Vector3 dir = (targetPos - transform.position);
-        dir.y = 0; // 평면 이동
-        
-        // 좌표가 세팅되지 않았거나 현재 위치와 똑같다면 그냥 앞을 보고 뜁니다.
-        if (dir.sqrMagnitude < 0.01f)
-        {
-            dir = transform.forward;
-        }
-        else
-        {
-            dir.Normalize();
-        }
-
-        // 2. 애니메이션 실행 (스킬 전용 오버라이드)
-        if (_animator != null)
-        {
-            _animator.Play("Attack", 0, 0f);
-        }
-
-        // 3. 코루틴으로 일정 시간 동안 직진 이동
-        if (_chargeCoroutine != null) StopCoroutine(_chargeCoroutine);
-        _chargeCoroutine = StartCoroutine(ChargeRoutine(dir));
+        _hitTargets.Clear();
+        _movementWasEnabled = _movement.enabled;
+        _syncMovementAndFacingWasEnabled = _movement.SyncMovementAndFacing;
+        StopMovement();
+        _movement.enabled = false;
+        _body.rotation = Quaternion.LookRotation(_chargeDirection);
+        SetPhase(ChargePhase.Preparing, preparationTime);
     }
 
-    private IEnumerator ChargeRoutine(Vector3 direction)
+    private bool CanExecute()
     {
-        float timer = 0f;
+        return _health != null && _health.IsSpawned && _health.IsServer && !_health.IsDead;
+    }
 
-        // 돌진 시작 전 즉시 방향 회전 (선택적)
-        if (direction.sqrMagnitude > 0.001f)
+    private void Update()
+    {
+        if (!IsExecuting) return;
+        if (!CanExecute())
         {
-            transform.rotation = Quaternion.LookRotation(direction);
+            CancelSkill();
+            return;
         }
+        if (Time.time < _phaseEndTime) return;
 
-        while (timer < maxChargeTime)
+        switch (CurrentPhase)
         {
-            // Update 주기에 맞춰서 이동 호출 (EntityMovement 내부는 FixedUpdate로 동작)
-            _movement.MoveInDirection(direction, chargeSpeed);
-            
-            timer += Time.deltaTime;
-            yield return null;
+            case ChargePhase.Preparing:
+                if (maxChargeTime <= 0f)
+                {
+                    BeginRecovery();
+                    break;
+                }
+                _movement.SyncMovementAndFacing = true;
+                _movement.enabled = true;
+                _movement.MoveInDirection(_chargeDirection, chargeSpeed);
+                SetPhase(ChargePhase.Charging, maxChargeTime);
+                PerformMeleeAttack();
+                break;
+            case ChargePhase.Charging:
+                // 마지막 물리 이동 위치도 검사한 후 공격 판정을 닫습니다.
+                PerformMeleeAttack();
+                BeginRecovery();
+                break;
+            case ChargePhase.Recovering:
+                CancelSkill();
+                break;
         }
+    }
 
-        // 돌진 완료
-        _movement.Stop();
+    private void FixedUpdate()
+    {
+        if (CurrentPhase != ChargePhase.Charging) return;
+        if (!CanExecute())
+        {
+            CancelSkill();
+            return;
+        }
+        PerformMeleeAttack();
+    }
+
+    private void SetPhase(ChargePhase phase, float duration)
+    {
+        CurrentPhase = phase;
+        _phaseEndTime = Time.time + Mathf.Max(0f, duration);
+
+        string stateName = phase switch
+        {
+            ChargePhase.Preparing => prepareStateName,
+            ChargePhase.Charging => chargeStateName,
+            ChargePhase.Recovering => recoverStateName,
+            _ => null
+        };
+        if (_enemyAnimator != null && !string.IsNullOrEmpty(stateName))
+            _enemyAnimator.PlaySkillAnimation(stateName);
+    }
+
+    private void BeginRecovery()
+    {
+        StopMovement();
+        _movement.enabled = false;
+        SetPhase(ChargePhase.Recovering, recoveryTime);
+    }
+
+    public void CancelSkill()
+    {
+        if (!IsExecuting) return;
+
+        StopMovement();
+        _movement.SyncMovementAndFacing = _syncMovementAndFacingWasEnabled;
+        _movement.enabled = _movementWasEnabled;
+        _hitTargets.Clear();
+        CurrentPhase = ChargePhase.Idle;
         IsExecuting = false;
+        if (_enemyAnimator != null) _enemyAnimator.EndSkillAnimation();
+    }
+
+    private void StopMovement()
+    {
+        if (_movement == null) return;
+
+        // Despawn 직후에는 NetworkRigidbody가 이미 kinematic으로 바뀔 수 있습니다.
+        // 이 경우 속도를 쓰지 않고 남아 있는 방향 이동 명령만 0으로 만듭니다.
+        if (_body != null && _body.isKinematic)
+            _movement.MoveInDirection(Vector3.zero, 0f);
+        else
+            _movement.Stop();
+    }
+
+    private void OnDisable()
+    {
+        CancelSkill();
     }
 
     /// <summary>
-    /// Run 애니메이션 클립의 Animation Event에서 호출됩니다.
-    /// 돌진 중 애니메이션 타이밍에 맞춰 물리 타격을 줍니다.
+    /// 돌진 중 물리 주기마다 호출합니다. 나중에 애니메이션 이벤트가 연결되어도
+    /// 같은 돌진에서는 플레이어 한 명당 한 번만 피해를 줍니다.
     /// </summary>
     public void PerformMeleeAttack()
     {
-        if (!IsExecuting) return; // 돌진 중이 아닐 때는 무시
+        if (!IsExecuting || CurrentPhase != ChargePhase.Charging || !CanExecute()) return;
 
-        Vector3 sphereCenter = transform.position + transform.rotation * attackOffset;
-        Collider[] hitColliders = Physics.OverlapSphere(sphereCenter, attackRadius, targetLayer);
+        Vector3 sphereCenter = _body.position + _body.rotation * attackOffset;
+        Collider[] hitColliders = Physics.OverlapSphere(
+            sphereCenter, attackRadius, targetLayer, QueryTriggerInteraction.Ignore);
 
         foreach (var hitCollider in hitColliders)
         {
-            if (hitCollider.gameObject == this.gameObject) continue;
+            Health targetHealth = hitCollider.GetComponentInParent<Health>();
+            if (targetHealth == null || targetHealth == _health || targetHealth.IsDead) continue;
+            if (!targetHealth.CompareTag("Player")
+                && targetHealth.GetComponentInParent<PlayerController>() == null) continue;
+            if (!_hitTargets.Add(targetHealth)) continue;
 
-            IDamageable damageable = hitCollider.GetComponent<IDamageable>();
-            if (damageable != null)
-            {
-                Vector3 hitPoint = hitCollider.bounds.center;
-                Vector3 hitNormal = (hitPoint - sphereCenter).normalized;
-
-                DamageInfo damageInfo = new DamageInfo(attackDamage, this.gameObject, hitPoint, hitNormal);
-                damageable.TakeDamage(damageInfo);
-            }
+            Vector3 hitPoint = hitCollider.ClosestPoint(sphereCenter);
+            Vector3 hitNormal = (hitPoint - sphereCenter).normalized;
+            targetHealth.TakeDamage(new DamageInfo(attackDamage, gameObject, hitPoint, hitNormal));
         }
     }
 
