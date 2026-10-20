@@ -100,7 +100,8 @@ namespace Scavenger.Manager
                 if (PlayerController.LocalInstance != null)
                 {
                     var health = PlayerController.LocalInstance.GetComponent<Health>();
-                    return (health != null && !health.IsDead) ? 1 : 0;
+                    return (health != null && (!health.IsDead
+                        || PlayerController.LocalInstance.IsWaitingForDeathAnimation)) ? 1 : 0;
                 }
                 return 1;
             }
@@ -111,7 +112,8 @@ namespace Scavenger.Manager
                 if (client.PlayerObject != null)
                 {
                     var health = client.PlayerObject.GetComponent<Health>();
-                    if (health != null && !health.IsDead) count++;
+                    var player = client.PlayerObject.GetComponent<PlayerController>();
+                    if (health != null && (!health.IsDead || (player != null && player.IsWaitingForDeathAnimation))) count++;
                 }
             }
             return count;

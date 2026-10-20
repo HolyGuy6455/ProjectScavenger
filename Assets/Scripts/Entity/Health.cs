@@ -202,8 +202,6 @@ public class Health : NetworkBehaviour, IDamageable
     /// </summary>
     private void Die(DamageInfo damageInfo)
     {
-        var player = GetComponent<PlayerController>();
-        if (player != null && player.TrySwitchToLivingCharacter()) return;
         IsDead = true;
 
         OnDeath?.Invoke(damageInfo);
