@@ -1,0 +1,183 @@
+ProjectScavenger - Font licenses and attribution
+
+이 문서는 저장소에 포함된 원본 폰트와 그 폰트로 생성한 TextMesh Pro SDF 에셋의
+출처 및 라이선스를 안내합니다. 아래 라이선스는 해당 폰트에 적용됩니다.
+각 폰트의 저작권 고지와 OFL 1.1 전문을 함께 보관하고 재배포해 주세요.
+폰트 파일의 원래 저작권 메타데이터도 아래에 함께 기록했습니다.
+
+확인일: 2026-10-20
+
+Bricolage Grotesque
+----------------------------------------------------------------
+라이선스: SIL Open Font License 1.1
+라이선스 파일: bricolagegrotesque-OFL.txt
+공식 출처: https://github.com/ateliertriay/bricolage
+라이선스 출처: https://raw.githubusercontent.com/google/fonts/main/ofl/bricolagegrotesque/OFL.txt
+포함된 원본 폰트:
+  Assets/Figma/Fonts/BricolageGrotesque-VariableFont_opsz,wdth,wght.ttf
+원본 폰트에 포함된 저작권 고지:
+  Copyright 2022 The Bricolage Grotesque Project Authors (https://github.com/ateliertriay/bricolage)
+
+Caveat
+----------------------------------------------------------------
+라이선스: SIL Open Font License 1.1
+라이선스 파일: caveat-OFL.txt
+공식 출처: https://github.com/googlefonts/caveat
+라이선스 출처: https://raw.githubusercontent.com/google/fonts/main/ofl/caveat/OFL.txt
+포함된 원본 폰트:
+  Assets/Figma/Fonts/Caveat_700.ttf
+원본 폰트에 포함된 저작권 고지:
+  Copyright 2014 The Caveat Project Authors (https://github.com/googlefonts/caveat)
+
+Inter
+----------------------------------------------------------------
+라이선스: SIL Open Font License 1.1
+라이선스 파일: inter-OFL.txt
+공식 출처: https://github.com/rsms/inter
+라이선스 출처: https://raw.githubusercontent.com/google/fonts/main/ofl/inter/OFL.txt
+포함된 원본 폰트:
+  Assets/Figma/Fonts/Inter_400.ttf
+  Assets/Figma/Fonts/Inter_500.ttf
+  Assets/Figma/Fonts/Inter_600.ttf
+  Assets/Figma/Fonts/Inter_700.ttf
+  Assets/Figma/Fonts/Inter_800.ttf
+  Assets/Figma/Fonts/Inter_900.ttf
+원본 폰트에 포함된 저작권 고지:
+  Copyright 2020 The Inter Project Authors (https://github.com/rsms/inter)
+
+Manrope
+----------------------------------------------------------------
+라이선스: SIL Open Font License 1.1
+라이선스 파일: manrope-OFL.txt
+공식 출처: https://github.com/sharanda/manrope
+라이선스 출처: https://raw.githubusercontent.com/google/fonts/main/ofl/manrope/OFL.txt
+포함된 원본 폰트:
+  Assets/Figma/Fonts/Manrope_500.ttf
+  Assets/Figma/Fonts/Manrope_600.ttf
+  Assets/Figma/Fonts/Manrope_700.ttf
+원본 폰트에 포함된 저작권 고지:
+  Copyright 2019 The Manrope Project Authors (https://github.com/sharanda/manrope)
+
+Noto Sans KR
+----------------------------------------------------------------
+라이선스: SIL Open Font License 1.1
+라이선스 파일: notosanskr-OFL.txt
+공식 출처: https://github.com/notofonts/noto-cjk
+라이선스 출처: https://raw.githubusercontent.com/google/fonts/main/ofl/notosanskr/OFL.txt
+포함된 원본 폰트:
+  Assets/Figma/Fonts/Noto Sans KR_400.ttf
+  Assets/Figma/Fonts/Noto Sans KR_500.ttf
+  Assets/Figma/Fonts/Noto Sans KR_700.ttf
+  Assets/Figma/Fonts/Noto Sans KR_900.ttf
+  Assets/TextMesh Pro/Fonts/NotoSansKR-ExtraBold.ttf
+원본 폰트에 포함된 저작권 고지:
+  (c) 2014-2021 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'.
+  © 2014-2020 Adobe (http://www.adobe.com/).
+
+Noto Serif KR
+----------------------------------------------------------------
+라이선스: SIL Open Font License 1.1
+라이선스 파일: notoserifkr-OFL.txt
+공식 출처: https://github.com/notofonts/noto-cjk
+라이선스 출처: https://raw.githubusercontent.com/notofonts/noto-cjk/main/Serif/LICENSE
+포함된 원본 폰트:
+  Assets/Figma/Fonts/Noto Serif KR_400.ttf
+  Assets/Figma/Fonts/Noto Serif KR_700.ttf
+원본 폰트에 포함된 저작권 고지:
+  Copyright © 2017 Adobe Systems Incorporated (http://www.adobe.com/).
+
+Sora
+----------------------------------------------------------------
+라이선스: SIL Open Font License 1.1
+라이선스 파일: sora-OFL.txt
+공식 출처: https://github.com/sora-xor/sora-font
+라이선스 출처: https://raw.githubusercontent.com/google/fonts/main/ofl/sora/OFL.txt
+포함된 원본 폰트:
+  Assets/Figma/Fonts/Sora_400.ttf
+  Assets/Figma/Fonts/Sora_600.ttf
+  Assets/Figma/Fonts/Sora_700.ttf
+  Assets/Figma/Fonts/Sora_800.ttf
+원본 폰트에 포함된 저작권 고지:
+  Copyright 2019 The Sora Project Authors (https://github.com/sora-xor/sora-font)
+
+학교안심 가을소풍 / Hakgyoansim Gaeulsopung
+----------------------------------------------------------------
+라이선스: SIL Open Font License 1.1
+라이선스 파일: keris-hakgyoansim-OFL.txt
+공식 출처: https://copyright.keris.or.kr/wft/fntDwnldView?fntGrpId=GFT202301120000000000007
+라이선스 출처: KERIS 공식 서체 안내의 OFL 고지와 포함된 폰트의 저작권 메타데이터.
+  OFL 1.1 원문: https://openfontlicense.org/open-font-license-official-text/
+포함된 원본 폰트:
+  Assets/TextMesh Pro/Fonts/HakgyoansimGaeulsopungB.otf
+  Assets/TextMesh Pro/Fonts/HakgyoansimGaeulsopungL.otf
+원본 폰트에 포함된 저작권 고지:
+  Copyright © KERIS. All rights reserved.
+
+학교안심 소나기 / Hakgyoansim Sonagi
+----------------------------------------------------------------
+라이선스: SIL Open Font License 1.1
+라이선스 파일: keris-hakgyoansim-OFL.txt
+공식 출처: https://copyright.keris.or.kr/wft/fntDwnldView?fntGrpId=GFT202312110000000000008
+라이선스 출처: KERIS 공식 서체 안내의 OFL 고지와 포함된 폰트의 저작권 메타데이터.
+  OFL 1.1 원문: https://openfontlicense.org/open-font-license-official-text/
+포함된 원본 폰트:
+  Assets/TextMesh Pro/Fonts/HakgyoansimSonagiOTFR.otf
+원본 폰트에 포함된 저작권 고지:
+  Copyright © KERIS. All rights reserved.
+
+Liberation Sans
+----------------------------------------------------------------
+라이선스: SIL Open Font License 1.1
+라이선스 파일: liberationsans-OFL.txt
+공식 출처: https://github.com/liberationfonts/liberation-fonts
+라이선스 출처: 프로젝트에 포함된 원본 라이선스: Assets/TextMesh Pro/Fonts/LiberationSans - OFL.txt
+포함된 원본 폰트:
+  Assets/TextMesh Pro/Fonts/LiberationSans.ttf
+원본 폰트에 포함된 저작권 고지:
+  Digitized data copyright (c) 2010 Google Corporation.
+  Copyright (c) 2012 Red Hat, Inc.
+
+마루 부리 / MaruBuri
+----------------------------------------------------------------
+라이선스: SIL Open Font License 1.1
+라이선스 파일: naver-maruburi-OFL.txt
+공식 출처: https://hangeul.naver.com/maruproject_11
+라이선스 출처: https://help.naver.com/service/11029/contents/18088?lang=ko&osType=PC
+  위 공식 안내의 저작권·Reserved Font Name 고지와 OFL 1.1 영문 원문.
+포함된 원본 폰트:
+  Assets/TextMesh Pro/Fonts/MaruBuri-Bold.otf
+  Assets/TextMesh Pro/Fonts/MaruBuri-ExtraLight.otf
+  Assets/TextMesh Pro/Fonts/MaruBuri-Light.otf
+  Assets/TextMesh Pro/Fonts/MaruBuri-Regular.otf
+  Assets/TextMesh Pro/Fonts/MaruBuri-SemiBold.otf
+원본 폰트에 포함된 저작권 고지:
+  © NAVER Corp. © NAVER Cultural Foundation Corp.
+
+나눔고딕 / Nanum Gothic
+----------------------------------------------------------------
+라이선스: SIL Open Font License 1.1
+라이선스 파일: nanumgothic-OFL.txt
+공식 출처: https://hangeul.naver.com/
+라이선스 출처: https://raw.githubusercontent.com/google/fonts/main/ofl/nanumgothic/OFL.txt
+포함된 원본 폰트:
+  Assets/TextMesh Pro/Fonts/NanumGothic.otf
+  Assets/TextMesh Pro/Fonts/NanumGothic.ttf
+  Assets/TextMesh Pro/Fonts/NanumGothicBold.otf
+  Assets/TextMesh Pro/Fonts/NanumGothicBold.ttf
+  Assets/TextMesh Pro/Fonts/NanumGothicExtraBold.otf
+  Assets/TextMesh Pro/Fonts/NanumGothicExtraBold.ttf
+  Assets/TextMesh Pro/Fonts/NanumGothicLight.otf
+  Assets/TextMesh Pro/Fonts/NanumGothicLight.ttf
+원본 폰트에 포함된 저작권 고지:
+  Copyright © 2011 NHN Corporation. All rights reserved. Font designed by Sandoll Communications Inc.
+
+페이퍼로지 / Paperlogy
+----------------------------------------------------------------
+라이선스: SIL Open Font License 1.1
+라이선스 파일: paperlogy-OFL.txt
+공식 출처: https://freesentation.blog/paperlogyfont
+라이선스 출처: https://www.designptn.com/wp-content/uploads/2024/08/OFL-license.txt
+포함된 원본 폰트:
+  Assets/TextMesh Pro/Fonts/Paperlogy-8ExtraBold.ttf
+원본 폰트에 포함된 저작권 고지:
+  Copyright © 2024 PT&
