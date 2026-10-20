@@ -185,10 +185,11 @@ namespace Scavenger.UI
             
             // 싱글플레이어는 외부 접속을 허용할 필요가 없으므로 로컬 루프백(127.0.0.1)으로 포트를 바인딩합니다.
             // 안드로이드 등에서 불명확한 IP로 Bind()가 실패하는 현상(Address unreachable)을 방지합니다.
+            // 포트 0으로 OS가 빈 포트를 배정하게 하여 다른 세션과의 포트 충돌을 피합니다.
             var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
             if (transport != null)
             {
-                transport.SetConnectionData("127.0.0.1", 7777, "127.0.0.1");
+                transport.SetConnectionData("127.0.0.1", 0, "127.0.0.1");
             }
 
             // 싱글플레이어는 자신이 호스트(서버+클라이언트)가 됩니다.
