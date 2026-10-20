@@ -80,6 +80,27 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
     public void PlayReload() => PlayUpperBody("Armature|reloading");
     public bool PlayUpperBodySkill() => PlayUpperBody("Skill");
 
+    public bool PlayUpperBodyAim() => PlayUpperBody("ThrowAim");
+
+    public bool PlayUpperBodySkill(float duration, float normalizedStart = 0f)
+    {
+        if (!isActiveAndEnabled || IsDeathPresented || IsFullBodyPlaying || !HasState(1, "Skill")) return false;
+        var clip = Array.Find(animator.runtimeAnimatorController.animationClips,
+            item => item.name.EndsWith("_upperbody_skill", StringComparison.Ordinal));
+        if (clip == null || !IsPositiveFinite(duration) || normalizedStart < 0f || normalizedStart >= 1f
+            || !HasParameter("UpperSkillSpeed", AnimatorControllerParameterType.Float)) return false;
+        animator.SetFloat("UpperSkillSpeed", clip.length * (1f - normalizedStart) / duration);
+        animator.Play("Skill", 1, normalizedStart);
+        return true;
+    }
+
+    public void CancelUpperBodySkill()
+    {
+        if (animator == null) return;
+        if (HasParameter("UpperSkillSpeed", AnimatorControllerParameterType.Float)) animator.SetFloat("UpperSkillSpeed", 1f);
+        if (!IsDeathPresented && !IsFullBodyPlaying) PlayUpperBody("Armature|idle");
+    }
+
     public bool PlayReload(float duration, bool firstRound)
     {
         if (!isActiveAndEnabled || IsDeathPresented || IsFullBodyPlaying || animator == null) return false;
@@ -165,6 +186,8 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
     public void PlayHit(bool gameplayReloadInProgress)
     {
         if (!enableDamageAnimations || gameplayReloadInProgress || IsReloadPoseActive()) return;
+        if (GetComponent<Char004ThrowAnimation>()?.IsPlaying == true
+            || GetComponentInParent<SkillAimController>()?.IsPrepared == true) return;
         PlayUpperBody(hitStateName);
     }
 

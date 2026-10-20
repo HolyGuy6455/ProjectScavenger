@@ -224,7 +224,8 @@ GameObject:
   - component: {fileID: 6955971973943230523}
   - component: {fileID: 2188030028687183891}
   - component: {fileID: 2449235653304136323}
-  - component: {fileID: 4422445420768831866}
+  - component: {fileID: 1000715293840938480}
+  - component: {fileID: 4082435947556090557}
   m_Layer: 6
   m_Name: char004
   m_TagString: Untagged
@@ -329,7 +330,7 @@ MonoBehaviour:
   enableDamageAnimations: 1
   deathStateName: Death
   hitStateName: Armature|hit
---- !u!114 &4422445420768831866
+--- !u!114 &1000715293840938480
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -338,12 +339,55 @@ MonoBehaviour:
   m_GameObject: {fileID: 175291255607039418}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 438a7266b49dbe44880f94e9b02a0010, type: 3}
+  m_Script: {fileID: 11500000, guid: f04ee6a8d65049849af7530405a428d9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PresentationOnlyUltimateSkill
+  m_EditorClassIdentifier: Assembly-CSharp::Char004ThrowAnimation
+  releasePoint: {fileID: 3796011236480757865}
+--- !u!114 &4082435947556090557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 175291255607039418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c56ae24a6cff2b4589dd0f3dac39796, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Char004Ultimate
   cinematicDuration: -1
   hideUIDuringUltimate: 1
   ultimateAnimStateName: Ultimate
+  cinematicProps:
+  - {fileID: 2535406843584756058}
+  - {fileID: 6613208279336798969}
+  - {fileID: 8904175124517307342}
+  - {fileID: 7615384985259247814}
+  - {fileID: 1711897682434076634}
+  - {fileID: 8371763192766380803}
+  - {fileID: 3504184373498189152}
+  - {fileID: 2082956010874169972}
+  - {fileID: 1357696538209296465}
+  - {fileID: 2884496169144359725}
+  - {fileID: 253261850374221418}
+  - {fileID: 4297961475998633141}
+  - {fileID: 1035598324239338085}
+  - {fileID: 3296375630326594531}
+  - {fileID: 9057226718534924720}
+  - {fileID: 4155489173187934882}
+  - {fileID: 1713257843733441679}
+  - {fileID: 5180301121288708834}
+  - {fileID: 8021599874983908594}
+  - {fileID: 156540229601760059}
+  - {fileID: 5706886674982502207}
+  - {fileID: 2240297993017276932}
+  - {fileID: 5398765473115174118}
+  - {fileID: 7347606264162478293}
+  - {fileID: 6974096642096200303}
+  - {fileID: 8770943203240251426}
+  - {fileID: 3711139389798086815}
+  - {fileID: 6186671432299735295}
+  - {fileID: 8218779192326019134}
 --- !u!1 &243803134088798812
 GameObject:
   m_ObjectHideFlags: 0
@@ -5489,6 +5533,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &5702429859989555903
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3796011236480757865}
+  m_Layer: 0
+  m_Name: Char004_ThrowRelease
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3796011236480757865
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5702429859989555903}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.7070247, y: -0.70702535, z: -0.0107543245, w: 0.010753896}
+  m_LocalPosition: {x: -0.0030803203, y: 0.03558907, z: 0.025817145}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3336904893641456066}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5856618387962048105
 GameObject:
   m_ObjectHideFlags: 0
@@ -5817,6 +5892,7 @@ Transform:
   - {fileID: 7403906992642366377}
   - {fileID: 2705988496316839261}
   - {fileID: 6995870883104356936}
+  - {fileID: 3796011236480757865}
   m_Father: {fileID: 427848741480504919}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6468389266915313215

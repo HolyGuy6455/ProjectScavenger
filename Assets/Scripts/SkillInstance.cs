@@ -30,10 +30,26 @@ public class SkillInstance
 
     public bool IsReady => currentCooldown <= 0f;
 
+    public virtual bool CanCancelAim => true;
+    public virtual bool DeferAimCost => false;
+    public virtual float AimRange => 0f;
+    public virtual float AimRadius => 0f;
+    public virtual bool TryBeginAim(Shooter shooter) => true;
+    public virtual bool TryExecuteAim(Shooter shooter, Vector3 target) => false;
+    public virtual void OnAimCancelled(Shooter shooter) { }
+
     public void Use(CharacterState state, Shooter shooter)
     {
         var data = Data;
         if (data == null || data.activeType == SkillActiveType.Passive) return;
+
+        // 준비 버튼의 재입력은 비용이나 실행 함수 없이 취소만 처리합니다.
+        var aim = shooter != null ? shooter.GetComponent<SkillAimController>() : null;
+        if (data.activeType == SkillActiveType.Aim && aim != null && aim.IsPreparedSkill(this))
+        {
+            aim.CancelPreparation();
+            return;
+        }
 
         if (currentCooldown > 0f && data.activeType != SkillActiveType.Toggle) 
         {
@@ -59,6 +75,9 @@ public class SkillInstance
 
         switch (data.activeType)
         {
+            case SkillActiveType.Aim:
+                if (aim != null) aim.Prepare(this, state);
+                return; // 비용과 쿨타임은 조준을 확정했을 때만 적용합니다.
             case SkillActiveType.Instant:
                 if (!ExecuteSkillBeginFunc(data.func, shooter, data.funcValue)) return;
                 ReduceRemain(shooter);
@@ -122,6 +141,25 @@ public class SkillInstance
                 ExecuteSkillFinishFunc(data.func, shooter, data.funcValue);
             }
         }
+    }
+
+    public bool CommitAim(CharacterState state, Shooter shooter, Vector3 target)
+    {
+        var data = Data;
+        if (data == null || data.activeType != SkillActiveType.Aim || !IsReady
+            || !CanExecuteSkillFunc(data.func, shooter) || !TryExecuteAim(shooter, target)) return false;
+        if (!DeferAimCost) ConsumeAimCost(state, shooter);
+        return true;
+    }
+
+    public void ConsumeAimCost(CharacterState state, Shooter shooter)
+    {
+        var data = Data;
+        if (data == null) return;
+        ReduceRemain(shooter);
+        currentCooldown = data.cooltime;
+        if (state != null)
+            shooter.GetComponent<PlayerController>()?.ModifyCharacterSurvivalStats(state.charId, 0f, -data.thirst);
     }
 
     /// <summary>Abandons pending effects without firing release/completion logic or refunding costs.</summary>

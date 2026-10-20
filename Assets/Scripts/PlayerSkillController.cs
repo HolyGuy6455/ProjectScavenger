@@ -351,6 +351,14 @@ public class PlayerSkillController : NetworkBehaviour
         SkillInstance skill = state.normalSkills[skillSlotIndex];
         if (skill == null || skill.skillId == 0) return;
 
+        var aim = GetComponent<SkillAimController>();
+        if (aim != null)
+        {
+            if (aim.IsPreparedSkill(skill)) { aim.CancelPreparation(); return; }
+            if (aim.BlocksOtherActions) return;
+            aim.CancelPreparation();
+        }
+
         // Different ammo skills share the same weapon and reload animation.
         if ((skill.Data?.func == 5 || skill.Data?.func == 6) && IsReloading()) return;
 

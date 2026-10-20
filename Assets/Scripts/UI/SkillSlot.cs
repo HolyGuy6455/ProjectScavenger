@@ -93,7 +93,9 @@ public class SkillSlot : MonoBehaviour
     {
         if (currentSkill == null || currentSkill.skillId == 0) return;
 
-        if (currentSkill.isToggledOn && toggledSprite != null)
+        bool isAiming = PlayerController.LocalInstance != null
+            && PlayerController.LocalInstance.GetComponent<SkillAimController>()?.IsPreparedSkill(currentSkill) == true;
+        if ((currentSkill.isToggledOn || isAiming) && toggledSprite != null)
         {
             icon.sprite = toggledSprite;
         }
@@ -142,7 +144,7 @@ public class SkillSlot : MonoBehaviour
         else
         {
             if (cooltimeCounter != null) cooltimeCounter.gameObject.SetActive(false);
-            icon.color = Color.white;
+            icon.color = isAiming ? new Color(1f, .8f, .3f) : Color.white;
         }
     }
 }

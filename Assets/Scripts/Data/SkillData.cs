@@ -8,7 +8,8 @@ public enum SkillActiveType
     Charge = 2,
     Toggle = 3,
     Continuous = 4,
-    Passive = 5
+    Passive = 5,
+    Aim = 6
 }
 
 public enum RemainCostType

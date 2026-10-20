@@ -7,7 +7,7 @@ public class BTActFindTarget_LineOfSight : BTActionLogic
     public string targetTag = "Player";
     [Min(0f)] public float maxDistance = 20f;
     [Range(0f, 360f)] public float fieldOfView = 120f; // 정면 기준 좌우를 합한 수평 시야각
-    [Tooltip("시야를 막는 벽/장애물 레이어입니다. 타겟 태그의 오브젝트(자식 포함), 자기 자신, 트리거는 제외합니다.")]
+    [Tooltip("시야를 막는 벽/장애물 레이어입니다. VisionBlocker 레이어는 자동 포함합니다. 타겟, 자신 및 VisionBlocker 이외의 트리거는 제외합니다.")]
     public LayerMask obstacleLayer;
     public string mySelfKey = "";
     public string outGameObjectKey = "";
@@ -18,7 +18,7 @@ public class BTActFindTarget_LineOfSight : BTActionLogic
     {
         string mySelfStr = GetKeyValueString<BTSharedGameObject>(brain, mySelfKey);
         string waitStr = returnRunningIfNotFound ? "\n(시야 내에 타겟이 없으면 대기합니다)" : "";
-        return $"{mySelfStr}의 거리 {maxDistance} 이내, 정면 기준 수평 총 시야각 {fieldOfView}° 안에 있는 태그 '{targetTag}' 중 장애물에 가리지 않은 가장 가까운 오브젝트를 '{outGameObjectKey}'에 저장합니다.\n지정한 장애물 레이어({obstacleLayer.value})만 시야를 막습니다. 타겟 태그의 오브젝트·자신(자식 포함)과 트리거는 장애물에서 제외하며, 찾지 못하면 출력값을 비웁니다.{waitStr}";
+        return $"{mySelfStr}의 거리 {maxDistance} 이내, 정면 기준 수평 총 시야각 {fieldOfView}° 안에 있는 태그 '{targetTag}' 중 장애물에 가리지 않은 가장 가까운 오브젝트를 '{outGameObjectKey}'에 저장합니다.\n지정한 장애물 레이어({obstacleLayer.value})와 VisionBlocker 레이어가 시야를 막습니다. 타겟 태그의 오브젝트·자신(자식 포함)과 VisionBlocker 이외의 트리거는 제외하며, 찾지 못하면 출력값을 비웁니다.{waitStr}";
     }
 
     public override NodeState Evaluate(AIBrain brain)
@@ -66,6 +66,16 @@ public class BTActFindTarget_LineOfSight : BTActionLogic
         float halfFieldOfView = Mathf.Clamp(fieldOfView, 0f, 360f) * 0.5f;
         // 시야 판정을 위해 발 밑이 아닌 가슴/머리 높이로 약간 보정 (필요시 사용)
         Vector3 rayStartPos = myPos + Vector3.up * 1.0f; 
+        int visionBlockerMask = LayerMask.GetMask("VisionBlocker");
+        int sightMask = obstacleLayer.value | visionBlockerMask;
+
+        // Raycast는 시작점이 콜라이더 내부일 때 검출하지 않으므로 눈 위치도 확인합니다.
+        foreach (var overlap in Physics.OverlapSphere(rayStartPos, .01f, visionBlockerMask,
+                     QueryTriggerInteraction.Collide))
+        {
+            if (IsBlockingCollider(overlap, mySelf.transform, targetTag, visionBlockerMask))
+                return returnRunningIfNotFound ? NodeState.RUNNING : NodeState.FAILURE;
+        }
 
         GameObject closestObj = null;
         float closestDistSqr = float.MaxValue;
@@ -87,8 +97,8 @@ public class BTActFindTarget_LineOfSight : BTActionLogic
                 continue;
 
             var hits = Physics.RaycastAll(rayStartPos, toTarget.normalized, Mathf.Sqrt(distSqr),
-                obstacleLayer, QueryTriggerInteraction.Ignore);
-            if (HasBlockingHit(hits, mySelf.transform, targetTag)) continue;
+                sightMask, QueryTriggerInteraction.Collide);
+            if (HasBlockingHit(hits, mySelf.transform, targetTag, visionBlockerMask)) continue;
 
             closestDistSqr = distSqr;
             closestObj = target;
@@ -103,26 +113,24 @@ public class BTActFindTarget_LineOfSight : BTActionLogic
         return NodeState.SUCCESS;
     }
 
-    private static bool HasBlockingHit(RaycastHit[] hits, Transform observer, string targetTag)
+    private static bool HasBlockingHit(RaycastHit[] hits, Transform observer, string targetTag, int visionBlockerMask)
     {
         foreach (var hit in hits)
         {
-            Transform hitTransform = hit.collider.transform;
-            if (hitTransform.IsChildOf(observer)) continue;
-
-            // 몸체는 타겟 태그여도 자식 콜라이더의 태그는 Untagged일 수 있다.
-            bool belongsToTarget = false;
-            for (Transform parent = hitTransform; parent != null; parent = parent.parent)
-            {
-                if (!parent.CompareTag(targetTag)) continue;
-                belongsToTarget = true;
-                break;
-            }
-            if (belongsToTarget) continue;
-
-            // 대상/자신의 콜라이더를 건너뛰어도 그 뒤에 있는 벽은 검사한다.
-            return true;
+            if (IsBlockingCollider(hit.collider, observer, targetTag, visionBlockerMask)) return true;
         }
         return false;
+    }
+
+    private static bool IsBlockingCollider(Collider collider, Transform observer, string targetTag, int visionBlockerMask)
+    {
+        if (collider == null || (collider.isTrigger && ((1 << collider.gameObject.layer) & visionBlockerMask) == 0)) return false;
+        Transform hitTransform = collider.transform;
+        if (hitTransform.IsChildOf(observer)) return false;
+
+        // 몸체는 타겟 태그여도 자식 콜라이더의 태그는 Untagged일 수 있다.
+        for (Transform parent = hitTransform; parent != null; parent = parent.parent)
+            if (parent.CompareTag(targetTag)) return false;
+        return true;
     }
 }

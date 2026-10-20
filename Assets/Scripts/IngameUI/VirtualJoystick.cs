@@ -51,6 +51,27 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
     private void OnDisable()
     {
         AllJoysticks.Remove(this);
+        CancelPointer();
+    }
+
+    private void OnApplicationFocus(bool focused)
+    {
+        if (!focused) CancelPointer();
+    }
+
+    private void CancelPointer()
+    {
+        _activePointerId = int.MinValue;
+        _inputVector = Vector2.zero;
+        if (_visualGroup != null) _visualGroup.alpha = 0f;
+        if (joystickHandle != null) joystickHandle.anchoredPosition = Vector2.zero;
+        if (playerController == null) return;
+        if (joystickType == JoystickType.Movement) playerController.SetMoveInput(Vector2.zero);
+        else
+        {
+            playerController.GetComponent<SkillAimController>()?.OnAimPointerCancel();
+            playerController.SetRotationInput(Vector2.zero);
+        }
     }
 
     private void Start()
@@ -169,6 +190,8 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
 
         // 이 터치를 조이스틱 조작용으로 등록합니다.
         _activePointerId = eventData.pointerId;
+        if (joystickType == JoystickType.Rotation && playerController != null)
+            playerController.GetComponent<SkillAimController>()?.OnAimPointerDown();
 
         // 터치한 위치로 조이스틱 배경 이동
         if (joystickBackground != null)
@@ -244,6 +267,10 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerDownHandler,
     {
         // 이 조이스틱을 조작하던 손가락이 아니면 무시합니다.
         if (eventData.pointerId != _activePointerId) return;
+
+        // 입력을 지우기 전에 실제 손 떼기만 투척 확정으로 전달합니다.
+        if (joystickType == JoystickType.Rotation && playerController != null)
+            playerController.GetComponent<SkillAimController>()?.OnAimPointerUp(_inputVector);
 
         // 추적 초기화
         _activePointerId = int.MinValue;

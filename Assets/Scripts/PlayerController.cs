@@ -51,7 +51,9 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     public bool HasCleared => _health != null && _health.IsClearProtected;
     public bool IsInputLocked => _deathHandled || HasCleared || _isCinematicPlaying || _cinematicInputLocks.Count > 0
         || (IsOwner && IsSpawned && !IsServer && _receivedStateSlot != ActiveSlotIndex);
-    public bool CanChangeCharacter => !IsInputLocked && !(GetActiveUltimateSkill()?.IsPresentationPlaying ?? false);
+    public bool CanChangeCharacter => !IsInputLocked && !(GetActiveUltimateSkill()?.IsPresentationPlaying ?? false)
+        && GetComponent<SkillAimController>()?.BlocksOtherActions != true
+        && GetComponent<Char004ThrowSkill>()?.BlocksCharacterChange != true;
     private Health _health;
     private SectorIndicator _sectorIndicator;
 
@@ -154,6 +156,14 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
             _rb.linearVelocity = Vector3.zero;
             _rb.angularVelocity = Vector3.zero;
         }
+        if (_sectorIndicator != null) _sectorIndicator.Hide();
+    }
+
+    public void StopWeaponForSkillAim()
+    {
+        _isShooting = false;
+        if (shooter == null) shooter = GetComponent<Shooter>();
+        if (shooter != null) shooter.SetTrigger(false);
         if (_sectorIndicator != null) _sectorIndicator.Hide();
     }
 
@@ -854,7 +864,18 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         bool isReloading = PlayerSkillController.Instance != null && PlayerSkillController.Instance.IsReloading();
 
         // 우측 회전 조이스틱 입력이 있는 경우 우선 처리 (발사 방향), 단 장전 중이 아닐 때만
-        if (_joystickRotationInput.sqrMagnitude > 0.001f && !isReloading)
+        var skillAim = GetComponent<SkillAimController>();
+        if (skillAim != null && skillAim.BlocksWeapon)
+        {
+            StopWeaponForSkillAim();
+            if (skillAim.UpdateTarget(_joystickRotationInput, out lookDir, out var aimPoint, out var aimRadius)
+                && _sectorIndicator != null)
+            {
+                _sectorIndicator.transform.position = aimPoint + Vector3.up * .1f;
+                _sectorIndicator.DrawCircle(aimRadius);
+            }
+        }
+        else if (_joystickRotationInput.sqrMagnitude > 0.001f && !isReloading)
         {
             Vector3 inputDir = new Vector3(_joystickRotationInput.x, 0f, _joystickRotationInput.y).normalized;
             float inputMag = Mathf.Clamp01(_joystickRotationInput.magnitude);
@@ -997,6 +1018,9 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     public void StartRoll(float duration, float distance, float invincibleTime)
     {
         if (_isRolling || !IsOwner || IsInputLocked || duration <= 0f) return;
+        var aim = GetComponent<SkillAimController>();
+        if (aim != null && aim.BlocksOtherActions) return;
+        aim?.CancelPreparation();
         _rollRoutine = StartCoroutine(RollRoutine(duration, distance, invincibleTime));
     }
 
