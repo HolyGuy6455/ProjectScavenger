@@ -687,6 +687,7 @@ MonoBehaviour:
   skillLevelUpCelebrationPopupPrefab: {fileID: 2957394713859618599, guid: 1108361ba3638db4e8124164dfb6ebbe, type: 3}
   skillLevelUpPopupPrefab: {fileID: 5627952908271466563, guid: c00c8bc311d554a4195641a666a38a56, type: 3}
   skillSelectPopupPrefab: {fileID: 3616719231736926623, guid: c4a916317edf9c3429e23ac6d03fa75b, type: 3}
+  itemInfoPopupPrefab: {fileID: 0}
 --- !u!4 &1676664896
 Transform:
   m_ObjectHideFlags: 0
