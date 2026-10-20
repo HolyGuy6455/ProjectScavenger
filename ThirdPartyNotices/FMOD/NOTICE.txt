@@ -1,0 +1,21 @@
+FMOD for Unity integration source
+
+Upstream: https://github.com/fmod/fmod-for-unity/tree/2.03
+License source: https://github.com/fmod/fmod-for-unity/blob/2.03/LICENSE
+License: MIT; the upstream notice is reproduced in fmod-for-unity-MIT.txt.
+Checked: 2026-10-21
+
+This notice covers the FMOD for Unity integration source supplied under the
+upstream repository's MIT license, retained under Assets/Plugins/FMOD.
+Existing copyright notices in individual source files are preserved.
+
+The MIT license does not cover the separately licensed FMOD Engine libraries
+or FMOD Studio. Engine libraries are installed locally and excluded from this
+public repository. The package's existing EULA and third-party notices remain
+in Assets/Plugins/FMOD/LICENSE.txt.
+
+This notice does not license ProjectScavenger as a whole. Distributing a game
+using FMOD also requires compliance with the applicable FMOD license and
+attribution terms:
+https://www.fmod.com/licensing
+https://www.fmod.com/attribution
