@@ -120,6 +120,11 @@ public class DataConverterEditor : EditorWindow
             ConvertData<AmmoDataList, AmmoData>("Ammo", "Scavenger - Ammo.tsv");
         }
 
+        if (GUILayout.Button("Convert Buff Data"))
+        {
+            ConvertData<BuffDataList, BuffData>("Buff", "Scavenger - Buff.tsv");
+        }
+
         if (GUILayout.Button("Convert Item Data"))
         {
             ConvertData<ItemDataList, ItemData>("Item", "Scavenger - Item.tsv");
@@ -189,6 +194,7 @@ public class DataConverterEditor : EditorWindow
     private void ConvertAllData()
     {
         ConvertData<AmmoDataList, AmmoData>("Ammo", "Scavenger - Ammo.tsv");
+        ConvertData<BuffDataList, BuffData>("Buff", "Scavenger - Buff.tsv");
         ConvertData<ItemDataList, ItemData>("Item", "Scavenger - Item.tsv");
         ConvertData<UserCurrencyDataList, UserCurrencyData>("UserCurrency", "Scavenger - UserCurrency.tsv");
         ConvertData<CharDataList, CharData>("Char", "Scavenger - Char.tsv");
@@ -210,7 +216,7 @@ public class DataConverterEditor : EditorWindow
     public static void CopyMasterDataToServer()
     {
         string clientDataPath = Application.dataPath + "/Data/";
-        // Assuming ScavengerServer is adjacent to ClaudePractice
+        // Assuming ScavengerServer is adjacent to the Unity project folder
         string serverResourcesPath = System.IO.Path.GetFullPath(Application.dataPath + "/../../ScavengerServer/Resources/");
         string serverTmpPath = System.IO.Path.GetFullPath(Application.dataPath + "/../../ScavengerServer/tmp/");
 
