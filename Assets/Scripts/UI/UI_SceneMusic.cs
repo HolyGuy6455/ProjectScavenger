@@ -10,7 +10,7 @@ namespace Scavenger.UI
     [DisallowMultipleComponent]
     public sealed class UI_SceneMusic : MonoBehaviour
     {
-        [SerializeField] private SoundKey soundKey = SoundKey.LobbyMusic;
+        [SerializeField] private SoundKey soundKey = SoundKey.None;
 
         private uint requestVersion;
 
