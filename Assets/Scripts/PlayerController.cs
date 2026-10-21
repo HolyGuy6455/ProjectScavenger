@@ -50,6 +50,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     private readonly HashSet<UnityEngine.Object> _cinematicInputLocks = new HashSet<UnityEngine.Object>();
     public bool HasCleared => _health != null && _health.IsClearProtected;
     public bool IsInputLocked => _deathHandled || HasCleared || _isCinematicPlaying || _cinematicInputLocks.Count > 0
+        || (IsOwner && IsSpawned && !IsLoadingReady)
         || (IsOwner && IsSpawned && !IsServer && _receivedStateSlot != ActiveSlotIndex);
     public bool CanChangeCharacter => !IsInputLocked && !(GetActiveUltimateSkill()?.IsPresentationPlaying ?? false)
         && GetComponent<SkillAimController>()?.BlocksOtherActions != true
@@ -126,6 +127,11 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     }
 
     public static PlayerController LocalInstance { get; private set; }
+    private bool _spawnPositionReady;
+    private bool _cameraAndUIReady;
+    public bool IsLoadingReady => IsSpawned && IsOwner && _spawnPositionReady && _cameraAndUIReady
+        && _characterModels[ActiveSlotIndex] != null
+        && (IsServer || _receivedStateSlot == ActiveSlotIndex);
 
     public void SetCinematicInputLocked(UnityEngine.Object source, bool locked)
     {
@@ -298,6 +304,8 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        _spawnPositionReady = false;
+        _cameraAndUIReady = false;
         if (IsOwner) SetRolling(false);
         _deathHandled = false;
         IsWaitingForDeathAnimation = false;
@@ -359,6 +367,8 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
     public override void OnNetworkDespawn()
     {
+        _spawnPositionReady = false;
+        _cameraAndUIReady = false;
         IsWaitingForDeathAnimation = false;
         CancelGameplayActions();
         InterruptPresentation();
@@ -644,9 +654,11 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     {
         // 카메라나 UI 컴포넌트가 씬에 로드될 때까지 대기합니다 (InGameScene 로딩 대기)
         CameraFollow camFollow = null;
-        while (camFollow == null)
+        WeaponUI weaponUI = null;
+        while (camFollow == null || weaponUI == null)
         {
             camFollow = FindAnyObjectByType<CameraFollow>();
+            weaponUI = FindAnyObjectByType<WeaponUI>(FindObjectsInactive.Include);
             yield return null;
         }
 
@@ -660,11 +672,8 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
             }
         }
         
-        var weaponUI = FindAnyObjectByType<WeaponUI>(FindObjectsInactive.Include);
-        if (weaponUI != null)
-        {
-            weaponUI.SetShooter(shooter); 
-        }
+        weaponUI.SetShooter(shooter);
+        _cameraAndUIReady = true;
     }
 
     private System.Collections.IEnumerator WaitAndTeleportRoutine()
@@ -682,6 +691,8 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         // 스폰 위치를 찾은 후(씬 로드 완료 및 프레임 경과 후)에 권한을 확인합니다.
         // OnNetworkSpawn 직후에는 NetworkTransform이 초기화되지 않아 CanCommitToTransform이 false로 반환될 수 있습니다.
         var nt = GetComponent<Unity.Netcode.Components.NetworkTransform>();
+        while (IsOwner && nt != null && !nt.CanCommitToTransform)
+            yield return null;
         bool hasAuthority = (nt != null) ? nt.CanCommitToTransform : IsServer;
 
         if (hasAuthority)
@@ -707,6 +718,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
                 _rb.position = spawnPos;
                 _rb.linearVelocity = Vector3.zero;
             }
+            _spawnPositionReady = true;
         }
 
         // 물리 복구
