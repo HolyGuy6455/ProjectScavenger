@@ -26,7 +26,8 @@ namespace Scavenger.UI
         SkillLevelUpCelebration,
         SkillLevelUp,
         SkillSelect,
-        ItemInfo
+        ItemInfo,
+        DefaultConfirm
     }
 
     public class OutGameUIManager : MonoBehaviour
@@ -56,6 +57,7 @@ namespace Scavenger.UI
         [SerializeField] private GameObject skillLevelUpPopupPrefab;
         [SerializeField] private GameObject skillSelectPopupPrefab;
         [SerializeField] private GameObject itemInfoPopupPrefab;
+        [SerializeField] private GameObject defaultConfirmPopupPrefab;
 
         // [Header("Persistent UI")]
         // [SerializeField] private GameObject persistentPartyListUI; // 파티 리스트 패널
@@ -283,12 +285,32 @@ namespace Scavenger.UI
                 popup => popup.SetItemForNextOpen(itemId));
         }
 
+        public DefaultConfirmPopup ShowDefaultConfirmPopup(string message, Action onConfirm,
+            Action onCancel = null, string description = null,
+            string confirmLabel = "확인", string cancelLabel = "취소")
+        {
+            return ShowPopup<DefaultConfirmPopup>(OutGamePopupType.DefaultConfirm,
+                popup => popup.Configure(message, onConfirm, onCancel, description, confirmLabel, cancelLabel));
+        }
+
         public void GoBack()
         {
             if (_activePopups.Count > 0)
             {
-                GameObject topPopup = _activePopups.Pop();
-                if (topPopup != null) topPopup.SetActive(false);
+                GameObject topPopup = _activePopups.Peek();
+                if (topPopup == null)
+                {
+                    _activePopups.Pop();
+                }
+                else if (topPopup.TryGetComponent<DefaultConfirmPopup>(out var confirmPopup)
+                    && confirmPopup.isActiveAndEnabled)
+                {
+                    confirmPopup.Cancel();
+                }
+                else
+                {
+                    ClosePopup(topPopup);
+                }
                 return;
             }
 
@@ -369,6 +391,10 @@ namespace Scavenger.UI
                     return itemInfoPopupPrefab != null
                         ? itemInfoPopupPrefab
                         : Resources.Load<GameObject>("UIPrefabs/Popups/ItemInfoPopup");
+                case OutGamePopupType.DefaultConfirm:
+                    return defaultConfirmPopupPrefab != null
+                        ? defaultConfirmPopupPrefab
+                        : Resources.Load<GameObject>("UIPrefabs/Popups/DefaultConfirmPopup");
             }
             return null;
         }
