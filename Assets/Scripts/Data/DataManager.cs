@@ -8,6 +8,8 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 public class DataManager : MonoBehaviour
 {
     public static DataManager Instance { get; private set; }
+    [SerializeField] private bool loadOnAwake = true;
+    private bool initialLoadStarted;
 
     // 카테고리별로 데이터를 분리하여 저장하는 이중 딕셔너리
     // 구조: <Category, <ID, IData>>
@@ -28,12 +30,15 @@ public class DataManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        // TODO: 나중에 전체 데이터 로드 시점(예: 로딩 화면, 타이틀 화면 등)이 정해지면 
-        // 아래 로직은 외부 흐름 관리자에서 직접 호출해야 합니다.
-        if (categoryDataMap.Count == 0)
-        {
-            StartCoroutine(LoadAllInitialDataAsync());
-        }
+        // 로그인 씬에서는 패치를 마친 뒤 호출하고, 서버/테스트 씬에서는 자동 로드합니다.
+        if (loadOnAwake) BeginInitialDataLoad();
+    }
+
+    public void BeginInitialDataLoad()
+    {
+        if (initialLoadStarted || IsDataLoaded) return;
+        initialLoadStarted = true;
+        StartCoroutine(LoadAllInitialDataAsync());
     }
 
     /// <summary>

@@ -8,6 +8,7 @@ namespace Scavenger.Editor
     {
         // 씬 경로 정의
         private static readonly string[] ClientScenes = {
+            "Assets/Scenes/LoginScene.unity",
             "Assets/Scenes/OutgameScene.unity",
             "Assets/Scenes/LoadingScene.unity",
             "Assets/Scenes/ServerBootScene.unity",

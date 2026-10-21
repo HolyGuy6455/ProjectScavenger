@@ -15,6 +15,11 @@ public class UserDataManager : MonoBehaviour
     public int[] SelectedDeck { get; private set; } = new int[4];
     public Dictionary<int, int> OwnedUserCurrencys { get; private set; } = new Dictionary<int, int>();
     public Dictionary<int, int> OwnedGameItems { get; private set; } = new Dictionary<int, int>();
+    public bool HasLoadedCharacterData { get; private set; }
+    public bool HasLoadedItemData { get; private set; }
+    public bool IsInitialDataLoaded => HasLoadedCharacterData && HasLoadedItemData;
+    public string InitialDataError { get; private set; }
+    private NetworkAuthManager authManager;
 
     public event Action OnCharacterDataUpdated;
     public event Action OnItemDataUpdated;
@@ -35,25 +40,32 @@ public class UserDataManager : MonoBehaviour
 
     private void Start()
     {
-        // Subscribe to login success to fetch characters
-        if (NetworkAuthManager.Instance != null)
+        // Start 실행 순서와 무관하게 이미 로그인된 경우에도 최초 데이터를 가져옵니다.
+        authManager = NetworkAuthManager.Instance;
+        if (authManager != null)
         {
-            NetworkAuthManager.Instance.OnLoginComplete += HandleLoginComplete;
+            authManager.OnLoginComplete += HandleLoginComplete;
+            if (!string.IsNullOrEmpty(authManager.AuthToken))
+                HandleLoginComplete(true);
         }
     }
 
     private void OnDestroy()
     {
-        if (NetworkAuthManager.Instance != null)
+        if (authManager != null)
         {
-            NetworkAuthManager.Instance.OnLoginComplete -= HandleLoginComplete;
+            authManager.OnLoginComplete -= HandleLoginComplete;
         }
+        if (Instance == this) Instance = null;
     }
 
     private void HandleLoginComplete(bool success)
     {
         if (success)
         {
+            HasLoadedCharacterData = false;
+            HasLoadedItemData = false;
+            InitialDataError = null;
             FetchCharacterList();
             FetchItemList();
         }
@@ -86,17 +98,26 @@ public class UserDataManager : MonoBehaviour
                         {
                             SelectedDeck = response.selectedDeck;
                         }
+                        HasLoadedCharacterData = true;
+                        if (IsInitialDataLoaded) InitialDataError = null;
                         Debug.Log($"[UserDataManager] 캐릭터 목록 로드 성공. 보유 캐릭터 수: {OwnedCharacters.Count}");
                         OnCharacterDataUpdated?.Invoke();
+                    }
+                    else
+                    {
+                        InitialDataError = "Invalid character data response.";
+                        Debug.LogError($"[UserDataManager] {InitialDataError}");
                     }
                 }
                 catch (Exception e)
                 {
+                    InitialDataError = "Failed to parse character data.";
                     Debug.LogError($"[UserDataManager] JSON Parsing Error: {e.Message}");
                 }
             }
             else
             {
+                InitialDataError = "Failed to load character data.";
                 Debug.LogError($"[UserDataManager] 캐릭터 목록 로드 실패: {request.error}\n{request.downloadHandler.text}");
             }
         }
@@ -148,19 +169,28 @@ public class UserDataManager : MonoBehaviour
                         }
                         
                         SyncStamina(response.stamina, response.maxStamina, response.nextStaminaRecoverySeconds);
+                        HasLoadedItemData = true;
+                        if (IsInitialDataLoaded) InitialDataError = null;
 
                         Debug.Log($"[UserDataManager] 아이템 목록 로드 성공. (UserCurrencys: {OwnedUserCurrencys.Count}, GameItems: {OwnedGameItems.Count})");
                         OnItemDataUpdated?.Invoke();
                         OnCurrencyDataUpdated?.Invoke();
                     }
+                    else
+                    {
+                        InitialDataError = "Invalid item data response.";
+                        Debug.LogError($"[UserDataManager] {InitialDataError}");
+                    }
                 }
                 catch (Exception e)
                 {
+                    InitialDataError = "Failed to parse item data.";
                     Debug.LogError($"[UserDataManager] 아이템 JSON Parsing Error: {e.Message}");
                 }
             }
             else
             {
+                InitialDataError = "Failed to load item data.";
                 Debug.LogError($"[UserDataManager] 아이템 목록 로드 실패: {request.error}\n{request.downloadHandler.text}");
             }
         }

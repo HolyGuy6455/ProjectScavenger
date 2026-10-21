@@ -6,8 +6,8 @@ namespace Scavenger.UI
 {
     public enum OutGamePanelType
     {
-        Login,
-        MainLobby,
+        // 기존 씬과 프리팹에 저장된 패널 번호를 유지합니다.
+        MainLobby = 1,
         ReadyToBattle,
         FriendParty,
         CharacterDeck,
@@ -38,7 +38,6 @@ namespace Scavenger.UI
         [SerializeField] private Transform canvasTransform;
 
         [Header("Panel Prefabs")]
-        [SerializeField] private GameObject loginPanelPrefab;
         [SerializeField] private GameObject mainLobbyPanelPrefab;
         [SerializeField] private GameObject readyToBattlePanelPrefab;
         [SerializeField] private GameObject friendPartyPanelPrefab;
@@ -64,7 +63,7 @@ namespace Scavenger.UI
 
         private Dictionary<OutGamePanelType, GameObject> _cachedPanels = new Dictionary<OutGamePanelType, GameObject>();
         private Stack<OutGamePanelType> _panelHistory = new Stack<OutGamePanelType>();
-        private OutGamePanelType _currentPanelType;
+        private OutGamePanelType _currentPanelType = OutGamePanelType.MainLobby;
         private Dictionary<OutGamePopupType, GameObject> _cachedPopups = new Dictionary<OutGamePopupType, GameObject>();
         private Stack<GameObject> _activePopups = new Stack<GameObject>();
         private Transform _inactiveUIRoot;
@@ -84,7 +83,7 @@ namespace Scavenger.UI
 
         private void Start()
         {
-            ShowPanel(OutGamePanelType.Login);
+            ShowPanel(OutGamePanelType.MainLobby);
         }
 
         private void Update()
@@ -126,11 +125,6 @@ namespace Scavenger.UI
                     }
                 }
             }
-
-            // if (persistentPartyListUI != null)
-            // {
-            //     persistentPartyListUI.SetActive(panelType != OutGamePanelType.Login);
-            // }
 
             if (_cachedPanels.TryGetValue(panelType, out GameObject cachedPanel) && cachedPanel != null)
             {
@@ -325,10 +319,6 @@ namespace Scavenger.UI
                 {
                     prevPanel.SetActive(true);
                     prevPanel.transform.SetAsLastSibling();
-                    // if (persistentPartyListUI != null)
-                    // {
-                    //     persistentPartyListUI.SetActive(previousPanelType != OutGamePanelType.Login);
-                    // }
                     _currentPanelType = previousPanelType;
 
                     if (!IsPartyScope(previousPanelType))
@@ -363,7 +353,6 @@ namespace Scavenger.UI
         {
             switch (type)
             {
-                case OutGamePanelType.Login: return loginPanelPrefab;
                 case OutGamePanelType.MainLobby: return mainLobbyPanelPrefab;
                 case OutGamePanelType.ReadyToBattle: return readyToBattlePanelPrefab;
                 case OutGamePanelType.FriendParty: return friendPartyPanelPrefab;
