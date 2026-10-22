@@ -58,6 +58,9 @@ namespace Scavenger.UI
         [SerializeField] private GameObject itemInfoPopupPrefab;
         [SerializeField] private GameObject defaultConfirmPopupPrefab;
 
+        [Header("Toast")]
+        [SerializeField] private GameObject toastPopupPrefab;
+
         // [Header("Persistent UI")]
         // [SerializeField] private GameObject persistentPartyListUI; // 파티 리스트 패널
 
@@ -67,6 +70,7 @@ namespace Scavenger.UI
         private Dictionary<OutGamePopupType, GameObject> _cachedPopups = new Dictionary<OutGamePopupType, GameObject>();
         private Stack<GameObject> _activePopups = new Stack<GameObject>();
         private Transform _inactiveUIRoot;
+        private ToastPopup _cachedToast;
 
         private bool IsPartyScope(OutGamePanelType type)
         {
@@ -285,6 +289,33 @@ namespace Scavenger.UI
         {
             return ShowPopup<DefaultConfirmPopup>(OutGamePopupType.DefaultConfirm,
                 popup => popup.Configure(message, onConfirm, onCancel, description, confirmLabel, cancelLabel));
+        }
+
+        // 토스트는 뒤로 가기로 닫는 팝업 스택과 별도로 재사용합니다.
+        public ToastPopup ShowToast(string message, float? duration = null)
+        {
+            if (_cachedToast == null)
+            {
+                GameObject prefab = toastPopupPrefab != null
+                    ? toastPopupPrefab
+                    : Resources.Load<GameObject>("UIPrefabs/Popups/ToastPopup");
+                if (prefab == null || canvasTransform == null || prefab.GetComponent<ToastPopup>() == null)
+                {
+                    Debug.LogError("[OutGameUIManager] ToastPopup 프리팹, 컴포넌트 또는 캔버스 연결 누락!");
+                    return null;
+                }
+
+                GameObject instance = InstantiateInactive(prefab);
+                if (instance.TryGetComponent<RectTransform>(out var rect))
+                {
+                    rect.anchoredPosition = Vector2.zero;
+                    rect.localScale = Vector3.one;
+                }
+                _cachedToast = instance.GetComponent<ToastPopup>();
+            }
+
+            _cachedToast.Show(message, duration);
+            return _cachedToast;
         }
 
         public void GoBack()
