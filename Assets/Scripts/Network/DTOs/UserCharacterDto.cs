@@ -42,9 +42,21 @@ namespace Scavenger.Network.DTOs
         public int targetSkillId;
     }
 
+    // 서버 LevelUpSkillErrorCode와 숫자를 맞춰 유지합니다.
+    public enum LevelUpSkillErrorCode
+    {
+        None = 0,
+        InvalidToken = 1,
+        CharacterNotFound = 2,
+        SkillNotFound = 3,
+        AlreadyUnlocked = 4,
+        InsufficientItems = 5
+    }
+
     [Serializable]
     public class LevelUpSkillResponse
     {
+        public LevelUpSkillErrorCode errorCode;
         public string message;
         public List<int> unlockedSkills;
         public List<UserCurrencyDto> updatedGameItems;
