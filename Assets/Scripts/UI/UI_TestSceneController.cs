@@ -138,10 +138,10 @@ namespace Scavenger.UI
             PlayerPrefs.Save();
 
             Debug.Log($"[TestScene] 싱글플레이어 데디케이티드 서버로 시작 요청...");
-            StartCoroutine(SpawnDedicatedServerCoroutine());
+            SpawnDedicatedServer();
         }
 
-        private System.Collections.IEnumerator SpawnDedicatedServerCoroutine()
+        private void SpawnDedicatedServer()
         {
             string serverUrl = "http://localhost:5000";
             if (Scavenger.Network.NetworkAuthManager.Instance != null)
@@ -165,34 +165,23 @@ namespace Scavenger.UI
 
             string url = serverUrl + "/api/debug/spawn-dedicated";
 
-            using (UnityEngine.Networking.UnityWebRequest request = new UnityEngine.Networking.UnityWebRequest(url, "POST"))
+            var request = Scavenger.Network.NetworkRequestManager.CreateJsonRequest(url, "POST");
+            Scavenger.Network.NetworkRequestManager.Instance.Send<SpawnServerResponse>(request, response =>
             {
-                request.downloadHandler = new UnityEngine.Networking.DownloadHandlerBuffer();
-                
-                yield return request.SendWebRequest();
-
-                if (request.result == UnityEngine.Networking.UnityWebRequest.Result.ConnectionError || 
-                    request.result == UnityEngine.Networking.UnityWebRequest.Result.ProtocolError)
+                if (this == null || !isActiveAndEnabled) return;
+                PlayerPrefs.SetString("TargetServerIP", response.ip);
+                PlayerPrefs.SetInt("TargetServerPort", response.port);
+                PlayerPrefs.Save();
+                SceneTransitionManager.LoadSceneWithIntent(LoadingIntent.EnterInGame);
+            }, new Scavenger.Network.NetworkRequestOptions
+            {
+                Name = "SpawnDedicatedServer", DuplicateKey = "SpawnDedicatedServer",
+                DuplicatePolicy = Scavenger.Network.DuplicateRequestPolicy.Reject, TimeoutSeconds = 60
+            }, validateResponse: response => !string.IsNullOrEmpty(response.ip) && response.port > 0,
+                onFinished: handle =>
                 {
-                    Debug.LogError($"[TestScene] 데디케이티드 서버 스폰 실패: {request.error}\n응답: {request.downloadHandler.text}");
-                    if (startDedicatedButton != null)
-                    {
-                        startDedicatedButton.interactable = true;
-                    }
-                }
-                else
-                {
-                    Debug.Log($"[TestScene] 데디케이티드 서버 스폰 성공! 응답: {request.downloadHandler.text}");
-                    
-                    SpawnServerResponse response = JsonUtility.FromJson<SpawnServerResponse>(request.downloadHandler.text);
-                    
-                    PlayerPrefs.SetString("TargetServerIP", response.ip);
-                    PlayerPrefs.SetInt("TargetServerPort", response.port);
-                    PlayerPrefs.Save();
-
-                    SceneTransitionManager.LoadSceneWithIntent(LoadingIntent.EnterInGame);
-                }
-            }
+                    if (this != null && startDedicatedButton != null) startDedicatedButton.interactable = true;
+                });
         }
 
         [System.Serializable]

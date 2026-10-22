@@ -1,9 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Networking;
 using Scavenger.Network;
 using Scavenger.Network.DTOs;
 using Scavenger.UI;
@@ -40,6 +38,7 @@ public class SkillSelectPopup : MonoBehaviour
 
     public void Open(int charId, int slotIndex)
     {
+        _viewVersion++;
         _charId = charId;
         gameObject.SetActive(true);
         OnTabClicked(slotIndex);
@@ -124,62 +123,35 @@ public class SkillSelectPopup : MonoBehaviour
         }
     }
 
+    private int _viewVersion;
+    private void OnDisable() { _viewVersion++; }
+
     private void HandleSelectClicked(SkillData skillData)
     {
-        Debug.Log($"장착 요청: {skillData.name} -> 슬롯 {_currentSlotIndex}");
-        StartCoroutine(EquipSkillRoutine(skillData.id));
-    }
-
-    private IEnumerator EquipSkillRoutine(int skillId)
-    {
-        string url = $"{NetworkAuthManager.Instance.ServerUrl}/api/game/equip-skill";
-        
-        var reqObj = new EquipSkillRequest
+        var auth = NetworkAuthManager.Instance;
+        var userData = UserDataManager.Instance;
+        if (auth == null || userData == null) return;
+        int charId = _charId;
+        int slot = _currentSlotIndex;
+        int version = _viewVersion;
+        string token = auth.AuthToken;
+        var request = NetworkRequestManager.CreateJsonRequest(auth.ServerUrl + "/api/game/equip-skill", "POST",
+            JsonUtility.ToJson(new EquipSkillRequest { charId = charId, skillId = skillData.id, slotIndex = slot }), token);
+        NetworkRequestManager.Instance.Send<EquipSkillResponse>(request, response =>
         {
-            charId = _charId,
-            skillId = skillId,
-            slotIndex = _currentSlotIndex
-        };
-        
-        string json = JsonUtility.ToJson(reqObj);
-        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+            if (userData == null || auth == null || auth.AuthToken != token) return;
+            var userChar = userData.GetCharacter(charId);
+            if (userChar != null) userChar.equippedSkills = response.equippedSkills;
+            userData.FetchCharacterList();
+            if (this != null && isActiveAndEnabled && version == _viewVersion) RefreshUI();
+        }, new NetworkRequestOptions
         {
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-            request.SetRequestHeader("Authorization", $"Bearer {NetworkAuthManager.Instance.AuthToken}");
-            
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                try
-                {
-                    var response = JsonUtility.FromJson<EquipSkillResponse>(request.downloadHandler.text);
-                    if (response != null && response.equippedSkills != null)
-                    {
-                        var userChar = UserDataManager.Instance.OwnedCharacters.FirstOrDefault(c => c.charId == _charId);
-                        if (userChar != null)
-                        {
-                            userChar.equippedSkills = response.equippedSkills;
-                            UserDataManager.Instance.FetchCharacterList(); // UI 갱신을 위해 이벤트 트리거 겸 최신화
-                        }
-                        
-                        RefreshUI(); // 현재 팝업 다시 그리기
-                        Debug.Log("스킬 장착 성공!");
-                    }
-                }
-                catch (System.Exception e)
-                {
-                    Debug.LogError($"[SkillSelectPopup] JSON Parsing Error: {e.Message}");
-                }
-            }
-            else
-            {
-                Debug.LogError($"[SkillSelectPopup] 스킬 장착 실패: {request.error}\n{request.downloadHandler.text}");
-            }
-        }
+            Name = "EquipSkill", DuplicateKey = $"{auth.Username}:EquipSkill:{charId}:{slot}",
+            DuplicatePolicy = DuplicateRequestPolicy.Reject
+        }, onFailure: error =>
+        {
+            if (userData != null && auth != null && auth.AuthToken == token) userData.FetchCharacterList(false, false);
+        }, validateResponse: response => response.equippedSkills != null);
     }
 
     private void HandleActionClicked(SkillData skillData)

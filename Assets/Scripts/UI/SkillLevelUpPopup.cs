@@ -1,9 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.Networking;
 using Scavenger.Network;
 using Scavenger.Network.DTOs;
 using Scavenger.UI;
@@ -24,6 +22,7 @@ public class SkillLevelUpPopup : MonoBehaviour
 
     public void Open(int charId, SkillData currentSkill, SkillData nextSkill)
     {
+        _viewVersion++;
         _charId = charId;
         
         SkillData displaySkill = nextSkill != null ? nextSkill : currentSkill;
@@ -109,101 +108,55 @@ public class SkillLevelUpPopup : MonoBehaviour
         gameObject.SetActive(true);
     }
 
+    private int _viewVersion;
+    private void OnDisable() { _viewVersion++; }
+
     private void OnLevelUpClicked()
     {
-        StartCoroutine(LevelUpSkillRoutine());
-    }
-
-    private IEnumerator LevelUpSkillRoutine()
-    {
-        string url = $"{NetworkAuthManager.Instance.ServerUrl}/api/game/levelup-skill";
-        
-        var reqObj = new LevelUpSkillRequest
+        var auth = NetworkAuthManager.Instance;
+        var userData = UserDataManager.Instance;
+        if (auth == null || userData == null) return;
+        int charId = _charId;
+        int skillId = _targetSkillId;
+        int version = _viewVersion;
+        string token = auth.AuthToken;
+        var request = NetworkRequestManager.CreateJsonRequest(auth.ServerUrl + "/api/game/levelup-skill", "POST",
+            JsonUtility.ToJson(new LevelUpSkillRequest { charId = charId, targetSkillId = skillId }), token);
+        NetworkRequestManager.Instance.Send<LevelUpSkillResponse>(request, response =>
         {
-            charId = _charId,
-            targetSkillId = _targetSkillId
-        };
-        
-        string json = JsonUtility.ToJson(reqObj);
-        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
-        {
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-            request.SetRequestHeader("Authorization", $"Bearer {NetworkAuthManager.Instance.AuthToken}");
-            
-            yield return request.SendWebRequest();
-
-            string responseBody = request.downloadHandler.text;
-            var response = ParseLevelUpResponse(responseBody);
-            if (request.result == UnityWebRequest.Result.Success
-                && response != null
-                && response.errorCode == LevelUpSkillErrorCode.None
-                && response.unlockedSkills != null)
+            if (userData == null || auth == null || auth.AuthToken != token) return;
+            userData.UpdateGameItems(response.updatedGameItems);
+            var userChar = userData.GetCharacter(charId);
+            if (userChar != null)
             {
-                // 서버로부터 받은 갱신된 아이템 수량 반영
-                if (response.updatedGameItems != null)
-                {
-                    UserDataManager.Instance.UpdateGameItems(response.updatedGameItems);
-                }
-
-                var userChar = UserDataManager.Instance.GetCharacter(_charId);
-                if (userChar != null)
-                {
-                    userChar.unlockedSkills = response.unlockedSkills;
-                    if (response.equippedSkills != null && response.equippedSkills.Length > 0)
-                    {
-                        userChar.equippedSkills = response.equippedSkills;
-                    }
-                    UserDataManager.Instance.FetchCharacterList();
-                }
-                    
-                Debug.Log("스킬 레벨업 성공!");
-                OutGameUIManager.Instance.ClosePopup(gameObject);
-                    
-                var celebrationPopup = OutGameUIManager.Instance.ShowPopup<SkillLevelUpCelebrationPopup>(OutGamePopupType.SkillLevelUpCelebration);
-                if (celebrationPopup != null)
-                {
-                    var newSkillData = DataManager.Instance.GetData<SkillData>("Skill", _targetSkillId);
-                    celebrationPopup.Open(newSkillData);
-                }
+                userChar.unlockedSkills = response.unlockedSkills;
+                if (response.equippedSkills != null) userChar.equippedSkills = response.equippedSkills;
             }
-            else
+            userData.FetchCharacterList();
+            if (this == null || !isActiveAndEnabled || version != _viewVersion || OutGameUIManager.Instance == null) return;
+            OutGameUIManager.Instance.ClosePopup(gameObject);
+            var celebration = OutGameUIManager.Instance.ShowPopup<SkillLevelUpCelebrationPopup>(OutGamePopupType.SkillLevelUpCelebration);
+            if (celebration != null) celebration.Open(DataManager.Instance.GetData<SkillData>("Skill", skillId));
+        }, new NetworkRequestOptions
+        {
+            Name = "LevelUpSkill", DuplicateKey = $"{auth.Username}:LevelUpSkill:{charId}:{skillId}",
+            DuplicatePolicy = DuplicateRequestPolicy.Reject, ShowErrorToast = false
+        }, onFailure: error =>
+        {
+            NetworkRequestManager.Instance.ShowToast(GetFailureToastMessage(error));
+            if (userData != null && auth != null && auth.AuthToken == token)
             {
-                Debug.LogError($"스킬 레벨업 실패: {request.error}\n{responseBody}");
-                if (OutGameUIManager.Instance != null)
-                {
-                    var errorCode = response != null ? response.errorCode : LevelUpSkillErrorCode.None;
-                    OutGameUIManager.Instance.ShowToast(GetFailureToastMessage(errorCode, request.result, request.responseCode));
-                }
+                userData.FetchCharacterList(false, false);
+                userData.FetchItemList(false, false);
             }
-        }
+        }, validateResponse: response => response.unlockedSkills != null);
     }
 
-    private static LevelUpSkillResponse ParseLevelUpResponse(string responseBody)
+    private static string GetFailureToastMessage(NetworkError error)
     {
-        if (string.IsNullOrWhiteSpace(responseBody)) return null;
-        try
-        {
-            return JsonUtility.FromJson<LevelUpSkillResponse>(responseBody);
-        }
-        catch (System.ArgumentException)
-        {
-            // 프록시의 HTML 오류 페이지나 잘못된 JSON도 기본 실패 토스트로 처리합니다.
-            return null;
-        }
-    }
-
-    private static string GetFailureToastMessage(LevelUpSkillErrorCode errorCode,
-        UnityWebRequest.Result requestResult, long responseCode)
-    {
-        if (requestResult == UnityWebRequest.Result.ConnectionError)
-            return "서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.";
-
-        // 인증 미들웨어가 본문 없이 반환하는 401/403도 처리합니다.
-        if (responseCode == 401 || responseCode == 403)
-            errorCode = LevelUpSkillErrorCode.InvalidToken;
+        if (error.Kind == NetworkErrorKind.Connection || error.Kind == NetworkErrorKind.Timeout
+            || error.HttpStatusCode == 401 || error.HttpStatusCode == 403) return error.DefaultMessage;
+        var errorCode = (LevelUpSkillErrorCode)(error.ServerCode ?? 0);
 
         switch (errorCode)
         {

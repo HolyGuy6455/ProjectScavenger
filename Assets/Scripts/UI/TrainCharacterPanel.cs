@@ -154,6 +154,7 @@ public class TrainCharacterPanel : MonoBehaviour
 
     private void OnDisable()
     {
+        _viewVersion++;
         _selectedCharId = -1;
         if (UserDataManager.Instance != null)
         {
@@ -442,68 +443,44 @@ public class TrainCharacterPanel : MonoBehaviour
         var userChar = UserDataManager.Instance.GetCharacter(_selectedCharId);
         if (userChar == null || userChar.level >= _currentTargetLevel) return;
 
-        StartCoroutine(SendLevelUpRequest());
+        SendLevelUpRequest();
     }
 
-    private System.Collections.IEnumerator SendLevelUpRequest()
+    private int _viewVersion;
+
+    private void SendLevelUpRequest()
     {
-        var request = new LevelUpCharacterRequest
+        var auth = NetworkAuthManager.Instance;
+        var userData = UserDataManager.Instance;
+        if (auth == null || userData == null) return;
+        int charId = _selectedCharId;
+        int targetLevel = _currentTargetLevel;
+        int version = _viewVersion;
+        string token = auth.AuthToken;
+        var request = NetworkRequestManager.CreateJsonRequest(auth.ServerUrl + "/api/game/levelup-character", "POST",
+            JsonUtility.ToJson(new LevelUpCharacterRequest { charId = charId, targetLevel = targetLevel }), token);
+        NetworkRequestManager.Instance.Send<LevelUpCharacterResponse>(request, response =>
         {
-            charId = _selectedCharId,
-            targetLevel = _currentTargetLevel
-        };
-
-        string json = UnityEngine.JsonUtility.ToJson(request);
-        string url = $"{NetworkAuthManager.Instance.ServerUrl}/api/game/levelup-character";
-
-        using (UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.PostWwwForm(url, "POST"))
+            if (userData == null || auth == null || auth.AuthToken != token) return;
+            var userChar = userData.GetCharacter(charId);
+            if (userChar != null) userChar.level = response.level;
+            userData.UpdateGameItems(response.updatedGameItems);
+            if (this == null || !isActiveAndEnabled || version != _viewVersion || _selectedCharId != charId) return;
+            RefreshUI();
+            if (OutGameUIManager.Instance == null) return;
+            var popup = OutGameUIManager.Instance.ShowPopup<CharacterLevelUpCelebrationPopup>(OutGamePopupType.CharacterLevelUpCelebration);
+            if (popup != null) popup.Open(response.level, DataManager.Instance.GetData<CharData>("Char", charId));
+        }, new NetworkRequestOptions
         {
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
-            www.uploadHandler = new UnityEngine.Networking.UploadHandlerRaw(bodyRaw);
-            www.downloadHandler = new UnityEngine.Networking.DownloadHandlerBuffer();
-            www.SetRequestHeader("Content-Type", "application/json");
-            
-            if (!string.IsNullOrEmpty(NetworkAuthManager.Instance.AuthToken))
+            Name = "LevelUpCharacter", DuplicateKey = $"{auth.Username}:LevelUpCharacter:{charId}",
+            DuplicatePolicy = DuplicateRequestPolicy.Reject
+        }, onFailure: error =>
+        {
+            if (userData != null && auth != null && auth.AuthToken == token)
             {
-                www.SetRequestHeader("Authorization", $"Bearer {NetworkAuthManager.Instance.AuthToken}");
+                userData.FetchCharacterList(false, false);
+                userData.FetchItemList(false, false);
             }
-
-            yield return www.SendWebRequest();
-
-            if (www.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
-            {
-                var response = UnityEngine.JsonUtility.FromJson<LevelUpCharacterResponse>(www.downloadHandler.text);
-                
-                // 캐릭터 정보 업데이트
-                var userChar = UserDataManager.Instance.GetCharacter(_selectedCharId);
-                if (userChar != null)
-                {
-                    userChar.level = response.level;
-                }
-
-                // 소모된 아이템 갱신
-                if (response.updatedGameItems != null)
-                {
-                    UserDataManager.Instance.UpdateGameItems(response.updatedGameItems);
-                }
-                
-                RefreshUI();
-
-                var popup = OutGameUIManager.Instance.ShowPopup<CharacterLevelUpCelebrationPopup>(OutGamePopupType.CharacterLevelUpCelebration);
-                if (popup != null)
-                {
-                    var charData = DataManager.Instance.GetData<CharData>("Char", _selectedCharId);
-                    popup.Open(response.level, charData);
-                }
-                else
-                {
-                    Debug.Log($"레벨업 성공! 새 레벨: {response.level}");
-                }
-            }
-            else
-            {
-                Debug.LogError($"레벨업 실패: {www.error}\n{www.downloadHandler.text}");
-            }
-        }
+        }, validateResponse: response => response.level >= targetLevel);
     }
 }

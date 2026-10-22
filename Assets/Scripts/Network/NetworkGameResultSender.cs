@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 using Scavenger.Network.DTOs;
 using Scavenger.Manager;
 
@@ -35,17 +33,17 @@ namespace Scavenger.Network
 
         public void SendGameResult(GameResultState state)
         {
-            StartCoroutine(SendResultRoutine(state));
+            SendResult(state);
         }
 
         public event System.Action<GameResultResponse> OnGameResultReceived;
 
-        private IEnumerator SendResultRoutine(GameResultState state)
+        private void SendResult(GameResultState state)
         {
             if (NetworkAuthManager.Instance == null || string.IsNullOrEmpty(NetworkAuthManager.Instance.AuthToken))
             {
                 Debug.LogError("[NetworkGameResultSender] 서버 인증 토큰이 없습니다. 결과를 송신하지 않습니다.", this);
-                yield break;
+                return;
             }
 
             var requestDto = new GameResultRequest
@@ -77,49 +75,30 @@ namespace Scavenger.Network
 
             Debug.Log($"[NetworkGameResultSender] 게임 결과 전송 중... ({state}) / Items: {requestDto.CollectedItems.Count}");
 
-            using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+            var auth = NetworkAuthManager.Instance;
+            string token = auth.AuthToken;
+            var request = NetworkRequestManager.CreateJsonRequest(url, "POST", json, token);
+            NetworkRequestManager.Instance.Send<GameResultResponse>(request, response =>
             {
-                byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
-                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                request.downloadHandler = new DownloadHandlerBuffer();
-                request.SetRequestHeader("Content-Type", "application/json");
-                request.SetRequestHeader("Authorization", $"Bearer {NetworkAuthManager.Instance.AuthToken}");
-
-                yield return request.SendWebRequest();
-
-                if (request.result != UnityWebRequest.Result.Success)
+                if (auth == null || auth.AuthToken != token) return;
+                var userData = UserDataManager.Instance;
+                if (userData != null)
                 {
-                    Debug.LogError($"[NetworkGameResultSender] 결과 송신 실패: {request.error} / {request.downloadHandler.text}");
-                }
-                else
-                {
-                    Debug.Log($"[NetworkGameResultSender] 결과 송신 성공: {request.downloadHandler.text}");
-                    try
-                    {
-                        var response = JsonUtility.FromJson<GameResultResponse>(request.downloadHandler.text);
-                        if (response != null)
+                    if (response.CharacterExpData != null)
+                        foreach (var exp in response.CharacterExpData)
                         {
-                            Debug.Log($"[NetworkGameResultSender] 플레이어 경험치 변화: {response.UserPrevExp} -> {response.UserCurrentExp}, 레벨: {response.UserPrevLevel} -> {response.UserCurrentLevel}");
-                            if (response.CharacterExpData != null)
-                            {
-                                foreach (var charExp in response.CharacterExpData)
-                                {
-                                    Debug.Log($"[NetworkGameResultSender] 캐릭터 {charExp.CharId} 경험치 변화: {charExp.PrevExp} -> {charExp.CurrentExp}, 레벨: {charExp.PrevLevel} -> {charExp.CurrentLevel}");
-                                }
-                            }
-                            OnGameResultReceived?.Invoke(response);
+                            var character = userData.GetCharacter(exp.CharId);
+                            if (character == null) continue;
+                            character.level = exp.CurrentLevel;
+                            character.exp = exp.CurrentExp;
                         }
-                        else
-                        {
-                            Debug.LogError("[NetworkGameResultSender] 결과 응답을 파싱했지만 데이터가 null입니다.", this);
-                        }
-                    }
-                    catch (System.Exception e)
-                    {
-                        Debug.LogError($"[NetworkGameResultSender] 응답 파싱 오류: {e.Message}");
-                    }
+                    userData.FetchItemList(false, false);
                 }
-            }
+                if (this != null && isActiveAndEnabled) OnGameResultReceived?.Invoke(response);
+            }, new NetworkRequestOptions
+            {
+                Name = "GameResult", DuplicateKey = auth.Username + ":GameResult", DuplicatePolicy = DuplicateRequestPolicy.Reject
+            }, validateResponse: response => response.CharacterExpData != null);
         }
     }
 }

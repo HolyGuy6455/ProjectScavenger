@@ -11,6 +11,10 @@ namespace Scavenger.UI
         [SerializeField] private Button confirmButton;
 
         private int[] _selectedCharIds = new int[4];
+        private int _viewVersion;
+
+        private void OnEnable() { if (confirmButton != null) confirmButton.interactable = true; }
+        private void OnDisable() { _viewVersion++; }
 
         private void Start()
         {
@@ -89,12 +93,14 @@ namespace Scavenger.UI
 
         private void OnConfirmButtonClicked()
         {
+            int version = _viewVersion;
             if (confirmButton != null) confirmButton.interactable = false;
             
             if (UserDataManager.Instance != null)
             {
                 UserDataManager.Instance.SaveSelectedDeck(_selectedCharIds, (success) =>
                 {
+                    if (this == null || !isActiveAndEnabled || version != _viewVersion) return;
                     if (confirmButton != null) confirmButton.interactable = true;
                     
                     if (success)

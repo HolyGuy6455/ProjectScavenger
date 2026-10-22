@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 using Scavenger.Network;
 using Scavenger.Network.DTOs;
 
@@ -71,129 +69,66 @@ public class UserDataManager : MonoBehaviour
         }
     }
 
-    public void FetchCharacterList()
-    {
-        StartCoroutine(FetchCharacterListRoutine());
-    }
+    private int _characterRequestVersion;
+    private int _itemRequestVersion;
 
-    private IEnumerator FetchCharacterListRoutine()
+    public void FetchCharacterList() => FetchCharacterList(true);
+
+    public void FetchCharacterList(bool showLoading, bool showErrorToast = true)
     {
-        string url = $"{NetworkAuthManager.Instance.ServerUrl}/api/game/character/list";
-        
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        var auth = NetworkAuthManager.Instance;
+        if (auth == null) return;
+        string token = auth.AuthToken;
+        int version = ++_characterRequestVersion;
+        var request = NetworkRequestManager.CreateJsonRequest(auth.ServerUrl + "/api/game/character/list", "GET", authToken: token);
+        NetworkRequestManager.Instance.Send<UserCharacterListResponse>(request, response =>
         {
-            request.SetRequestHeader("Authorization", $"Bearer {NetworkAuthManager.Instance.AuthToken}");
-            
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
+            if (this == null || auth == null || auth.AuthToken != token || version != _characterRequestVersion) return;
+            OwnedCharacters = response.characters;
+            if (response.selectedDeck != null && response.selectedDeck.Length == 4) SelectedDeck = response.selectedDeck;
+            HasLoadedCharacterData = true;
+            if (IsInitialDataLoaded) InitialDataError = null;
+            OnCharacterDataUpdated?.Invoke();
+        }, new NetworkRequestOptions { Name = "CharacterList", ShowLoading = showLoading, ShowErrorToast = showErrorToast },
+            onFailure: error =>
             {
-                try
-                {
-                    var response = JsonUtility.FromJson<UserCharacterListResponse>(request.downloadHandler.text);
-                    if (response != null && response.characters != null)
-                    {
-                        OwnedCharacters = response.characters;
-                        if (response.selectedDeck != null && response.selectedDeck.Length == 4)
-                        {
-                            SelectedDeck = response.selectedDeck;
-                        }
-                        HasLoadedCharacterData = true;
-                        if (IsInitialDataLoaded) InitialDataError = null;
-                        Debug.Log($"[UserDataManager] 캐릭터 목록 로드 성공. 보유 캐릭터 수: {OwnedCharacters.Count}");
-                        OnCharacterDataUpdated?.Invoke();
-                    }
-                    else
-                    {
-                        InitialDataError = "Invalid character data response.";
-                        Debug.LogError($"[UserDataManager] {InitialDataError}");
-                    }
-                }
-                catch (Exception e)
-                {
-                    InitialDataError = "Failed to parse character data.";
-                    Debug.LogError($"[UserDataManager] JSON Parsing Error: {e.Message}");
-                }
-            }
-            else
-            {
-                InitialDataError = "Failed to load character data.";
-                Debug.LogError($"[UserDataManager] 캐릭터 목록 로드 실패: {request.error}\n{request.downloadHandler.text}");
-            }
-        }
+                if (this != null && version == _characterRequestVersion) InitialDataError = error.DefaultMessage;
+            }, validateResponse: response => response.characters != null);
     }
-    
+
     public UserCharacterDto GetCharacter(int charId)
     {
         return OwnedCharacters.Find(c => c.charId == charId);
     }
 
-    public void FetchItemList()
-    {
-        StartCoroutine(FetchItemListRoutine());
-    }
+    public void FetchItemList() => FetchItemList(true);
 
-    private IEnumerator FetchItemListRoutine()
+    public void FetchItemList(bool showLoading, bool showErrorToast = true)
     {
-        string url = $"{NetworkAuthManager.Instance.ServerUrl}/api/game/item/list";
-        
-        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        var auth = NetworkAuthManager.Instance;
+        if (auth == null) return;
+        string token = auth.AuthToken;
+        int version = ++_itemRequestVersion;
+        var request = NetworkRequestManager.CreateJsonRequest(auth.ServerUrl + "/api/game/item/list", "GET", authToken: token);
+        NetworkRequestManager.Instance.Send<UserCurrencyListResponse>(request, response =>
         {
-            request.SetRequestHeader("Authorization", $"Bearer {NetworkAuthManager.Instance.AuthToken}");
-            
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
+            if (this == null || auth == null || auth.AuthToken != token || version != _itemRequestVersion) return;
+            OwnedUserCurrencys.Clear();
+            if (response.userCurrencys != null)
+                foreach (var item in response.userCurrencys) OwnedUserCurrencys[item.itemId] = item.amount;
+            OwnedGameItems.Clear();
+            if (response.gameItems != null)
+                foreach (var item in response.gameItems) OwnedGameItems[item.itemId] = item.amount;
+            SyncStamina(response.stamina, response.maxStamina, response.nextStaminaRecoverySeconds);
+            HasLoadedItemData = true;
+            if (IsInitialDataLoaded) InitialDataError = null;
+            OnItemDataUpdated?.Invoke();
+            OnCurrencyDataUpdated?.Invoke();
+        }, new NetworkRequestOptions { Name = "ItemList", ShowLoading = showLoading, ShowErrorToast = showErrorToast },
+            onFailure: error =>
             {
-                try
-                {
-                    var response = JsonUtility.FromJson<UserCurrencyListResponse>(request.downloadHandler.text);
-                    if (response != null)
-                    {
-                        OwnedUserCurrencys.Clear();
-                        if (response.userCurrencys != null)
-                        {
-                            foreach (var item in response.userCurrencys)
-                            {
-                                OwnedUserCurrencys[item.itemId] = item.amount;
-                            }
-                        }
-
-                        OwnedGameItems.Clear();
-                        if (response.gameItems != null)
-                        {
-                            foreach (var item in response.gameItems)
-                            {
-                                OwnedGameItems[item.itemId] = item.amount;
-                            }
-                        }
-                        
-                        SyncStamina(response.stamina, response.maxStamina, response.nextStaminaRecoverySeconds);
-                        HasLoadedItemData = true;
-                        if (IsInitialDataLoaded) InitialDataError = null;
-
-                        Debug.Log($"[UserDataManager] 아이템 목록 로드 성공. (UserCurrencys: {OwnedUserCurrencys.Count}, GameItems: {OwnedGameItems.Count})");
-                        OnItemDataUpdated?.Invoke();
-                        OnCurrencyDataUpdated?.Invoke();
-                    }
-                    else
-                    {
-                        InitialDataError = "Invalid item data response.";
-                        Debug.LogError($"[UserDataManager] {InitialDataError}");
-                    }
-                }
-                catch (Exception e)
-                {
-                    InitialDataError = "Failed to parse item data.";
-                    Debug.LogError($"[UserDataManager] 아이템 JSON Parsing Error: {e.Message}");
-                }
-            }
-            else
-            {
-                InitialDataError = "Failed to load item data.";
-                Debug.LogError($"[UserDataManager] 아이템 목록 로드 실패: {request.error}\n{request.downloadHandler.text}");
-            }
-        }
+                if (this != null && version == _itemRequestVersion) InitialDataError = error.DefaultMessage;
+            }, validateResponse: response => response.userCurrencys != null || response.gameItems != null);
     }
 
     public int GetGameItemAmount(int itemId)
@@ -262,42 +197,19 @@ public class UserDataManager : MonoBehaviour
 
     public void SaveSelectedDeck(int[] newDeck, Action<bool> onComplete = null)
     {
-        StartCoroutine(SaveSelectedDeckRoutine(newDeck, onComplete));
-    }
-
-    private IEnumerator SaveSelectedDeckRoutine(int[] newDeck, Action<bool> onComplete)
-    {
-        string url = $"{NetworkAuthManager.Instance.ServerUrl}/api/game/character/deck";
-        
-        var requestDto = new SaveDeckRequest { selectedCharIds = newDeck };
-        string jsonData = JsonUtility.ToJson(requestDto);
-        
-        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+        var auth = NetworkAuthManager.Instance;
+        if (auth == null) { onComplete?.Invoke(false); return; }
+        string token = auth.AuthToken;
+        var request = NetworkRequestManager.CreateJsonRequest(auth.ServerUrl + "/api/game/character/deck", "POST",
+            JsonUtility.ToJson(new SaveDeckRequest { selectedCharIds = (int[])newDeck.Clone() }), token);
+        NetworkRequestManager.Instance.Send<SaveDeckResponse>(request, response =>
         {
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
-            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-            request.SetRequestHeader("Authorization", $"Bearer {NetworkAuthManager.Instance.AuthToken}");
-            
-            yield return request.SendWebRequest();
-
-            if (request.result == UnityWebRequest.Result.Success)
-            {
-                var response = JsonUtility.FromJson<SaveDeckResponse>(request.downloadHandler.text);
-                if (response != null && response.selectedDeck != null)
-                {
-                    SelectedDeck = response.selectedDeck;
-                }
-                Debug.Log("[UserDataManager] 덱 저장 성공");
-                onComplete?.Invoke(true);
-            }
-            else
-            {
-                Debug.LogError($"[UserDataManager] 덱 저장 실패: {request.error}\n{request.downloadHandler.text}");
-                onComplete?.Invoke(false);
-            }
-        }
+            if (this != null && auth != null && auth.AuthToken == token) SelectedDeck = response.selectedDeck;
+        }, new NetworkRequestOptions
+        {
+            Name = "SaveDeck", DuplicateKey = auth.Username + ":SaveDeck", DuplicatePolicy = DuplicateRequestPolicy.Reject
+        }, validateResponse: response => response.selectedDeck != null && response.selectedDeck.Length == 4,
+            onFinished: handle => onComplete?.Invoke(handle.Status == NetworkRequestStatus.Succeeded));
     }
 
     // --- 스테미너 동기화 및 로컬 계산 로직 ---

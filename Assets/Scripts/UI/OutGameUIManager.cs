@@ -320,6 +320,8 @@ namespace Scavenger.UI
 
         public void GoBack()
         {
+            if (Scavenger.Network.NetworkRequestManager.IsInputBlocked) return;
+
             if (_activePopups.Count > 0)
             {
                 GameObject topPopup = _activePopups.Peek();

@@ -1,8 +1,5 @@
 using System;
-using System.Collections;
-using System.Text;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace Scavenger.Network
 {
@@ -76,7 +73,7 @@ namespace Scavenger.Network
                 Debug.Log($"[Auth] 기존 DeviceId 발견: {deviceId}");
             }
 
-            StartCoroutine(SendLoginRequest(deviceId));
+            SendLoginRequest(deviceId);
         }
 
         // 유저가 원할 때 기기 키를 초기화하는 디버그/테스트용 함수
@@ -88,46 +85,29 @@ namespace Scavenger.Network
             StartGuestLogin(); // 초기화 후 바로 새 계정 로그인 시도
         }
 
-        private IEnumerator SendLoginRequest(string deviceId)
+        private void SendLoginRequest(string deviceId)
         {
-            string url = $"{ServerUrl}/api/auth/guest-login";
-            string jsonBody = $"{{\"deviceId\": \"{deviceId}\"}}";
-
-            using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+            var request = NetworkRequestManager.CreateJsonRequest(ServerUrl + "/api/auth/guest-login", "POST",
+                JsonUtility.ToJson(new GuestLoginRequest { deviceId = deviceId }));
+            NetworkRequestManager.Instance.Send<GuestLoginResponse>(request, response =>
             {
-                byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonBody);
-                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                request.downloadHandler = new DownloadHandlerBuffer();
-                request.SetRequestHeader("Content-Type", "application/json");
-
-                Debug.Log("[Auth] 서버에 로그인 요청을 보냅니다...");
-                yield return request.SendWebRequest();
-
-                if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
-                {
-                    Debug.LogError($"[Auth] 로그인 실패: {request.error}\n(서버가 켜져 있는지 확인하세요)");
-                    OnLoginComplete?.Invoke(false);
-                }
-                else
-                {
-                    // JSON 응답 파싱 (간단한 파싱을 위해 JsonUtility 사용)
-                    GuestLoginResponse response = JsonUtility.FromJson<GuestLoginResponse>(request.downloadHandler.text);
-                    
-                    if (response != null && !string.IsNullOrEmpty(response.token))
-                    {
-                        AuthToken = response.token;
-                        Username = response.username;
-                        Debug.Log($"[Auth] 로그인 성공! 환영합니다, {Username}");
-                        OnLoginComplete?.Invoke(true);
-                    }
-                    else
-                    {
-                        Debug.LogError("[Auth] 로그인 응답 파싱 실패");
-                        OnLoginComplete?.Invoke(false);
-                    }
-                }
-            }
+                if (this == null || PlayerPrefs.GetString(PREFS_DEVICE_ID) != deviceId) return;
+                AuthToken = response.token;
+                Username = response.username;
+                OnLoginComplete?.Invoke(true);
+            }, new NetworkRequestOptions
+            {
+                Name = "GuestLogin", DuplicateKey = "GuestLogin:" + deviceId,
+                DuplicatePolicy = DuplicateRequestPolicy.Reject
+            }, onFailure: error =>
+            {
+                if (this != null && PlayerPrefs.GetString(PREFS_DEVICE_ID) == deviceId) OnLoginComplete?.Invoke(false);
+            },
+                validateResponse: response => !string.IsNullOrEmpty(response.token));
         }
+
+        [Serializable]
+        private class GuestLoginRequest { public string deviceId; }
 
         [Serializable]
         private class GuestLoginResponse
