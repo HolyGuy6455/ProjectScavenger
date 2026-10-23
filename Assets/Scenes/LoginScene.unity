@@ -586,6 +586,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5049836756595177348, guid: fb1e589b4ab002749a13e0a655781620, type: 3}
+      propertyPath: startupDownloadKeys.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8389506994711050304, guid: fb1e589b4ab002749a13e0a655781620, type: 3}
       propertyPath: m_Name
       value: LoginPanel

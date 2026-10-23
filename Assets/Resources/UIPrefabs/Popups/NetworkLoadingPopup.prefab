@@ -357,3 +357,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.NetworkLoadingPopup
   spinner: {fileID: 2367453577854848502}
   rotationSpeed: 360
+  fadeInDuration: 0.2
+  fadeOutDuration: 0.2
