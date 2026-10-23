@@ -422,6 +422,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.ToastPopup
   messageText: {fileID: 310473456079048938}
   defaultDuration: 2
+  fadeInDuration: 0.2
+  fadeOutDuration: 0.2
 --- !u!225 &346474713841900374
 CanvasGroup:
   m_ObjectHideFlags: 0

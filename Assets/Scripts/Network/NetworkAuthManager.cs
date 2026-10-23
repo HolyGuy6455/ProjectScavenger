@@ -98,7 +98,9 @@ namespace Scavenger.Network
             }, new NetworkRequestOptions
             {
                 Name = "GuestLogin", DuplicateKey = "GuestLogin:" + deviceId,
-                DuplicatePolicy = DuplicateRequestPolicy.Reject
+                DuplicatePolicy = DuplicateRequestPolicy.Reject,
+                // 로그인 화면 자체의 상태 안내와 시작 버튼으로 진행 상태를 관리합니다.
+                ShowLoading = false
             }, onFailure: error =>
             {
                 if (this != null && PlayerPrefs.GetString(PREFS_DEVICE_ID) == deviceId) OnLoginComplete?.Invoke(false);

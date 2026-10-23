@@ -256,16 +256,19 @@ namespace Scavenger.Network
             catch (Exception ex) { Debug.LogException(ex); }
         }
 
-        public void ShowToast(string message)
+        // 일반 UI와 네트워크 오류가 같은 토스트 인스턴스/대기열을 사용합니다.
+        public ToastPopup ShowToast(string message, float? duration = null)
         {
+            if (string.IsNullOrWhiteSpace(message)) return _toast;
             EnsureCanvas();
             if (_toast == null)
             {
                 var prefab = Resources.Load<ToastPopup>("UIPrefabs/Popups/ToastPopup");
-                if (prefab == null) { Debug.LogWarning("[Network] ToastPopup 프리팹이 없습니다."); return; }
+                if (prefab == null) { Debug.LogWarning("[Network] ToastPopup 프리팹이 없습니다."); return null; }
                 _toast = Instantiate(prefab, _canvas.transform, false);
             }
-            _toast.Show(message);
+            _toast.Show(message, duration);
+            return _toast;
         }
 
         private void EnsureCanvas()
@@ -277,8 +280,9 @@ namespace Scavenger.Network
             _canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             _canvas.sortingOrder = 32760;
             var scaler = go.GetComponent<CanvasScaler>();
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(800f, 600f);
+            // 기존 씬 Canvas와 같은 배율로 프리팹에 지정한 UI 크기를 유지합니다.
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+            scaler.scaleFactor = 1f;
         }
 
         private void RefreshLoading()
@@ -290,7 +294,11 @@ namespace Scavenger.Network
                 if (prefab != null) _loadingPopup = Instantiate(prefab, _canvas.transform, false);
                 else Debug.LogError("[Network] NetworkLoadingPopup 프리팹이 없습니다.");
             }
-            if (_loadingPopup != null) _loadingPopup.gameObject.SetActive(BlockingRequestCount > 0);
+            if (_loadingPopup != null)
+            {
+                if (BlockingRequestCount > 0) _loadingPopup.Show();
+                else _loadingPopup.Hide();
+            }
             if (_toast != null) _toast.transform.SetAsLastSibling();
             UpdateNavigationBlock();
         }
@@ -319,6 +327,8 @@ namespace Scavenger.Network
         {
             _stopping = true;
             foreach (var pending in new List<PendingRequest>(_pending.Values)) Finish(pending, NetworkRequestStatus.Cancelled);
+            if (_loadingPopup != null) _loadingPopup.gameObject.SetActive(false);
+            if (_toast != null) _toast.Hide();
             _stopping = false;
         }
         private void OnDestroy() { if (_instance == this) _instance = null; }

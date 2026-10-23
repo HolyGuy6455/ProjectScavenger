@@ -46,7 +46,7 @@ public static class NetworkRequestRegression
         _checks = 0;
         _unexpectedLog = null;
         Application.logMessageReceived += CheckLog;
-        _deadline = EditorApplication.timeSinceStartup + 30;
+        _deadline = EditorApplication.timeSinceStartup + 60;
         _server = new LocalServer();
         _manager = NetworkRequestManager.Instance;
         Result = "RUNNING";
@@ -108,28 +108,76 @@ public static class NetworkRequestRegression
         rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one; rect.sizeDelta = Vector2.zero;
 
         Time.timeScale = 0;
-        var first = Send("/slow");
-        var second = Send("/slower");
+        var first = Send("/hold-first");
+        var second = Send("/hold-second");
         var background = Send("/slow", new NetworkRequestOptions { ShowLoading = false });
         Check(first.Id != second.Id, "Unique request IDs");
         Check(_manager.ActiveRequestCount == 3 && _manager.BlockingRequestCount == 2, "Concurrent and background counts");
         Check(NetworkRequestManager.IsInputBlocked && !events.sendNavigationEvents, "Input immediately blocked");
         var loading = Object.FindFirstObjectByType<NetworkLoadingPopup>();
         Check(loading != null, "Loading prefab instantiated");
+        var loadingGroup = loading.GetComponent<CanvasGroup>();
+        Check(loadingGroup.alpha == 0f && loadingGroup.blocksRaycasts, "Fade starts transparent with immediate input blocking");
         var spinner = loading.transform.Find("Root/Spinner");
         float angle = spinner.localEulerAngles.z;
         int frame = Time.frameCount;
         while (Time.frameCount < frame + 3) yield return null;
         Check(Mathf.Abs(Mathf.DeltaAngle(angle, spinner.localEulerAngles.z)) > 0.1f, "Spinner moves at timeScale zero");
+        Check(loadingGroup.alpha > 0f, "Fade-in progresses at timeScale zero");
         var hits = new System.Collections.Generic.List<RaycastResult>();
         events.RaycastAll(new PointerEventData(events) { position = new Vector2(Screen.width / 2f, Screen.height / 2f) }, hits);
         Check(hits.Count > 0 && hits[0].gameObject == loading.gameObject, "Overlay blocks underlying button");
+        _server.ReleaseFirst = true;
         while (!first.IsDone || !background.IsDone) yield return null;
         Check(first.Status == NetworkRequestStatus.Succeeded, "Valid JSON succeeds");
         Check(!second.IsDone && loading.gameObject.activeSelf, "One response does not hide another request's loader");
+        while (loadingGroup.alpha < 1f) yield return null;
+        _server.ReleaseSecond = true;
         while (!second.IsDone) yield return null;
-        Check(_manager.ActiveRequestCount == 0 && !loading.gameObject.activeSelf, "Last request hides loader");
+        Check(_manager.ActiveRequestCount == 0 && !loadingGroup.blocksRaycasts, "Last response immediately releases pointer blocking");
+        Check(loading.gameObject.activeSelf && loadingGroup.alpha > 0f, "Last response fades out instead of disappearing instantly");
         Check(events.sendNavigationEvents && !NetworkRequestManager.IsInputBlocked, "Navigation restored");
+        while (loading.gameObject.activeSelf) yield return null;
+        Check(loadingGroup.alpha == 0f, "Fade-out completes at timeScale zero");
+
+        // 짧은 요청은 완전히 불투명해질 때까지 기다리지 않고 현재 투명도에서 사라집니다.
+        first = Send("/ok");
+        float peakAlpha = loadingGroup.alpha;
+        while (!first.IsDone) { peakAlpha = Mathf.Max(peakAlpha, loadingGroup.alpha); yield return null; }
+        Check(peakAlpha < 1f && loadingGroup.alpha < 1f, "Quick response never flashes to full opacity");
+        while (loading.gameObject.activeSelf) yield return null;
+
+        // 에디터의 프레임 간격과 서버 응답 시간이 달라도 중간 페이드 상태를 확실히 관찰합니다.
+        SetField(loading, "fadeOutDuration", 10f);
+        _server.ReleaseFirst = false;
+        _server.ReleaseSecond = false;
+        first = Send("/hold-first");
+        while (loadingGroup.alpha < 1f) yield return null;
+        _server.ReleaseFirst = true;
+        while (!first.IsDone) yield return null;
+        while (loadingGroup.alpha >= 0.99f) yield return null;
+        float fadeOutAlpha = loadingGroup.alpha;
+        second = Send("/hold-second");
+        Check(fadeOutAlpha > 0f && Mathf.Approximately(loadingGroup.alpha, fadeOutAlpha),
+            "New request preserves current fade-out opacity: " + fadeOutAlpha + " -> " + loadingGroup.alpha);
+        Check(loadingGroup.blocksRaycasts && NetworkRequestManager.IsInputBlocked, "New request immediately restores input blocking");
+        while (!second.IsDone && loadingGroup.alpha <= fadeOutAlpha) yield return null;
+        Check(loadingGroup.alpha > fadeOutAlpha, "Interrupted fade-out reverses into fade-in");
+        SetField(loading, "fadeOutDuration", 0.2f);
+        _server.ReleaseSecond = true;
+        while (!second.IsDone) yield return null;
+        while (loading.gameObject.activeSelf) yield return null;
+
+        SetField(loading, "fadeInDuration", 0f);
+        SetField(loading, "fadeOutDuration", 0f);
+        int beforeZeroFade = _server.Hits;
+        first = Send("/slow");
+        Check(loadingGroup.alpha == 1f, "Zero fade-in duration shows immediately");
+        while (_server.Hits == beforeZeroFade) yield return null;
+        first.Cancel();
+        Check(!loading.gameObject.activeSelf && loadingGroup.alpha == 0f, "Zero fade-out duration hides immediately");
+        SetField(loading, "fadeInDuration", 0.2f);
+        SetField(loading, "fadeOutDuration", 0.2f);
 
         int before = _server.Hits, finished = 0, failures = 0;
         var options = new NetworkRequestOptions { DuplicateKey = "same", DuplicatePolicy = DuplicateRequestPolicy.Reject };
@@ -267,9 +315,193 @@ public static class NetworkRequestRegression
         while (_manager.ActiveRequestCount > 0) yield return null;
         Check(toast.GetComponentInChildren<TMPro.TextMeshProUGUI>().text == "스킬 레벨업에 필요한 재료가 부족합니다.", "Skill-specific failure toast retained");
 
+        toast.Hide();
+        var toastCases = ToastCases();
+        while (toastCases.MoveNext()) yield return toastCases.Current;
+        var fadeCases = ToastFadeCases();
+        while (fadeCases.MoveNext()) yield return fadeCases.Current;
+        var earlyExitCases = ToastEarlyExitCases();
+        while (earlyExitCases.MoveNext()) yield return earlyExitCases.Current;
+
         first = Send("/slow");
+        toast.Show("Shutdown active", 10f);
+        toast.Show("Shutdown pending", 10f);
         _manager.gameObject.SetActive(false);
         Check(first.Status == NetworkRequestStatus.Cancelled && _manager.ActiveRequestCount == 0, "Manager shutdown cancels and releases requests");
+        _manager.gameObject.SetActive(true);
+        Check(!toast.gameObject.activeSelf, "Re-enabling manager does not revive stale toast");
+        toast.Show("Restarted", 0.1f);
+        double restartDeadline = Time.realtimeSinceStartupAsDouble + 2;
+        while (toast.gameObject.activeSelf && Time.realtimeSinceStartupAsDouble < restartDeadline) yield return null;
+        Check(!toast.gameObject.activeSelf, "Manager shutdown also clears the shared toast queue");
+    }
+
+    private static IEnumerator ToastCases()
+    {
+        var uiObject = CreateIntegrationObject("RegressionOutGameUI");
+        uiObject.SetActive(false); // 로비 패널을 생성하는 Start는 실행하지 않습니다.
+        var ui = uiObject.AddComponent<OutGameUIManager>();
+        var toast = ui.ShowToast("First", 0.3f);
+        var label = toast.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        Check(label.text == "First" && toast.isActiveAndEnabled, "Idle toast displays immediately through UI manager");
+        Check(_manager.ShowToast("First", 10f) == toast, "UI and network share one cached toast");
+        ui.ShowToast("Second", 0.3f);
+        _manager.ShowToast("Second", 10f);
+        _manager.ShowToast("Third", 0.3f);
+        Check(label.text == "First", "Queued messages do not replace the current toast");
+        double deadline = Time.realtimeSinceStartupAsDouble + 5;
+        while (label.text == "First" && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+        Check(label.text == "Second", "Active duplicate does not extend display duration; FIFO advances at timeScale zero");
+        while (label.text == "Second" && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+        Check(label.text == "Third", "Pending duplicate neither evicts a message nor replaces its duration");
+        while (toast.gameObject.activeSelf && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+        Check(!toast.gameObject.activeSelf, "Toast hides when the queue is empty");
+
+        toast.Show("Burst start", 0.3f);
+        for (int i = 0; i < 100; i++) _manager.ShowToast("Burst " + i, 0.3f);
+        Check(label.text == "Burst start", "Burst preserves the currently visible message");
+        deadline = Time.realtimeSinceStartupAsDouble + 5;
+        while (label.text == "Burst start" && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+        Check(label.text == "Burst 98", "Only the newest two messages remain pending after 100 requests");
+        while (label.text == "Burst 98" && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+        Check(label.text == "Burst 99", "Newest pending message follows in order");
+        while (toast.gameObject.activeSelf && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+        Check(!toast.gameObject.activeSelf, "Burst drains without a long backlog");
+
+        // 긴 페이드아웃으로 대기 시간을 확보합니다. 새 요청도 페이드아웃을 단축하면 안 됩니다.
+        SetField(toast, "fadeOutDuration", 5.5f);
+        double started = Time.realtimeSinceStartupAsDouble;
+        toast.Show("Long fade-out", 10f);
+        toast.Show("Expired pending", 10f);
+        while (Time.realtimeSinceStartupAsDouble - started < 3) yield return null;
+        toast.Show("Expired pending", 10f);
+        while (Time.realtimeSinceStartupAsDouble - started < 4.5) yield return null;
+        toast.Show("Fresh pending", 0.3f);
+        while (label.text == "Long fade-out" && Time.realtimeSinceStartupAsDouble - started < 10) yield return null;
+        Check(label.text == "Fresh pending", "Pending messages older than five seconds expire despite duplicate requests");
+        SetField(toast, "fadeOutDuration", 0.2f);
+        while (toast.gameObject.activeSelf && Time.realtimeSinceStartupAsDouble - started < 10) yield return null;
+        Check(!toast.gameObject.activeSelf, "Fresh pending message still displays after stale message is discarded");
+
+        toast.Show("Dismiss", 10f);
+        toast.Show("Discard with dismissal", 10f);
+        toast.Hide();
+        toast.Show("After dismissal", 0.1f);
+        deadline = Time.realtimeSinceStartupAsDouble + 2;
+        while (toast.gameObject.activeSelf && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+        Check(!toast.gameObject.activeSelf && label.text == "After dismissal", "Explicit hide clears old pending messages");
+        _manager.ShowToast("  ");
+        Check(!toast.gameObject.activeSelf, "Empty messages do not activate the overlay");
+
+        _server.ReleaseFirst = false;
+        var remaining = Send("/hold-first");
+        var failed = Send("/failure", new NetworkRequestOptions());
+        while (!failed.IsDone) yield return null;
+        var loading = Object.FindFirstObjectByType<NetworkLoadingPopup>();
+        Check(!remaining.IsDone && NetworkRequestManager.IsInputBlocked && loading.gameObject.activeSelf,
+            "One failed request keeps another request's loading overlay active");
+        Check(label.text == "재료가 부족합니다." && toast.isActiveAndEnabled,
+            "Failure toast displays before the remaining request completes");
+        Check(toast.transform.parent == loading.transform.parent
+            && toast.transform.GetSiblingIndex() > loading.transform.GetSiblingIndex(), "Toast renders above the loading popup");
+        Check(!toast.GetComponent<CanvasGroup>().blocksRaycasts, "Toast does not intercept overlay input blocking");
+        Check(ui.ShowToast("UI during loading", 0.3f) == toast, "UI notification joins the same queue during loading");
+        deadline = Time.realtimeSinceStartupAsDouble + 4;
+        while (label.text != "UI during loading" && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+        Check(label.text == "UI during loading" && NetworkRequestManager.IsInputBlocked,
+            "Queued UI notification displays while another request is still pending");
+        Check(Object.FindObjectsByType<ToastPopup>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length == 1,
+            "All notifications reuse one toast instance");
+        _server.ReleaseFirst = true;
+        while (!remaining.IsDone) yield return null;
+        toast.Hide();
+    }
+
+    private static IEnumerator ToastFadeCases()
+    {
+        var toast = _manager.ShowToast("Fade A", 0.3f);
+        var label = toast.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        var group = toast.GetComponent<CanvasGroup>();
+        Check(group.alpha == 0f, "Toast starts fully transparent");
+        toast.Show("Fade B", 0.3f);
+        float previousAlpha = group.alpha;
+        bool sawFadeIn = false, sawFadeOut = false;
+        double deadline = Time.realtimeSinceStartupAsDouble + 6;
+        while (label.text == "Fade A" && Time.realtimeSinceStartupAsDouble < deadline)
+        {
+            if (group.alpha > previousAlpha && group.alpha < 1f) sawFadeIn = true;
+            if (group.alpha < previousAlpha && group.alpha > 0f) sawFadeOut = true;
+            previousAlpha = group.alpha;
+            yield return null;
+        }
+        Check(sawFadeIn && sawFadeOut, "Toast smoothly fades in and out at timeScale zero");
+        Check(label.text == "Fade B" && group.alpha == 0f,
+            "Queued toast replaces the previous message only at full transparency");
+
+        bool queuedDuringFadeOut = false;
+        previousAlpha = group.alpha;
+        while (label.text == "Fade B" && Time.realtimeSinceStartupAsDouble < deadline)
+        {
+            if (!queuedDuringFadeOut && group.alpha < previousAlpha && group.alpha > 0f)
+            {
+                float beforeEnqueue = group.alpha;
+                toast.Show("Fade C", 0.3f);
+                Check(label.text == "Fade B" && group.alpha == beforeEnqueue,
+                    "New request during fade-out does not replace or restart the visible toast");
+                queuedDuringFadeOut = true;
+            }
+            previousAlpha = group.alpha;
+            yield return null;
+        }
+        Check(queuedDuringFadeOut && label.text == "Fade C" && group.alpha == 0f,
+            "Request received during fade-out begins its own fade-in after the previous toast disappears");
+        while (toast.gameObject.activeSelf && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+        Check(!toast.gameObject.activeSelf && group.alpha == 0f, "Last toast deactivates fully transparent");
+
+        SetField(toast, "fadeInDuration", 0f);
+        SetField(toast, "fadeOutDuration", 0f);
+        toast.Show("Zero fade", 0.3f);
+        deadline = Time.realtimeSinceStartupAsDouble + 2;
+        while (group.alpha < 1f && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+        Check(group.alpha == 1f, "Zero fade duration reaches full opacity");
+        while (toast.gameObject.activeSelf && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+        Check(!toast.gameObject.activeSelf && group.alpha == 0f, "Zero fade duration still completes and clears opacity");
+        SetField(toast, "fadeInDuration", 0.2f);
+        SetField(toast, "fadeOutDuration", 0.2f);
+    }
+
+    private static IEnumerator ToastEarlyExitCases()
+    {
+        var toast = _manager.ShowToast("Early A", 5f);
+        var label = toast.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        var group = toast.GetComponent<CanvasGroup>();
+        double deadline = Time.realtimeSinceStartupAsDouble + 3;
+        while (group.alpha < 1f && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+        Check(group.alpha == 1f, "Toast reaches its fully visible hold phase");
+
+        // 같은 문구와 빈 문구는 현재 메시지의 유지 시간을 조기 종료하지 않습니다.
+        toast.Show("Early A", 10f);
+        toast.Show("  ");
+        double holdStarted = Time.realtimeSinceStartupAsDouble;
+        while (Time.realtimeSinceStartupAsDouble - holdStarted < 0.3) yield return null;
+        Check(label.text == "Early A" && group.alpha == 1f, "Duplicate and empty messages do not interrupt the current hold");
+
+        double requestedAt = Time.realtimeSinceStartupAsDouble;
+        toast.Show("Early B", 0.5f);
+        Check(label.text == "Early A" && group.alpha == 1f, "New message does not instantly replace or hide the current toast");
+        while (label.text == "Early A" && Time.realtimeSinceStartupAsDouble - requestedAt < 2) yield return null;
+        double transitionTime = Time.realtimeSinceStartupAsDouble - requestedAt;
+        Check(label.text == "Early B" && transitionTime >= 0.18 && transitionTime < 2,
+            "New request skips the five-second hold but preserves the full 0.2-second fade-out: " + transitionTime);
+        Check(group.alpha == 0f, "Replacement starts its own fade-in from zero alpha");
+
+        deadline = Time.realtimeSinceStartupAsDouble + 3;
+        while (group.alpha < 1f && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+        double nextHoldStarted = Time.realtimeSinceStartupAsDouble;
+        while (Time.realtimeSinceStartupAsDouble - nextHoldStarted < 0.2) yield return null;
+        Check(label.text == "Early B" && group.alpha == 1f, "Replacement receives its own hold duration");
+        while (toast.gameObject.activeSelf && Time.realtimeSinceStartupAsDouble < deadline) yield return null;
+        Check(!toast.gameObject.activeSelf && group.alpha == 0f, "Replacement fades out normally when no new requests arrive");
     }
 
     private static GameObject CreateIntegrationObject(string name)
@@ -306,6 +538,8 @@ public static class NetworkRequestRegression
         private readonly CancellationTokenSource _stop = new CancellationTokenSource();
         private int _hits;
         public volatile bool FailSkill;
+        public volatile bool ReleaseFirst;
+        public volatile bool ReleaseSecond;
         public volatile string LastSkillBody;
         public int Hits => Volatile.Read(ref _hits);
         public string Url { get; }
@@ -350,6 +584,8 @@ public static class NetworkRequestRegression
                 }
                 if (path == "/api/game/levelup-skill") LastSkillBody = new string(requestBody);
                 Interlocked.Increment(ref _hits);
+                while ((path == "/hold-first" && !ReleaseFirst) || (path == "/hold-second" && !ReleaseSecond))
+                    await Task.Delay(10, _stop.Token).ConfigureAwait(false);
                 int delay = path == "/slow" || path.StartsWith("/api/game/levelup-") ? 350 : path == "/slower" ? 1000 : path == "/timeout" ? 2500 : 20;
                 await Task.Delay(delay, _stop.Token).ConfigureAwait(false);
                 string body = path == "/invalid" ? "<html>oops</html>" : path == "/invalid-fields" ? "{}"

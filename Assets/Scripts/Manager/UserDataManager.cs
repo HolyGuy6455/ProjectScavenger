@@ -64,8 +64,9 @@ public class UserDataManager : MonoBehaviour
             HasLoadedCharacterData = false;
             HasLoadedItemData = false;
             InitialDataError = null;
-            FetchCharacterList();
-            FetchItemList();
+            // 로그인 직후 최초 데이터 로딩은 로그인 화면에서 안내합니다.
+            FetchCharacterList(showLoading: false);
+            FetchItemList(showLoading: false);
         }
     }
 
