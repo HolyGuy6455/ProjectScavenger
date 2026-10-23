@@ -24,8 +24,18 @@ namespace Scavenger.UI
         [Header("Exp Bar")]
         [SerializeField] private Image expBarFill;
 
+        private IEnumerator _pendingExpBarAnimation;
+        private Coroutine _expBarAnimation;
+
         public void Setup(CharData charData, int oldLevel, int newLevel, int oldExp, int newExp, int maxExpForOldLevel, int maxExpForNewLevel, int addedExp)
         {
+            if (_expBarAnimation != null)
+            {
+                StopCoroutine(_expBarAnimation);
+                _expBarAnimation = null;
+            }
+            _pendingExpBarAnimation = null;
+
             if (charData == null) return;
 
             bool isLevelUp = newLevel > oldLevel;
@@ -78,8 +88,18 @@ namespace Scavenger.UI
                 if (charLevelUpText != null) charLevelUpText.gameObject.SetActive(false);
             }
 
-            // 경험치 바 채우기 애니메이션 시작
-            StartCoroutine(ExpBarAnimation(oldLevel, newLevel, oldExp, newExp, maxExpForOldLevel, maxExpForNewLevel, addedExp));
+            // 비활성 상태에서는 초기 표시와 코루틴만 준비하고, 팝업이 나타난 뒤 실행합니다.
+            if (expBarFill != null) expBarFill.fillAmount = (float)oldExp / maxExpForOldLevel;
+            _pendingExpBarAnimation = ExpBarAnimation(oldLevel, newLevel, oldExp, newExp, maxExpForOldLevel, maxExpForNewLevel, addedExp);
+        }
+
+        public void PlayExpBarAnimation()
+        {
+            if (!isActiveAndEnabled || _pendingExpBarAnimation == null) return;
+
+            IEnumerator animation = _pendingExpBarAnimation;
+            _pendingExpBarAnimation = null;
+            _expBarAnimation = StartCoroutine(animation);
         }
 
         private IEnumerator ExpBarAnimation(int oldLevel, int newLevel, int oldExp, int newExp, int maxExpForOldLevel, int maxExpForNewLevel, int addedExp)

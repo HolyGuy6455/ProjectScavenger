@@ -156,6 +156,13 @@ namespace Scavenger.UI
             {
                 // 팝업이 다 나타난 뒤에 경험치 바 차오르는 연출 시작
                 StartCoroutine(CommanderExpBarAnimation(_playerExpResultForAnim));
+                if (charNodes != null)
+                {
+                    foreach (var charNode in charNodes)
+                    {
+                        if (charNode != null) charNode.PlayExpBarAnimation();
+                    }
+                }
                 onAnimationFinished?.Invoke();
             }));
         }
