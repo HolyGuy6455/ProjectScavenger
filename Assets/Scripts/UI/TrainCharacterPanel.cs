@@ -227,7 +227,7 @@ public class TrainCharacterPanel : MonoBehaviour
         TrainCharacterPolaroid polaroid = obj.GetComponent<TrainCharacterPolaroid>();
         if (polaroid != null)
         {
-            Sprite icon = LoadSprite(masterData.resourceSlot);
+            Sprite icon = SpriteManager.Instance.LoadSprite(masterData.resourceSlot);
             polaroid.Setup(charDto, masterData, icon);
             polaroid.OnPolaroidClicked += HandlePolaroidClicked;
         }
@@ -272,7 +272,7 @@ public class TrainCharacterPanel : MonoBehaviour
         
         if (characterImage != null)
         {
-            Sprite standSprite = LoadSprite(masterData.resourceStand);
+            Sprite standSprite = SpriteManager.Instance.LoadSprite(masterData.resourceStand);
             if (standSprite != null)
             {
                 characterImage.sprite = standSprite;
@@ -391,7 +391,7 @@ public class TrainCharacterPanel : MonoBehaviour
             if (itemData != null)
             {
                 int currentAmount = UserDataManager.Instance.GetGameItemAmount(itemId);
-                Sprite icon = LoadSprite(itemData.uiResource);
+                Sprite icon = SpriteManager.Instance.LoadSprite(itemData.uiResource);
                 
                 if (levelingCostSlots[slotIndex] != null)
                 {
@@ -421,19 +421,6 @@ public class TrainCharacterPanel : MonoBehaviour
                 popup.Open(_selectedCharId, slotIndex);
             }
         }
-    }
-
-    private Sprite LoadSprite(string resourceName)
-    {
-        if (string.IsNullOrEmpty(resourceName)) return null;
-        string nameWithoutExt = System.IO.Path.GetFileNameWithoutExtension(resourceName);
-        
-        Sprite loadedSprite = Resources.Load<Sprite>($"char/{nameWithoutExt}");
-        if (loadedSprite == null)
-        {
-            loadedSprite = Resources.Load<Sprite>(nameWithoutExt);
-        }
-        return loadedSprite;
     }
 
     public void OnClickLevelUp()

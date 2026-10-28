@@ -116,9 +116,7 @@ namespace Scavenger.UI
 
             if (face != null && !string.IsNullOrEmpty(charData.resourceSlot))
             {
-                string path = charData.resourceSlot.Replace(".png", "");
-                Sprite loadedSprite = Resources.Load<Sprite>($"char/{path}");
-                if (loadedSprite == null) loadedSprite = Resources.Load<Sprite>(path);
+                Sprite loadedSprite = SpriteManager.Instance.LoadSprite(charData.resourceSlot);
                 if (loadedSprite != null) face.sprite = loadedSprite;
             }
 
@@ -157,7 +155,7 @@ namespace Scavenger.UI
             var skillData = DataManager.Instance.GetData<SkillData>("Skill", skillId);
             if (skillData != null && !string.IsNullOrEmpty(skillData.resourceIcon))
             {
-                Sprite skillSprite = SkillIconLoader.Load(skillData.resourceIcon);
+                Sprite skillSprite = SpriteManager.Instance.LoadSprite(skillData.resourceIcon);
                 
                 if (skillSprite != null)
                 {

@@ -111,24 +111,16 @@ namespace Scavenger.UI
             if (reward.Type == "USER_ITEM")
             {
                 var currency = DataManager.Instance.GetData<UserCurrencyData>("UserCurrency", reward.Id);
-                return LoadRewardSprite(currency?.ui_resources, "UserCurrency");
+                return SpriteManager.Instance.LoadSprite(currency?.ui_resources);
             }
 
             if (reward.Type == "ITEM")
             {
                 var item = DataManager.Instance.GetData<ItemData>("Item", reward.Id);
-                return LoadRewardSprite(item?.uiResource, "Items");
+                return SpriteManager.Instance.LoadSprite(item?.uiResource);
             }
 
             return null;
-        }
-
-        private Sprite LoadRewardSprite(string resourceName, string folder)
-        {
-            if (string.IsNullOrWhiteSpace(resourceName) || resourceName == "_") return null;
-
-            string iconName = System.IO.Path.GetFileNameWithoutExtension(resourceName);
-            return Resources.Load<Sprite>($"{folder}/{iconName}") ?? Resources.Load<Sprite>(iconName);
         }
 
         private void ApplyRandomStyle()

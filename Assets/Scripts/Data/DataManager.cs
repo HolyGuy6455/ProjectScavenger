@@ -199,6 +199,8 @@ public class DataManager : MonoBehaviour
             {
                 foreach (TData data in dataList.GetList())
                 {
+                    // Older remote Addressables tables may still contain filename-only sprite keys.
+                    SpriteResourcePaths.Normalize(data);
                     targetMap[data.GetId()] = data;
                 }
                 Debug.Log($"[DataManager] Successfully loaded {targetMap.Count} '{category}' datas.");

@@ -40,13 +40,7 @@ public class CharacterLevelUpCelebrationPopup : MonoBehaviour
 
         if (characterStandingImage != null)
         {
-            string standPath = System.IO.Path.GetFileNameWithoutExtension(charData.resourceStand);
-            Sprite loadedSprite = Resources.Load<Sprite>($"char/{standPath}");
-            
-            if (loadedSprite == null) 
-            {
-                loadedSprite = Resources.Load<Sprite>(standPath);
-            }
+            Sprite loadedSprite = SpriteManager.Instance.LoadSprite(charData.resourceStand);
 
             if (loadedSprite != null)
             {

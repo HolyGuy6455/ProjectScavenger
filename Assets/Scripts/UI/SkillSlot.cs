@@ -71,11 +71,11 @@ public class SkillSlot : MonoBehaviour
         {
             if (!string.IsNullOrEmpty(data.resourceIcon))
             {
-                normalSprite = SkillIconLoader.Load(data.resourceIcon);
+                normalSprite = SpriteManager.Instance.LoadSprite(data.resourceIcon);
             }
             if (!string.IsNullOrEmpty(data.resourceIcon2))
             {
-                toggledSprite = SkillIconLoader.Load(data.resourceIcon2);
+                toggledSprite = SpriteManager.Instance.LoadSprite(data.resourceIcon2);
             }
         }
 
@@ -85,7 +85,7 @@ public class SkillSlot : MonoBehaviour
         }
         else
         {
-            icon.sprite = Resources.Load<Sprite>("skill_reload_nothing");
+            icon.sprite = SpriteManager.Instance.LoadSprite("skill_reload_nothing");
         }
     }
 
@@ -105,7 +105,7 @@ public class SkillSlot : MonoBehaviour
         }
         else
         {
-            icon.sprite = Resources.Load<Sprite>("skill_reload_nothing");
+            icon.sprite = SpriteManager.Instance.LoadSprite("skill_reload_nothing");
         }
 
         float cd = currentSkill.currentCooldown;

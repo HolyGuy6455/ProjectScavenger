@@ -54,7 +54,7 @@ namespace Scavenger.UI
             if (loadingImage == null) return;
 
             string path = LoadingImagePaths[UnityEngine.Random.Range(0, LoadingImagePaths.Length)];
-            var sprite = Resources.Load<Sprite>(path);
+            var sprite = SpriteManager.Instance.LoadSprite(path);
             if (sprite == null)
             {
                 Debug.LogWarning($"[LoadingScreen] Loading image not found: {path}");
@@ -91,7 +91,9 @@ namespace Scavenger.UI
 
         private System.Collections.IEnumerator StartupCleanupRoutine()
         {
-            // 로딩 씬에 진입하자마자 이전 씬(메인화면이든 인게임이든)에서 남긴 쓰레기 메모리를 싹 비웁니다.
+            // 이전 씬의 비활성 패널까지 파괴된 뒤 조회 캐시의 참조를 놓습니다.
+            // 현재 로딩 이미지나 공용 UI가 참조하는 에셋은 Unity가 계속 유지합니다.
+            SpriteManager.Instance.ClearSceneCache();
             System.GC.Collect();
             yield return Resources.UnloadUnusedAssets();
 
@@ -512,7 +514,9 @@ namespace Scavenger.UI
                 Destroy(Scavenger.Manager.GameFlowManager.Instance.gameObject);
             }
 
-            // 기타 불필요한 메모리 해제
+            // Destroy가 처리된 뒤 씬 범위 캐시와 미사용 에셋을 정리합니다.
+            yield return null;
+            SpriteManager.Instance.ClearSceneCache();
             System.GC.Collect();
             yield return Resources.UnloadUnusedAssets();
 

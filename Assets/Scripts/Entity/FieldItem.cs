@@ -47,10 +47,7 @@ public class FieldItem : NetworkBehaviour
         ItemData data = DataManager.Instance.GetData<ItemData>("Item", itemId.Value);
         if (data != null && !string.IsNullOrEmpty(data.uiResource))
         {
-            // InventoryUI와 동일하게 이름에서 확장자를 제거하고 로드합니다.
-            string nameWithoutExt = data.uiResource.Replace(".png", "").Replace(".jpg", "");
-            Sprite loadedSprite = Resources.Load<Sprite>($"Items/{nameWithoutExt}");
-            if (loadedSprite == null) loadedSprite = Resources.Load<Sprite>(nameWithoutExt);
+            Sprite loadedSprite = SpriteManager.Instance.LoadSprite(data.uiResource);
             
             if (_spriteRenderer == null)
             {

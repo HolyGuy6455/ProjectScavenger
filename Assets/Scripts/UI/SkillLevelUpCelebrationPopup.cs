@@ -30,7 +30,7 @@ public class SkillLevelUpCelebrationPopup : MonoBehaviour
 
         if (skillIcon != null)
         {
-            Sprite loadedSprite = SkillIconLoader.Load(newSkillData.resourceIcon);
+            Sprite loadedSprite = SpriteManager.Instance.LoadSprite(newSkillData.resourceIcon);
             skillIcon.sprite = loadedSprite;
         }
 

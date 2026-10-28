@@ -34,7 +34,7 @@ public class SkillSelectTabButton : MonoBehaviour
         {
             if (skillIcon != null)
             {
-                Sprite loadedSprite = SkillIconLoader.Load(equippedSkill.resourceIcon);
+                Sprite loadedSprite = SpriteManager.Instance.LoadSprite(equippedSkill.resourceIcon);
                 
                 skillIcon.sprite = loadedSprite;
                 skillIcon.color = Color.white;

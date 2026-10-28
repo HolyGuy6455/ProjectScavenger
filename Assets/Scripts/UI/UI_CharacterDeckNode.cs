@@ -102,7 +102,7 @@ namespace Scavenger.UI
                                 continue;
                             }
 
-                            Sprite icon = SkillIconLoader.Load(skillData.resourceIcon);
+                            Sprite icon = SpriteManager.Instance.LoadSprite(skillData.resourceIcon);
                             skillIcons[i].sprite = icon;
                             skillIcons[i].enabled = icon != null;
                         }
@@ -112,11 +112,7 @@ namespace Scavenger.UI
             
             if (characterImage != null && !string.IsNullOrEmpty(charData.resourceStand))
             {
-                // 확장자 제거 및 경로 조정 (예: char_001_stand.png -> char/char_001_stand)
-                string spritePath = charData.resourceStand.Replace(".png", "");
-                if (!spritePath.StartsWith("char/")) spritePath = "char/" + spritePath;
-
-                Sprite standSprite = Resources.Load<Sprite>(spritePath);
+                Sprite standSprite = SpriteManager.Instance.LoadSprite(charData.resourceStand);
                 if (standSprite != null)
                 {
                     characterImage.sprite = standSprite;
@@ -124,7 +120,8 @@ namespace Scavenger.UI
                 }
                 else
                 {
-                    Debug.LogWarning($"[UI_CharacterDeckNode] Stand Sprite not found at: {spritePath}");
+                    characterImage.sprite = null;
+                    characterImage.enabled = false;
                 }
             }
         }

@@ -13,9 +13,10 @@ public class TrainCharacterLevelingCost : MonoBehaviour
 
     public void Setup(Sprite icon, int requiredAmount, int currentAmount)
     {
-        if (itemIcon != null && icon != null)
+        if (itemIcon != null)
         {
             itemIcon.sprite = icon;
+            itemIcon.enabled = icon != null;
         }
 
         if (amountText != null)

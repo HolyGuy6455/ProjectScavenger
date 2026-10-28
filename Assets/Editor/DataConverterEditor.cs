@@ -462,6 +462,10 @@ public class DataConverterEditor : EditorWindow
         string tsvContent = File.ReadAllText(tsvPath);
         TList dataList = new TList();
         var list = parser != null ? parser(tsvContent) : ParseTsv<TData>(tsvContent);
+        foreach (TData data in list)
+        {
+            SpriteResourcePaths.Normalize(data);
+        }
         
         // Find the List<TData> field and set it
         var fields = typeof(TList).GetFields();

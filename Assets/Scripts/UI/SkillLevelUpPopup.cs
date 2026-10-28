@@ -38,7 +38,7 @@ public class SkillLevelUpPopup : MonoBehaviour
 
         if (skillIcon != null)
         {
-            Sprite loadedSprite = SkillIconLoader.Load(displaySkill.resourceIcon);
+            Sprite loadedSprite = SpriteManager.Instance.LoadSprite(displaySkill.resourceIcon);
             skillIcon.sprite = loadedSprite;
         }
 
@@ -82,9 +82,7 @@ public class SkillLevelUpPopup : MonoBehaviour
                         itemName = itemData.name;
                         if (!string.IsNullOrEmpty(itemData.uiResource))
                         {
-                            string itemIconPath = System.IO.Path.GetFileNameWithoutExtension(itemData.uiResource);
-                            itemIcon = Resources.Load<Sprite>($"Items/{itemIconPath}");
-                            if (itemIcon == null) itemIcon = Resources.Load<Sprite>(itemIconPath);
+                            itemIcon = SpriteManager.Instance.LoadSprite(itemData.uiResource);
                         }
                     }
 

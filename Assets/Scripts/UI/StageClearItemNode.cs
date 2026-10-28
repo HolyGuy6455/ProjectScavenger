@@ -15,10 +15,7 @@ namespace Scavenger.UI
         {
             if (itemData != null && itemIcon != null)
             {
-                // Resource loading logic
-                string nameWithoutExt = System.IO.Path.GetFileNameWithoutExtension(itemData.uiResource);
-                Sprite sprite = Resources.Load<Sprite>($"Items/{nameWithoutExt}");
-                if (sprite == null) sprite = Resources.Load<Sprite>(nameWithoutExt);
+                Sprite sprite = SpriteManager.Instance.LoadSprite(itemData.uiResource);
                 if (sprite != null)
                 {
                     itemIcon.sprite = sprite;

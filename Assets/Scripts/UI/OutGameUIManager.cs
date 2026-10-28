@@ -81,6 +81,15 @@ namespace Scavenger.UI
             else Destroy(gameObject);
         }
 
+        private void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+            _cachedPanels.Clear();
+            _cachedPopups.Clear();
+            _activePopups.Clear();
+            _panelHistory.Clear();
+        }
+
         private void Start()
         {
             ShowPanel(OutGamePanelType.MainLobby);

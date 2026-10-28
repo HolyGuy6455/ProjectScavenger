@@ -95,9 +95,7 @@ public class ItemPickupButton : MonoBehaviour
                     // 아이콘 설정
                     if (itemIcon != null && !string.IsNullOrEmpty(data.uiResource))
                     {
-                        string path = data.uiResource.Replace(".png", "");
-                        Sprite sprite = Resources.Load<Sprite>($"Items/{path}");
-                        if (sprite == null) sprite = Resources.Load<Sprite>(path);
+                        Sprite sprite = SpriteManager.Instance.LoadSprite(data.uiResource);
                         
                         itemIcon.sprite = sprite;
                         itemIcon.enabled = sprite != null;

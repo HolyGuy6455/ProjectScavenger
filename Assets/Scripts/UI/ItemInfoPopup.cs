@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -96,7 +95,7 @@ namespace Scavenger.UI
 
             if (itemIconImage != null)
             {
-                Sprite icon = LoadItemIcon(_itemData.uiResource);
+                Sprite icon = SpriteManager.Instance.LoadSprite(_itemData.uiResource);
                 itemIconImage.sprite = icon;
                 itemIconImage.enabled = icon != null;
             }
@@ -200,14 +199,6 @@ namespace Scavenger.UI
                 itemIconImage.enabled = false;
             }
             if (itemInfoRoot != null) itemInfoRoot.SetActive(false);
-        }
-
-        private static Sprite LoadItemIcon(string resource)
-        {
-            if (string.IsNullOrWhiteSpace(resource)) return null;
-            string path = Path.ChangeExtension(resource.Trim().Replace('\\', '/'), null);
-            Sprite icon = Resources.Load<Sprite>($"Items/{path}");
-            return icon != null ? icon : Resources.Load<Sprite>(path);
         }
 
         private static string GetCategoryName(ItemCategory category)

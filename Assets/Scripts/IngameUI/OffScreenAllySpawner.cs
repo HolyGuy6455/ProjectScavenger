@@ -36,8 +36,8 @@ public class OffScreenAllySpawner : NetworkBehaviour
             }
         }
 
-        // 내 캐릭터가 아닐 때(다른 플레이어일 때)만 아군 태그 UI를 생성합니다.
-        if (!IsOwner && offScreenAllyPrefab != null)
+        // 클라이언트에서 다른 플레이어의 아군 태그만 생성합니다. 전용 서버에는 UI가 필요 없습니다.
+        if (IsClient && !IsOwner && offScreenAllyPrefab != null)
         {
             spawnedUI = Instantiate(offScreenAllyPrefab);
             allyUI = spawnedUI.GetComponentInChildren<OffScreenAllyUI>();

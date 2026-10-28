@@ -181,9 +181,7 @@ namespace Scavenger.UI
 
             if (dossierIconImage != null && !string.IsNullOrEmpty(data.uiResource))
             {
-                string path = data.uiResource.Replace(".png", "");
-                Sprite sprite = Resources.Load<Sprite>($"Items/{path}");
-                if (sprite == null) sprite = Resources.Load<Sprite>(path);
+                Sprite sprite = SpriteManager.Instance.LoadSprite(data.uiResource);
                 
                 if (sprite != null)
                 {

@@ -51,7 +51,7 @@ public class SkillSelectRow : MonoBehaviour
         
         if (skillIcon != null)
         {
-            Sprite loadedSprite = SkillIconLoader.Load(skillData.resourceIcon);
+            Sprite loadedSprite = SpriteManager.Instance.LoadSprite(skillData.resourceIcon);
             skillIcon.sprite = loadedSprite;
         }
 

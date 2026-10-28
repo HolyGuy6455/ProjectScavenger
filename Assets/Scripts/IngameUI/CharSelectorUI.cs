@@ -30,7 +30,7 @@ public class CharSelectorUI : MonoBehaviour
     {
         if (standingImage != null)
         {
-            Sprite standSprite = LoadSprite(charData.resourceStand);
+            Sprite standSprite = SpriteManager.Instance.LoadSprite(charData.resourceStand);
             standingImage.sprite = standSprite;
             standingImage.enabled = standSprite != null;
         }
@@ -71,7 +71,7 @@ public class CharSelectorUI : MonoBehaviour
         for (int i = 0; i < slots.Count && i < charDatas.Count; i++)
         {
             CharData data = charDatas[i];
-            Sprite iconSprite = LoadSprite(data.resourceSlot);
+            Sprite iconSprite = SpriteManager.Instance.LoadSprite(data.resourceSlot);
             
             slots[i].Setup(data, iconSprite);
             slots[i].OnSlotClickedEvent += HandleCharacterSelected;
@@ -97,28 +97,5 @@ public class CharSelectorUI : MonoBehaviour
                 slot.OnSlotClickedEvent -= HandleCharacterSelected;
             }
         }
-    }
-
-    private Sprite LoadSprite(string resourceName)
-    {
-        if (string.IsNullOrEmpty(resourceName)) return null;
-        
-        string nameWithoutExt = System.IO.Path.GetFileNameWithoutExtension(resourceName);
-        
-        // 새로 바뀐 폴더 구조 (Resources/char) 우선 탐색
-        Sprite loadedSprite = Resources.Load<Sprite>($"char/{nameWithoutExt}");
-        
-        // 만약 없다면 기존 루트 폴더도 혹시 모르니 탐색
-        if (loadedSprite == null)
-        {
-            loadedSprite = Resources.Load<Sprite>(nameWithoutExt);
-        }
-        
-        if (loadedSprite == null)
-        {
-             Debug.LogWarning($"[CharSelectorUI] Icon not found: {nameWithoutExt}");
-        }
-        
-        return loadedSprite;
     }
 }

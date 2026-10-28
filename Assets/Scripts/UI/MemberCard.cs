@@ -27,10 +27,7 @@ namespace Scavenger.UI
                         var charData = DataManager.Instance.GetData<CharData>("Char", charId);
                         if (charData != null && !string.IsNullOrEmpty(charData.resourceSlot))
                         {
-                            string spritePath = charData.resourceSlot.Replace(".png", "");
-                            if (!spritePath.StartsWith("char/")) spritePath = "char/" + spritePath;
-                            
-                            Sprite icon = Resources.Load<Sprite>(spritePath);
+                            Sprite icon = SpriteManager.Instance.LoadSprite(charData.resourceSlot);
                             deckCharacterImages[i].sprite = icon;
                             deckCharacterImages[i].enabled = icon != null;
                         }

@@ -21,11 +21,7 @@ namespace Scavenger.UI
 
             if (slotImage != null && data != null && !string.IsNullOrEmpty(data.resourceSlot))
             {
-                // 확장자 제거 및 경로 조정
-                string spritePath = data.resourceSlot.Replace(".png", "");
-                if (!spritePath.StartsWith("char/")) spritePath = "char/" + spritePath;
-
-                Sprite faceSprite = Resources.Load<Sprite>(spritePath);
+                Sprite faceSprite = SpriteManager.Instance.LoadSprite(data.resourceSlot);
                 if (faceSprite != null)
                 {
                     slotImage.sprite = faceSprite;
@@ -33,7 +29,8 @@ namespace Scavenger.UI
                 }
                 else
                 {
-                    Debug.LogWarning($"[UI_CharacterSelectNode] Slot Sprite not found at: {spritePath}");
+                    slotImage.sprite = null;
+                    slotImage.enabled = false;
                 }
             }
 
