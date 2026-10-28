@@ -25,6 +25,7 @@ GameObject:
   - component: {fileID: 6087195057596087254}
   - component: {fileID: 8855595816186367892}
   - component: {fileID: 725646440334297459}
+  - component: {fileID: 7299625779246611360}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -345,6 +346,54 @@ MonoBehaviour:
   smokePrefab: {fileID: 8591780217847057363, guid: 187b6e19b77675544acd0202fe5984ff, type: 3}
   bottlePrefab: {fileID: 9157244214043574801, guid: c8aab434dfa3b054993a04b092015b3d, type: 3}
   molotovPrefab: {fileID: 607768393819723639, guid: 7623813ac5f715c46b8d318706c5d694, type: 3}
+--- !u!114 &7299625779246611360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2760713653355842673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10d3c5881c172cc45ac7da78fb9d14e2, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::OffScreenAllySpawner
+  offScreenAllyPrefab: {fileID: 6235567738144659268, guid: 0189901e1555ba342a0b10957590bb34, type: 3}
+  NetPlayerName:
+    m_InternalValue:
+      utf8LengthInBytes: 0
+      bytes:
+        offset0000:
+          byte0000: 0
+          byte0001: 0
+          byte0002: 0
+          byte0003: 0
+          byte0004: 0
+          byte0005: 0
+          byte0006: 0
+          byte0007: 0
+          byte0008: 0
+          byte0009: 0
+          byte0010: 0
+          byte0011: 0
+          byte0012: 0
+          byte0013: 0
+          byte0014: 0
+          byte0015: 0
+        byte0016: 0
+        byte0017: 0
+        byte0018: 0
+        byte0019: 0
+        byte0020: 0
+        byte0021: 0
+        byte0022: 0
+        byte0023: 0
+        byte0024: 0
+        byte0025: 0
+        byte0026: 0
+        byte0027: 0
+        byte0028: 0
+        byte0029: 0
 --- !u!1 &4400775269835697234
 GameObject:
   m_ObjectHideFlags: 0
