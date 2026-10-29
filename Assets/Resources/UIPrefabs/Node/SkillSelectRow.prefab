@@ -2088,6 +2088,7 @@ GameObject:
   - component: {fileID: 8286884153817286396}
   - component: {fileID: 8548329347474750437}
   - component: {fileID: 6294382476943896498}
+  - component: {fileID: 7218246243409412974}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -2195,7 +2196,32 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8548329347474750437}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 7218246243409412974}
+        m_TargetAssemblyTypeName: Scavenger.UI.UI_ButtonSound, Assembly-CSharp
+        m_MethodName: Play
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &7218246243409412974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7311848376320606861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98d9cba4736c408fa40874ccaf8420d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_ButtonSound
+  soundKey: 1
 --- !u!1 &8181058486989879865
 GameObject:
   m_ObjectHideFlags: 0
@@ -2621,8 +2647,8 @@ MonoBehaviour:
     \uCD94\uAC00\uB85C \uC8FC\uBCC0 \uC801\uB4E4\uC5D0\uAC8C 5\uCD08\uAC04 \uD654\uC0C1
     \uB514\uBC84\uD504\uB97C \uC9C0\uC18D \uBD80\uC5EC\uD569\uB2C8\uB2E4."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: f517943e205ddf14180a8d5c080f9c84, type: 2}
-  m_sharedMaterial: {fileID: 2264667363095892454, guid: f517943e205ddf14180a8d5c080f9c84, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 155a8a5e0ffaac0408aa8abe6d64e3a5, type: 2}
+  m_sharedMaterial: {fileID: 8091220943188924011, guid: 155a8a5e0ffaac0408aa8abe6d64e3a5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2646,7 +2672,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 40.3
+  m_fontSize: 42
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1

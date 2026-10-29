@@ -3187,8 +3187,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "\uBB50 \uADF8\uB807\uAC8C \uB098\uC05C \uC2A4\uD0AC\uC740 \uC544\uB2D0\uC9C0\uB3C4?"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: fad37a49528055a428d5ee662092d997, type: 2}
-  m_sharedMaterial: {fileID: 8906006909252640554, guid: fad37a49528055a428d5ee662092d997, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 155a8a5e0ffaac0408aa8abe6d64e3a5, type: 2}
+  m_sharedMaterial: {fileID: 8091220943188924011, guid: 155a8a5e0ffaac0408aa8abe6d64e3a5, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3359,6 +3359,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1013693137818626114, guid: 14a442101bc459a4c9fd54ea4926f53f, type: 3}
+      propertyPath: m_fontSize
+      value: 42.95
+      objectReference: {fileID: 0}
+    - target: {fileID: 1084365715706120733, guid: 14a442101bc459a4c9fd54ea4926f53f, type: 3}
+      propertyPath: m_fontSize
+      value: 46
+      objectReference: {fileID: 0}
+    - target: {fileID: 3594929408560980955, guid: 14a442101bc459a4c9fd54ea4926f53f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6921807626331934662, guid: 14a442101bc459a4c9fd54ea4926f53f, type: 3}
       propertyPath: m_Name
       value: item-slot-wrapper
@@ -3459,6 +3471,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 251399286533845492, guid: 14a442101bc459a4c9fd54ea4926f53f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1013693137818626114, guid: 14a442101bc459a4c9fd54ea4926f53f, type: 3}
+      propertyPath: m_fontSize
+      value: 42.95
+      objectReference: {fileID: 0}
+    - target: {fileID: 1084365715706120733, guid: 14a442101bc459a4c9fd54ea4926f53f, type: 3}
+      propertyPath: m_fontSize
+      value: 46
+      objectReference: {fileID: 0}
+    - target: {fileID: 3594929408560980955, guid: 14a442101bc459a4c9fd54ea4926f53f, type: 3}
+      propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6921807626331934662, guid: 14a442101bc459a4c9fd54ea4926f53f, type: 3}
