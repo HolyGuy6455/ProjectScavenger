@@ -14,6 +14,7 @@ public class SkillSelectPopup : MonoBehaviour
 
     private int _charId;
     private int _currentSlotIndex;
+    private UserDataManager _userDataManager;
     private List<GameObject> _spawnedRows = new List<GameObject>();
 
     private void Awake()
@@ -33,6 +34,15 @@ public class SkillSelectPopup : MonoBehaviour
             {
                 Destroy(child.gameObject);
             }
+        }
+    }
+
+    private void OnEnable()
+    {
+        _userDataManager = UserDataManager.Instance;
+        if (_userDataManager != null)
+        {
+            _userDataManager.OnCharacterDataUpdated += RefreshUI;
         }
     }
 
@@ -124,7 +134,15 @@ public class SkillSelectPopup : MonoBehaviour
     }
 
     private int _viewVersion;
-    private void OnDisable() { _viewVersion++; }
+    private void OnDisable()
+    {
+        _viewVersion++;
+        if (_userDataManager != null)
+        {
+            _userDataManager.OnCharacterDataUpdated -= RefreshUI;
+            _userDataManager = null;
+        }
+    }
 
     private void HandleSelectClicked(SkillData skillData)
     {

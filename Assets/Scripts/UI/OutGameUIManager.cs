@@ -27,7 +27,8 @@ namespace Scavenger.UI
         SkillLevelUp,
         SkillSelect,
         ItemInfo,
-        DefaultConfirm
+        DefaultConfirm,
+        PartyPick
     }
 
     public class OutGameUIManager : MonoBehaviour
@@ -51,6 +52,7 @@ namespace Scavenger.UI
 
         [Header("Popup Prefabs")]
         [SerializeField] private GameObject characterSelectPopupPrefab;
+        [SerializeField] private GameObject partyPickPopupPrefab;
         [SerializeField] private GameObject characterLevelUpCelebrationPopupPrefab;
         [SerializeField] private GameObject skillLevelUpCelebrationPopupPrefab;
         [SerializeField] private GameObject skillLevelUpPopupPrefab;
@@ -394,14 +396,9 @@ namespace Scavenger.UI
                 case OutGamePopupType.SkillLevelUpCelebration: return skillLevelUpCelebrationPopupPrefab;
                 case OutGamePopupType.SkillLevelUp: return skillLevelUpPopupPrefab;
                 case OutGamePopupType.SkillSelect: return skillSelectPopupPrefab;
-                case OutGamePopupType.ItemInfo:
-                    return itemInfoPopupPrefab != null
-                        ? itemInfoPopupPrefab
-                        : Resources.Load<GameObject>("UIPrefabs/Popups/ItemInfoPopup");
-                case OutGamePopupType.DefaultConfirm:
-                    return defaultConfirmPopupPrefab != null
-                        ? defaultConfirmPopupPrefab
-                        : Resources.Load<GameObject>("UIPrefabs/Popups/DefaultConfirmPopup");
+                case OutGamePopupType.ItemInfo: return itemInfoPopupPrefab;
+                case OutGamePopupType.DefaultConfirm: return defaultConfirmPopupPrefab;
+                case OutGamePopupType.PartyPick: return partyPickPopupPrefab;
             }
             return null;
         }

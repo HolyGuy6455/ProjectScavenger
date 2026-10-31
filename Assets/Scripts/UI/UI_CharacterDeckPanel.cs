@@ -72,17 +72,26 @@ namespace Scavenger.UI
         {
             if (OutGameUIManager.Instance != null)
             {
-                var popup = OutGameUIManager.Instance.ShowPopup<UI_CharacterSelectPopup>(OutGamePopupType.CharacterSelect);
+                int currentCharId = _selectedCharIds[slotIndex];
+                var popup = OutGameUIManager.Instance.ShowPopup<PartyPickPopup>(OutGamePopupType.PartyPick);
                 if (popup != null)
                 {
                     popup.Open((selectedData) =>
                     {
                         if (selectedData != null)
                         {
-                            _selectedCharIds[slotIndex] = selectedData.id;
+                            int newCharId = selectedData.id;
+                            int existingSlotIndex = System.Array.IndexOf(_selectedCharIds, newCharId);
+                            if (existingSlotIndex >= 0 && existingSlotIndex != slotIndex)
+                            {
+                                _selectedCharIds[existingSlotIndex] = currentCharId;
+                                UpdateDeckNodeUI(existingSlotIndex);
+                            }
+
+                            _selectedCharIds[slotIndex] = newCharId;
                             UpdateDeckNodeUI(slotIndex);
                         }
-                    });
+                    }, currentCharId, _selectedCharIds);
                 }
             }
             else
