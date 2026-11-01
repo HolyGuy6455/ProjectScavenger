@@ -101,9 +101,19 @@ namespace Scavenger.Network.DTOs
         public int[] selectedCharIds = new int[4];
     }
 
+    // 서버 SaveDeckErrorCode와 숫자를 맞춰 유지합니다.
+    public enum SaveDeckErrorCode
+    {
+        None = 0,
+        InvalidToken = 1,
+        UserNotFound = 2,
+        InvalidDeck = 3
+    }
+
     [Serializable]
     public class SaveDeckResponse
     {
+        public SaveDeckErrorCode errorCode;
         public string message;
         public int[] selectedDeck;
     }

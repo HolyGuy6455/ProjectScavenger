@@ -208,9 +208,30 @@ public class UserDataManager : MonoBehaviour
             if (this != null && auth != null && auth.AuthToken == token) SelectedDeck = response.selectedDeck;
         }, new NetworkRequestOptions
         {
-            Name = "SaveDeck", DuplicateKey = auth.Username + ":SaveDeck", DuplicatePolicy = DuplicateRequestPolicy.Reject
+            Name = "SaveDeck", DuplicateKey = auth.Username + ":SaveDeck",
+            DuplicatePolicy = DuplicateRequestPolicy.Reject, ShowErrorToast = false
+        }, onFailure: error =>
+        {
+            NetworkRequestManager.Instance.ShowToast(GetSaveDeckFailureToastMessage(error));
         }, validateResponse: response => response.selectedDeck != null && response.selectedDeck.Length == 4,
             onFinished: handle => onComplete?.Invoke(handle.Status == NetworkRequestStatus.Succeeded));
+    }
+
+    private static string GetSaveDeckFailureToastMessage(NetworkError error)
+    {
+        if (error.Kind == NetworkErrorKind.Connection || error.Kind == NetworkErrorKind.Timeout
+            || error.HttpStatusCode == 401 || error.HttpStatusCode == 403) return error.DefaultMessage;
+        var errorCode = (SaveDeckErrorCode)(error.ServerCode ?? 0);
+
+        switch (errorCode)
+        {
+            case SaveDeckErrorCode.InvalidToken:
+                return "로그인 정보를 확인할 수 없습니다. 다시 로그인해주세요.";
+            case SaveDeckErrorCode.InvalidDeck:
+                return "편성에 문제가 있습니다. 다시 편성해주세요";
+            default:
+                return error.DefaultMessage;
+        }
     }
 
     // --- 스테미너 동기화 및 로컬 계산 로직 ---
