@@ -14,6 +14,7 @@ namespace Scavenger.UI
         [SerializeField] private GameObject selectedOverlay;
         [SerializeField] private GameObject organizedOverlay;
         [SerializeField] private Button nodeButton;
+        [SerializeField] private CanvasGroup canvasGroup;
 
         private CharData _charData;
         public CharData CharacterData => _charData;
@@ -27,6 +28,11 @@ namespace Scavenger.UI
             if (nodeButton == null)
             {
                 nodeButton = GetComponentInChildren<Button>(true);
+            }
+
+            if (canvasGroup == null)
+            {
+                canvasGroup = GetComponent<CanvasGroup>();
             }
         }
 
@@ -59,6 +65,7 @@ namespace Scavenger.UI
             }
 
             gameObject.SetActive(true);
+            SetVisible(true);
 
             if (portraitImage != null)
             {
@@ -101,7 +108,23 @@ namespace Scavenger.UI
             _isSelected = false;
             _isOrganized = false;
             UpdateOverlayState();
-            gameObject.SetActive(false);
+            gameObject.SetActive(true);
+            SetVisible(false);
+        }
+
+        private void SetVisible(bool isVisible)
+        {
+            if (canvasGroup == null)
+            {
+                canvasGroup = GetComponent<CanvasGroup>();
+            }
+
+            if (canvasGroup != null)
+            {
+                canvasGroup.alpha = isVisible ? 1f : 0f;
+                canvasGroup.interactable = isVisible;
+                canvasGroup.blocksRaycasts = isVisible;
+            }
         }
 
         public void SetSelected(bool isSelected)
