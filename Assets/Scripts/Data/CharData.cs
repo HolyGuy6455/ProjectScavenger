@@ -36,6 +36,11 @@ public class CharData : IData
         return id;
     }
 
+    public string GetLocalizedName()
+    {
+        return LocalizationManager.Get(name);
+    }
+
     public int GetGunId(int index = 0)
     {
         return defaultAmmoId;

@@ -19,6 +19,7 @@ namespace Scavenger.UI
         private CharData _charData;
         public CharData CharacterData => _charData;
 
+        private int _level = 1;
         private bool _isSelected;
         private bool _isOrganized;
         private Action<PartyPickCharNode, CharData> _onSelectedCallback;
@@ -34,6 +35,17 @@ namespace Scavenger.UI
             {
                 canvasGroup = GetComponent<CanvasGroup>();
             }
+        }
+
+        private void OnEnable()
+        {
+            LocalizationManager.OnLanguageChanged += RefreshLocalizedTexts;
+            RefreshLocalizedTexts();
+        }
+
+        private void OnDisable()
+        {
+            LocalizationManager.OnLanguageChanged -= RefreshLocalizedTexts;
         }
 
         public void Initialize(CharData data, Action<PartyPickCharNode, CharData> onSelected, bool isOrganized = false)
@@ -54,6 +66,7 @@ namespace Scavenger.UI
         public void Initialize(CharData data, int level, Action<PartyPickCharNode, CharData> onSelected, bool isOrganized = false)
         {
             _charData = data;
+            _level = level;
             _onSelectedCallback = onSelected;
             _isOrganized = isOrganized;
             _isSelected = false;
@@ -77,15 +90,7 @@ namespace Scavenger.UI
                 portraitImage.enabled = faceSprite != null;
             }
 
-            if (nameText != null)
-            {
-                nameText.text = data.name;
-            }
-
-            if (levelText != null)
-            {
-                levelText.text = $"Lv.{level}";
-            }
+            RefreshLocalizedTexts();
 
             if (nodeButton == null)
             {
@@ -99,6 +104,21 @@ namespace Scavenger.UI
             }
 
             UpdateOverlayState();
+        }
+
+        private void RefreshLocalizedTexts()
+        {
+            if (_charData == null) return;
+
+            if (nameText != null)
+            {
+                nameText.text = _charData.GetLocalizedName();
+            }
+
+            if (levelText != null)
+            {
+                levelText.text = LocalizationManager.Get("UI_FORMAT_LEVEL_COMPACT", _level);
+            }
         }
 
         public void SetEmpty()

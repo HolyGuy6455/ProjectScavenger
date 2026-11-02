@@ -34,7 +34,7 @@ public class TrainCharacterPolaroid : MonoBehaviour
 
         if (nameText != null)
         {
-            nameText.text = masterData.name;
+            nameText.text = masterData.GetLocalizedName();
         }
 
         if (polaroidButton != null)

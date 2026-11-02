@@ -49,7 +49,7 @@ namespace Scavenger.UI
             if (charNameText != null)
             {
                 // 실제 이름 매핑
-                charNameText.text = charData.name; 
+                charNameText.text = charData.GetLocalizedName(); 
             }
 
             if (avatarImage != null)

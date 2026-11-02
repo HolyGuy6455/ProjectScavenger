@@ -182,6 +182,11 @@ public class DataConverterEditor : EditorWindow
         {
             ConvertMobGroupData();
         }
+
+        if (GUILayout.Button("Convert Localization Data (KO/EN/JA)"))
+        {
+            LocalizationEditorUtility.ConvertLocalizationTsvToBytes();
+        }
         
         GUILayout.Space(10);
 
@@ -193,6 +198,7 @@ public class DataConverterEditor : EditorWindow
 
     private void ConvertAllData()
     {
+        LocalizationEditorUtility.ConvertLocalizationTsvToBytes();
         ConvertData<AmmoDataList, AmmoData>("Ammo", "Scavenger - Ammo.tsv");
         ConvertData<BuffDataList, BuffData>("Buff", "Scavenger - Buff.tsv");
         ConvertData<ItemDataList, ItemData>("Item", "Scavenger - Item.tsv");

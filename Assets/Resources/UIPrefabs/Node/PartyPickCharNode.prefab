@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4275564110603629010}
   - component: {fileID: 6650760302629353895}
   - component: {fileID: 6954802448225530764}
+  - component: {fileID: 8534612926009120171}
   m_Layer: 0
   m_Name: SELECTED
   m_TagString: Untagged
@@ -87,7 +88,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uD604\uC7AC \uC120\uD0DD\n"
+  m_text: "\uD604\uC7AC \uC120\uD0DD"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
   m_sharedMaterial: {fileID: 2563163035340340034, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
@@ -173,6 +174,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
   m_HorizontalFit: 2
   m_VerticalFit: 2
+--- !u!114 &8534612926009120171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 192882653011928640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a57c6cc90dcedeb4686fd28f37ce65b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
+  targetText: {fileID: 6650760302629353895}
+  localizationKey: UI_PARTYPICK_NODE_SELECTED
+  previewText: "\uD604\uC7AC \uC120\uD0DD"
 --- !u!1 &450788686212877750
 GameObject:
   m_ObjectHideFlags: 0
@@ -186,6 +202,7 @@ GameObject:
   - component: {fileID: 2612395476563964525}
   - component: {fileID: 801113219662005764}
   - component: {fileID: 4468129732344466470}
+  - component: {fileID: 4410641376081962801}
   m_Layer: 0
   m_Name: SELECTED
   m_TagString: Untagged
@@ -346,6 +363,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
   m_HorizontalFit: 2
   m_VerticalFit: 2
+--- !u!114 &4410641376081962801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 450788686212877750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a57c6cc90dcedeb4686fd28f37ce65b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
+  targetText: {fileID: 801113219662005764}
+  localizationKey: UI_PARTYPICK_NODE_ORGANIZED
+  previewText: "\uD3B8\uC131\uB428"
 --- !u!1 &1481092668897504127
 GameObject:
   m_ObjectHideFlags: 0

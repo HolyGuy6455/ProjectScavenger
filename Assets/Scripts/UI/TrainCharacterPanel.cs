@@ -267,7 +267,7 @@ public class TrainCharacterPanel : MonoBehaviour
         _selectedCharId = charDto.charId;
         Debug.Log($"[TrainCharacterPanel] 캐릭터 선택됨: {masterData.name} (Lv.{charDto.level})");
         
-        if (charNameText != null) charNameText.text = masterData.name;
+        if (charNameText != null) charNameText.text = masterData.GetLocalizedName();
         if (levelAmountText != null) levelAmountText.text = charDto.level.ToString();
         
         if (characterImage != null)

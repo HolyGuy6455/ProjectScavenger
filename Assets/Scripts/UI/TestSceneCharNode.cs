@@ -49,7 +49,7 @@ namespace Scavenger.UI
                 {
                     var c = allChars[i];
                     _charIds.Add(c.id);
-                    charDropdown.options.Add(new TMP_Dropdown.OptionData($"{c.id}: {c.name}"));
+                    charDropdown.options.Add(new TMP_Dropdown.OptionData($"{c.id}: {c.GetLocalizedName()}"));
                     if (c.id == charId) selectedIndex = i;
                 }
                 charDropdown.value = selectedIndex;

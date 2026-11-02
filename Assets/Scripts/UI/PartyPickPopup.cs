@@ -55,6 +55,7 @@ namespace Scavenger.UI
             {
                 UserDataManager.Instance.OnCharacterDataUpdated += PopulateNodes;
             }
+            LocalizationManager.OnLanguageChanged += OnLanguageChanged;
         }
 
         private void OnDisable()
@@ -63,6 +64,12 @@ namespace Scavenger.UI
             {
                 UserDataManager.Instance.OnCharacterDataUpdated -= PopulateNodes;
             }
+            LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+        }
+
+        private void OnLanguageChanged()
+        {
+            UpdateDetailView(_selectedCharData);
         }
 
         public void Open(Action<CharData> onConfirm, int initialSelectedCharId = 0, IEnumerable<int> organizedCharIds = null)
@@ -290,7 +297,7 @@ namespace Scavenger.UI
 
             if (detailNameText != null)
             {
-                detailNameText.text = charData.name;
+                detailNameText.text = charData.GetLocalizedName();
             }
 
             if (roleTags != null && roleTags.Length > 0)
@@ -316,7 +323,7 @@ namespace Scavenger.UI
 
             if (detailLevelText != null)
             {
-                detailLevelText.text = $"Lv. {level}";
+                detailLevelText.text = LocalizationManager.Get("UI_FORMAT_LEVEL_SPACED", level);
             }
         }
 

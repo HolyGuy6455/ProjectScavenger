@@ -64,7 +64,7 @@ namespace Scavenger.UI
                 return;
             }
 
-            if (nameText != null) nameText.text = charData.name;
+            if (nameText != null) nameText.text = charData.GetLocalizedName();
             if (levelText != null) levelText.text = "Lv. 15";
             
             if (roleTags != null && roleTags.Length > 0)
