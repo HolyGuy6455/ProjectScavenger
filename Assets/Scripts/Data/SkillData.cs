@@ -49,6 +49,16 @@ public class SkillData : IData
     {
         return id;
     }
+
+    public string GetLocalizedName()
+    {
+        return LocalizationManager.Get(name);
+    }
+
+    public string GetLocalizedDescription()
+    {
+        return LocalizationManager.Get(description);
+    }
 }
 
 [System.Serializable]

@@ -6836,7 +6836,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7528287579583115697}
   - component: {fileID: 5301311837768144986}
-  - component: {fileID: 262665832954040376}
   m_Layer: 0
   m_Name: Line
   m_TagString: Untagged
@@ -6883,22 +6882,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!114 &262665832954040376
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 853752328099631555}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97c7a5308c8e0ef4580734eb6f4d4b15, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SkillLevelUpCelebrationPopup
-  levelAmount: {fileID: 6971431119066773463}
-  skillIcon: {fileID: 5913073478013298806}
-  skillName: {fileID: 177316720802394230}
-  skillDescription: {fileID: 5699915782078207976}
 --- !u!1 &901377700323113993
 GameObject:
   m_ObjectHideFlags: 0
@@ -8926,7 +8909,7 @@ GameObject:
   - component: {fileID: 4830519631102695852}
   - component: {fileID: 7779841040830685179}
   - component: {fileID: 177316720802394230}
-  - component: {fileID: 2625884520203065433}
+  - component: {fileID: 8432645703757656191}
   m_Layer: 0
   m_Name: SkillName
   m_TagString: Untagged
@@ -8951,7 +8934,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 1200, y: 66}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &4830519631102695852
 MonoBehaviour:
@@ -9031,11 +9014,11 @@ MonoBehaviour:
   m_fontSize: 44
   m_fontSizeBase: 44
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 22
+  m_fontSizeMax: 44
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: -0.7
@@ -9045,7 +9028,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -9073,7 +9056,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &2625884520203065433
+--- !u!114 &8432645703757656191
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9082,11 +9065,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1149772594097806671}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Script: {fileID: 11500000, guid: a57c6cc90dcedeb4686fd28f37ce65b6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 2
-  m_VerticalFit: 2
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
+  targetText: {fileID: 177316720802394230}
+  originalFont: {fileID: 11400000, guid: fad37a49528055a428d5ee662092d997, type: 2}
+  localizationKey: 
+  previewText: "\uC2A4\uD0AC"
 --- !u!1 &1154919262528367725
 GameObject:
   m_ObjectHideFlags: 0
@@ -13432,7 +13417,7 @@ GameObject:
   - component: {fileID: 4892680084473161656}
   - component: {fileID: 1297581713555445259}
   - component: {fileID: 6136672245469346926}
-  - component: {fileID: 2038652419009074875}
+  - component: {fileID: 228678180813535492}
   m_Layer: 0
   m_Name: "\uD655\uC778"
   m_TagString: Untagged
@@ -13457,7 +13442,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 92.78, y: 48}
+  m_SizeDelta: {x: 240, y: 54}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &4892680084473161656
 MonoBehaviour:
@@ -13537,9 +13522,9 @@ MonoBehaviour:
   m_fontSize: 48
   m_fontSizeBase: 48
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 48
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -13551,7 +13536,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -13579,7 +13564,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &2038652419009074875
+--- !u!114 &228678180813535492
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -13588,11 +13573,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1751074171812392715}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Script: {fileID: 11500000, guid: a57c6cc90dcedeb4686fd28f37ce65b6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 2
-  m_VerticalFit: 2
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
+  targetText: {fileID: 6136672245469346926}
+  originalFont: {fileID: 11400000, guid: fad37a49528055a428d5ee662092d997, type: 2}
+  localizationKey: UI_COMMON_CONFIRM
+  previewText: "\uD655\uC778"
 --- !u!1 &1755069823019392346
 GameObject:
   m_ObjectHideFlags: 0
@@ -16550,7 +16537,6 @@ GameObject:
   - component: {fileID: 887395806326590762}
   - component: {fileID: 895884234710509480}
   - component: {fileID: 4590733469776183999}
-  - component: {fileID: 2955302937306126935}
   m_Layer: 0
   m_Name: '[ACTIVE PASSIVE PROTOCOL]'
   m_TagString: Untagged
@@ -16575,7 +16561,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 735, y: -67}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 330, y: 30}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &887395806326590762
 MonoBehaviour:
@@ -16655,11 +16641,11 @@ MonoBehaviour:
   m_fontSize: 22
   m_fontSizeBase: 22
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 12
+  m_fontSizeMax: 22
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: -0.7
@@ -16669,7 +16655,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -16697,20 +16683,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &2955302937306126935
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2090536449067986272}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 2
-  m_VerticalFit: 2
 --- !u!1 &2093842788008974587
 GameObject:
   m_ObjectHideFlags: 0
@@ -21690,7 +21662,6 @@ GameObject:
   - component: {fileID: 1313187870242081166}
   - component: {fileID: 7680894688303663879}
   - component: {fileID: 6971431119066773463}
-  - component: {fileID: 4726500913907799529}
   m_Layer: 0
   m_Name: LevelAmount
   m_TagString: Untagged
@@ -21715,7 +21686,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 62, y: -0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 95, y: 132}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1313187870242081166
 MonoBehaviour:
@@ -21795,9 +21766,9 @@ MonoBehaviour:
   m_fontSize: 110
   m_fontSizeBase: 110
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 36
+  m_fontSizeMax: 110
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
@@ -21809,7 +21780,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -21837,20 +21808,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &4726500913907799529
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2883785746857986615}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 2
-  m_VerticalFit: 2
 --- !u!1 &2891340293818345059
 GameObject:
   m_ObjectHideFlags: 0
@@ -23691,7 +23648,7 @@ GameObject:
   - component: {fileID: 2577029172482652424}
   - component: {fileID: 4680833106237383458}
   - component: {fileID: 7489803241730211085}
-  - component: {fileID: 4477692375881213261}
+  - component: {fileID: 7208782778587932130}
   m_Layer: 0
   m_Name: "\uD130\uCE58\uD574\uC11C \uCC3D \uB2EB\uAE30"
   m_TagString: Untagged
@@ -23716,7 +23673,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 160.5651}
-  m_SizeDelta: {x: 500, y: 50}
+  m_SizeDelta: {x: 800, y: 50}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &2577029172482652424
 MonoBehaviour:
@@ -23766,7 +23723,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "- \uD130\uCE58\uD574\uC11C \uCC3D \uB2EB\uAE30-"
+  m_text: "- \uD130\uCE58\uD574\uC11C \uCC3D \uB2EB\uAE30 -"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5f293bfb7924bb348bf35e00fbc7e1e2, type: 2}
   m_sharedMaterial: {fileID: 3032804871496204123, guid: 5f293bfb7924bb348bf35e00fbc7e1e2, type: 2}
@@ -23796,9 +23753,9 @@ MonoBehaviour:
   m_fontSize: 32
   m_fontSizeBase: 32
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 32
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -23810,7 +23767,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -23838,20 +23795,22 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &4477692375881213261
+--- !u!114 &7208782778587932130
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3089451344616243357}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Script: {fileID: 11500000, guid: a57c6cc90dcedeb4686fd28f37ce65b6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 2
-  m_VerticalFit: 2
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
+  targetText: {fileID: 7489803241730211085}
+  originalFont: {fileID: 11400000, guid: 5f293bfb7924bb348bf35e00fbc7e1e2, type: 2}
+  localizationKey: UI_CELEBRATION_TOUCH_TO_CLOSE
+  previewText: "- \uD130\uCE58\uD574\uC11C \uCC3D \uB2EB\uAE30 -"
 --- !u!1 &3090076831994218141
 GameObject:
   m_ObjectHideFlags: 0
@@ -27914,7 +27873,6 @@ GameObject:
   - component: {fileID: 4108367680215360536}
   - component: {fileID: 8369713533476880832}
   - component: {fileID: 7180729691312036735}
-  - component: {fileID: 7827865887100175548}
   m_Layer: 0
   m_Name: "Tactical Enhancer Protocol \u2022 Matrix Synced"
   m_TagString: Untagged
@@ -27939,7 +27897,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 1048.5, y: -188}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 310, y: 20}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &4108367680215360536
 MonoBehaviour:
@@ -28019,11 +27977,11 @@ MonoBehaviour:
   m_fontSize: 12
   m_fontSizeBase: 12
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 8
+  m_fontSizeMax: 12
   m_fontStyle: 16
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: -0.7
@@ -28033,7 +27991,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -28061,20 +28019,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &7827865887100175548
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3533353925144342425}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 2
-  m_VerticalFit: 2
 --- !u!1 &3551664112437808001
 GameObject:
   m_ObjectHideFlags: 0
@@ -29172,7 +29116,6 @@ GameObject:
   - component: {fileID: 1615745173053370802}
   - component: {fileID: 6713851037802444449}
   - component: {fileID: 3860941472841605728}
-  - component: {fileID: 5393241854920616709}
   m_Layer: 0
   m_Name: '[CONFIRM]'
   m_TagString: Untagged
@@ -29197,7 +29140,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 42, y: -3.5}
-  m_SizeDelta: {x: 65, y: 16}
+  m_SizeDelta: {x: 90, y: 20}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1615745173053370802
 MonoBehaviour:
@@ -29277,9 +29220,9 @@ MonoBehaviour:
   m_fontSize: 12
   m_fontSizeBase: 12
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 8
+  m_fontSizeMax: 12
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
@@ -29291,7 +29234,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -29319,20 +29262,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &5393241854920616709
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3682506011873931025}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 2
-  m_VerticalFit: 2
 --- !u!1 &3692176770197166712
 GameObject:
   m_ObjectHideFlags: 0
@@ -33676,7 +33605,6 @@ GameObject:
   - component: {fileID: 439442682848258969}
   - component: {fileID: 3109199045289293237}
   - component: {fileID: 5831184970422653285}
-  - component: {fileID: 4127341642579202302}
   m_Layer: 0
   m_Name: SKILL LEVEL UP!
   m_TagString: Untagged
@@ -33701,7 +33629,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 36, y: -0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 252, y: 36}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &439442682848258969
 MonoBehaviour:
@@ -33781,12 +33709,12 @@ MonoBehaviour:
   m_fontSize: 28
   m_fontSizeBase: 28
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 14
+  m_fontSizeMax: 28
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: -0.7
   m_characterHorizontalScale: 1
@@ -33795,7 +33723,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -33823,20 +33751,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &4127341642579202302
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4218510248629343126}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 2
-  m_VerticalFit: 2
 --- !u!1 &4270782366060218568
 GameObject:
   m_ObjectHideFlags: 0
@@ -35941,7 +35855,7 @@ GameObject:
   - component: {fileID: 5180214017136168543}
   - component: {fileID: 8919799255751214172}
   - component: {fileID: 5699915782078207976}
-  - component: {fileID: 3457447395482656308}
+  - component: {fileID: 7553865421172706553}
   m_Layer: 0
   m_Name: SkillDescription
   m_TagString: Untagged
@@ -35965,9 +35879,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 48}
+  m_SizeDelta: {x: 1400, y: 125}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &5180214017136168543
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36046,9 +35960,9 @@ MonoBehaviour:
   m_fontSize: 36
   m_fontSizeBase: 36
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 36
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
@@ -36088,7 +36002,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &3457447395482656308
+--- !u!114 &7553865421172706553
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -36097,11 +36011,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 4544234463035418940}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Script: {fileID: 11500000, guid: a57c6cc90dcedeb4686fd28f37ce65b6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 2
-  m_VerticalFit: 2
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
+  targetText: {fileID: 5699915782078207976}
+  originalFont: {fileID: 11400000, guid: fad37a49528055a428d5ee662092d997, type: 2}
+  localizationKey: 
+  previewText: "\uC0DD\uAC01\uBCF4\uB2E4 \uBCC4\uB85C\uC778 \uC2A4\uD0AC"
 --- !u!1 &4558587958288150295
 GameObject:
   m_ObjectHideFlags: 0
@@ -51766,7 +51682,6 @@ GameObject:
   - component: {fileID: 9178715024394241140}
   - component: {fileID: 7694535278211099133}
   - component: {fileID: 6399437320710751532}
-  - component: {fileID: 141630054584273199}
   m_Layer: 0
   m_Name: LV.
   m_TagString: Untagged
@@ -51791,7 +51706,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: -37.5}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 60, y: 44}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &9178715024394241140
 MonoBehaviour:
@@ -51871,9 +51786,9 @@ MonoBehaviour:
   m_fontSize: 36
   m_fontSizeBase: 36
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMax: 36
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
@@ -51885,7 +51800,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -51913,20 +51828,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &141630054584273199
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6419834118099962584}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 2
-  m_VerticalFit: 2
 --- !u!1 &6431534393928210429
 GameObject:
   m_ObjectHideFlags: 0

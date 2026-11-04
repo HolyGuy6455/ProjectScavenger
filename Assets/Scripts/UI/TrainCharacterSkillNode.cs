@@ -47,14 +47,19 @@ public class TrainCharacterSkillNode : MonoBehaviour
 
             if (skillNameText != null)
             {
-                skillNameText.text = skillData.name;
+                Scavenger.UI.LocalizedText.ApplyFont(skillNameText);
+                skillNameText.text = skillData.GetLocalizedName();
             }
         }
         else
         {
             _currentSkillId = 0;
             if (skillIcon != null) skillIcon.enabled = false;
-            if (skillNameText != null) skillNameText.text = "Empty";
+            if (skillNameText != null)
+            {
+                Scavenger.UI.LocalizedText.ApplyFont(skillNameText);
+                skillNameText.text = LocalizationManager.Get("UI_SKILL_EMPTY");
+            }
         }
     }
 }

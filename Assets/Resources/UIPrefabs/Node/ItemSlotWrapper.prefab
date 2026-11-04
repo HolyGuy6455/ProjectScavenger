@@ -105,7 +105,6 @@ GameObject:
   - component: {fileID: 8639432338511568497}
   - component: {fileID: 955979740119494345}
   - component: {fileID: 1013693137818626114}
-  - component: {fileID: 8474788009196841977}
   m_Layer: 0
   m_Name: ItemAmount
   m_TagString: Untagged
@@ -128,10 +127,10 @@ RectTransform:
   m_Father: {fileID: 251399286533845492}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0.21522225}
-  m_AnchoredPosition: {x: 3.5549, y: -2.7834}
-  m_SizeDelta: {x: -3.5549, y: -2.7833}
-  m_Pivot: {x: 0, y: 1}
+  m_AnchorMax: {x: 1, y: 0.2}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -8, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8639432338511568497
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -211,8 +210,8 @@ MonoBehaviour:
   m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMin: 12
+  m_fontSizeMax: 24
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -224,7 +223,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -252,20 +251,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &8474788009196841977
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6495855507749180671}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 2
-  m_VerticalFit: 2
 --- !u!1 &6921807626331934662
 GameObject:
   m_ObjectHideFlags: 0
@@ -527,7 +512,7 @@ GameObject:
   - component: {fileID: 5115355344951650756}
   - component: {fileID: 5418224985241399004}
   - component: {fileID: 1084365715706120733}
-  - component: {fileID: 3426527096276398512}
+  - component: {fileID: 5558601643906175868}
   m_Layer: 0
   m_Name: ItemName
   m_TagString: Untagged
@@ -549,11 +534,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 251399286533845492}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0.1785207}
-  m_AnchorMax: {x: 1, y: 0.40735114}
-  m_AnchoredPosition: {x: 2.368599, y: -2.8579025}
-  m_SizeDelta: {x: -4.7372284, y: -2.5191846}
-  m_Pivot: {x: 0, y: 1}
+  m_AnchorMin: {x: 0, y: 0.2}
+  m_AnchorMax: {x: 1, y: 0.41}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: -8, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &5115355344951650756
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -633,8 +618,8 @@ MonoBehaviour:
   m_fontSizeBase: 28
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMin: 11
+  m_fontSizeMax: 24
   m_fontStyle: 0
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
@@ -674,20 +659,22 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &3426527096276398512
+--- !u!114 &5558601643906175868
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8829327252356539492}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Script: {fileID: 11500000, guid: a57c6cc90dcedeb4686fd28f37ce65b6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 2
-  m_VerticalFit: 2
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
+  targetText: {fileID: 1084365715706120733}
+  originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
+  localizationKey: 
+  previewText: "\uCE74\uB4DC"
 --- !u!1001 &9217745640249885859
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -808,7 +795,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fd0613d16c5dae046838e88bccc760a0, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_ItemInfoButton
   itemId: 0
 --- !u!224 &4690622128982433235 stripped

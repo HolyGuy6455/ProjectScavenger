@@ -39,7 +39,11 @@ public class SkillSelectTabButton : MonoBehaviour
                 skillIcon.sprite = loadedSprite;
                 skillIcon.color = Color.white;
             }
-            if (skillNameText != null) skillNameText.text = equippedSkill.name;
+            if (skillNameText != null)
+            {
+                Scavenger.UI.LocalizedText.ApplyFont(skillNameText);
+                skillNameText.text = equippedSkill.GetLocalizedName();
+            }
         }
         else
         {
@@ -48,7 +52,11 @@ public class SkillSelectTabButton : MonoBehaviour
                 skillIcon.sprite = null;
                 skillIcon.color = new Color(1, 1, 1, 0); // 투명하게
             }
-            if (skillNameText != null) skillNameText.text = "Empty";
+            if (skillNameText != null)
+            {
+                Scavenger.UI.LocalizedText.ApplyFont(skillNameText);
+                skillNameText.text = LocalizationManager.Get("UI_SKILL_EMPTY");
+            }
         }
     }
 }

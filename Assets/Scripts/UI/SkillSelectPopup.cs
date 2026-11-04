@@ -39,6 +39,7 @@ public class SkillSelectPopup : MonoBehaviour
 
     private void OnEnable()
     {
+        LocalizationManager.OnLanguageChanged += RefreshUI;
         _userDataManager = UserDataManager.Instance;
         if (_userDataManager != null)
         {
@@ -136,6 +137,7 @@ public class SkillSelectPopup : MonoBehaviour
     private int _viewVersion;
     private void OnDisable()
     {
+        LocalizationManager.OnLanguageChanged -= RefreshUI;
         _viewVersion++;
         if (_userDataManager != null)
         {

@@ -30,11 +30,17 @@ public class SkillLevelUpPopup : MonoBehaviour
         
         _targetSkillId = displaySkill.id;
 
-        if (currentLevelText != null) 
+        if (currentLevelText != null)
+        {
+            LocalizedText.ApplyFont(currentLevelText);
             currentLevelText.text = currentSkill != null ? $"Lv.{currentSkill.lvl}" : "Lv.0";
+        }
             
-        if (nextLevelText != null) 
+        if (nextLevelText != null)
+        {
+            LocalizedText.ApplyFont(nextLevelText);
             nextLevelText.text = nextSkill != null ? $"Lv.{nextSkill.lvl}" : "MAX";
+        }
 
         if (skillIcon != null)
         {
@@ -42,8 +48,16 @@ public class SkillLevelUpPopup : MonoBehaviour
             skillIcon.sprite = loadedSprite;
         }
 
-        if (skillNameText != null) skillNameText.text = displaySkill.name;
-        if (skillDescText != null) skillDescText.text = displaySkill.description;
+        if (skillNameText != null)
+        {
+            LocalizedText.ApplyFont(skillNameText);
+            skillNameText.text = displaySkill.GetLocalizedName();
+        }
+        if (skillDescText != null)
+        {
+            LocalizedText.ApplyFont(skillDescText);
+            skillDescText.text = displaySkill.GetLocalizedDescription();
+        }
 
 
 

@@ -26,6 +26,7 @@ public class ItemSlotWrapper : MonoBehaviour
 
         if (itemNameText != null)
         {
+            LocalizedText.ApplyFont(itemNameText);
             itemNameText.text = name ?? "";
         }
 

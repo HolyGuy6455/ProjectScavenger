@@ -55,21 +55,43 @@ public class SkillSelectRow : MonoBehaviour
             skillIcon.sprite = loadedSprite;
         }
 
-        if (skillNameText != null) skillNameText.text = skillData.name;
-        if (skillLevelText != null) skillLevelText.text = isUnlocked ? $"Lv. {skillData.lvl}" : "Lv. 0";
-        if (skillDescText != null) skillDescText.text = skillData.description;
+        if (skillNameText != null)
+        {
+            Scavenger.UI.LocalizedText.ApplyFont(skillNameText);
+            skillNameText.text = skillData.GetLocalizedName();
+            float prefW = skillNameText.preferredWidth;
+            skillNameText.rectTransform.sizeDelta = new Vector2(Mathf.Min(prefW + 4f, 470f), skillNameText.rectTransform.sizeDelta.y);
+        }
+        if (skillLevelText != null)
+        {
+            Scavenger.UI.LocalizedText.ApplyFont(skillLevelText);
+            skillLevelText.text = isUnlocked ? $"Lv. {skillData.lvl}" : "Lv. 0";
+        }
+        if (skillDescText != null)
+        {
+            Scavenger.UI.LocalizedText.ApplyFont(skillDescText);
+            skillDescText.text = skillData.GetLocalizedDescription();
+        }
 
         if (selectedBorder != null) selectedBorder.SetActive(isEquipped);
 
         if (isEquipped)
         {
             if (_btnSelect != null) _btnSelect.interactable = false;
-            if (selectButtonText != null) selectButtonText.text = "장착중";
+            if (selectButtonText != null)
+            {
+                Scavenger.UI.LocalizedText.ApplyFont(selectButtonText);
+                selectButtonText.text = LocalizationManager.Get("UI_SKILLSELECT_BTN_EQUIPPED");
+            }
         }
         else
         {
             if (_btnSelect != null) _btnSelect.interactable = isUnlocked;
-            if (selectButtonText != null) selectButtonText.text = "장착하기";
+            if (selectButtonText != null)
+            {
+                Scavenger.UI.LocalizedText.ApplyFont(selectButtonText);
+                selectButtonText.text = LocalizationManager.Get("UI_SKILLSELECT_BTN_EQUIP");
+            }
         }
 
         // 해금 여부에 따른 버튼 표시/숨김 제어
