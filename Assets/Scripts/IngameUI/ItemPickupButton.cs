@@ -89,7 +89,8 @@ public class ItemPickupButton : MonoBehaviour
                     // 텍스트 설정
                     if (itemText != null)
                     {
-                        itemText.text = $"{data.name} 줍기";
+                        Scavenger.UI.LocalizedText.ApplyFont(itemText);
+                        itemText.text = $"{data.GetLocalizedName()} 줍기";
                     }
 
                     // 아이콘 설정

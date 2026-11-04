@@ -22,6 +22,9 @@ public static class SpriteResourcePaths
                 skill.resourceIcon = NormalizePath(skill.resourceIcon, "skill");
                 skill.resourceIcon2 = NormalizePath(skill.resourceIcon2, "skill");
                 break;
+            case BuffData buff:
+                buff.resourceIcon = NormalizePath(buff.resourceIcon, "skill");
+                break;
             case UserCurrencyData currency:
                 currency.ui_resources = NormalizePath(currency.ui_resources, "UserCurrency");
                 break;

@@ -3,6 +3,8 @@ using UnityEngine;
 public class Buff
 {
     public int id;
+    public string name;
+    public string resourceIcon;
     public float lifeTime;
     public float maxLifeTime;
     public float value;
@@ -20,10 +22,64 @@ public class Buff
     public void Refresh(BuffData data)
     {
         this.id = data.id;
+        if (!string.IsNullOrEmpty(data.name)) this.name = data.name;
+        if (!string.IsNullOrEmpty(data.resourceIcon)) this.resourceIcon = data.resourceIcon;
         this.maxLifeTime = data.duration;
         this.lifeTime = data.duration;
         this.value = data.value;
         this.tickInterval = data.tickInterval;
+    }
+
+    public string GetDisplayName()
+    {
+        if (!string.IsNullOrEmpty(name)) return name;
+        if (DataManager.Instance != null)
+        {
+            if (id > 0)
+            {
+                BuffData data = DataManager.Instance.GetData<BuffData>("Buff", id);
+                if (data != null && !string.IsNullOrEmpty(data.name))
+                {
+                    name = data.name;
+                    return name;
+                }
+            }
+            else if (id < 0)
+            {
+                SkillData skill = DataManager.Instance.GetData<SkillData>("Skill", -id);
+                if (skill != null && !string.IsNullOrEmpty(skill.name))
+                {
+                    name = skill.name;
+                    return name;
+                }
+            }
+        }
+        return $"Buff {id}";
+    }
+
+    public Sprite GetIconSprite()
+    {
+        if (string.IsNullOrEmpty(resourceIcon) && DataManager.Instance != null)
+        {
+            if (id > 0)
+            {
+                BuffData data = DataManager.Instance.GetData<BuffData>("Buff", id);
+                if (data != null) resourceIcon = data.resourceIcon;
+            }
+            else if (id < 0)
+            {
+                SkillData skill = DataManager.Instance.GetData<SkillData>("Skill", -id);
+                if (skill != null) resourceIcon = skill.resourceIcon;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(resourceIcon))
+        {
+            Sprite loaded = SpriteManager.Instance.LoadSprite(resourceIcon);
+            if (loaded != null) return loaded;
+        }
+
+        return SpriteManager.Instance.LoadSprite("skill_reload_sprint");
     }
 
     /// <summary>

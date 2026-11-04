@@ -49,6 +49,8 @@ public sealed class Char003HealSkill : NetworkBehaviour
         buffs.AddSharedBuff(new BuffData
         {
             id = RecoveryBuffId,
+            name = data.name,
+            resourceIcon = data.resourceIcon,
             buffType = (int)BuffType.HealOverTime,
             duration = data.duration,
             value = data.funcValue[0],

@@ -7,6 +7,8 @@ public class CharSelectorUI : MonoBehaviour
 
     [SerializeField] private List<CharSelectorSlot> slots = new List<CharSelectorSlot>();
     [SerializeField] private UnityEngine.UI.Image standingImage;
+
+    private BuffController _buffController;
     
     private void Start()
     {
@@ -18,12 +20,22 @@ public class CharSelectorUI : MonoBehaviour
         // Start보다 늦게 등록될 수 있으므로 예외처리
         if (CharacterStateManager.Instance != null)
             CharacterStateManager.Instance.OnCharacterChanged += UpdateUIOnCharacterChange;
+
+        if (_buffController != null)
+        {
+            _buffController.OnBuffsChanged -= RefreshAllSlotBuffs;
+            _buffController.OnBuffsChanged += RefreshAllSlotBuffs;
+            RefreshAllSlotBuffs();
+        }
     }
 
     private void OnDisable()
     {
         if (CharacterStateManager.Instance != null)
             CharacterStateManager.Instance.OnCharacterChanged -= UpdateUIOnCharacterChange;
+
+        if (_buffController != null)
+            _buffController.OnBuffsChanged -= RefreshAllSlotBuffs;
     }
 
     private void UpdateUIOnCharacterChange(CharData charData)
@@ -34,6 +46,7 @@ public class CharSelectorUI : MonoBehaviour
             standingImage.sprite = standSprite;
             standingImage.enabled = standSprite != null;
         }
+        RefreshAllSlotBuffs();
     }
 
     private void InitializeUI()
@@ -73,13 +86,44 @@ public class CharSelectorUI : MonoBehaviour
             CharData data = charDatas[i];
             Sprite iconSprite = SpriteManager.Instance.LoadSprite(data.resourceSlot);
             
-            slots[i].Setup(data, iconSprite);
+            slots[i].Setup(data, iconSprite, i);
+            slots[i].OnSlotClickedEvent -= HandleCharacterSelected;
             slots[i].OnSlotClickedEvent += HandleCharacterSelected;
         }
+
+        BindBuffController(PlayerController.LocalInstance.GetComponent<BuffController>());
 
         // UI may load after a death/selection. Render the confirmed character.
         var selected = CharacterStateManager.Instance.CurrentCharData;
         if (selected != null) UpdateUIOnCharacterChange(selected);
+    }
+
+    public void BindBuffController(BuffController buffController)
+    {
+        if (_buffController != null)
+        {
+            _buffController.OnBuffsChanged -= RefreshAllSlotBuffs;
+        }
+
+        _buffController = buffController;
+
+        if (_buffController != null && isActiveAndEnabled)
+        {
+            _buffController.OnBuffsChanged += RefreshAllSlotBuffs;
+        }
+
+        RefreshAllSlotBuffs();
+    }
+
+    public void RefreshAllSlotBuffs()
+    {
+        for (int i = 0; i < slots.Count; i++)
+        {
+            if (slots[i] != null)
+            {
+                slots[i].RefreshBuffIcons(_buffController);
+            }
+        }
     }
 
     private void HandleCharacterSelected(CharData charData)
