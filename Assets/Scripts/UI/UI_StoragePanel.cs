@@ -169,9 +169,17 @@ namespace Scavenger.UI
 
             if (dossierPanel != null) dossierPanel.SetActive(true);
 
-            if (dossierNameText != null) dossierNameText.text = data.name;
+            if (dossierNameText != null)
+            {
+                LocalizedText.ApplyFont(dossierNameText);
+                dossierNameText.text = data.GetLocalizedName();
+            }
             
-            if (dossierDescText != null) dossierDescText.text = data.Desc;
+            if (dossierDescText != null)
+            {
+                LocalizedText.ApplyFont(dossierDescText);
+                dossierDescText.text = data.GetLocalizedDesc();
+            }
 
             if (dossierAmountText != null)
             {
