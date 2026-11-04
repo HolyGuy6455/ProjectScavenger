@@ -16,7 +16,8 @@ namespace Scavenger.UI
         TrainCharacter,
         StageInfo,
         Storage, // 계정 창고 패널 추가
-        QuestBoard
+        QuestBoard,
+        Setting
     }
 
     public enum OutGamePopupType
@@ -49,6 +50,7 @@ namespace Scavenger.UI
         [SerializeField] private GameObject stageInfoPanelPrefab;
         [SerializeField] private GameObject storagePanelPrefab; // 계정 창고 프리팹
         [SerializeField] private GameObject questBoardPanelPrefab;
+        [SerializeField] private GameObject settingPanelPrefab;
 
         [Header("Popup Prefabs")]
         [SerializeField] private GameObject characterSelectPopupPrefab;
@@ -383,6 +385,7 @@ namespace Scavenger.UI
                 case OutGamePanelType.StageInfo: return stageInfoPanelPrefab;
                 case OutGamePanelType.Storage: return storagePanelPrefab;
                 case OutGamePanelType.QuestBoard: return questBoardPanelPrefab;
+                case OutGamePanelType.Setting: return settingPanelPrefab;
             }
             return null;
         }
@@ -413,5 +416,6 @@ namespace Scavenger.UI
         public void OnClickGoToStageInfo() => ShowPanel(OutGamePanelType.StageInfo);
         public void OnClickGoToStorage() => ShowPanel(OutGamePanelType.Storage);
         public void OnClickGoToQuestBoard() => ShowPanel(OutGamePanelType.QuestBoard);
+        public void OnClickGoToSetting() => ShowPanel(OutGamePanelType.Setting);
     }
 }

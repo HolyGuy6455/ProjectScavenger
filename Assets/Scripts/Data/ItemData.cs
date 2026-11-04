@@ -42,6 +42,29 @@ public class ItemData : IData
     {
         return id;
     }
+
+    public string GetLocalizedName()
+    {
+        return LocalizationManager.Get(name);
+    }
+
+    public string GetLocalizedDesc()
+    {
+        return LocalizationManager.Get(Desc);
+    }
+
+    public static string GetLocalizedCategoryName(ItemCategory category)
+    {
+        return category switch
+        {
+            ItemCategory.All => LocalizationManager.Get("UI_ITEM_CATEGORY_ALL"),
+            ItemCategory.Important => LocalizationManager.Get("UI_ITEM_CATEGORY_IMPORTANT"),
+            ItemCategory.Food => LocalizationManager.Get("UI_ITEM_CATEGORY_FOOD"),
+            ItemCategory.Tool => LocalizationManager.Get("UI_ITEM_CATEGORY_TOOL"),
+            ItemCategory.Consumable => LocalizationManager.Get("UI_ITEM_CATEGORY_CONSUMABLE"),
+            _ => LocalizationManager.Get("UI_ITEM_CATEGORY_ETC")
+        };
+    }
 }
 
 [System.Serializable]

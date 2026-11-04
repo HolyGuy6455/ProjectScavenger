@@ -427,8 +427,8 @@ public class LocalizationToolWindow : EditorWindow
             }
 
             bool hasSource = fa.sourceFontFile != null;
-            bool supportsKor = korBaked > 0 || (hasSource && fa.sourceFontFile.HasCharacter('가'));
-            bool supportsJp = jpBaked > 0 || (hasSource && fa.sourceFontFile.HasCharacter('あ'));
+            bool supportsKor = korBaked > 0 || (hasSource && fa.HasCharacter('가', false, true));
+            bool supportsJp = jpBaked > 0 || (hasSource && fa.HasCharacter('あ', false, true));
 
             var entry = new FontAuditEntry
             {
@@ -496,8 +496,40 @@ public class LocalizationToolWindow : EditorWindow
         }
 
         int replacedCount = 0;
+        var currentStage = PrefabStageUtility.GetCurrentPrefabStage();
+
         foreach (string path in prefabPaths)
         {
+            if (currentStage != null && currentStage.assetPath == path && currentStage.prefabContentsRoot != null)
+            {
+                var stageTmps = currentStage.prefabContentsRoot.GetComponentsInChildren<TMP_Text>(true);
+                bool stageModified = false;
+                foreach (var tmp in stageTmps)
+                {
+                    if (tmp != null && tmp.font == entry.fontAsset)
+                    {
+                        if (!onlyKoreanTexts || ContainsKorean(tmp.text))
+                        {
+                            tmp.font = entry.replaceTargetFont;
+                            tmp.fontSharedMaterial = entry.replaceTargetFont.material;
+                            var loc = tmp.GetComponent<LocalizedText>();
+                            if (loc != null)
+                            {
+                                loc.OriginalFont = entry.replaceTargetFont;
+                            }
+                            EditorUtility.SetDirty(tmp);
+                            stageModified = true;
+                            replacedCount++;
+                        }
+                    }
+                }
+                if (stageModified)
+                {
+                    PrefabUtility.SaveAsPrefabAsset(currentStage.prefabContentsRoot, path);
+                }
+                continue;
+            }
+
             GameObject root = PrefabUtility.LoadPrefabContents(path);
             var tmps = root.GetComponentsInChildren<TMP_Text>(true);
             bool modified = false;
@@ -509,6 +541,7 @@ public class LocalizationToolWindow : EditorWindow
                     if (!onlyKoreanTexts || ContainsKorean(tmp.text))
                     {
                         tmp.font = entry.replaceTargetFont;
+                        tmp.fontSharedMaterial = entry.replaceTargetFont.material;
                         var loc = tmp.GetComponent<LocalizedText>();
                         if (loc != null)
                         {
@@ -528,6 +561,7 @@ public class LocalizationToolWindow : EditorWindow
         }
 
         AssetDatabase.SaveAssets();
+        SceneView.RepaintAll();
         Debug.Log($"[LocalizationTool] '{entry.fontAsset.name}' -> '{entry.replaceTargetFont.name}' 일괄 교체 완료 ({replacedCount}개 TMP 변경).");
         RunProjectFontAudit();
     }

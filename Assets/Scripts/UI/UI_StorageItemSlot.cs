@@ -59,7 +59,11 @@ namespace Scavenger.UI
                     }
                 }
 
-                if (nameText != null) nameText.text = data.name;
+                if (nameText != null)
+                {
+                    LocalizedText.ApplyFont(nameText);
+                    nameText.text = data.GetLocalizedName();
+                }
             }
             else
             {

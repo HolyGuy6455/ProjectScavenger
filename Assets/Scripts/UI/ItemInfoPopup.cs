@@ -30,11 +30,13 @@ namespace Scavenger.UI
 
         private void OnEnable()
         {
+            LocalizationManager.OnLanguageChanged += RefreshUI;
             RefreshUI();
         }
 
         private void OnDisable()
         {
+            LocalizationManager.OnLanguageChanged -= RefreshUI;
             StopWaitingForData();
             UnsubscribeFromUserData();
         }
@@ -87,11 +89,23 @@ namespace Scavenger.UI
             }
 
             if (itemInfoRoot != null) itemInfoRoot.SetActive(true);
-            if (itemNameText != null) itemNameText.text = _itemData.name ?? string.Empty;
-            if (itemDescriptionText != null) itemDescriptionText.text = _itemData.Desc ?? string.Empty;
+            if (itemNameText != null)
+            {
+                LocalizedText.ApplyFont(itemNameText);
+                itemNameText.text = _itemData.GetLocalizedName() ?? string.Empty;
+            }
+            if (itemDescriptionText != null)
+            {
+                LocalizedText.ApplyFont(itemDescriptionText);
+                itemDescriptionText.text = _itemData.GetLocalizedDesc() ?? string.Empty;
+            }
 
             string category = GetCategoryName(_itemData.Category);
-            if (categoryText != null) categoryText.text = category;
+            if (categoryText != null)
+            {
+                LocalizedText.ApplyFont(categoryText);
+                categoryText.text = category;
+            }
 
             if (itemIconImage != null)
             {
@@ -182,7 +196,8 @@ namespace Scavenger.UI
             int amount = UserDataManager.Instance != null
                 ? UserDataManager.Instance.GetGameItemAmount(_itemId)
                 : 0;
-            ownedAmountText.text = $"보유 수량  {amount:N0}개";
+            LocalizedText.ApplyFont(ownedAmountText);
+            ownedAmountText.text = LocalizationManager.Get("UI_ITEMINFO_OWNED_AMOUNT", amount.ToString("N0"));
         }
 
         private void ClearDisplay()
@@ -203,14 +218,7 @@ namespace Scavenger.UI
 
         private static string GetCategoryName(ItemCategory category)
         {
-            switch (category)
-            {
-                case ItemCategory.Important: return "중요";
-                case ItemCategory.Food: return "음식";
-                case ItemCategory.Tool: return "도구";
-                case ItemCategory.Consumable: return "소모품";
-                default: return "기타";
-            }
+            return ItemData.GetLocalizedCategoryName(category);
         }
     }
 }

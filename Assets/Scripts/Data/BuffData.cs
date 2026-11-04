@@ -4,6 +4,8 @@ using System.Collections.Generic;
 public class BuffData : IData
 {
     public int id;
+    public string name;
+    public string resourceIcon;
     public int buffType; // BuffType enum 값과 매핑 (JSON 특성상 int로 저장하는 경우가 많음)
     public float duration; // 유지 시간
     public float value;    // 힐량, 이속 배율 등 핵심 수치

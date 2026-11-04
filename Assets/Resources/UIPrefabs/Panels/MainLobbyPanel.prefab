@@ -5148,13 +5148,34 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4757625836159977775, guid: 77f7700d3a0133245a0558a495727dca, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5487340180220612981}
   m_SourcePrefab: {fileID: 100100000, guid: 77f7700d3a0133245a0558a495727dca, type: 3}
 --- !u!224 &1325371538333686090 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4536370756532410736, guid: 77f7700d3a0133245a0558a495727dca, type: 3}
   m_PrefabInstance: {fileID: 3211285677528268858}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &7968763517703948565 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4757625836159977775, guid: 77f7700d3a0133245a0558a495727dca, type: 3}
+  m_PrefabInstance: {fileID: 3211285677528268858}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5487340180220612981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7968763517703948565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9d1b4722a279c04ba737a8c27ba4d4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_NavigateButton
+  targetPanel: 11
 --- !u!1001 &3556743926563935481
 PrefabInstance:
   m_ObjectHideFlags: 0

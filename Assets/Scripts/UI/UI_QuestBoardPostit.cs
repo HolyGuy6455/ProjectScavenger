@@ -63,6 +63,34 @@ namespace Scavenger.UI
         private Action<int> _onClaimRequested;
         private bool _canClaim = true;
 
+        private void OnEnable()
+        {
+            LocalizationManager.OnLanguageChanged += RefreshLocalizedTexts;
+            RefreshLocalizedTexts();
+        }
+
+        private void OnDisable()
+        {
+            LocalizationManager.OnLanguageChanged -= RefreshLocalizedTexts;
+        }
+
+        public void RefreshLocalizedTexts()
+        {
+            if (_masterData == null) return;
+
+            if (titleText != null)
+            {
+                LocalizedText.ApplyFont(titleText);
+                titleText.text = _masterData.GetLocalizedName();
+            }
+
+            if (descText != null)
+            {
+                LocalizedText.ApplyFont(descText);
+                descText.text = _masterData.GetLocalizedDesc();
+            }
+        }
+
         public void Setup(UserQuestDto quest, Action<int> onClaimRequested)
         {
             _currentQuest = quest;
@@ -71,8 +99,7 @@ namespace Scavenger.UI
             _masterData = DataManager.Instance.GetData<QuestData>("Quest", _currentQuest.questId);
             if (_masterData == null) return;
 
-            if (titleText != null) titleText.text = _masterData.Name;
-            if (descText != null) descText.text = _masterData.Desc;
+            RefreshLocalizedTexts();
             
             if (progressText != null)
             {

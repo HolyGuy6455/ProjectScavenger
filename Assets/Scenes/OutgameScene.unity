@@ -567,6 +567,7 @@ MonoBehaviour:
   stageInfoPanelPrefab: {fileID: 3897945546778568232, guid: f4ee5a44f24cfd040a6d4969d61d721c, type: 3}
   storagePanelPrefab: {fileID: 4798374054230103912, guid: 58752f8bf43fe854e9f3944fffe06aef, type: 3}
   questBoardPanelPrefab: {fileID: 6609786376707513574, guid: 133d9ef4474769e4fb99328d19f5f581, type: 3}
+  settingPanelPrefab: {fileID: 2755642792444163995, guid: c4a7659334cee794080f48d20c593a39, type: 3}
   characterSelectPopupPrefab: {fileID: 963945710570392003, guid: 3e0ee28af1fccfb4587039e6aec7b7f8, type: 3}
   partyPickPopupPrefab: {fileID: 8107032812707540197, guid: 96f308b3ec878d64fb8b4b3df0493805, type: 3}
   characterLevelUpCelebrationPopupPrefab: {fileID: 4635000736612556670, guid: 3910f37baec396c46af66b8aeb05c02c, type: 3}

@@ -141,6 +141,8 @@ public class TrainCharacterPanel : MonoBehaviour
             _characterIdOnNextOpen = -1;
         }
 
+        LocalizationManager.OnLanguageChanged += RefreshUI;
+
         if (UserDataManager.Instance != null)
         {
             UserDataManager.Instance.OnCharacterDataUpdated += RefreshUI;
@@ -154,6 +156,7 @@ public class TrainCharacterPanel : MonoBehaviour
 
     private void OnDisable()
     {
+        LocalizationManager.OnLanguageChanged -= RefreshUI;
         _viewVersion++;
         _selectedCharId = -1;
         if (UserDataManager.Instance != null)
@@ -267,7 +270,11 @@ public class TrainCharacterPanel : MonoBehaviour
         _selectedCharId = charDto.charId;
         Debug.Log($"[TrainCharacterPanel] 캐릭터 선택됨: {masterData.name} (Lv.{charDto.level})");
         
-        if (charNameText != null) charNameText.text = masterData.GetLocalizedName();
+        if (charNameText != null)
+        {
+            Scavenger.UI.LocalizedText.ApplyFont(charNameText);
+            charNameText.text = masterData.GetLocalizedName();
+        }
         if (levelAmountText != null) levelAmountText.text = charDto.level.ToString();
         
         if (characterImage != null)

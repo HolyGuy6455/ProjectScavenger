@@ -12,5 +12,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 568751d29ce87dd47b4c08bbfd3f53b1, type: 3}
   m_Name: LocalizationFontConfig
   m_EditorClassIdentifier: Assembly-CSharp::LocalizationFontConfig
-  defaultJaFallbackFont: {fileID: 0}
-  rules: []
+  defaultJaFallbackFont: {fileID: 11400000, guid: 183841fec6d4c0b42ac5ad2bb66487d9, type: 2}
+  rules:
+  - sourceFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
+    memo: "\uBA54\uC778 \uD0C0\uC774\uD2C0/\uBC84\uD2BC \uAD75\uC740 \uACE0\uB515
+      -> M PLUS 1p ExtraBold"
+    koFont: {fileID: 0}
+    enFont: {fileID: 0}
+    jaFont: {fileID: 11400000, guid: 183841fec6d4c0b42ac5ad2bb66487d9, type: 2}
+  - sourceFont: {fileID: 11400000, guid: fe53f6268271e18459c8cf7c62d406bd, type: 2}
+    memo: "\uAD75\uC740 \uBCF8\uBB38 \uACE0\uB515 -> M PLUS 1p ExtraBold"
+    koFont: {fileID: 0}
+    enFont: {fileID: 0}
+    jaFont: {fileID: 11400000, guid: 183841fec6d4c0b42ac5ad2bb66487d9, type: 2}
+  - sourceFont: {fileID: 11400000, guid: 155a8a5e0ffaac0408aa8abe6d64e3a5, type: 2}
+    memo: "\uC77C\uBC18 \uBCF8\uBB38 \uACE0\uB515 -> M PLUS 1p Medium"
+    koFont: {fileID: 0}
+    enFont: {fileID: 0}
+    jaFont: {fileID: 11400000, guid: f03dcc164f5dcd34c995e0f1c02b115b, type: 2}
+  - sourceFont: {fileID: 11400000, guid: fad37a49528055a428d5ee662092d997, type: 2}
+    memo: "\uC5F0\uCD9C/\uAC15\uC870 \uBA85\uC870 Bold -> Shippori Mincho Bold"
+    koFont: {fileID: 0}
+    enFont: {fileID: 0}
+    jaFont: {fileID: 11400000, guid: 73195527cf605f24a9e2925980f908ca, type: 2}
+  - sourceFont: {fileID: 11400000, guid: 5f293bfb7924bb348bf35e00fbc7e1e2, type: 2}
+    memo: "\uC5F0\uCD9C/\uAC15\uC870 \uBA85\uC870 SemiBold -> Shippori Mincho Bold"
+    koFont: {fileID: 0}
+    enFont: {fileID: 0}
+    jaFont: {fileID: 11400000, guid: 73195527cf605f24a9e2925980f908ca, type: 2}
+  - sourceFont: {fileID: 11400000, guid: 277d83e2ed38ae541baf338051c8af95, type: 2}
+    memo: "\uD3EC\uC2A4\uD2B8\uC787/\uBA54\uBAA8 \uC190\uAE00\uC528 -> Yomogi Regular"
+    koFont: {fileID: 0}
+    enFont: {fileID: 0}
+    jaFont: {fileID: 11400000, guid: 9f0b369d244d2aa4f99e66e3d85cf9ef, type: 2}
+  - sourceFont: {fileID: 11400000, guid: 8787c9305b368cb4296b7fb0c747e0fe, type: 2}
+    memo: "\uD544\uAE30\uCCB4/\uAC10\uC131 \uC190\uAE00\uC528 -> Klee One SemiBold"
+    koFont: {fileID: 0}
+    enFont: {fileID: 0}
+    jaFont: {fileID: 11400000, guid: f449556c3831d08438a6990fc3509c91, type: 2}

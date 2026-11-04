@@ -34,6 +34,7 @@ public class TrainCharacterPolaroid : MonoBehaviour
 
         if (nameText != null)
         {
+            Scavenger.UI.LocalizedText.ApplyFont(nameText);
             nameText.text = masterData.GetLocalizedName();
         }
 

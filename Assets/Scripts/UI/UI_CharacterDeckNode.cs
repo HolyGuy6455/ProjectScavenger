@@ -22,6 +22,17 @@ namespace Scavenger.UI
         private UI_CharacterDeckPanel _parentPanel;
         private CharData _currentCharData;
 
+        private void OnEnable()
+        {
+            LocalizationManager.OnLanguageChanged += RefreshLocalizedTexts;
+            RefreshLocalizedTexts();
+        }
+
+        private void OnDisable()
+        {
+            LocalizationManager.OnLanguageChanged -= RefreshLocalizedTexts;
+        }
+
         public void Initialize(int slotIndex, UI_CharacterDeckPanel parentPanel)
         {
             _slotIndex = slotIndex;
@@ -64,8 +75,16 @@ namespace Scavenger.UI
                 return;
             }
 
-            if (nameText != null) nameText.text = charData.GetLocalizedName();
-            if (levelText != null) levelText.text = "Lv. 15";
+            if (nameText != null)
+            {
+                LocalizedText.ApplyFont(nameText);
+                nameText.text = charData.GetLocalizedName();
+            }
+            if (levelText != null)
+            {
+                LocalizedText.ApplyFont(levelText);
+                levelText.text = LocalizationManager.Get("UI_FORMAT_LEVEL_SPACED", 15);
+            }
             
             if (roleTags != null && roleTags.Length > 0)
             {
@@ -80,7 +99,11 @@ namespace Scavenger.UI
                 var userChar = UserDataManager.Instance.GetCharacter(charData.id);
                 if (userChar != null)
                 {
-                    if (levelAmountText != null) levelAmountText.text = $"Lv. {userChar.level}";
+                    if (levelAmountText != null)
+                    {
+                        LocalizedText.ApplyFont(levelAmountText);
+                        levelAmountText.text = LocalizationManager.Get("UI_FORMAT_LEVEL_SPACED", userChar.level);
+                    }
                     
                     if (skillIcons != null && skillIcons.Length == 4)
                     {
@@ -122,6 +145,27 @@ namespace Scavenger.UI
                 {
                     characterImage.sprite = null;
                     characterImage.enabled = false;
+                }
+            }
+        }
+
+        private void RefreshLocalizedTexts()
+        {
+            if (_currentCharData == null) return;
+
+            if (nameText != null)
+            {
+                LocalizedText.ApplyFont(nameText);
+                nameText.text = _currentCharData.GetLocalizedName();
+            }
+
+            if (UserDataManager.Instance != null)
+            {
+                var userChar = UserDataManager.Instance.GetCharacter(_currentCharData.id);
+                if (userChar != null && levelAmountText != null)
+                {
+                    LocalizedText.ApplyFont(levelAmountText);
+                    levelAmountText.text = LocalizationManager.Get("UI_FORMAT_LEVEL_SPACED", userChar.level);
                 }
             }
         }

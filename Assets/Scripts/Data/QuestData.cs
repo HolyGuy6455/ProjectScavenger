@@ -31,6 +31,16 @@ public class QuestData : IData
     {
         return id;
     }
+
+    public string GetLocalizedName()
+    {
+        return LocalizationManager.Get(Name);
+    }
+
+    public string GetLocalizedDesc()
+    {
+        return LocalizationManager.Get(Desc);
+    }
 }
 
 [System.Serializable]

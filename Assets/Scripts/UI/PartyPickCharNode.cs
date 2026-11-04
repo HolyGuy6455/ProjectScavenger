@@ -112,11 +112,13 @@ namespace Scavenger.UI
 
             if (nameText != null)
             {
+                LocalizedText.ApplyFont(nameText);
                 nameText.text = _charData.GetLocalizedName();
             }
 
             if (levelText != null)
             {
+                LocalizedText.ApplyFont(levelText);
                 levelText.text = LocalizationManager.Get("UI_FORMAT_LEVEL_COMPACT", _level);
             }
         }
@@ -127,6 +129,8 @@ namespace Scavenger.UI
             _onSelectedCallback = null;
             _isSelected = false;
             _isOrganized = false;
+            if (nameText != null) nameText.text = string.Empty;
+            if (levelText != null) levelText.text = string.Empty;
             UpdateOverlayState();
             gameObject.SetActive(true);
             SetVisible(false);

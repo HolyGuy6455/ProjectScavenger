@@ -282,6 +282,7 @@ namespace Scavenger.UI
                     }
                 }
                 if (detailLevelText != null) detailLevelText.text = string.Empty;
+                if (detailDescriptionText != null) detailDescriptionText.text = string.Empty;
                 return;
             }
 
@@ -297,6 +298,7 @@ namespace Scavenger.UI
 
             if (detailNameText != null)
             {
+                LocalizedText.ApplyFont(detailNameText);
                 detailNameText.text = charData.GetLocalizedName();
             }
 
@@ -323,7 +325,14 @@ namespace Scavenger.UI
 
             if (detailLevelText != null)
             {
+                LocalizedText.ApplyFont(detailLevelText);
                 detailLevelText.text = LocalizationManager.Get("UI_FORMAT_LEVEL_SPACED", level);
+            }
+
+            if (detailDescriptionText != null)
+            {
+                LocalizedText.ApplyFont(detailDescriptionText);
+                detailDescriptionText.text = charData.GetLocalizedDescription();
             }
         }
 

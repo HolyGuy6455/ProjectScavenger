@@ -49,6 +49,7 @@ namespace Scavenger.UI
             if (charNameText != null)
             {
                 // 실제 이름 매핑
+                LocalizedText.ApplyFont(charNameText);
                 charNameText.text = charData.GetLocalizedName(); 
             }
 

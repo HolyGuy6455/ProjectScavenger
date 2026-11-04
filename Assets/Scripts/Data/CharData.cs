@@ -16,6 +16,7 @@ public class CharData : IData
 {
     public int id;
     public string name;
+    public string description;
     public string resourceSlot;
     public string resourceStand;
     public CharRole role;
@@ -39,6 +40,11 @@ public class CharData : IData
     public string GetLocalizedName()
     {
         return LocalizationManager.Get(name);
+    }
+
+    public string GetLocalizedDescription()
+    {
+        return LocalizationManager.Get(description);
     }
 
     public int GetGunId(int index = 0)

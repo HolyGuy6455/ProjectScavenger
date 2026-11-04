@@ -79,7 +79,7 @@ public class SkillLevelUpPopup : MonoBehaviour
                     var itemData = DataManager.Instance?.GetData<ItemData>("Item", itemId);
                     if (itemData != null)
                     {
-                        itemName = itemData.name;
+                        itemName = itemData.GetLocalizedName();
                         if (!string.IsNullOrEmpty(itemData.uiResource))
                         {
                             itemIcon = SpriteManager.Instance.LoadSprite(itemData.uiResource);
