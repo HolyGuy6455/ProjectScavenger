@@ -927,6 +927,8 @@ GameObject:
   - component: {fileID: 5036909797473063808}
   - component: {fileID: 6470756876575220371}
   - component: {fileID: 1526596415199716700}
+  - component: {fileID: 6292169878305499068}
+  - component: {fileID: 7933541414405046152}
   m_Layer: 0
   m_Name: SettingPanel
   m_TagString: Untagged
@@ -991,7 +993,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2755642792444163995}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0186b0e08a08b6645958d1b546fb94ba, type: 3}
   m_Name: 
@@ -1078,6 +1080,34 @@ MonoBehaviour:
   applyButton: {fileID: 1591930501596086216}
   applyButtonImage: {fileID: 2531419167793901886}
   applyButtonText: {fileID: 314888038363179967}
+--- !u!225 &6292169878305499068
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2755642792444163995}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &7933541414405046152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2755642792444163995}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76803549ff94b404eb9d5712c56bf817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_Transition
+  transitionType: 0
+  uiCanvasGroup: {fileID: 6292169878305499068}
+  backgroundCanvasGroups:
+  - {fileID: 4456343425010888379}
 --- !u!1 &2810852351380525060
 GameObject:
   m_ObjectHideFlags: 0
@@ -3150,6 +3180,7 @@ GameObject:
   - component: {fileID: 3761011210487764731}
   - component: {fileID: 1453324787661072319}
   - component: {fileID: 6476075060857880951}
+  - component: {fileID: 4456343425010888379}
   m_Layer: 0
   m_Name: "\uAE30\uC874 \uCC45\uC0C1 \uBC30\uACBD"
   m_TagString: Untagged
@@ -3294,6 +3325,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.AspectRatioFitter
   m_AspectMode: 4
   m_AspectRatio: 1.7843137
+--- !u!225 &4456343425010888379
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8083469653273722948}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 1
 --- !u!1 &8964872761079853341
 GameObject:
   m_ObjectHideFlags: 0

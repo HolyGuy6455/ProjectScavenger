@@ -22483,6 +22483,8 @@ GameObject:
   - component: {fileID: 6116748781328652911}
   - component: {fileID: 6623084477846054146}
   - component: {fileID: 6557320876136750120}
+  - component: {fileID: 5706356196873421305}
+  - component: {fileID: 4482267499636066580}
   m_Layer: 5
   m_Name: SkillLevelUpCelebrationPopup
   m_TagString: Untagged
@@ -22565,6 +22567,33 @@ MonoBehaviour:
   skillIcon: {fileID: 5913073478013298806}
   skillName: {fileID: 177316720802394230}
   skillDescription: {fileID: 5699915782078207976}
+--- !u!225 &5706356196873421305
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2957394713859618599}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &4482267499636066580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2957394713859618599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76803549ff94b404eb9d5712c56bf817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_Transition
+  transitionType: 1
+  uiCanvasGroup: {fileID: 5706356196873421305}
+  backgroundCanvasGroups: []
 --- !u!1 &2960940504450946885
 GameObject:
   m_ObjectHideFlags: 0
@@ -33297,22 +33326,9 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument:
+          m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &5826640084019615976
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4198715995515815606}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98d9cba4736c408fa40874ccaf8420d0, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_ButtonSound
-  soundKey: 2
 --- !u!114 &9123429958141767805
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33325,6 +33341,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8662f5e032b6fb549a09f2259c5e21fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_NavigateBackButton
+--- !u!114 &5826640084019615976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4198715995515815606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98d9cba4736c408fa40874ccaf8420d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_ButtonSound
+  soundKey: 2
 --- !u!1 &4205923555325812892
 GameObject:
   m_ObjectHideFlags: 0

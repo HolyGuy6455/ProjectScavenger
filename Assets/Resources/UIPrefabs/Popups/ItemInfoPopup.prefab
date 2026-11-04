@@ -1924,6 +1924,8 @@ GameObject:
   - component: {fileID: 1659186116687763614}
   - component: {fileID: 5016766828145228485}
   - component: {fileID: 6010066717574889459}
+  - component: {fileID: 4217911222637011665}
+  - component: {fileID: 7985297724155057447}
   m_Layer: 0
   m_Name: ItemInfoPopup
   m_TagString: Untagged
@@ -2075,6 +2077,33 @@ MonoBehaviour:
   categoryText: {fileID: 1392517632249224508}
   shortcutRoot: {fileID: 904860208061856059}
   shortcutNodeTemplate: {fileID: 856474634220186665}
+--- !u!225 &4217911222637011665
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8154750263302841035}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &7985297724155057447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8154750263302841035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76803549ff94b404eb9d5712c56bf817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_Transition
+  transitionType: 1
+  uiCanvasGroup: {fileID: 4217911222637011665}
+  backgroundCanvasGroups: []
 --- !u!1 &8573818001293975725
 GameObject:
   m_ObjectHideFlags: 0

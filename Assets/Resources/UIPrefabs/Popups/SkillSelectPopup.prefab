@@ -764,6 +764,8 @@ GameObject:
   - component: {fileID: 4866738611374300476}
   - component: {fileID: 526598530308188593}
   - component: {fileID: 1383828730440749231}
+  - component: {fileID: 2647800603038882036}
+  - component: {fileID: 8984819973506630411}
   m_Layer: 5
   m_Name: SkillSelectPopup
   m_TagString: Untagged
@@ -848,6 +850,33 @@ MonoBehaviour:
   - {fileID: 1534434252467096630}
   - {fileID: 9059029514072922243}
   - {fileID: 1559492791991127392}
+--- !u!225 &2647800603038882036
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3616719231736926623}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &8984819973506630411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3616719231736926623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76803549ff94b404eb9d5712c56bf817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_Transition
+  transitionType: 1
+  uiCanvasGroup: {fileID: 2647800603038882036}
+  backgroundCanvasGroups: []
 --- !u!1 &4296790262918770962
 GameObject:
   m_ObjectHideFlags: 0

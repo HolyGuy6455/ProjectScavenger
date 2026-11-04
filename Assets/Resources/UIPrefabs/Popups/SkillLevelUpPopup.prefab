@@ -2317,6 +2317,8 @@ GameObject:
   - component: {fileID: 8717436746769815156}
   - component: {fileID: 1063062277932586300}
   - component: {fileID: 6526766077872085161}
+  - component: {fileID: 6822384352021231911}
+  - component: {fileID: 7815885493815000393}
   m_Layer: 5
   m_Name: SkillLevelUpPopup
   m_TagString: Untagged
@@ -2402,6 +2404,33 @@ MonoBehaviour:
   itemSlotPrefab: {fileID: 6921807626331934662, guid: 14a442101bc459a4c9fd54ea4926f53f, type: 3}
   currentLevelText: {fileID: 8738589320977459771}
   nextLevelText: {fileID: 255974537381656183}
+--- !u!225 &6822384352021231911
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5627952908271466563}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &7815885493815000393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5627952908271466563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76803549ff94b404eb9d5712c56bf817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_Transition
+  transitionType: 1
+  uiCanvasGroup: {fileID: 6822384352021231911}
+  backgroundCanvasGroups: []
 --- !u!1 &6423312512743527127
 GameObject:
   m_ObjectHideFlags: 0

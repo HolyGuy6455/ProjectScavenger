@@ -774,6 +774,8 @@ GameObject:
   - component: {fileID: 1598378358704158934}
   - component: {fileID: 8867938666141690455}
   - component: {fileID: 3992490023552824140}
+  - component: {fileID: 160246628208022370}
+  - component: {fileID: 5967561212635347077}
   m_Layer: 5
   m_Name: StageInfoPanel
   m_TagString: Untagged
@@ -835,6 +837,34 @@ MonoBehaviour:
   - {fileID: 4726809567808679901}
   - {fileID: 559513432196124117}
   supportButtonObject: {fileID: 3922614712130683414}
+--- !u!225 &160246628208022370
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3897945546778568232}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &5967561212635347077
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3897945546778568232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76803549ff94b404eb9d5712c56bf817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_Transition
+  transitionType: 0
+  uiCanvasGroup: {fileID: 160246628208022370}
+  backgroundCanvasGroups:
+  - {fileID: 7389800915614795639}
 --- !u!1 &3922614712130683414
 GameObject:
   m_ObjectHideFlags: 0
@@ -2131,6 +2161,7 @@ GameObject:
   - component: {fileID: 406843150066347989}
   - component: {fileID: 5012455816448233016}
   - component: {fileID: 2184716976932725761}
+  - component: {fileID: 7389800915614795639}
   m_Layer: 5
   m_Name: BackgroundImage
   m_TagString: Untagged
@@ -2209,6 +2240,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.AspectRatioFitter
   m_AspectMode: 4
   m_AspectRatio: 1.7843137
+--- !u!225 &7389800915614795639
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6763652577956129941}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 1
 --- !u!1 &6808217531074508917
 GameObject:
   m_ObjectHideFlags: 0

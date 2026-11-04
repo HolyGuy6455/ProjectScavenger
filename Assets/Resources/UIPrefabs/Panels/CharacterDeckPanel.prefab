@@ -386,6 +386,8 @@ GameObject:
   - component: {fileID: 7626181881489963304}
   - component: {fileID: 4459195905226104996}
   - component: {fileID: 4054371676923256085}
+  - component: {fileID: 5616505108585883384}
+  - component: {fileID: 5410263351049104189}
   m_Layer: 5
   m_Name: CharacterDeckPanel
   m_TagString: Untagged
@@ -434,7 +436,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1813855078207234182}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -475,6 +477,34 @@ MonoBehaviour:
   - {fileID: 98828381926680652}
   - {fileID: 4080724380485526560}
   confirmButton: {fileID: 772302048050474637}
+--- !u!225 &5616505108585883384
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1813855078207234182}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &5410263351049104189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1813855078207234182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76803549ff94b404eb9d5712c56bf817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_Transition
+  transitionType: 0
+  uiCanvasGroup: {fileID: 5616505108585883384}
+  backgroundCanvasGroups:
+  - {fileID: 2235810442707738302}
 --- !u!1 &2674052690800483737
 GameObject:
   m_ObjectHideFlags: 0
@@ -1364,6 +1394,7 @@ GameObject:
   - component: {fileID: 4368723864273767084}
   - component: {fileID: 8721942650501513517}
   - component: {fileID: 5732561319099125610}
+  - component: {fileID: 2235810442707738302}
   m_Layer: 5
   m_Name: BackgroundImage
   m_TagString: Untagged
@@ -1442,6 +1473,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.AspectRatioFitter
   m_AspectMode: 4
   m_AspectRatio: 1.7843137
+--- !u!225 &2235810442707738302
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8461754277979784723}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 1
 --- !u!1001 &1784446725569009462
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -2842,6 +2842,8 @@ GameObject:
   - component: {fileID: 6388097418000504179}
   - component: {fileID: 3857359969002450029}
   - component: {fileID: 239532828350601666}
+  - component: {fileID: 8934788008495201681}
+  - component: {fileID: 102083857375658041}
   m_Layer: 5
   m_Name: MainLobbyPanel
   m_TagString: Untagged
@@ -2912,6 +2914,33 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &8934788008495201681
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5503115048430643127}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &102083857375658041
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5503115048430643127}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76803549ff94b404eb9d5712c56bf817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_Transition
+  transitionType: 0
+  uiCanvasGroup: {fileID: 8934788008495201681}
+  backgroundCanvasGroups: []
 --- !u!1 &5651019388880205804
 GameObject:
   m_ObjectHideFlags: 0

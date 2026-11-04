@@ -68933,6 +68933,8 @@ GameObject:
   - component: {fileID: 1209695030158742192}
   - component: {fileID: 2378099488904352270}
   - component: {fileID: 3020657268370239088}
+  - component: {fileID: 7833986129177496681}
+  - component: {fileID: 6963123117038261239}
   m_Layer: 5
   m_Name: CharacterLevelUpCelebrationPopup
   m_TagString: Untagged
@@ -69014,6 +69016,33 @@ MonoBehaviour:
   levelAmount: {fileID: 8899687232446263771}
   characterStandingImage: {fileID: 8810042823706528395}
   closeButton: {fileID: 6219031994734747853}
+--- !u!225 &7833986129177496681
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4635000736612556670}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &6963123117038261239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4635000736612556670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76803549ff94b404eb9d5712c56bf817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_Transition
+  transitionType: 1
+  uiCanvasGroup: {fileID: 7833986129177496681}
+  backgroundCanvasGroups: []
 --- !u!1 &4642247029371758377
 GameObject:
   m_ObjectHideFlags: 0

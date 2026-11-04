@@ -991,6 +991,8 @@ GameObject:
   - component: {fileID: 7282888862988289558}
   - component: {fileID: 481731044483853647}
   - component: {fileID: 5560110130822251481}
+  - component: {fileID: 964357403577068303}
+  - component: {fileID: 7387524412401082645}
   m_Layer: 0
   m_Name: DefaultConfirmPopup
   m_TagString: Untagged
@@ -1094,6 +1096,33 @@ MonoBehaviour:
   cancelButton: {fileID: 8537409417068197300}
   confirmButtonText: {fileID: 3061792787488108562}
   cancelButtonText: {fileID: 3625902668517791756}
+--- !u!225 &964357403577068303
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7388062625732452449}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &7387524412401082645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7388062625732452449}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76803549ff94b404eb9d5712c56bf817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_Transition
+  transitionType: 1
+  uiCanvasGroup: {fileID: 964357403577068303}
+  backgroundCanvasGroups: []
 --- !u!1 &8572971671183870973
 GameObject:
   m_ObjectHideFlags: 0

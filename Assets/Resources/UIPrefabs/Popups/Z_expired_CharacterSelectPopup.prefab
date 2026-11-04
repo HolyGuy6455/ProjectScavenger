@@ -149,6 +149,8 @@ GameObject:
   - component: {fileID: 3443384942062405943}
   - component: {fileID: 9015807306450473454}
   - component: {fileID: 6989542147511534175}
+  - component: {fileID: 3702156685604831339}
+  - component: {fileID: 979939352700703728}
   m_Layer: 5
   m_Name: Z_expired_CharacterSelectPopup
   m_TagString: Untagged
@@ -233,6 +235,33 @@ MonoBehaviour:
   characterSelectNodePrefab: {fileID: 3245953435702671811, guid: 62c097de2e8f4aa4fb1a4e495e0a5749, type: 3}
   confirmButton: {fileID: 5517570802236601162}
   cancelButton: {fileID: 6220692375156515411}
+--- !u!225 &3702156685604831339
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963945710570392003}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &979939352700703728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 963945710570392003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76803549ff94b404eb9d5712c56bf817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_Transition
+  transitionType: 1
+  uiCanvasGroup: {fileID: 3702156685604831339}
+  backgroundCanvasGroups: []
 --- !u!1 &4814713798621613133
 GameObject:
   m_ObjectHideFlags: 0

@@ -2852,6 +2852,7 @@ GameObject:
   - component: {fileID: 2358514642615701487}
   - component: {fileID: 7959815033632260906}
   - component: {fileID: 6679146826940948776}
+  - component: {fileID: 3566203908655255895}
   m_Layer: 0
   m_Name: BackgroundImage
   m_TagString: Untagged
@@ -2916,6 +2917,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &3566203908655255895
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1055473063709144392}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 1
 --- !u!1 &1086834763825746741
 GameObject:
   m_ObjectHideFlags: 0
@@ -10905,6 +10918,7 @@ GameObject:
   - component: {fileID: 8671095920833809262}
   - component: {fileID: 8184598510688485714}
   - component: {fileID: 2097490288428128443}
+  - component: {fileID: 2434706745778148190}
   m_Layer: 0
   m_Name: foregroundImage
   m_TagString: Untagged
@@ -10969,6 +10983,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &2434706745778148190
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4149178268896462389}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 1
 --- !u!1 &4197506409145084709
 GameObject:
   m_ObjectHideFlags: 0
@@ -15619,6 +15645,8 @@ GameObject:
   - component: {fileID: 9021847077721542770}
   - component: {fileID: 9071570397484269688}
   - component: {fileID: 5120794396680801588}
+  - component: {fileID: 1888134366968040938}
+  - component: {fileID: 2760260614586765146}
   m_Layer: 0
   m_Name: QuestBoardPanel
   m_TagString: Untagged
@@ -15701,6 +15729,35 @@ MonoBehaviour:
   prevPageBtn: {fileID: 5283255576467974985}
   nextPageBtn: {fileID: 3286400646286146702}
   pageText: {fileID: 6634689316222915463}
+--- !u!225 &1888134366968040938
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6609786376707513574}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &2760260614586765146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6609786376707513574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76803549ff94b404eb9d5712c56bf817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_Transition
+  transitionType: 0
+  uiCanvasGroup: {fileID: 1888134366968040938}
+  backgroundCanvasGroups:
+  - {fileID: 3566203908655255895}
+  - {fileID: 2434706745778148190}
 --- !u!1 &6704254305181286025
 GameObject:
   m_ObjectHideFlags: 0

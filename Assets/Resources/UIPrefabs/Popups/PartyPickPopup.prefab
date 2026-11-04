@@ -9281,6 +9281,8 @@ GameObject:
   - component: {fileID: 4603195505393934972}
   - component: {fileID: 6368656070087179147}
   - component: {fileID: 6368656070087179148}
+  - component: {fileID: 7176396519949640710}
+  - component: {fileID: 6963845115884444095}
   m_Layer: 0
   m_Name: PartyPickPopup
   m_TagString: Untagged
@@ -9384,6 +9386,33 @@ MonoBehaviour:
     selectedObj: {fileID: 1328729378704509764}
   confirmButton: {fileID: 4102463424568784996}
   cancelButton: {fileID: 5831089967252671491}
+--- !u!225 &7176396519949640710
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8107032812707540197}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &6963845115884444095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8107032812707540197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76803549ff94b404eb9d5712c56bf817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_Transition
+  transitionType: 1
+  uiCanvasGroup: {fileID: 7176396519949640710}
+  backgroundCanvasGroups: []
 --- !u!1 &8258692108067109904
 GameObject:
   m_ObjectHideFlags: 0
