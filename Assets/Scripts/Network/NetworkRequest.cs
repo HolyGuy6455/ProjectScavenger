@@ -35,14 +35,14 @@ namespace Scavenger.Network
         {
             get
             {
-                if (Kind == NetworkErrorKind.Timeout) return "서버 응답이 지연되고 있습니다. 잠시 후 다시 시도해주세요.";
-                if (Kind == NetworkErrorKind.Connection) return "서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.";
-                if (HttpStatusCode == 401 || HttpStatusCode == 403) return "로그인 정보를 확인할 수 없습니다. 다시 로그인해주세요.";
+                if (Kind == NetworkErrorKind.Timeout) return LocalizationManager.Get("UI_NET_ERR_TIMEOUT");
+                if (Kind == NetworkErrorKind.Connection) return LocalizationManager.Get("UI_NET_ERR_CONNECTION");
+                if (HttpStatusCode == 401 || HttpStatusCode == 403) return LocalizationManager.Get("UI_NET_ERR_AUTH");
                 if ((Kind == NetworkErrorKind.Http || Kind == NetworkErrorKind.Server)
                     && HttpStatusCode < 500 && !string.IsNullOrWhiteSpace(ServerMessage)) return ServerMessage;
                 if (Kind == NetworkErrorKind.InvalidResponse || Kind == NetworkErrorKind.ResponseProcessing)
-                    return "서버 응답을 처리하지 못했습니다. 정보를 새로고침해주세요.";
-                return "요청을 처리하지 못했습니다. 잠시 후 다시 시도해주세요.";
+                    return LocalizationManager.Get("UI_NET_ERR_INVALID_RESPONSE");
+                return LocalizationManager.Get("UI_NET_ERR_DEFAULT");
             }
         }
     }

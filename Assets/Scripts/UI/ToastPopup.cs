@@ -38,13 +38,28 @@ namespace Scavenger.UI
             _canvasGroup.alpha = 0f;
         }
 
+        private void OnEnable()
+        {
+            LocalizationManager.OnLanguageChanged += RefreshFontOnly;
+            RefreshFontOnly();
+        }
+
         private void OnDisable()
         {
+            LocalizationManager.OnLanguageChanged -= RefreshFontOnly;
             StopHideTimer();
             _pending.Clear();
             _currentMessage = null;
             _finishHoldEarly = false;
             if (_canvasGroup != null) _canvasGroup.alpha = 0f;
+        }
+
+        private void RefreshFontOnly()
+        {
+            if (messageText != null)
+            {
+                LocalizedText.ApplyFont(messageText);
+            }
         }
 
         // 시간을 생략하거나 유효하지 않은 값을 전달하면 Inspector의 기본값을 사용합니다.
@@ -95,7 +110,11 @@ namespace Scavenger.UI
                 _canvasGroup.alpha = 0f;
                 _currentMessage = request.Message;
                 _finishHoldEarly = false;
-                if (messageText != null) messageText.text = request.Message;
+                if (messageText != null)
+                {
+                    LocalizedText.ApplyFont(messageText);
+                    messageText.text = request.Message;
+                }
                 transform.SetAsLastSibling();
                 SoundManager.Play(SoundKey.UIBack);
                 // 표시 시간과 대기 만료 모두 Time.timeScale의 영향을 받지 않습니다.

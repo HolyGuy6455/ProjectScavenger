@@ -5,6 +5,8 @@ using System.Collections.Generic;
 public class EnemyData : IData
 {
     public int id;
+    public string name;
+    public string icon;
     public int hp;
     public int lootTable;
     public string prefabName;
@@ -13,6 +15,11 @@ public class EnemyData : IData
     public int GetId()
     {
         return id;
+    }
+
+    public string GetLocalizedName()
+    {
+        return LocalizationManager.Get(name);
     }
 }
 

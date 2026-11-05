@@ -173,17 +173,17 @@ public class SkillLevelUpPopup : MonoBehaviour
         switch (errorCode)
         {
             case LevelUpSkillErrorCode.InvalidToken:
-                return "로그인 정보를 확인할 수 없습니다. 다시 로그인해주세요.";
+                return LocalizationManager.Get("UI_NET_ERR_AUTH");
             case LevelUpSkillErrorCode.CharacterNotFound:
-                return "캐릭터 정보를 찾을 수 없습니다. 다시 확인해주세요.";
+                return LocalizationManager.Get("UI_TOAST_SKILL_ERR_CHAR_NOT_FOUND");
             case LevelUpSkillErrorCode.SkillNotFound:
-                return "스킬 정보를 찾을 수 없습니다. 다시 시도해주세요.";
+                return LocalizationManager.Get("UI_TOAST_SKILL_ERR_SKILL_NOT_FOUND");
             case LevelUpSkillErrorCode.AlreadyUnlocked:
-                return "이미 해금되었거나 레벨업한 스킬입니다.";
+                return LocalizationManager.Get("UI_TOAST_SKILL_ERR_ALREADY_UNLOCKED");
             case LevelUpSkillErrorCode.InsufficientItems:
-                return "스킬 레벨업에 필요한 재료가 부족합니다.";
+                return LocalizationManager.Get("UI_TOAST_SKILL_ERR_INSUFFICIENT_ITEMS");
             default:
-                return "스킬 레벨업에 실패했습니다. 잠시 후 다시 시도해주세요.";
+                return LocalizationManager.Get("UI_TOAST_SKILL_ERR_DEFAULT");
         }
     }
 }

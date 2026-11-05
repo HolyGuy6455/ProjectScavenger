@@ -226,9 +226,9 @@ public class UserDataManager : MonoBehaviour
         switch (errorCode)
         {
             case SaveDeckErrorCode.InvalidToken:
-                return "로그인 정보를 확인할 수 없습니다. 다시 로그인해주세요.";
+                return LocalizationManager.Get("UI_NET_ERR_AUTH");
             case SaveDeckErrorCode.InvalidDeck:
-                return "편성에 문제가 있습니다. 다시 편성해주세요";
+                return LocalizationManager.Get("UI_TOAST_DECK_INVALID");
             default:
                 return error.DefaultMessage;
         }

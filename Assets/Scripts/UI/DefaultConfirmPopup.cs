@@ -20,19 +20,44 @@ namespace Scavenger.UI
         private Action _onConfirm;
         private Action _onCancel;
         private bool _isAwaitingResponse;
+        private string _customConfirmLabel;
+        private string _customCancelLabel;
 
         private void OnEnable()
         {
             _isAwaitingResponse = true;
             if (confirmButton != null) confirmButton.onClick.AddListener(Confirm);
             if (cancelButton != null) cancelButton.onClick.AddListener(Cancel);
+            LocalizationManager.OnLanguageChanged += RefreshLocalizedTexts;
+            RefreshLocalizedTexts();
         }
 
         private void OnDisable()
         {
             if (confirmButton != null) confirmButton.onClick.RemoveListener(Confirm);
             if (cancelButton != null) cancelButton.onClick.RemoveListener(Cancel);
+            LocalizationManager.OnLanguageChanged -= RefreshLocalizedTexts;
             ClearCallbacks();
+        }
+
+        private void RefreshLocalizedTexts()
+        {
+            if (messageText != null) LocalizedText.ApplyFont(messageText);
+            if (descriptionText != null) LocalizedText.ApplyFont(descriptionText);
+            if (confirmButtonText != null)
+            {
+                LocalizedText.ApplyFont(confirmButtonText);
+                confirmButtonText.text = string.IsNullOrEmpty(_customConfirmLabel) || _customConfirmLabel == "확인"
+                    ? LocalizationManager.Get("UI_COMMON_CONFIRM")
+                    : _customConfirmLabel;
+            }
+            if (cancelButtonText != null)
+            {
+                LocalizedText.ApplyFont(cancelButtonText);
+                cancelButtonText.text = string.IsNullOrEmpty(_customCancelLabel) || _customCancelLabel == "취소"
+                    ? LocalizationManager.Get("UI_COMMON_CANCEL")
+                    : _customCancelLabel;
+            }
         }
 
         // 매니저가 비활성 상태의 캐시된 팝업에도 데이터를 전달할 수 있습니다.
@@ -42,6 +67,8 @@ namespace Scavenger.UI
             _onConfirm = onConfirm;
             _onCancel = onCancel;
             _isAwaitingResponse = true;
+            _customConfirmLabel = confirmLabel;
+            _customCancelLabel = cancelLabel;
 
             if (messageText != null) messageText.text = message ?? string.Empty;
             if (descriptionText != null)
@@ -49,10 +76,7 @@ namespace Scavenger.UI
                 descriptionText.text = description ?? string.Empty;
                 descriptionText.gameObject.SetActive(!string.IsNullOrWhiteSpace(description));
             }
-            if (confirmButtonText != null)
-                confirmButtonText.text = string.IsNullOrEmpty(confirmLabel) ? "확인" : confirmLabel;
-            if (cancelButtonText != null)
-                cancelButtonText.text = string.IsNullOrEmpty(cancelLabel) ? "취소" : cancelLabel;
+            RefreshLocalizedTexts();
         }
 
         public void Open(string message, Action onConfirm, Action onCancel = null,

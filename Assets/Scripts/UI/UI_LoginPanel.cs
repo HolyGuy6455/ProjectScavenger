@@ -144,8 +144,10 @@ namespace Scavenger.UI
             string size = bytes >= 1024L * 1024 * 1024 ? $"{bytes / (1024d * 1024 * 1024):0.##} GB"
                 : bytes >= 1024L * 1024 ? $"{bytes / (1024d * 1024):0.##} MB"
                 : bytes >= 1024 ? $"{bytes / 1024d:0.##} KB" : $"{bytes} B";
-            return ShowPatchConfirmationAsync($"추가 데이터 {size}를 다운로드할까요?",
-                "게임 실행에 필요한 데이터가 있습니다.", "다운로드");
+            return ShowPatchConfirmationAsync(
+                LocalizationManager.Get("UI_PATCH_CONFIRM_MSG", size),
+                LocalizationManager.Get("UI_PATCH_CONFIRM_DESC"),
+                LocalizationManager.Get("UI_PATCH_BTN_DOWNLOAD"));
         }
 
         private Task<bool> ShowPatchConfirmationAsync(string message, string description, string confirmLabel)

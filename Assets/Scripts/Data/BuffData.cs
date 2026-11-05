@@ -16,6 +16,11 @@ public class BuffData : IData
     {
         return id;
     }
+
+    public string GetLocalizedName()
+    {
+        return LocalizationManager.Get(name);
+    }
 }
 
 [System.Serializable]

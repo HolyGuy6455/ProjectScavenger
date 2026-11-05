@@ -68,7 +68,8 @@ namespace Scavenger.UI
                 if (exitText != null)
                 {
                     float remainingTime = Mathf.Max(0, totalTime - timer);
-                    exitText.text = $"탈출 중... {remainingTime:F1}s";
+                    LocalizedText.ApplyFont(exitText);
+                    exitText.text = LocalizationManager.Get("UI_INGAME_EXTRACTING_FORMAT", remainingTime.ToString("F1"));
                 }
             }
             else

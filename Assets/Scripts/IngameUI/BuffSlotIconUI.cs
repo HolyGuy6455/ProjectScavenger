@@ -30,6 +30,24 @@ public class BuffSlotIconUI : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        LocalizationManager.OnLanguageChanged += RefreshLocalizedName;
+        RefreshLocalizedName();
+    }
+
+    private void OnDisable()
+    {
+        LocalizationManager.OnLanguageChanged -= RefreshLocalizedName;
+    }
+
+    private void RefreshLocalizedName()
+    {
+        if (nameText == null || _boundBuff == null) return;
+        Scavenger.UI.LocalizedText.ApplyFont(nameText);
+        nameText.text = _boundBuff.GetDisplayName();
+    }
+
     public void Bind(Buff buff)
     {
         if (buff == null)
@@ -47,10 +65,7 @@ public class BuffSlotIconUI : MonoBehaviour
             iconImage.enabled = icon != null;
         }
 
-        if (nameText != null)
-        {
-            nameText.text = buff.GetDisplayName();
-        }
+        RefreshLocalizedName();
 
         if (canvasGroup == null)
         {

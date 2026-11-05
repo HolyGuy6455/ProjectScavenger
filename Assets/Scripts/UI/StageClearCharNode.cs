@@ -24,8 +24,27 @@ namespace Scavenger.UI
         [Header("Exp Bar")]
         [SerializeField] private Image expBarFill;
 
+        private CharData _charData;
         private IEnumerator _pendingExpBarAnimation;
         private Coroutine _expBarAnimation;
+
+        private void OnEnable()
+        {
+            LocalizationManager.OnLanguageChanged += RefreshLocalizedTexts;
+            RefreshLocalizedTexts();
+        }
+
+        private void OnDisable()
+        {
+            LocalizationManager.OnLanguageChanged -= RefreshLocalizedTexts;
+        }
+
+        private void RefreshLocalizedTexts()
+        {
+            if (_charData == null || charNameText == null) return;
+            LocalizedText.ApplyFont(charNameText);
+            charNameText.text = _charData.GetLocalizedName();
+        }
 
         public void Setup(CharData charData, int oldLevel, int newLevel, int oldExp, int newExp, int maxExpForOldLevel, int maxExpForNewLevel, int addedExp)
         {
@@ -36,6 +55,7 @@ namespace Scavenger.UI
             }
             _pendingExpBarAnimation = null;
 
+            _charData = charData;
             if (charData == null) return;
 
             bool isLevelUp = newLevel > oldLevel;
@@ -46,14 +66,9 @@ namespace Scavenger.UI
             if (levelUpTag != null) levelUpTag.SetActive(isLevelUp);
 
             // 캐릭터 이름 및 초상화 설정
-            if (charNameText != null)
-            {
-                // 실제 이름 매핑
-                LocalizedText.ApplyFont(charNameText);
-                charNameText.text = charData.GetLocalizedName(); 
-            }
+            RefreshLocalizedTexts();
 
-            if (avatarImage != null)
+            if (avatarImage != null && SpriteManager.Instance != null)
             {
                 Sprite loadedSprite = SpriteManager.Instance.LoadSprite(charData.resourceSlot);
                 

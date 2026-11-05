@@ -74,6 +74,16 @@ public class ItemPickupButton : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        LocalizationManager.OnLanguageChanged += UpdateUI;
+    }
+
+    private void OnDisable()
+    {
+        LocalizationManager.OnLanguageChanged -= UpdateUI;
+    }
+
     private void UpdateUI()
     {
         if (_closestItem != null)
@@ -90,7 +100,7 @@ public class ItemPickupButton : MonoBehaviour
                     if (itemText != null)
                     {
                         Scavenger.UI.LocalizedText.ApplyFont(itemText);
-                        itemText.text = $"{data.GetLocalizedName()} 줍기";
+                        itemText.text = LocalizationManager.Get("UI_INGAME_PICKUP_ITEM", data.GetLocalizedName());
                     }
 
                     // 아이콘 설정

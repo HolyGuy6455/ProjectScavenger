@@ -180,6 +180,7 @@ public class OffScreenAllyUI : MonoBehaviour
         target = newTarget;
         if (nameText != null)
         {
+            Scavenger.UI.LocalizedText.ApplyFont(nameText);
             nameText.text = name;
         }
     }

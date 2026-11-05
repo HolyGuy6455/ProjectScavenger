@@ -32,7 +32,6 @@ public class Buff
 
     public string GetDisplayName()
     {
-        if (!string.IsNullOrEmpty(name)) return name;
         if (DataManager.Instance != null)
         {
             if (id > 0)
@@ -41,7 +40,7 @@ public class Buff
                 if (data != null && !string.IsNullOrEmpty(data.name))
                 {
                     name = data.name;
-                    return name;
+                    return data.GetLocalizedName();
                 }
             }
             else if (id < 0)
@@ -50,9 +49,13 @@ public class Buff
                 if (skill != null && !string.IsNullOrEmpty(skill.name))
                 {
                     name = skill.name;
-                    return name;
+                    return skill.GetLocalizedName();
                 }
             }
+        }
+        if (!string.IsNullOrEmpty(name))
+        {
+            return LocalizationManager.HasKey(name) ? LocalizationManager.Get(name) : name;
         }
         return $"Buff {id}";
     }

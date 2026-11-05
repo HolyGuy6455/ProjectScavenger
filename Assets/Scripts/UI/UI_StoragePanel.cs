@@ -34,6 +34,7 @@ namespace Scavenger.UI
 
         private void OnEnable()
         {
+            LocalizationManager.OnLanguageChanged += RefreshUI;
             currentSelectedItemId = 0; // 패널을 처음 열 때 무조건 첫번째 아이템이 선택되도록 초기화
             if (tabs != null)
             {
@@ -54,6 +55,7 @@ namespace Scavenger.UI
 
         private void OnDisable()
         {
+            LocalizationManager.OnLanguageChanged -= RefreshUI;
             if (UserDataManager.Instance != null)
             {
                 UserDataManager.Instance.OnItemDataUpdated -= RefreshUI;
@@ -90,6 +92,7 @@ namespace Scavenger.UI
 
             if (categoryCountText != null)
             {
+                LocalizedText.ApplyFont(categoryCountText);
                 categoryCountText.text = $"{GetCategoryName(currentCategory)} ({items.Count} / {maxCapacity})";
             }
 
@@ -229,12 +232,12 @@ namespace Scavenger.UI
         {
             switch (category)
             {
-                case ItemCategory.Important: return "중요";
-                case ItemCategory.Food: return "음식";
-                case ItemCategory.Tool: return "도구";
-                case ItemCategory.Consumable: return "소모품";
+                case ItemCategory.Important: return LocalizationManager.Get("UI_STORAGE_TAB_IMPORTANT");
+                case ItemCategory.Food: return LocalizationManager.Get("UI_STORAGE_TAB_FOOD");
+                case ItemCategory.Tool: return LocalizationManager.Get("UI_STORAGE_TAB_TOOL");
+                case ItemCategory.Consumable: return LocalizationManager.Get("UI_STORAGE_TAB_CONSUMABLE");
                 case ItemCategory.All:
-                default: return "전체";
+                default: return LocalizationManager.Get("UI_STORAGE_TAB_ALL");
             }
         }
     }
