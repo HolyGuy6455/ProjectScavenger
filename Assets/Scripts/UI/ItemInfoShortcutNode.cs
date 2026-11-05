@@ -66,7 +66,6 @@ namespace Scavenger.UI
             if (manager == null || string.IsNullOrEmpty(_shortcut)) return;
 
             ItemInfoPopup popup = GetComponentInParent<ItemInfoPopup>();
-            if (popup != null) manager.ClosePopup(popup.gameObject);
             manager.GoToQuestShortcut(_shortcut, _shortcutValue);
         }
     }

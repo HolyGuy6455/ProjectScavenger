@@ -11,6 +11,7 @@ namespace Scavenger.Network
     {
         public string connectionId;
         public string username;
+        public int level = 1;
         public string partyId;
         public bool isReady;
         public List<int> selectedCharIds;

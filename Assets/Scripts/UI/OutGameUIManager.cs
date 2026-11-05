@@ -8,9 +8,8 @@ namespace Scavenger.UI
     {
         // 기존 씬과 프리팹에 저장된 패널 번호를 유지합니다.
         MainLobby = 1,
-        ReadyToBattle,
-        FriendParty,
-        CharacterDeck,
+        ReadyToBattle = 2,
+        CharacterDeck = 4,
         SelectOperation,
         SelectStage,
         TrainCharacter,
@@ -29,7 +28,8 @@ namespace Scavenger.UI
         SkillSelect,
         ItemInfo,
         DefaultConfirm,
-        PartyPick
+        PartyPick,
+        CallFriend
     }
 
     public class OutGameUIManager : MonoBehaviour
@@ -158,7 +158,6 @@ namespace Scavenger.UI
         [Header("Panel Prefabs")]
         [SerializeField] private GameObject mainLobbyPanelPrefab;
         [SerializeField] private GameObject readyToBattlePanelPrefab;
-        [SerializeField] private GameObject friendPartyPanelPrefab;
         [SerializeField] private GameObject characterDeckPanelPrefab;
         [SerializeField] private GameObject selectOperationPanelPrefab;
         [SerializeField] private GameObject selectStagePanelPrefab;
@@ -177,6 +176,7 @@ namespace Scavenger.UI
         [SerializeField] private GameObject skillSelectPopupPrefab;
         [SerializeField] private GameObject itemInfoPopupPrefab;
         [SerializeField] private GameObject defaultConfirmPopupPrefab;
+        [SerializeField] private GameObject callFriendPopupPrefab;
 
         // [Header("Persistent UI")]
         // [SerializeField] private GameObject persistentPartyListUI; // 파티 리스트 패널
@@ -200,8 +200,7 @@ namespace Scavenger.UI
         private bool IsPartyScope(OutGamePanelType type)
         {
             return type == OutGamePanelType.StageInfo || 
-                   type == OutGamePanelType.CharacterDeck || 
-                   type == OutGamePanelType.FriendParty;
+                   type == OutGamePanelType.CharacterDeck;
         }
 
         private void Awake()
@@ -830,7 +829,6 @@ namespace Scavenger.UI
             {
                 case OutGamePanelType.MainLobby: return mainLobbyPanelPrefab;
                 case OutGamePanelType.ReadyToBattle: return readyToBattlePanelPrefab;
-                case OutGamePanelType.FriendParty: return friendPartyPanelPrefab;
                 case OutGamePanelType.CharacterDeck: return characterDeckPanelPrefab;
                 case OutGamePanelType.SelectOperation: return selectOperationPanelPrefab;
                 case OutGamePanelType.SelectStage: return selectStagePanelPrefab;
@@ -855,13 +853,14 @@ namespace Scavenger.UI
                 case OutGamePopupType.ItemInfo: return itemInfoPopupPrefab;
                 case OutGamePopupType.DefaultConfirm: return defaultConfirmPopupPrefab;
                 case OutGamePopupType.PartyPick: return partyPickPopupPrefab;
+                case OutGamePopupType.CallFriend: return callFriendPopupPrefab;
             }
             return null;
         }
 
         public void OnClickGoToLobby() => ShowPanel(OutGamePanelType.MainLobby);
         public void OnClickGoToReadyToBattle() => ShowPanel(OutGamePanelType.ReadyToBattle);
-        public void OnClickGoToParty() => ShowPanel(OutGamePanelType.FriendParty);
+        public void OnClickGoToParty() => ShowPopup<CallFriendPopup>(OutGamePopupType.CallFriend);
         public void OnClickGoToCharacterDeck() => ShowPanel(OutGamePanelType.CharacterDeck);
         public void OnClickGoToSelectOperation() => ShowPanel(OutGamePanelType.SelectOperation);
         public void OnClickGoToSelectStage() => ShowPanel(OutGamePanelType.SelectStage);

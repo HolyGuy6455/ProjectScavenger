@@ -12,6 +12,27 @@ namespace Scavenger.UI
         [Header("UI Elements")]
         [SerializeField] private GameObject supportButtonObject;
 
+        private void Awake()
+        {
+            if (supportButtonObject != null)
+            {
+                var btn = supportButtonObject.GetComponentInChildren<UnityEngine.UI.Button>(true);
+                if (btn != null)
+                {
+                    btn.onClick.RemoveListener(OnClickSupportButton);
+                    btn.onClick.AddListener(OnClickSupportButton);
+                }
+            }
+        }
+
+        private void OnClickSupportButton()
+        {
+            if (OutGameUIManager.Instance != null)
+            {
+                OutGameUIManager.Instance.ShowPopup<CallFriendPopup>(OutGamePopupType.CallFriend);
+            }
+        }
+
         private void OnEnable()
         {
             if (Scavenger.Network.NetworkPartyManager.Instance == null)
