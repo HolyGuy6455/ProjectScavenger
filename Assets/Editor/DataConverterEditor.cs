@@ -160,6 +160,11 @@ public class DataConverterEditor : EditorWindow
             ConvertQuestData();
         }
 
+        if (GUILayout.Button("Convert Stage Data"))
+        {
+            ConvertData<StageDataList, StageData>("Stage", "Scavenger - Stage.tsv");
+        }
+
         GUILayout.Space(20);
 
 
@@ -208,6 +213,7 @@ public class DataConverterEditor : EditorWindow
         ConvertData<LevelDataList, LevelData>("Level", "Scavenger - Level.tsv");
         ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - Skill.tsv");
         ConvertQuestData();
+        ConvertData<StageDataList, StageData>("Stage", "Scavenger - Stage.tsv");
 
         ConvertData<LootDataList, LootData>("Loot", "Scavenger - Loot.tsv");
         ConvertData<EnemyDataList, EnemyData>("Enemy", "Scavenger - Enemy.tsv");
@@ -504,7 +510,24 @@ public class DataConverterEditor : EditorWindow
         File.WriteAllText(Path.Combine(jsonPath, $"{dataName}.json"), exportedJson);
         
         AssetDatabase.Refresh();
+        RegisterDataAssetInAddressables($"Assets/Resources_moved/Data/{dataName}Data.bytes", $"{dataName}Data");
         Debug.Log($"Successfully converted and encrypted {dataName}Data to: {savePath}");
+    }
+
+    private static void RegisterDataAssetInAddressables(string assetPath, string address)
+    {
+        var settings = UnityEditor.AddressableAssets.AddressableAssetSettingsDefaultObject.Settings;
+        if (settings == null || settings.DefaultGroup == null) return;
+
+        string guid = AssetDatabase.AssetPathToGUID(assetPath);
+        if (string.IsNullOrEmpty(guid)) return;
+
+        var entry = settings.CreateOrMoveEntry(guid, settings.DefaultGroup);
+        if (entry != null && entry.address != address)
+        {
+            entry.address = address;
+            settings.SetDirty(UnityEditor.AddressableAssets.Settings.AddressableAssetSettings.ModificationEvent.EntryMoved, entry, true);
+        }
     }
 
     private List<T> ParseTsv<T>(string tsvContent) where T : new()

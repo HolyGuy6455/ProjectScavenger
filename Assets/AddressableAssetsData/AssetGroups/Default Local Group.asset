@@ -70,6 +70,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 733933ba57736d54788dc34a1b0d9eab
+    m_Address: StageData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7f73016dddd080443962e4c14d56df3c
     m_Address: LevelData
     m_ReadOnly: 0

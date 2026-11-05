@@ -28,6 +28,13 @@ public static class SpriteResourcePaths
             case UserCurrencyData currency:
                 currency.ui_resources = NormalizePath(currency.ui_resources, "UserCurrency");
                 break;
+            case EnemyData enemy:
+                enemy.icon = NormalizePath(enemy.icon, "Items");
+                break;
+            case StageData stage:
+                stage.previewImage = NormalizePath(stage.previewImage, "Illustration");
+                stage.bgIllustration = NormalizePath(stage.bgIllustration, "Illustration");
+                break;
         }
     }
 
@@ -39,7 +46,13 @@ public static class SpriteResourcePaths
         int separator = value.IndexOf('#');
         string path = separator >= 0 ? value.Substring(0, separator).Trim() : value;
         string slice = separator >= 0 ? "#" + value.Substring(separator + 1).Trim() : string.Empty;
-        path = Path.ChangeExtension(path, null);
+        string ext = Path.GetExtension(path);
+        if (ext.Equals(".png", System.StringComparison.OrdinalIgnoreCase) ||
+            ext.Equals(".jpg", System.StringComparison.OrdinalIgnoreCase) ||
+            ext.Equals(".jpeg", System.StringComparison.OrdinalIgnoreCase))
+        {
+            path = Path.ChangeExtension(path, null);
+        }
         if (string.IsNullOrEmpty(path)) return string.Empty;
 
         // An explicit folder is authoritative; only old basename-only values need migration.
