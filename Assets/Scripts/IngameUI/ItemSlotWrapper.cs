@@ -62,4 +62,25 @@ public class ItemSlotWrapper : MonoBehaviour
             itemAmountText.color = sufficientColor;
         }
     }
+
+    public void SetIconOnlyData(Sprite icon, int itemId = 0)
+    {
+        itemInfoButton?.SetItemId(itemId);
+
+        if (itemIcon != null)
+        {
+            itemIcon.sprite = icon;
+            itemIcon.enabled = icon != null;
+        }
+
+        if (itemNameText != null)
+        {
+            itemNameText.gameObject.SetActive(false);
+        }
+
+        if (itemAmountText != null)
+        {
+            itemAmountText.gameObject.SetActive(false);
+        }
+    }
 }

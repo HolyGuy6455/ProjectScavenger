@@ -1465,6 +1465,10 @@ PrefabInstance:
       propertyPath: m_text
       value: "\uC721\uC131\uC7AC\uD654\uB358\uC804"
       objectReference: {fileID: 0}
+    - target: {fileID: 6935987377596061131, guid: 5d84b84a308db0e4ba9b892bf3487806, type: 3}
+      propertyPath: stageType
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7406937701051992524, guid: 5d84b84a308db0e4ba9b892bf3487806, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1736,6 +1740,10 @@ PrefabInstance:
     - target: {fileID: 6131276871109911757, guid: 5d84b84a308db0e4ba9b892bf3487806, type: 3}
       propertyPath: m_text
       value: "\uB7AD\uD0B9\uC804"
+      objectReference: {fileID: 0}
+    - target: {fileID: 6935987377596061131, guid: 5d84b84a308db0e4ba9b892bf3487806, type: 3}
+      propertyPath: stageType
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7406937701051992524, guid: 5d84b84a308db0e4ba9b892bf3487806, type: 3}
       propertyPath: m_Pivot.x

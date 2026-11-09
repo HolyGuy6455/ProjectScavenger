@@ -324,8 +324,8 @@ Camera:
   m_GameObject: {fileID: 681050258}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 4
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 3
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -495,7 +495,7 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 0
   m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
+  m_PlaneDistance: 10
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -556,13 +556,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53d669c78a066e94795b58070320dbd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.OutGameUIManager
+  overrideTransitionTimingInEditor: 1
+  editorPanelBgFadeInDuration: 0.2
+  editorPanelUiFadeInDelay: 0.15
+  editorPanelUiFadeInDuration: 0.2
+  editorPanelUiFadeOutDuration: 0.15
+  editorPanelBgFadeOutDelay: 0.1
+  editorPanelBgFadeOutDuration: 0.2
+  editorPopupFadeInDuration: 0.15
+  editorPopupFadeOutDuration: 0.15
   canvasTransform: {fileID: 1130490004}
   mainLobbyPanelPrefab: {fileID: 5503115048430643127, guid: 580c2346a8418824f831bf97dafa1a7c, type: 3}
   readyToBattlePanelPrefab: {fileID: 7114252727718224438, guid: a583897e8c25a2e41826325ef65e9718, type: 3}
-  friendPartyPanelPrefab: {fileID: 8256683056724951733, guid: aea74ef787125274a8603160da2f2c06, type: 3}
   characterDeckPanelPrefab: {fileID: 1813855078207234182, guid: 2169579baec9867498450bcf011955f5, type: 3}
   selectOperationPanelPrefab: {fileID: 403311199544709674, guid: 458046228d2aeb2479e54878bcbd72a0, type: 3}
-  selectStagePanelPrefab: {fileID: 0}
+  selectStagePanelPrefab: {fileID: 9105420056638402584, guid: 864d1c0e035b0f141bc2b521aaacf627, type: 3}
   trainCharacterPanelPrefab: {fileID: 5439909724396608738, guid: 8167043b365dc6142bad6508160be01b, type: 3}
   stageInfoPanelPrefab: {fileID: 3897945546778568232, guid: f4ee5a44f24cfd040a6d4969d61d721c, type: 3}
   storagePanelPrefab: {fileID: 4798374054230103912, guid: 58752f8bf43fe854e9f3944fffe06aef, type: 3}
@@ -576,6 +584,7 @@ MonoBehaviour:
   skillSelectPopupPrefab: {fileID: 3616719231736926623, guid: c4a916317edf9c3429e23ac6d03fa75b, type: 3}
   itemInfoPopupPrefab: {fileID: 8154750263302841035, guid: ba1605ab2e74b464e96e69c16931d60e, type: 3}
   defaultConfirmPopupPrefab: {fileID: 7388062625732452449, guid: bd69a30cd426da74984474e6059bf2d8, type: 3}
+  callFriendPopupPrefab: {fileID: 4757940022835497853, guid: d2e63e3894ef4cc48a25d423279e5203, type: 3}
 --- !u!4 &1676664896
 Transform:
   m_ObjectHideFlags: 0

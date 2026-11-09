@@ -24,10 +24,25 @@ namespace Scavenger.UI
                 NetworkPartyManager.Instance.OnGameStartBroadcasted += HandleGameStart;
                 NetworkPartyManager.Instance.OnHostGameStartBroadcasted += HandleHostGameStart;
             }
+
+            _isReady = false;
+            if (NetworkPartyManager.Instance != null &&
+                NetworkPartyManager.Instance.IsMultiplay &&
+                NetworkPartyManager.Instance.PartyMembers != null &&
+                NetworkAuthManager.Instance != null)
+            {
+                var myInfo = NetworkPartyManager.Instance.PartyMembers.Find(m => m.username == NetworkAuthManager.Instance.Username);
+                if (myInfo != null) _isReady = myInfo.isReady;
+            }
+
+            LocalizationManager.OnLanguageChanged += RefreshButtonText;
+            RefreshButtonText();
         }
 
         private void OnDisable()
         {
+            LocalizationManager.OnLanguageChanged -= RefreshButtonText;
+
             if (NetworkPartyManager.Instance != null)
             {
                 NetworkPartyManager.Instance.OnGameStartBroadcasted -= HandleGameStart;
@@ -43,23 +58,37 @@ namespace Scavenger.UI
             {
                 _isReady = !_isReady;
                 NetworkPartyManager.Instance.SendReadyState(_isReady);
+                RefreshButtonText();
+                Debug.Log($"[Match] 레디 상태 변경됨: {_isReady}");
+            }
+        }
 
-                // Update button text if it has one
-                var textComponent = startGameButton.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-                if (textComponent != null)
+        private void RefreshButtonText()
+        {
+            if (startGameButton == null) return;
+
+            string key = _isReady ? "UI_STAGEINFO_BTN_CANCEL_READY" : "UI_STAGEINFO_BTN_DEPLOY";
+            var textComponent = startGameButton.GetComponentInChildren<TMPro.TextMeshProUGUI>(true);
+            if (textComponent != null)
+            {
+                var loc = textComponent.GetComponent<LocalizedText>();
+                if (loc != null)
                 {
-                    textComponent.text = _isReady ? "Cancel Ready" : "Ready";
+                    loc.SetKey(key);
                 }
                 else
                 {
-                    var textMesh = startGameButton.GetComponentInChildren<UnityEngine.UI.Text>();
-                    if (textMesh != null)
-                    {
-                        textMesh.text = _isReady ? "Cancel Ready" : "Ready";
-                    }
+                    LocalizedText.ApplyFont(textComponent);
+                    textComponent.text = LocalizationManager.Get(key);
                 }
-                
-                Debug.Log($"[Match] 레디 상태 변경됨: {_isReady}");
+            }
+            else
+            {
+                var textMesh = startGameButton.GetComponentInChildren<UnityEngine.UI.Text>(true);
+                if (textMesh != null)
+                {
+                    textMesh.text = LocalizationManager.Get(key);
+                }
             }
         }
 
@@ -71,7 +100,7 @@ namespace Scavenger.UI
             PlayerPrefs.SetString("TargetServerIP", ip);
             PlayerPrefs.SetInt("TargetServerPort", port);
             PlayerPrefs.SetString("MatchToken", matchToken);
-            PlayerPrefs.SetString("SelectedMap", "Stage002");
+            PlayerPrefs.SetString("SelectedMap", GetSelectedMapSceneName());
             PlayerPrefs.SetInt("IsTestMode", 0);
             PlayerPrefs.Save();
 
@@ -84,12 +113,26 @@ namespace Scavenger.UI
             Debug.Log($"[DEBUG-TRACE] [UI_StartGameController] 서버로부터 HandleHostGameStart 수신! matchToken: {matchToken}");
             
             PlayerPrefs.SetString("MatchToken", matchToken);
-            PlayerPrefs.SetString("SelectedMap", "Stage002");
+            PlayerPrefs.SetString("SelectedMap", GetSelectedMapSceneName());
             PlayerPrefs.SetInt("IsTestMode", 0);
             PlayerPrefs.Save();
 
             // 로컬 호스트 모드로 로딩 씬 진입
             Scavenger.Core.SceneTransitionManager.LoadSceneWithIntent(Scavenger.Core.LoadingIntent.StartSingleplayerHost);
+        }
+
+        private string GetSelectedMapSceneName()
+        {
+            int stageId = OutGameUIManager.Instance != null ? OutGameUIManager.Instance.SelectedStageId : 1;
+            if (DataManager.Instance != null)
+            {
+                StageData stageData = DataManager.Instance.GetData<StageData>("Stage", stageId);
+                if (stageData != null && !string.IsNullOrWhiteSpace(stageData.sceneName))
+                {
+                    return stageData.sceneName.Trim();
+                }
+            }
+            return "Stage002";
         }
     }
 }

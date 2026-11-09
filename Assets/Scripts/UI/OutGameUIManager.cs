@@ -197,6 +197,9 @@ namespace Scavenger.UI
         private CanvasGroup _sceneLobbyBackgroundCanvasGroup;
         private Action _activePanelTransitionCleanup;
 
+        public StageType SelectedStageType { get; private set; } = StageType.Normal;
+        public int SelectedStageId { get; private set; } = 1;
+
         private bool IsPartyScope(OutGamePanelType type)
         {
             return type == OutGamePanelType.StageInfo || 
@@ -533,8 +536,14 @@ namespace Scavenger.UI
             switch (shortcut)
             {
                 case "STAGE_SELECT":
-                    // 스테이지 선택 화면이 준비되기 전까지는 스테이지 정보로 이동합니다.
-                    ShowPanel(OutGamePanelType.StageInfo);
+                    if (int.TryParse(shortcutValue, out int stageId) && stageId > 0)
+                    {
+                        OpenStageInfo(stageId);
+                    }
+                    else
+                    {
+                        OpenStageSelect(StageType.Normal);
+                    }
                     break;
 
                 case "TRAIN_CHARACTOR":
@@ -858,14 +867,44 @@ namespace Scavenger.UI
             return null;
         }
 
+        public void OpenStageSelect(StageType stageType = StageType.Normal)
+        {
+            SelectedStageType = stageType == StageType.None ? StageType.Normal : stageType;
+            ShowPanel(OutGamePanelType.SelectStage, panel =>
+            {
+                var selectPanel = panel.GetComponent<StageSelectPanel>();
+                if (selectPanel != null)
+                {
+                    selectPanel.SetStageTypeForNextOpen(SelectedStageType);
+                }
+            });
+        }
+
+        public void OpenStageInfo(int stageId)
+        {
+            if (stageId > 0)
+            {
+                SelectedStageId = stageId;
+            }
+
+            ShowPanel(OutGamePanelType.StageInfo, panel =>
+            {
+                var infoPanel = panel.GetComponent<StageInfoPanel>();
+                if (infoPanel != null)
+                {
+                    infoPanel.SetStageForNextOpen(SelectedStageId);
+                }
+            });
+        }
+
         public void OnClickGoToLobby() => ShowPanel(OutGamePanelType.MainLobby);
         public void OnClickGoToReadyToBattle() => ShowPanel(OutGamePanelType.ReadyToBattle);
         public void OnClickGoToParty() => ShowPopup<CallFriendPopup>(OutGamePopupType.CallFriend);
         public void OnClickGoToCharacterDeck() => ShowPanel(OutGamePanelType.CharacterDeck);
         public void OnClickGoToSelectOperation() => ShowPanel(OutGamePanelType.SelectOperation);
-        public void OnClickGoToSelectStage() => ShowPanel(OutGamePanelType.SelectStage);
+        public void OnClickGoToSelectStage() => OpenStageSelect(SelectedStageType);
         public void OnClickGoToTrainCharacter() => ShowPanel(OutGamePanelType.TrainCharacter);
-        public void OnClickGoToStageInfo() => ShowPanel(OutGamePanelType.StageInfo);
+        public void OnClickGoToStageInfo() => OpenStageInfo(SelectedStageId);
         public void OnClickGoToStorage() => ShowPanel(OutGamePanelType.Storage);
         public void OnClickGoToQuestBoard() => ShowPanel(OutGamePanelType.QuestBoard);
         public void OnClickGoToSetting() => ShowPanel(OutGamePanelType.Setting);

@@ -436,7 +436,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9d1b4722a279c04ba737a8c27ba4d4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.UI_NavigateButton
-  targetPanel: 8
+  targetPanel: 6
+  stageType: 1
 --- !u!1 &7015374182256390858
 GameObject:
   m_ObjectHideFlags: 0
