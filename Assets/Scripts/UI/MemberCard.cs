@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,8 +7,43 @@ namespace Scavenger.UI
     public class MemberCard : MonoBehaviour
     {
         [Header("UI References")]
+        [SerializeField] private TMP_Text memberTitleText;
         [SerializeField] private Image[] deckCharacterImages; // Size 4
         [SerializeField] private GameObject readyStampImage;
+
+        /// <summary>
+        /// 상단 헤더 텍스트('지원군' 등)에 파티 멤버 이름을 표시합니다.
+        /// </summary>
+        public void SetMemberName(string memberName)
+        {
+            if (memberTitleText == null)
+            {
+                Transform headerTr = transform.Find("section-header");
+                if (headerTr != null)
+                {
+                    memberTitleText = headerTr.GetComponentInChildren<TMP_Text>(true);
+                }
+            }
+
+            if (memberTitleText == null) return;
+
+            LocalizedText localizedText = memberTitleText.GetComponent<LocalizedText>();
+            if (!string.IsNullOrEmpty(memberName))
+            {
+                if (localizedText != null)
+                {
+                    localizedText.enabled = false;
+                }
+
+                LocalizedText.ApplyFont(memberTitleText);
+                memberTitleText.text = memberName;
+            }
+            else if (localizedText != null)
+            {
+                localizedText.enabled = true;
+                localizedText.RefreshText();
+            }
+        }
 
         /// <summary>
         /// 4명의 캐릭터 덱 정보를 받아서 resourceSlot 이미지를 표시합니다.
