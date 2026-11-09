@@ -202,16 +202,20 @@ namespace Scavenger.UI
                 rt.sizeDelta = newSize;
             }
 
-            if (!tmp.enableAutoSizing && baseFontSize > 8f)
+            if (!tmp.enableAutoSizing && baseFontSize > 0f)
             {
                 tmp.enableAutoSizing = true;
                 tmp.fontSizeMax = baseFontSize;
-                tmp.fontSizeMin = Mathf.Max(8f, Mathf.Round(baseFontSize * 0.45f));
+                tmp.fontSizeMin = baseFontSize > 8f
+                    ? Mathf.Max(8f, Mathf.Round(baseFontSize * 0.45f))
+                    : Mathf.Max(0.1f, Mathf.Round(baseFontSize * 45f) * 0.01f);
             }
-            else if (tmp.enableAutoSizing && tmp.fontSizeMax <= 0f)
+            else if (tmp.enableAutoSizing && tmp.fontSizeMax <= 0f && baseFontSize > 0f)
             {
                 tmp.fontSizeMax = baseFontSize;
-                tmp.fontSizeMin = Mathf.Max(8f, Mathf.Round(baseFontSize * 0.45f));
+                tmp.fontSizeMin = baseFontSize > 8f
+                    ? Mathf.Max(8f, Mathf.Round(baseFontSize * 0.45f))
+                    : Mathf.Max(0.1f, Mathf.Round(baseFontSize * 45f) * 0.01f);
             }
         }
 

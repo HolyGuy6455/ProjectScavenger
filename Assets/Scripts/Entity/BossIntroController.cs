@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Cinemachine;
+using Scavenger.UI;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -41,6 +42,19 @@ public class BossIntroController : NetworkBehaviour
         _animator = GetComponentInChildren<Animator>();
         _health = GetComponent<Health>();
         _camera = GetComponent<CharacterCinematicController>().CinematicCamera;
+        RefreshIntroLocalizedTexts();
+    }
+
+    private void RefreshIntroLocalizedTexts()
+    {
+        var localizedTexts = GetComponentsInChildren<LocalizedText>(true);
+        for (int i = 0; i < localizedTexts.Length; i++)
+        {
+            if (localizedTexts[i] != null)
+            {
+                localizedTexts[i].RefreshText();
+            }
+        }
     }
 
     public override void OnNetworkSpawn()
@@ -131,6 +145,7 @@ public class BossIntroController : NetworkBehaviour
     {
         if (_finished || _health.IsDead) return;
 
+        RefreshIntroLocalizedTexts();
         LockPlayer(PlayerController.LocalInstance);
         _showingPresentation = true;
         if (_camera != null)
