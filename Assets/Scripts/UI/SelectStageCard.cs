@@ -9,6 +9,7 @@ namespace Scavenger.UI
     public class SelectStageCard : MonoBehaviour
     {
         public const float DEFAULT_CARD_ASPECT_RATIO = 0.48f;
+        public const float DEFAULT_CARD_WIDTH = 309.1f;
 
         [Header("UI References")]
         [SerializeField] private Button cardButton;
@@ -19,6 +20,8 @@ namespace Scavenger.UI
         [SerializeField] private TextMeshProUGUI stageDescText;
         [SerializeField] private LayoutElement layoutElement;
         [SerializeField] private float cardAspectRatio = DEFAULT_CARD_ASPECT_RATIO;
+        [SerializeField] private bool lockCardWidth = true;
+        [SerializeField] private float fixedCardWidth = DEFAULT_CARD_WIDTH;
 
         private StageData _stageData;
         private Action<StageData> _onClickCallback;
@@ -60,6 +63,18 @@ namespace Scavenger.UI
             {
                 layoutElement = GetComponent<LayoutElement>();
                 if (layoutElement == null) return;
+            }
+
+            if (lockCardWidth)
+            {
+                float lockedWidth = fixedCardWidth > 1f ? fixedCardWidth : DEFAULT_CARD_WIDTH;
+                if (Mathf.Abs(layoutElement.preferredWidth - lockedWidth) > 0.5f ||
+                    Mathf.Abs(layoutElement.minWidth - lockedWidth) > 0.5f)
+                {
+                    layoutElement.preferredWidth = lockedWidth;
+                    layoutElement.minWidth = lockedWidth;
+                }
+                return;
             }
 
             RectTransform rt = transform as RectTransform;
