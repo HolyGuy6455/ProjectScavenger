@@ -35,6 +35,8 @@ namespace Scavenger.UI
                 if (myInfo != null) _isReady = myInfo.isReady;
             }
 
+            GetComponentInParent<StageInfoPanel>()?.SetMyReadyState(_isReady);
+
             LocalizationManager.OnLanguageChanged += RefreshButtonText;
             RefreshButtonText();
         }
@@ -57,6 +59,7 @@ namespace Scavenger.UI
             if (NetworkPartyManager.Instance != null)
             {
                 _isReady = !_isReady;
+                GetComponentInParent<StageInfoPanel>()?.SetMyReadyState(_isReady);
                 NetworkPartyManager.Instance.SendReadyState(_isReady);
                 RefreshButtonText();
                 Debug.Log($"[Match] 레디 상태 변경됨: {_isReady}");

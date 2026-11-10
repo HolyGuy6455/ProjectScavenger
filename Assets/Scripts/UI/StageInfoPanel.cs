@@ -21,8 +21,18 @@ namespace Scavenger.UI
         private const float SLOT_SIZE = 88f;
 
         private int _currentStageId = 1;
+        private bool _isMyReady = false;
         private readonly List<ItemSlotWrapper> _enemySlots = new List<ItemSlotWrapper>();
         private readonly List<ItemSlotWrapper> _rewardSlots = new List<ItemSlotWrapper>();
+
+        public void SetMyReadyState(bool isReady)
+        {
+            _isMyReady = isReady;
+            if (myMemberCard != null)
+            {
+                myMemberCard.SetReady(_isMyReady);
+            }
+        }
 
         public void SetStageForNextOpen(int stageId)
         {
@@ -55,6 +65,8 @@ namespace Scavenger.UI
 
         private void OnEnable()
         {
+            _isMyReady = false;
+
             if (OutGameUIManager.Instance != null && OutGameUIManager.Instance.SelectedStageId > 0)
             {
                 _currentStageId = OutGameUIManager.Instance.SelectedStageId;
@@ -99,12 +111,16 @@ namespace Scavenger.UI
                 // UserDataManager에서 저장된 4인 덱 정보를 가져와 카드에 세팅
                 myMemberCard.SetDeck(UserDataManager.Instance.SelectedDeck);
 
-                // 로컬 유저의 레디 상태 갱신 (싱글플레이 시 항상 준비 완료 표시)
-                bool isMyReady = !isMultiplay;
+                // 로컬 유저의 레디 상태 갱신
+                bool isMyReady = _isMyReady;
                 if (isMultiplay && Scavenger.Network.NetworkPartyManager.Instance.PartyMembers != null)
                 {
                     var myInfo = Scavenger.Network.NetworkPartyManager.Instance.PartyMembers.Find(m => m.username == Scavenger.Network.NetworkAuthManager.Instance.Username);
-                    if (myInfo != null) isMyReady = myInfo.isReady;
+                    if (myInfo != null)
+                    {
+                        isMyReady = myInfo.isReady;
+                        _isMyReady = isMyReady;
+                    }
                 }
                 myMemberCard.SetReady(isMyReady);
             }
