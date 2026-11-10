@@ -182,7 +182,7 @@ namespace Scavenger.UI
         {
             if (_currentCharData != null && OutGameUIManager.Instance != null)
             {
-                var popup = OutGameUIManager.Instance.ShowPopup<SkillSelectPopup>(OutGamePopupType.SkillSelect);
+                var popup = OutGameUIManager.Instance.ShowPopup<SelectSkillPopup>(OutGamePopupType.SelectSkill);
                 if (popup != null)
                 {
                     popup.Open(_currentCharData.id, 0);

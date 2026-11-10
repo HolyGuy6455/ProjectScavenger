@@ -1207,7 +1207,7 @@ GameObject:
   - component: {fileID: 4519006911158361325}
   - component: {fileID: 683487868321545826}
   m_Layer: 0
-  m_Name: StageSelectCard
+  m_Name: SelectStageCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1365,7 +1365,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c6d36cbcdcbfd0f47949147173c194bd, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.StageSelectCard
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.SelectStageCard
   cardButton: {fileID: 100474992178016276}
   previewImage: {fileID: 6649701039623406114}
   recordNumberText: {fileID: 6361613747510213353}

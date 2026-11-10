@@ -6,11 +6,11 @@ using Scavenger.Network;
 using Scavenger.Network.DTOs;
 using Scavenger.UI;
 
-public class SkillSelectPopup : MonoBehaviour
+public class SelectSkillPopup : MonoBehaviour
 {
     [SerializeField] private Transform rowContainer;
     [SerializeField] private GameObject rowPrefab;
-    [SerializeField] private SkillSelectTabButton[] tabButtons; // 4 tabs
+    [SerializeField] private SelectSkillTabButton[] tabButtons; // 4 tabs
 
     private int _charId;
     private int _currentSlotIndex;
@@ -125,7 +125,7 @@ public class SkillSelectPopup : MonoBehaviour
         GameObject obj = Instantiate(rowPrefab, rowContainer);
         _spawnedRows.Add(obj);
 
-        SkillSelectRow row = obj.GetComponent<SkillSelectRow>();
+        SelectSkillRow row = obj.GetComponent<SelectSkillRow>();
         if (row != null)
         {
             row.Setup(skillData, isUnlocked, isEquipped, canLevelUp);

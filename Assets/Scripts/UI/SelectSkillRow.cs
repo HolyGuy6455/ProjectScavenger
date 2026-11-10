@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 
-public class SkillSelectRow : MonoBehaviour
+public class SelectSkillRow : MonoBehaviour
 {
     [SerializeField] private Image skillIcon;
     [SerializeField] private TextMeshProUGUI skillNameText;
@@ -81,7 +81,7 @@ public class SkillSelectRow : MonoBehaviour
             if (selectButtonText != null)
             {
                 Scavenger.UI.LocalizedText.ApplyFont(selectButtonText);
-                selectButtonText.text = LocalizationManager.Get("UI_SKILLSELECT_BTN_EQUIPPED");
+                selectButtonText.text = LocalizationManager.Get("UI_SELECTSKILL_BTN_EQUIPPED");
             }
         }
         else
@@ -90,7 +90,7 @@ public class SkillSelectRow : MonoBehaviour
             if (selectButtonText != null)
             {
                 Scavenger.UI.LocalizedText.ApplyFont(selectButtonText);
-                selectButtonText.text = LocalizationManager.Get("UI_SKILLSELECT_BTN_EQUIP");
+                selectButtonText.text = LocalizationManager.Get("UI_SELECTSKILL_BTN_EQUIP");
             }
         }
 

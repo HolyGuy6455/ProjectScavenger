@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7183310120174315023}
   - component: {fileID: 627937764065171236}
   m_Layer: 0
-  m_Name: SkillSelectTabNode
+  m_Name: SelectSkillTabNode
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -98,7 +98,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 74511f1d51fe77f48b63117a573b24ae, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SkillSelectTabButton
+  m_EditorClassIdentifier: Assembly-CSharp::SelectSkillTabButton
   skillIcon: {fileID: 163791297436712820}
   skillNameText: {fileID: 4560429220145560915}
   selectedBorder: {fileID: 576250474764416294}

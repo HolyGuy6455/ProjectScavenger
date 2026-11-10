@@ -25,11 +25,11 @@ namespace Scavenger.UI
         CharacterLevelUpCelebration,
         SkillLevelUpCelebration,
         SkillLevelUp,
-        SkillSelect,
+        SelectSkill,
         ItemInfo,
         DefaultConfirm,
-        PartyPick,
-        CallFriend
+        SelectCharacter,
+        InviteFriend
     }
 
     public class OutGameUIManager : MonoBehaviour
@@ -169,14 +169,14 @@ namespace Scavenger.UI
 
         [Header("Popup Prefabs")]
         [SerializeField] private GameObject characterSelectPopupPrefab;
-        [SerializeField] private GameObject partyPickPopupPrefab;
+        [SerializeField] private GameObject selectCharacterPopupPrefab;
         [SerializeField] private GameObject characterLevelUpCelebrationPopupPrefab;
         [SerializeField] private GameObject skillLevelUpCelebrationPopupPrefab;
         [SerializeField] private GameObject skillLevelUpPopupPrefab;
-        [SerializeField] private GameObject skillSelectPopupPrefab;
+        [SerializeField] private GameObject selectSkillPopupPrefab;
         [SerializeField] private GameObject itemInfoPopupPrefab;
         [SerializeField] private GameObject defaultConfirmPopupPrefab;
-        [SerializeField] private GameObject callFriendPopupPrefab;
+        [SerializeField] private GameObject inviteFriendPopupPrefab;
 
         // [Header("Persistent UI")]
         // [SerializeField] private GameObject persistentPartyListUI; // 파티 리스트 패널
@@ -858,11 +858,11 @@ namespace Scavenger.UI
                 case OutGamePopupType.CharacterLevelUpCelebration: return characterLevelUpCelebrationPopupPrefab;
                 case OutGamePopupType.SkillLevelUpCelebration: return skillLevelUpCelebrationPopupPrefab;
                 case OutGamePopupType.SkillLevelUp: return skillLevelUpPopupPrefab;
-                case OutGamePopupType.SkillSelect: return skillSelectPopupPrefab;
+                case OutGamePopupType.SelectSkill: return selectSkillPopupPrefab;
                 case OutGamePopupType.ItemInfo: return itemInfoPopupPrefab;
                 case OutGamePopupType.DefaultConfirm: return defaultConfirmPopupPrefab;
-                case OutGamePopupType.PartyPick: return partyPickPopupPrefab;
-                case OutGamePopupType.CallFriend: return callFriendPopupPrefab;
+                case OutGamePopupType.SelectCharacter: return selectCharacterPopupPrefab;
+                case OutGamePopupType.InviteFriend: return inviteFriendPopupPrefab;
             }
             return null;
         }
@@ -872,7 +872,7 @@ namespace Scavenger.UI
             SelectedStageType = stageType == StageType.None ? StageType.Normal : stageType;
             ShowPanel(OutGamePanelType.SelectStage, panel =>
             {
-                var selectPanel = panel.GetComponent<StageSelectPanel>();
+                var selectPanel = panel.GetComponent<SelectStagePanel>();
                 if (selectPanel != null)
                 {
                     selectPanel.SetStageTypeForNextOpen(SelectedStageType);
@@ -899,7 +899,7 @@ namespace Scavenger.UI
 
         public void OnClickGoToLobby() => ShowPanel(OutGamePanelType.MainLobby);
         public void OnClickGoToReadyToBattle() => ShowPanel(OutGamePanelType.ReadyToBattle);
-        public void OnClickGoToParty() => ShowPopup<CallFriendPopup>(OutGamePopupType.CallFriend);
+        public void OnClickGoToParty() => ShowPopup<InviteFriendPopup>(OutGamePopupType.InviteFriend);
         public void OnClickGoToCharacterDeck() => ShowPanel(OutGamePanelType.CharacterDeck);
         public void OnClickGoToSelectOperation() => ShowPanel(OutGamePanelType.SelectOperation);
         public void OnClickGoToSelectStage() => OpenStageSelect(SelectedStageType);

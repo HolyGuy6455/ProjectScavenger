@@ -49,7 +49,7 @@ namespace Scavenger.UI
         {
             if (OutGameUIManager.Instance != null)
             {
-                OutGameUIManager.Instance.ShowPopup<CallFriendPopup>(OutGamePopupType.CallFriend);
+                OutGameUIManager.Instance.ShowPopup<InviteFriendPopup>(OutGamePopupType.InviteFriend);
             }
         }
 

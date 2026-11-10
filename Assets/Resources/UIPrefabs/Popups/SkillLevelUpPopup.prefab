@@ -348,7 +348,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 1273463075378720378}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_SKILLSELECT_BTN_LEVELUP
+  localizationKey: UI_SELECTSKILL_BTN_LEVELUP
   previewText: "\uB808\uBCA8\uC5C5 \uD558\uAE30"
 --- !u!1 &1322893175108112084
 GameObject:

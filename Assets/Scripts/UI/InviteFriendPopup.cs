@@ -6,14 +6,14 @@ using UnityEngine.UI;
 
 namespace Scavenger.UI
 {
-    public class CallFriendPopup : MonoBehaviour
+    public class InviteFriendPopup : MonoBehaviour
     {
         public const int MAX_INVITE_COUNT = 3;
 
         [Header("리스트 참조")]
         [SerializeField] private ScrollRect scrollRect;
         [SerializeField] private Transform nodeContainer;
-        [SerializeField] private CallFriendNode nodePrefab;
+        [SerializeField] private InviteFriendNode nodePrefab;
         [SerializeField] private TextMeshProUGUI inviteCountText;
 
         [Header("하단 UI 및 버튼")]
@@ -22,14 +22,14 @@ namespace Scavenger.UI
         [SerializeField] private Button cancelButton;
         [SerializeField] private Button requestButton;
 
-        private readonly List<CallFriendNode> _nodes = new List<CallFriendNode>();
-        private readonly List<CallFriendNode> _selectedNodes = new List<CallFriendNode>();
+        private readonly List<InviteFriendNode> _nodes = new List<InviteFriendNode>();
+        private readonly List<InviteFriendNode> _selectedNodes = new List<InviteFriendNode>();
 
         private void Awake()
         {
             if (nodePrefab == null)
             {
-                nodePrefab = Resources.Load<CallFriendNode>("UIPrefabs/Node/CallFriendNode");
+                nodePrefab = Resources.Load<InviteFriendNode>("UIPrefabs/Node/InviteFriendNode");
             }
 
             if (cancelButton != null)
@@ -116,7 +116,7 @@ namespace Scavenger.UI
 
             if (nodePrefab == null)
             {
-                nodePrefab = Resources.Load<CallFriendNode>("UIPrefabs/Node/CallFriendNode");
+                nodePrefab = Resources.Load<InviteFriendNode>("UIPrefabs/Node/InviteFriendNode");
             }
 
             if (NetworkPartyManager.Instance != null &&
@@ -146,7 +146,7 @@ namespace Scavenger.UI
                         continue;
                     }
 
-                    CallFriendNode node = Instantiate(nodePrefab, nodeContainer);
+                    InviteFriendNode node = Instantiate(nodePrefab, nodeContainer);
                     node.Setup(user, OnNodeSelected);
 
                     bool isPrevSelected = !string.IsNullOrEmpty(user.connectionId) &&
@@ -178,7 +178,7 @@ namespace Scavenger.UI
             UpdateSelectedFriendView();
         }
 
-        private void OnNodeSelected(CallFriendNode node)
+        private void OnNodeSelected(InviteFriendNode node)
         {
             if (node == null) return;
 
@@ -212,16 +212,24 @@ namespace Scavenger.UI
 
             if (inviteCountText != null)
             {
-                LocalizedText.ApplyFont(inviteCountText);
-                inviteCountText.text = LocalizationManager.Get(
-                    "UI_CALLFRIEND_INVITE_COUNT_FORMAT",
-                    _selectedNodes.Count,
-                    MAX_INVITE_COUNT);
+                var loc = inviteCountText.GetComponent<LocalizedText>();
+                if (loc != null)
+                {
+                    loc.SetKey("UI_INVITEFRIEND_INVITE_COUNT_FORMAT", _selectedNodes.Count, MAX_INVITE_COUNT);
+                }
+                else
+                {
+                    LocalizedText.ApplyFont(inviteCountText);
+                    inviteCountText.text = LocalizationManager.Get(
+                        "UI_INVITEFRIEND_INVITE_COUNT_FORMAT",
+                        _selectedNodes.Count,
+                        MAX_INVITE_COUNT);
+                }
             }
 
             if (selectedFriendText != null)
             {
-                LocalizedText.ApplyFont(selectedFriendText);
+                var loc = selectedFriendText.GetComponent<LocalizedText>();
                 if (_selectedNodes.Count > 0)
                 {
                     List<string> names = new List<string>(_selectedNodes.Count);
@@ -233,13 +241,37 @@ namespace Scavenger.UI
                         }
                     }
 
-                    selectedFriendText.text = names.Count > 0
-                        ? LocalizationManager.Get("UI_CALLFRIEND_SELECTED_FORMAT", string.Join(", ", names))
-                        : LocalizationManager.Get("UI_CALLFRIEND_SELECTED_NONE");
+                    if (names.Count > 0)
+                    {
+                        string joined = string.Join(", ", names);
+                        if (loc != null)
+                        {
+                            loc.SetKey("UI_INVITEFRIEND_SELECTED_FORMAT", joined);
+                        }
+                        else
+                        {
+                            LocalizedText.ApplyFont(selectedFriendText);
+                            selectedFriendText.text = LocalizationManager.Get("UI_INVITEFRIEND_SELECTED_FORMAT", joined);
+                        }
+                    }
+                    else if (loc != null)
+                    {
+                        loc.SetKey("UI_INVITEFRIEND_SELECTED_NONE");
+                    }
+                    else
+                    {
+                        LocalizedText.ApplyFont(selectedFriendText);
+                        selectedFriendText.text = LocalizationManager.Get("UI_INVITEFRIEND_SELECTED_NONE");
+                    }
+                }
+                else if (loc != null)
+                {
+                    loc.SetKey("UI_INVITEFRIEND_SELECTED_NONE");
                 }
                 else
                 {
-                    selectedFriendText.text = LocalizationManager.Get("UI_CALLFRIEND_SELECTED_NONE");
+                    LocalizedText.ApplyFont(selectedFriendText);
+                    selectedFriendText.text = LocalizationManager.Get("UI_INVITEFRIEND_SELECTED_NONE");
                 }
             }
         }
@@ -250,7 +282,7 @@ namespace Scavenger.UI
             {
                 for (int i = 0; i < _selectedNodes.Count; i++)
                 {
-                    CallFriendNode node = _selectedNodes[i];
+                    InviteFriendNode node = _selectedNodes[i];
                     if (node != null && !string.IsNullOrEmpty(node.ConnectionId))
                     {
                         NetworkPartyManager.Instance.InviteToParty(node.ConnectionId);

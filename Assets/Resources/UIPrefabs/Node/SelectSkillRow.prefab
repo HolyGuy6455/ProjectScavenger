@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 9214140767567581743}
   - component: {fileID: 7035636776390086422}
   m_Layer: 0
-  m_Name: SkillSelectRow
+  m_Name: SelectSkillRow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -113,7 +113,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6ffe8e5ae05583e4ea8475ffc364ba88, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SkillSelectRow
+  m_EditorClassIdentifier: Assembly-CSharp::SelectSkillRow
   skillIcon: {fileID: 4322209912934108005}
   skillNameText: {fileID: 3898491881371289970}
   skillLevelText: {fileID: 5514159173247316859}
@@ -809,7 +809,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 8063020503155680821}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_SKILLSELECT_BTN_LEVELUP
+  localizationKey: UI_SELECTSKILL_BTN_LEVELUP
   previewText: "\uB808\uBCA8\uC5C5 \uD558\uAE30"
 --- !u!1 &2805851584327518290
 GameObject:
@@ -1164,7 +1164,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 6331296084736311235}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_SKILLSELECT_BTN_UNLOCK
+  localizationKey: UI_SELECTSKILL_BTN_UNLOCK
   previewText: "\uD574\uAE08\uD558\uAE30"
 --- !u!1 &3621648045234034143
 GameObject:
@@ -1692,7 +1692,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 210995226262827987}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_SKILLSELECT_BTN_EQUIP
+  localizationKey: UI_SELECTSKILL_BTN_EQUIP
   previewText: "\uC7A5\uCC29\uD558\uAE30"
 --- !u!1 &5513675627207114318
 GameObject:

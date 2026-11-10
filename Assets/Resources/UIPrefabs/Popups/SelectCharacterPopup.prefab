@@ -152,7 +152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 700889061031146929}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_PARTYPICK_CONFIRM
+  localizationKey: UI_SELECTCHARACTER_CONFIRM
   previewText: "\uC120\uD0DD \uD655\uC778"
 --- !u!1 &40116285260739572
 GameObject:
@@ -1135,7 +1135,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 7039698293582515029}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_PARTYPICK_FILTER_ALL
+  localizationKey: UI_SELECTCHARACTER_FILTER_ALL
   previewText: "\uC804\uCCB4 \uBCF4\uAE30"
 --- !u!1 &1104320245835103917
 GameObject:
@@ -2805,7 +2805,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 7700716784395243227}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_PARTYPICK_DETAIL_HEADER
+  localizationKey: UI_SELECTCHARACTER_DETAIL_HEADER
   previewText: "\uC120\uD0DD \uC218\uD5D8\uC0DD \uC0C1\uC138 \uC815\uBCF4"
 --- !u!1 &2124166284103086673
 GameObject:
@@ -3476,7 +3476,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 6486525194970692940}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_PARTYPICK_HEADER_SUBTITLE
+  localizationKey: UI_SELECTCHARACTER_HEADER_SUBTITLE
   previewText: // DECK MEMBER SELECT
 --- !u!1 &2712055261644876244
 GameObject:
@@ -3805,7 +3805,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 3096171361844296965}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_PARTYPICK_HEADER_TITLE
+  localizationKey: UI_SELECTCHARACTER_HEADER_TITLE
   previewText: "\uB2E8\uC6D0 \uAD50\uCCB4"
 --- !u!1 &2781090490334413564
 GameObject:
@@ -5056,7 +5056,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 1992306174972667962}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_PARTYPICK_FILTER_LABEL
+  localizationKey: UI_SELECTCHARACTER_FILTER_LABEL
   previewText: "\uBD84\uB958 :"
 --- !u!1 &3834244317884851397
 GameObject:
@@ -8464,7 +8464,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 3012132951158311254}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_PARTYPICK_FILTER_ALL
+  localizationKey: UI_SELECTCHARACTER_FILTER_ALL
   previewText: "\uC804\uCCB4 \uBCF4\uAE30"
 --- !u!1 &8085908623528350372
 GameObject:
@@ -9284,7 +9284,7 @@ GameObject:
   - component: {fileID: 7176396519949640710}
   - component: {fileID: 6963845115884444095}
   m_Layer: 0
-  m_Name: PartyPickPopup
+  m_Name: SelectCharacterPopup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9350,7 +9350,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f5ab6fee9b35f8342b492f441482c0e0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.PartyPickPopup
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.SelectCharacterPopup
   contentParent: {fileID: 8639791185453656451}
   rowPrefab: {fileID: 7177831197487485067, guid: 85316a5fd23382c4d9fa3fac5fbcb1ca, type: 3}
   nodesPerRow: 5
@@ -10211,7 +10211,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 152767749348269472}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_PARTYPICK_LIST_TITLE
+  localizationKey: UI_SELECTCHARACTER_LIST_TITLE
   previewText: "\uBCF4\uC720 \uC218\uD5D8\uC0DD \uBAA9\uB85D"
 --- !u!1001 &72347785068157241
 PrefabInstance:
@@ -10640,7 +10640,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7177831197487485067, guid: 85316a5fd23382c4d9fa3fac5fbcb1ca, type: 3}
       propertyPath: m_Name
-      value: PartyPickCharRow
+      value: SelectCharacterRow
       objectReference: {fileID: 0}
     - target: {fileID: 7377451508125364639, guid: 85316a5fd23382c4d9fa3fac5fbcb1ca, type: 3}
       propertyPath: m_fontSize
@@ -11808,7 +11808,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7177831197487485067, guid: 85316a5fd23382c4d9fa3fac5fbcb1ca, type: 3}
       propertyPath: m_Name
-      value: PartyPickCharRow (1)
+      value: SelectCharacterRow (1)
       objectReference: {fileID: 0}
     - target: {fileID: 7377451508125364639, guid: 85316a5fd23382c4d9fa3fac5fbcb1ca, type: 3}
       propertyPath: m_fontSize

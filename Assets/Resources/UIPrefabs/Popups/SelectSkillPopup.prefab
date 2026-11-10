@@ -752,7 +752,7 @@ GameObject:
   - component: {fileID: 2647800603038882036}
   - component: {fileID: 8984819973506630411}
   m_Layer: 5
-  m_Name: SkillSelectPopup
+  m_Name: SelectSkillPopup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -827,7 +827,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1339b67f44edcf448a2a42c61646b3e6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SkillSelectPopup
+  m_EditorClassIdentifier: Assembly-CSharp::SelectSkillPopup
   rowContainer: {fileID: 2344979499945190115}
   rowPrefab: {fileID: 792998381122731296, guid: f09e80a8fbb55594096c39f38bcbaca1, type: 3}
   tabButtons:
@@ -1866,7 +1866,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 3167722284841164488}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_SKILLSELECT_TITLE
+  localizationKey: UI_SELECTSKILL_TITLE
   previewText: "\uC2A4\uD0AC \uC120\uD0DD"
 --- !u!1 &8156167858811628036
 GameObject:
@@ -2386,7 +2386,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 307541557173832207, guid: 36ffcbf6eed5da74eb9f65c7a5aa184e, type: 3}
       propertyPath: m_Name
-      value: SkillSelectTabNode (3)
+      value: SelectSkillTabNode (3)
       objectReference: {fileID: 0}
     - target: {fileID: 3055700021464838978, guid: 36ffcbf6eed5da74eb9f65c7a5aa184e, type: 3}
       propertyPath: m_text
@@ -2507,7 +2507,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 74511f1d51fe77f48b63117a573b24ae, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SkillSelectTabButton
+  m_EditorClassIdentifier: Assembly-CSharp::SelectSkillTabButton
 --- !u!224 &5700056722099015206 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5911017513076626530, guid: 36ffcbf6eed5da74eb9f65c7a5aa184e, type: 3}
@@ -2523,7 +2523,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 307541557173832207, guid: 36ffcbf6eed5da74eb9f65c7a5aa184e, type: 3}
       propertyPath: m_Name
-      value: SkillSelectTabNode (1)
+      value: SelectSkillTabNode (1)
       objectReference: {fileID: 0}
     - target: {fileID: 3055700021464838978, guid: 36ffcbf6eed5da74eb9f65c7a5aa184e, type: 3}
       propertyPath: m_text
@@ -2644,7 +2644,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 74511f1d51fe77f48b63117a573b24ae, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SkillSelectTabButton
+  m_EditorClassIdentifier: Assembly-CSharp::SelectSkillTabButton
 --- !u!224 &5761690378384019312 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5911017513076626530, guid: 36ffcbf6eed5da74eb9f65c7a5aa184e, type: 3}
@@ -2766,7 +2766,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: e3229e3e842fcfb4da51a5f0aa00633b, type: 3}
     - target: {fileID: 307541557173832207, guid: 36ffcbf6eed5da74eb9f65c7a5aa184e, type: 3}
       propertyPath: m_Name
-      value: SkillSelectTabNode
+      value: SelectSkillTabNode
       objectReference: {fileID: 0}
     - target: {fileID: 3851385923028615331, guid: 36ffcbf6eed5da74eb9f65c7a5aa184e, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -2908,7 +2908,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 74511f1d51fe77f48b63117a573b24ae, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SkillSelectTabButton
+  m_EditorClassIdentifier: Assembly-CSharp::SelectSkillTabButton
 --- !u!1001 &8434891673203429287
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2919,7 +2919,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 307541557173832207, guid: 36ffcbf6eed5da74eb9f65c7a5aa184e, type: 3}
       propertyPath: m_Name
-      value: SkillSelectTabNode (2)
+      value: SelectSkillTabNode (2)
       objectReference: {fileID: 0}
     - target: {fileID: 3055700021464838978, guid: 36ffcbf6eed5da74eb9f65c7a5aa184e, type: 3}
       propertyPath: m_text
@@ -3045,4 +3045,4 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 74511f1d51fe77f48b63117a573b24ae, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SkillSelectTabButton
+  m_EditorClassIdentifier: Assembly-CSharp::SelectSkillTabButton

@@ -4276,7 +4276,7 @@ GameObject:
   - component: {fileID: 891512485182402939}
   - component: {fileID: 3437728600235370678}
   m_Layer: 0
-  m_Name: StageSelectPanel
+  m_Name: SelectStagePanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4446,7 +4446,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 13cb5414114866544b77cbe4fac29f56, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.StageSelectPanel
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.SelectStagePanel
   cardContainer: {fileID: 8687948176070276329}
   cardPrefab: {fileID: 683487868321545826, guid: b2821d40dbebb534a821132a4d7af462, type: 3}
   scrollRect: {fileID: 4292070383597412326}
@@ -4581,7 +4581,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5674888740479634848, guid: b2821d40dbebb534a821132a4d7af462, type: 3}
       propertyPath: m_Name
-      value: StageSelectCard
+      value: SelectStageCard
       objectReference: {fileID: 0}
     - target: {fileID: 5795657191825986779, guid: b2821d40dbebb534a821132a4d7af462, type: 3}
       propertyPath: m_IsActive
@@ -4730,7 +4730,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5674888740479634848, guid: b2821d40dbebb534a821132a4d7af462, type: 3}
       propertyPath: m_Name
-      value: StageSelectCard
+      value: SelectStageCard
       objectReference: {fileID: 0}
     - target: {fileID: 5795657191825986779, guid: b2821d40dbebb534a821132a4d7af462, type: 3}
       propertyPath: m_IsActive
@@ -4883,7 +4883,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5674888740479634848, guid: b2821d40dbebb534a821132a4d7af462, type: 3}
       propertyPath: m_Name
-      value: StageSelectCard
+      value: SelectStageCard
       objectReference: {fileID: 0}
     - target: {fileID: 5795657191825986779, guid: b2821d40dbebb534a821132a4d7af462, type: 3}
       propertyPath: m_IsActive
@@ -5231,7 +5231,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5674888740479634848, guid: b2821d40dbebb534a821132a4d7af462, type: 3}
       propertyPath: m_Name
-      value: StageSelectCard
+      value: SelectStageCard
       objectReference: {fileID: 0}
     - target: {fileID: 6900208684229141323, guid: b2821d40dbebb534a821132a4d7af462, type: 3}
       propertyPath: m_text

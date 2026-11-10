@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Scavenger.UI
 {
-    public class CallFriendNode : MonoBehaviour
+    public class InviteFriendNode : MonoBehaviour
     {
         [Header("UI References")]
         [SerializeField] private GameObject selectedOverlay;
@@ -16,7 +16,7 @@ namespace Scavenger.UI
         [SerializeField] private Image[] deckMemberImages;
         [SerializeField] private Button selectButton;
 
-        private Action<CallFriendNode> _onSelectedCallback;
+        private Action<InviteFriendNode> _onSelectedCallback;
         private int _level;
 
         public UserInfo TargetUser { get; private set; }
@@ -55,12 +55,12 @@ namespace Scavenger.UI
             LocalizationManager.OnLanguageChanged -= RefreshLocalizedTexts;
         }
 
-        public void BindSelectionCallback(Action<CallFriendNode> onSelected)
+        public void BindSelectionCallback(Action<InviteFriendNode> onSelected)
         {
             _onSelectedCallback = onSelected;
         }
 
-        public void Setup(UserInfo user, Action<CallFriendNode> onSelected = null)
+        public void Setup(UserInfo user, Action<InviteFriendNode> onSelected = null)
         {
             TargetUser = user;
             _level = user != null && user.level > 0 ? user.level : 1;
@@ -117,7 +117,7 @@ namespace Scavenger.UI
             RefreshLocalizedTexts();
         }
 
-        public void Setup(string friendName, int level, Sprite profileSprite = null, Sprite[] deckSprites = null, Action<CallFriendNode> onSelected = null)
+        public void Setup(string friendName, int level, Sprite profileSprite = null, Sprite[] deckSprites = null, Action<InviteFriendNode> onSelected = null)
         {
             TargetUser = null;
             _level = level;
@@ -170,10 +170,22 @@ namespace Scavenger.UI
 
             if (friendLevelText != null)
             {
-                LocalizedText.ApplyFont(friendLevelText);
+                var loc = friendLevelText.GetComponent<LocalizedText>();
                 if (_level > 0)
                 {
-                    friendLevelText.text = LocalizationManager.Get("UI_FORMAT_LEVEL_SPACED", _level);
+                    if (loc != null)
+                    {
+                        loc.SetKey("UI_FORMAT_LEVEL_SPACED", _level);
+                    }
+                    else
+                    {
+                        LocalizedText.ApplyFont(friendLevelText);
+                        friendLevelText.text = LocalizationManager.Get("UI_FORMAT_LEVEL_SPACED", _level);
+                    }
+                }
+                else
+                {
+                    LocalizedText.ApplyFont(friendLevelText);
                 }
             }
         }

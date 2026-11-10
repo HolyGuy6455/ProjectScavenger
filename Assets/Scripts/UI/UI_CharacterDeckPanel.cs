@@ -73,7 +73,7 @@ namespace Scavenger.UI
             if (OutGameUIManager.Instance != null)
             {
                 int currentCharId = _selectedCharIds[slotIndex];
-                var popup = OutGameUIManager.Instance.ShowPopup<PartyPickPopup>(OutGamePopupType.PartyPick);
+                var popup = OutGameUIManager.Instance.ShowPopup<SelectCharacterPopup>(OutGamePopupType.SelectCharacter);
                 if (popup != null)
                 {
                     popup.Open((selectedData) =>

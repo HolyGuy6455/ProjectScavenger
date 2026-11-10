@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Scavenger.UI
 {
-    public class PartyPickCharNode : MonoBehaviour
+    public class SelectCharacterNode : MonoBehaviour
     {
         [Header("UI References")]
         [SerializeField] private Image portraitImage;
@@ -22,7 +22,7 @@ namespace Scavenger.UI
         private int _level = 1;
         private bool _isSelected;
         private bool _isOrganized;
-        private Action<PartyPickCharNode, CharData> _onSelectedCallback;
+        private Action<SelectCharacterNode, CharData> _onSelectedCallback;
 
         private void Awake()
         {
@@ -48,7 +48,7 @@ namespace Scavenger.UI
             LocalizationManager.OnLanguageChanged -= RefreshLocalizedTexts;
         }
 
-        public void Initialize(CharData data, Action<PartyPickCharNode, CharData> onSelected, bool isOrganized = false)
+        public void Initialize(CharData data, Action<SelectCharacterNode, CharData> onSelected, bool isOrganized = false)
         {
             int level = 1;
             if (data != null && UserDataManager.Instance != null)
@@ -63,7 +63,7 @@ namespace Scavenger.UI
             Initialize(data, level, onSelected, isOrganized);
         }
 
-        public void Initialize(CharData data, int level, Action<PartyPickCharNode, CharData> onSelected, bool isOrganized = false)
+        public void Initialize(CharData data, int level, Action<SelectCharacterNode, CharData> onSelected, bool isOrganized = false)
         {
             _charData = data;
             _level = level;

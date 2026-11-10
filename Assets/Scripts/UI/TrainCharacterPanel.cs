@@ -422,7 +422,7 @@ public class TrainCharacterPanel : MonoBehaviour
     {
         if (_selectedCharId != -1)
         {
-            var popup = OutGameUIManager.Instance.ShowPopup<SkillSelectPopup>(OutGamePopupType.SkillSelect);
+            var popup = OutGameUIManager.Instance.ShowPopup<SelectSkillPopup>(OutGamePopupType.SelectSkill);
             if (popup != null)
             {
                 popup.Open(_selectedCharId, slotIndex);

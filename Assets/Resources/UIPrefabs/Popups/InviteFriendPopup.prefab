@@ -648,7 +648,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC120\uD0DD\uD55C \uCE5C\uAD6C   \uB2EC\uBE5B \uC815\uCC30\uB300"
+  m_text: "\uC120\uD0DD\uD55C \uCE5C\uAD6C   -"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
   m_sharedMaterial: {fileID: 2563163035340340034, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
@@ -692,7 +692,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -734,8 +734,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 7684435113075721436}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: 
-  previewText: "\uC120\uD0DD\uD55C \uCE5C\uAD6C   \uB2EC\uBE5B \uC815\uCC30\uB300"
+  localizationKey: UI_INVITEFRIEND_SELECTED_NONE
+  previewText: "\uC120\uD0DD\uD55C \uCE5C\uAD6C   -"
 --- !u!1 &2224538021205997566
 GameObject:
   m_ObjectHideFlags: 0
@@ -911,6 +911,7 @@ GameObject:
   - component: {fileID: 8801999914598821608}
   - component: {fileID: 5380774878067078317}
   - component: {fileID: 340175644084301120}
+  - component: {fileID: 663720425714713461}
   m_Layer: 0
   m_Name: "\uB371 \uD56D\uBAA9"
   m_TagString: Untagged
@@ -985,7 +986,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uCD08\uB300 \uAC00\uB2A5 (1/3)"
+  m_text: "\uCD08\uB300 \uAC00\uB2A5 ({0}/{1})"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
   m_sharedMaterial: {fileID: 2563163035340340034, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
@@ -1029,7 +1030,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -1057,6 +1058,22 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &663720425714713461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2228948609073987844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a57c6cc90dcedeb4686fd28f37ce65b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
+  targetText: {fileID: 340175644084301120}
+  originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
+  localizationKey: UI_INVITEFRIEND_INVITE_COUNT_FORMAT
+  previewText: "\uCD08\uB300 \uAC00\uB2A5 ({0}/{1})"
 --- !u!1 &2357799218998773374
 GameObject:
   m_ObjectHideFlags: 0
@@ -1287,7 +1304,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: -96}
-  m_SizeDelta: {x: -80, y: 32}
+  m_SizeDelta: {x: -80, y: 35}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &7076881829230594214
 MonoBehaviour:
@@ -1382,7 +1399,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -1424,7 +1441,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 5468125187686271640}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_CALLFRIEND_DESC
+  localizationKey: UI_INVITEFRIEND_DESC
   previewText: "\uC9C0\uC6D0\uC744 \uC694\uCCAD\uD560 \uCE5C\uAD6C\uB97C \uC120\uD0DD\uD574
     \uC8FC\uC138\uC694."
 --- !u!1 &2769232323662864268
@@ -1558,7 +1575,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -1600,7 +1617,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 2207095794248819838}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_CALLFRIEND_COL_FRIEND
+  localizationKey: UI_INVITEFRIEND_COL_FRIEND
   previewText: "\uCE5C\uAD6C"
 --- !u!1 &3297494331925203229
 GameObject:
@@ -1959,7 +1976,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -2001,7 +2018,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 6065135467380774280}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_CALLFRIEND_BTN_REQUEST
+  localizationKey: UI_INVITEFRIEND_BTN_REQUEST
   previewText: "\uC9C0\uC6D0 \uC694\uCCAD"
 --- !u!1 &4536166509329243214
 GameObject:
@@ -2098,7 +2115,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 600, y: 48}
+  m_SizeDelta: {x: 600, y: 52}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!114 &7965467288227785854
 MonoBehaviour:
@@ -2192,7 +2209,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -2234,7 +2251,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Scavenger.UI.LocalizedText
   targetText: {fileID: 6633053365875012798}
   originalFont: {fileID: 11400000, guid: 157930b88f4039445a6030ceeac9549d, type: 2}
-  localizationKey: UI_CALLFRIEND_TITLE
+  localizationKey: UI_INVITEFRIEND_TITLE
   previewText: "\uC9C0\uC6D0 \uC694\uCCAD"
 --- !u!1 &4757940022835497853
 GameObject:
@@ -2251,7 +2268,7 @@ GameObject:
   - component: {fileID: 5725591950436856297}
   - component: {fileID: 410704430832867453}
   m_Layer: 0
-  m_Name: CallFriendPopup
+  m_Name: InviteFriendPopup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3110,7 +3127,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -3568,7 +3585,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2416917236842875146, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_text
-      value: Lv. 26
+      value: Lv. {0}
       objectReference: {fileID: 0}
     - target: {fileID: 4062898480260200376, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Sprite
@@ -3576,7 +3593,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 3b09d69ed303eb84a99b63884e6d3806, type: 3}
     - target: {fileID: 4088393228657623598, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Name
-      value: CallFriendNode (4)
+      value: InviteFriendNode (4)
       objectReference: {fileID: 0}
     - target: {fileID: 4408857529483681436, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Sprite
@@ -3584,7 +3601,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: dcd4206523e45fb449ad2bf3ee65fb4e, type: 3}
     - target: {fileID: 8106967937984925303, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: previewText
-      value: Lv. 26
+      value: Lv. {0}
       objectReference: {fileID: 0}
     - target: {fileID: 9152371629141851108, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Pivot.x
@@ -3702,7 +3719,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: dcd4206523e45fb449ad2bf3ee65fb4e, type: 3}
     - target: {fileID: 2416917236842875146, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_text
-      value: Lv. 28
+      value: Lv. {0}
       objectReference: {fileID: 0}
     - target: {fileID: 4062898480260200376, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Sprite
@@ -3710,7 +3727,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 3b09d69ed303eb84a99b63884e6d3806, type: 3}
     - target: {fileID: 4088393228657623598, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Name
-      value: CallFriendNode (2)
+      value: InviteFriendNode (2)
       objectReference: {fileID: 0}
     - target: {fileID: 4408857529483681436, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Sprite
@@ -3722,7 +3739,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 8d7b4727878e49b47963368a65ce4fa0, type: 3}
     - target: {fileID: 8106967937984925303, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: previewText
-      value: Lv. 28
+      value: Lv. {0}
       objectReference: {fileID: 0}
     - target: {fileID: 9152371629141851108, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Pivot.x
@@ -3824,7 +3841,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4088393228657623598, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Name
-      value: CallFriendNode
+      value: InviteFriendNode
       objectReference: {fileID: 0}
     - target: {fileID: 9152371629141851108, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Pivot.x
@@ -3942,7 +3959,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 3b09d69ed303eb84a99b63884e6d3806, type: 3}
     - target: {fileID: 2416917236842875146, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_text
-      value: Lv. 21
+      value: Lv. {0}
       objectReference: {fileID: 0}
     - target: {fileID: 4062898480260200376, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Sprite
@@ -3950,7 +3967,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 8d7b4727878e49b47963368a65ce4fa0, type: 3}
     - target: {fileID: 4088393228657623598, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Name
-      value: CallFriendNode (3)
+      value: InviteFriendNode (3)
       objectReference: {fileID: 0}
     - target: {fileID: 4408857529483681436, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Sprite
@@ -3962,7 +3979,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 505aed5fadd491648846acdbc18c85c1, type: 3}
     - target: {fileID: 8106967937984925303, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: previewText
-      value: Lv. 21
+      value: Lv. {0}
       objectReference: {fileID: 0}
     - target: {fileID: 9152371629141851108, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Pivot.x
@@ -4197,7 +4214,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 8d7b4727878e49b47963368a65ce4fa0, type: 3}
     - target: {fileID: 2416917236842875146, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_text
-      value: Lv. 32
+      value: Lv. {0}
       objectReference: {fileID: 0}
     - target: {fileID: 4062898480260200376, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Sprite
@@ -4205,7 +4222,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 505aed5fadd491648846acdbc18c85c1, type: 3}
     - target: {fileID: 4088393228657623598, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Name
-      value: CallFriendNode (1)
+      value: InviteFriendNode (1)
       objectReference: {fileID: 0}
     - target: {fileID: 4408857529483681436, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Sprite
@@ -4217,7 +4234,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: dcd4206523e45fb449ad2bf3ee65fb4e, type: 3}
     - target: {fileID: 8106967937984925303, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: previewText
-      value: Lv. 32
+      value: Lv. {0}
       objectReference: {fileID: 0}
     - target: {fileID: 9152371629141851108, guid: 93da921c0c596294f8234ee8d9cdec1c, type: 3}
       propertyPath: m_Pivot.x

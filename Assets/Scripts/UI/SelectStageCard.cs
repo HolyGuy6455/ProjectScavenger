@@ -6,7 +6,7 @@ using UnityEngine.UI;
 namespace Scavenger.UI
 {
     [ExecuteAlways]
-    public class StageSelectCard : MonoBehaviour
+    public class SelectStageCard : MonoBehaviour
     {
         public const float DEFAULT_CARD_ASPECT_RATIO = 0.48f;
 

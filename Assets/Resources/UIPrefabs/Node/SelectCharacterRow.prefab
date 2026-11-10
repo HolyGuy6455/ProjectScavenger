@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6396168777238384528}
   - component: {fileID: 5220617381129327957}
   m_Layer: 0
-  m_Name: PartyPickCharRow
+  m_Name: SelectCharacterRow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -92,7 +92,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1481092668897504127, guid: d29b61b74bf226048be498873d495542, type: 3}
       propertyPath: m_Name
-      value: PartyPickCharNode (4)
+      value: SelectCharacterNode (4)
       objectReference: {fileID: 0}
     - target: {fileID: 5960507297356164153, guid: d29b61b74bf226048be498873d495542, type: 3}
       propertyPath: m_AnchorMax.x
@@ -218,7 +218,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1481092668897504127, guid: d29b61b74bf226048be498873d495542, type: 3}
       propertyPath: m_Name
-      value: PartyPickCharNode (1)
+      value: SelectCharacterNode (1)
       objectReference: {fileID: 0}
     - target: {fileID: 5960507297356164153, guid: d29b61b74bf226048be498873d495542, type: 3}
       propertyPath: m_AnchorMax.x
@@ -344,7 +344,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1481092668897504127, guid: d29b61b74bf226048be498873d495542, type: 3}
       propertyPath: m_Name
-      value: PartyPickCharNode (3)
+      value: SelectCharacterNode (3)
       objectReference: {fileID: 0}
     - target: {fileID: 5960507297356164153, guid: d29b61b74bf226048be498873d495542, type: 3}
       propertyPath: m_AnchorMax.x
@@ -470,7 +470,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1481092668897504127, guid: d29b61b74bf226048be498873d495542, type: 3}
       propertyPath: m_Name
-      value: PartyPickCharNode
+      value: SelectCharacterNode
       objectReference: {fileID: 0}
     - target: {fileID: 5960507297356164153, guid: d29b61b74bf226048be498873d495542, type: 3}
       propertyPath: m_AnchorMax.x
@@ -596,7 +596,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1481092668897504127, guid: d29b61b74bf226048be498873d495542, type: 3}
       propertyPath: m_Name
-      value: PartyPickCharNode (2)
+      value: SelectCharacterNode (2)
       objectReference: {fileID: 0}
     - target: {fileID: 5960507297356164153, guid: d29b61b74bf226048be498873d495542, type: 3}
       propertyPath: m_AnchorMax.x

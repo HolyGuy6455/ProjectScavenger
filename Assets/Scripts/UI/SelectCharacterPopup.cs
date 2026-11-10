@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Scavenger.UI
 {
-    public class PartyPickPopup : MonoBehaviour
+    public class SelectCharacterPopup : MonoBehaviour
     {
         [Serializable]
         public struct RoleFilterTab
@@ -41,7 +41,7 @@ namespace Scavenger.UI
         [SerializeField] private Button cancelButton;
 
         private readonly List<GameObject> _spawnedRows = new List<GameObject>();
-        private readonly List<PartyPickCharNode> _nodes = new List<PartyPickCharNode>();
+        private readonly List<SelectCharacterNode> _nodes = new List<SelectCharacterNode>();
         private readonly HashSet<int> _organizedCharIds = new HashSet<int>();
 
         private CharRole _currentRoleFilter = CharRole.None;
@@ -196,7 +196,7 @@ namespace Scavenger.UI
             int slotsPerRow = Mathf.Max(1, nodesPerRow);
             int rowCount = Mathf.CeilToInt((float)displayEntries.Count / slotsPerRow);
 
-            PartyPickCharNode nodeToSelect = null;
+            SelectCharacterNode nodeToSelect = null;
 
             for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
             {
@@ -204,7 +204,7 @@ namespace Scavenger.UI
                 rowObj.SetActive(true);
                 _spawnedRows.Add(rowObj);
 
-                PartyPickCharNode[] rowNodes = rowObj.GetComponentsInChildren<PartyPickCharNode>(true);
+                SelectCharacterNode[] rowNodes = rowObj.GetComponentsInChildren<SelectCharacterNode>(true);
                 for (int i = 0; i < rowNodes.Length; i++)
                 {
                     int dataIndex = (rowIndex * slotsPerRow) + i;
@@ -243,7 +243,7 @@ namespace Scavenger.UI
             return _currentRoleFilter == CharRole.None || role == _currentRoleFilter;
         }
 
-        private void OnNodeSelected(PartyPickCharNode selectedNode, CharData charData)
+        private void OnNodeSelected(SelectCharacterNode selectedNode, CharData charData)
         {
             _selectedCharData = charData;
             _selectedCharId = charData != null ? charData.id : 0;

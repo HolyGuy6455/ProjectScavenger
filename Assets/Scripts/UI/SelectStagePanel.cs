@@ -6,15 +6,15 @@ using UnityEngine.UI;
 
 namespace Scavenger.UI
 {
-    public class StageSelectPanel : MonoBehaviour
+    public class SelectStagePanel : MonoBehaviour
     {
         [Header("UI References")]
         [SerializeField] private Transform cardContainer;
-        [SerializeField] private StageSelectCard cardPrefab;
+        [SerializeField] private SelectStageCard cardPrefab;
         [SerializeField] private ScrollRect scrollRect;
         [SerializeField] private TextMeshProUGUI stageCountText;
 
-        private readonly List<StageSelectCard> _spawnedCards = new List<StageSelectCard>();
+        private readonly List<SelectStageCard> _spawnedCards = new List<SelectStageCard>();
         private StageType _currentStageType = StageType.Normal;
 
         public void SetStageTypeForNextOpen(StageType stageType)
@@ -71,7 +71,7 @@ namespace Scavenger.UI
 
             for (int i = 0; i < _spawnedCards.Count; i++)
             {
-                StageSelectCard card = _spawnedCards[i];
+                SelectStageCard card = _spawnedCards[i];
                 if (card == null) continue;
 
                 if (i < stages.Count)
@@ -104,7 +104,7 @@ namespace Scavenger.UI
             {
                 foreach (Transform child in cardContainer)
                 {
-                    var existingCard = child.GetComponent<StageSelectCard>();
+                    var existingCard = child.GetComponent<SelectStageCard>();
                     if (existingCard != null)
                     {
                         _spawnedCards.Add(existingCard);
@@ -114,12 +114,12 @@ namespace Scavenger.UI
 
             if (cardPrefab == null)
             {
-                cardPrefab = Resources.Load<StageSelectCard>("UIPrefabs/Node/StageSelectCard");
+                cardPrefab = Resources.Load<SelectStageCard>("UIPrefabs/Node/SelectStageCard");
             }
 
             while (_spawnedCards.Count < requiredCount && cardPrefab != null)
             {
-                StageSelectCard newCard = Instantiate(cardPrefab, cardContainer, false);
+                SelectStageCard newCard = Instantiate(cardPrefab, cardContainer, false);
                 _spawnedCards.Add(newCard);
             }
         }

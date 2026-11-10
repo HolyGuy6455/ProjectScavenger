@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class SkillSelectTabButton : MonoBehaviour
+public class SelectSkillTabButton : MonoBehaviour
 {
     [SerializeField] private Image skillIcon;
     [SerializeField] private TextMeshProUGUI skillNameText;
