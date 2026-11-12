@@ -1,0 +1,195 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Char007_UpperBody
+  m_Mask: 00000000010000000100000000000000000000000100000001000000010000000100000000000000000000000000000000000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 0
+  - m_Path: Virtual Camera
+    m_Weight: 0
+  - m_Path: Virtual Camera/cm
+    m_Weight: 0
+  - m_Path: Char007_Rig
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:CameraAim
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:CameraPosition
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips/Char007:LeftUpLeg
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips/Char007:LeftUpLeg/Char007:LeftLeg
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips/Char007:LeftUpLeg/Char007:LeftLeg/Char007:LeftFoot
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips/Char007:LeftUpLeg/Char007:LeftLeg/Char007:LeftFoot/Char007:LeftToeBase
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips/Char007:LeftUpLeg/Char007:LeftLeg/Char007:LeftFoot/Char007:LeftToeBase/Char007:LeftToe_End
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips/Char007:LeftUpLeg/Char007:LeftLeg/Char007:LeftFoot/Char007:LeftToeBase/Char007:LeftToe_End/Char007:LeftToe_End_end
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips/Char007:LeftUpLeg/Char007:LeftLeg/Char007:LeftFoot/Char007:LeftToeBase/Char007:LeftToe_End/Char007:LeftToe_End_end/Char007:LeftToe_End_end_end
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips/Char007:RightUpLeg
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips/Char007:RightUpLeg/Char007:RightLeg
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips/Char007:RightUpLeg/Char007:RightLeg/Char007:RightFoot
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips/Char007:RightUpLeg/Char007:RightLeg/Char007:RightFoot/Char007:RightToeBase
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips/Char007:RightUpLeg/Char007:RightLeg/Char007:RightFoot/Char007:RightToeBase/Char007:RightToe_End
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips/Char007:RightUpLeg/Char007:RightLeg/Char007:RightFoot/Char007:RightToeBase/Char007:RightToe_End/Char007:RightToe_End_end
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips/Char007:RightUpLeg/Char007:RightLeg/Char007:RightFoot/Char007:RightToeBase/Char007:RightToe_End/Char007:RightToe_End_end/Char007:RightToe_End_end_end
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandIndex1
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandIndex1/Char007:LeftHandIndex2
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandIndex1/Char007:LeftHandIndex2/Char007:LeftHandIndex3
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandIndex1/Char007:LeftHandIndex2/Char007:LeftHandIndex3/Char007:LeftHandIndex4
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandIndex1/Char007:LeftHandIndex2/Char007:LeftHandIndex3/Char007:LeftHandIndex4/Char007:LeftHandIndex4_end
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandIndex1/Char007:LeftHandIndex2/Char007:LeftHandIndex3/Char007:LeftHandIndex4/Char007:LeftHandIndex4_end/Char007:LeftHandIndex4_end_end
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandMiddle1
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandMiddle1/Char007:LeftHandMiddle2
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandMiddle1/Char007:LeftHandMiddle2/Char007:LeftHandMiddle3
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandMiddle1/Char007:LeftHandMiddle2/Char007:LeftHandMiddle3/Char007:LeftHandMiddle4
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandMiddle1/Char007:LeftHandMiddle2/Char007:LeftHandMiddle3/Char007:LeftHandMiddle4/Char007:LeftHandMiddle4_end
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandMiddle1/Char007:LeftHandMiddle2/Char007:LeftHandMiddle3/Char007:LeftHandMiddle4/Char007:LeftHandMiddle4_end/Char007:LeftHandMiddle4_end_end
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandThumb1
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandThumb1/Char007:LeftHandThumb2
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandThumb1/Char007:LeftHandThumb2/Char007:LeftHandThumb3
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandThumb1/Char007:LeftHandThumb2/Char007:LeftHandThumb3/Char007:LeftHandThumb4
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandThumb1/Char007:LeftHandThumb2/Char007:LeftHandThumb3/Char007:LeftHandThumb4/Char007:LeftHandThumb4_end
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:LeftHandThumb1/Char007:LeftHandThumb2/Char007:LeftHandThumb3/Char007:LeftHandThumb4/Char007:LeftHandThumb4_end/Char007:LeftHandThumb4_end_end
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:Reload_Bullet
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:Reload_Bullet/Char007_Reload_Bullet
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:Reload_Round
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:Reload_Round/Char007:Reload_Round_Bullets
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:Reload_Round/Char007:Reload_Round_Bullets/Char007_Reload_Round_Bullets
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:Reload_Round/Char007_Reload_Round
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:Weapon
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:Weapon/Char007:Weapon_Cylinder
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:Weapon/Char007:Weapon_Cylinder/Char007_Revolver_Cylinder
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:Weapon/Char007_Revolver
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:LeftShoulder/Char007:LeftArm/Char007:LeftForeArm/Char007:LeftHand/Char007:Weapon/Char007_Revolver/tripo_node_1d96922d-bc37-4578-8e89-00465da95d43
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:Neck
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:Neck/Char007:Head
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:Neck/Char007:Head/Char007:HeadTop_End
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:Neck/Char007:Head/Char007:HeadTop_End/Char007:HeadTop_End_end
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:Neck/Char007:Head/Char007:HeadTop_End/Char007:HeadTop_End_end/Char007:HeadTop_End_end_end
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandIndex1
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandIndex1/Char007:RightHandIndex2
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandIndex1/Char007:RightHandIndex2/Char007:RightHandIndex3
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandIndex1/Char007:RightHandIndex2/Char007:RightHandIndex3/Char007:RightHandIndex4
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandIndex1/Char007:RightHandIndex2/Char007:RightHandIndex3/Char007:RightHandIndex4/Char007:RightHandIndex4_end
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandIndex1/Char007:RightHandIndex2/Char007:RightHandIndex3/Char007:RightHandIndex4/Char007:RightHandIndex4_end/Char007:RightHandIndex4_end_end
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandMiddle1
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandMiddle1/Char007:RightHandMiddle2
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandMiddle1/Char007:RightHandMiddle2/Char007:RightHandMiddle3
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandMiddle1/Char007:RightHandMiddle2/Char007:RightHandMiddle3/Char007:RightHandMiddle4
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandMiddle1/Char007:RightHandMiddle2/Char007:RightHandMiddle3/Char007:RightHandMiddle4/Char007:RightHandMiddle4_end
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandMiddle1/Char007:RightHandMiddle2/Char007:RightHandMiddle3/Char007:RightHandMiddle4/Char007:RightHandMiddle4_end/Char007:RightHandMiddle4_end_end
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandThumb1
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandThumb1/Char007:RightHandThumb2
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandThumb1/Char007:RightHandThumb2/Char007:RightHandThumb3
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandThumb1/Char007:RightHandThumb2/Char007:RightHandThumb3/Char007:RightHandThumb4
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandThumb1/Char007:RightHandThumb2/Char007:RightHandThumb3/Char007:RightHandThumb4/Char007:RightHandThumb4_end
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Hips/Char007:Spine/Char007:Spine1/Char007:Spine2/Char007:RightShoulder/Char007:RightArm/Char007:RightForeArm/Char007:RightHand/Char007:RightHandThumb1/Char007:RightHandThumb2/Char007:RightHandThumb3/Char007:RightHandThumb4/Char007:RightHandThumb4_end/Char007:RightHandThumb4_end_end
+    m_Weight: 1
+  - m_Path: Char007_Rig/Char007:Ultimate_Motorcycle
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Ultimate_Motorcycle/Char007_Motorcycle
+    m_Weight: 0
+  - m_Path: Char007_Rig/Char007:Ultimate_Motorcycle/Char007_Motorcycle/ec8e9c9d_2a04_4612_a832_0deaa60026fb
+    m_Weight: 0
+  - m_Path: Char007_Rig/Export_CameraAim
+    m_Weight: 0
+  - m_Path: Char007_Rig/Export_CameraAim/CameraLookAt
+    m_Weight: 0
+  - m_Path: Char007_Rig/Export_CameraPosition
+    m_Weight: 0
+  - m_Path: Char007_Rig/Export_CameraPosition/CameraPosition
+    m_Weight: 0
+  - m_Path: tripo_020ff63e_e82a_4235_a3a7_1668ed0d2e0b
+    m_Weight: 0

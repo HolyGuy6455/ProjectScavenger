@@ -1,0 +1,364 @@
+{
+  "characterId": "char007",
+  "source": "E:\\작업물\\charFBX\\char007\\Char007.blend",
+  "fps": 24,
+  "rigName": "Char007_Rig",
+  "bodyName": "tripo_020ff63e_e82a_4235_a3a7_1668ed0d2e0b",
+  "faceMaterial": "Char007_Face_Atlas",
+  "faceMaterialIndex": 1,
+  "expressionProfileFilename": "Char007_ExpressionProfile.json",
+  "faceAtlasFilename": "textures/Char007_FaceAtlas.png",
+  "camera": {
+    "positionName": "CameraPosition",
+    "aimName": "CameraLookAt",
+    "defaultFov": 40,
+    "ultimateFov": 38,
+    "forward": "+Z",
+    "up": "+Y",
+    "positionBone": "Export_CameraPosition",
+    "aimBone": "Export_CameraAim"
+  },
+  "actions": [
+    {
+      "name": "death",
+      "start": 1.0,
+      "end": 72.0,
+      "fps": 24,
+      "loop": false,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "entering",
+      "start": 1.0,
+      "end": 108.0,
+      "fps": 24,
+      "loop": false,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "exit",
+      "start": 1.0,
+      "end": 152.0,
+      "fps": 24,
+      "loop": false,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "hit",
+      "start": 1.0,
+      "end": 14.0,
+      "fps": 24,
+      "loop": false,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "idle",
+      "start": 1.0,
+      "end": 94.0,
+      "fps": 24,
+      "loop": true,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "reloading",
+      "start": 1.0,
+      "end": 37.0,
+      "fps": 24,
+      "loop": false,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "reloading_end",
+      "start": 1.0,
+      "end": 15.0,
+      "fps": 24,
+      "loop": false,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "reloading_loop",
+      "start": 1.0,
+      "end": 17.0,
+      "fps": 24,
+      "loop": true,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "reloading_start",
+      "start": 1.0,
+      "end": 13.0,
+      "fps": 24,
+      "loop": false,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "run_backward",
+      "start": 1.0,
+      "end": 17.0,
+      "fps": 24,
+      "loop": true,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "run_forward",
+      "start": 1.0,
+      "end": 22.0,
+      "fps": 24,
+      "loop": true,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "run_left",
+      "start": 1.0,
+      "end": 17.0,
+      "fps": 24,
+      "loop": true,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "run_right",
+      "start": 1.0,
+      "end": 21.0,
+      "fps": 24,
+      "loop": true,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "shoot",
+      "start": 1.0,
+      "end": 30.0,
+      "fps": 24,
+      "loop": false,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "skill",
+      "start": 1.0,
+      "end": 36.0,
+      "fps": 24,
+      "loop": false,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "ultimate",
+      "start": 1.0,
+      "end": 76.0,
+      "fps": 24,
+      "loop": false,
+      "filledChannels": 0,
+      "fov": 38
+    },
+    {
+      "name": "ultimate_crash",
+      "start": 1.0,
+      "end": 36.0,
+      "fps": 24,
+      "loop": false,
+      "filledChannels": 0,
+      "fov": 38
+    },
+    {
+      "name": "ultimate_end",
+      "start": 1.0,
+      "end": 48.0,
+      "fps": 24,
+      "loop": false,
+      "filledChannels": 0,
+      "fov": 38
+    },
+    {
+      "name": "ultimate_left",
+      "start": 1.0,
+      "end": 20.0,
+      "fps": 24,
+      "loop": true,
+      "filledChannels": 0,
+      "fov": 38
+    },
+    {
+      "name": "ultimate_right",
+      "start": 1.0,
+      "end": 20.0,
+      "fps": 24,
+      "loop": true,
+      "filledChannels": 0,
+      "fov": 38
+    },
+    {
+      "name": "ultimate_run",
+      "start": 1.0,
+      "end": 20.0,
+      "fps": 24,
+      "loop": true,
+      "filledChannels": 0,
+      "fov": 38
+    },
+    {
+      "name": "walk_backward",
+      "start": 1.0,
+      "end": 43.0,
+      "fps": 24,
+      "loop": true,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "walk_forward",
+      "start": 1.0,
+      "end": 42.0,
+      "fps": 24,
+      "loop": true,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "walk_left",
+      "start": 1.0,
+      "end": 30.0,
+      "fps": 24,
+      "loop": true,
+      "filledChannels": 0,
+      "fov": 40
+    },
+    {
+      "name": "walk_right",
+      "start": 1.0,
+      "end": 44.0,
+      "fps": 24,
+      "loop": true,
+      "filledChannels": 0,
+      "fov": 40
+    }
+  ],
+  "materials": [
+    {
+      "name": "Char007_Body",
+      "texture": "textures/Char007_BaseColor.jpg",
+      "images": [
+        "textures/Char007_BaseColor.jpg"
+      ],
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "alpha": 1.0,
+      "roughness": 0.6,
+      "metallic": 0.0,
+      "emission": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "doubleSided": true
+    },
+    {
+      "name": "Char007_Face_Atlas",
+      "texture": "textures/Char007_FaceAtlas.png",
+      "images": [
+        "textures/Char007_FaceAtlas.png"
+      ],
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "alpha": 1.0,
+      "roughness": 0.6,
+      "metallic": 0.0,
+      "emission": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "doubleSided": true
+    },
+    {
+      "name": "Char007_Revolver_Mat",
+      "texture": "textures/futuristic_revolver_3d_model_basecolor.jpg",
+      "images": [
+        "textures/futuristic_revolver_3d_model_basecolor.jpg"
+      ],
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "alpha": 1.0,
+      "roughness": 0.5,
+      "metallic": 0.2,
+      "emission": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "doubleSided": true
+    },
+    {
+      "name": "Char007_Motorcycle_Mat",
+      "texture": "textures/motorcycle_3d_model_basecolor.jpg",
+      "images": [
+        "textures/motorcycle_3d_model_basecolor.jpg"
+      ],
+      "color": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "alpha": 1.0,
+      "roughness": 0.5,
+      "metallic": 0.2,
+      "emission": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "emissionStrength": 0.0,
+      "transparent": false,
+      "doubleSided": true
+    }
+  ],
+  "scalarTracks": [],
+  "nonHumanoidBones": [
+    "Char007:Weapon",
+    "Char007:Weapon_Cylinder",
+    "Char007:Reload_Round",
+    "Char007:Reload_Round_Bullets",
+    "Char007:Reload_Bullet",
+    "Char007:Ultimate_Motorcycle",
+    "Char007:CameraPosition",
+    "Char007:CameraAim",
+    "Export_CameraPosition",
+    "Export_CameraAim"
+  ],
+  "bindPose": "All pose-bone matrix_basis identity, action unassigned; prevents zero-scale child bind transforms."
+}

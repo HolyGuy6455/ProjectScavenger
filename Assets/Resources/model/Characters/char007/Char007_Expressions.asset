@@ -1,0 +1,78 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a37cd16fb6db2f4b94e4a79d22224ce, type: 3}
+  m_Name: Char007_Expressions
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterExpressionProfile
+  characterId: char007
+  atlasTexture: {fileID: 2800000, guid: ed9f4b3050a98e64aa47ece6aa0fff4f, type: 3}
+  sourceRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0.33333334
+    height: 0.5
+  defaultId: normal
+  entries:
+  - index: 0
+    id: normal
+    displayName: "\uAE30\uBCF8"
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0.33333334
+      height: 0.5
+  - index: 1
+    id: smile
+    displayName: "\uC7A5\uB09C\uAE30 \uAC00\uB4DD\uD55C \uC528\uC775 \uC6C3\uC74C"
+    rect:
+      serializedVersion: 2
+      x: 0.33333334
+      y: 0
+      width: 0.33333334
+      height: 0.5
+  - index: 2
+    id: excited
+    displayName: "\uC2E0\uB098\uC11C \uD150\uC158 \uD3ED\uBC1C"
+    rect:
+      serializedVersion: 2
+      x: 0.6666667
+      y: 0
+      width: 0.33333334
+      height: 0.5
+  - index: 3
+    id: squeezed
+    displayName: "\uB208 \uC9C8\uB048"
+    rect:
+      serializedVersion: 2
+      x: 0
+      y: 0.5
+      width: 0.33333334
+      height: 0.5
+  - index: 4
+    id: surprised
+    displayName: "\uAE5C\uC9DD \uB180\uB780 \uD5C8\uB2F9 \uD45C\uC815"
+    rect:
+      serializedVersion: 2
+      x: 0.33333334
+      y: 0.5
+      width: 0.33333334
+      height: 0.5
+  - index: 5
+    id: dazed
+    displayName: "\uB10B \uB098\uAC10"
+    rect:
+      serializedVersion: 2
+      x: 0.6666667
+      y: 0.5
+      width: 0.33333334
+      height: 0.5

@@ -1,0 +1,129 @@
+{
+  "version": 1,
+  "character": "char007",
+  "property": "Face_Expression",
+  "material": "Char007_Face_Atlas",
+  "texture": "Char007_FaceAtlas.png",
+  "columns": 3,
+  "rows": 2,
+  "expression_count": 6,
+  "tile_size_pixels": 1024,
+  "padding_pixels": 24,
+  "texture_size": [
+    3072,
+    2048
+  ],
+  "uv_layer": "Attribute",
+  "source_uv_layer": "UV_OriginalLayout",
+  "uv_convention": "bottom-left origin; UVs stored in tile 0; add expression.uv_offset",
+  "expressions": [
+    {
+      "index": 0,
+      "id": "normal",
+      "label": "기본",
+      "column": 0,
+      "row": 0,
+      "uv_offset": [
+        0.0,
+        0.0
+      ],
+      "uv_rect": [
+        0.0,
+        0.0,
+        0.3333333333333333,
+        0.5
+      ]
+    },
+    {
+      "index": 1,
+      "id": "smile",
+      "label": "장난기 가득한 씨익 웃음",
+      "column": 1,
+      "row": 0,
+      "uv_offset": [
+        0.3333333333333333,
+        0.0
+      ],
+      "uv_rect": [
+        0.3333333333333333,
+        0.0,
+        0.3333333333333333,
+        0.5
+      ]
+    },
+    {
+      "index": 2,
+      "id": "excited",
+      "label": "신나서 텐션 폭발",
+      "column": 2,
+      "row": 0,
+      "uv_offset": [
+        0.6666666666666666,
+        0.0
+      ],
+      "uv_rect": [
+        0.6666666666666666,
+        0.0,
+        0.3333333333333333,
+        0.5
+      ]
+    },
+    {
+      "index": 3,
+      "id": "squeezed",
+      "label": "눈 질끈",
+      "column": 0,
+      "row": 1,
+      "uv_offset": [
+        0.0,
+        0.5
+      ],
+      "uv_rect": [
+        0.0,
+        0.5,
+        0.3333333333333333,
+        0.5
+      ]
+    },
+    {
+      "index": 4,
+      "id": "surprised",
+      "label": "깜짝 놀란 허당 표정",
+      "column": 1,
+      "row": 1,
+      "uv_offset": [
+        0.3333333333333333,
+        0.5
+      ],
+      "uv_rect": [
+        0.3333333333333333,
+        0.5,
+        0.3333333333333333,
+        0.5
+      ]
+    },
+    {
+      "index": 5,
+      "id": "dazed",
+      "label": "넋 나감",
+      "column": 2,
+      "row": 1,
+      "uv_offset": [
+        0.6666666666666666,
+        0.5
+      ],
+      "uv_rect": [
+        0.6666666666666666,
+        0.5,
+        0.3333333333333333,
+        0.5
+      ]
+    }
+  ],
+  "mesh": "tripo_020ff63e_e82a_4235_a3a7_1668ed0d2e0b",
+  "material_slot": 1,
+  "base_color_texture": "//anime girl 3d model\\anime_girl_3d_model.fbm\\anime_girl_3d_model_basecolor.jpg",
+  "face_texture": "//textures/Char007_FaceAtlas.png",
+  "note": "UV channel 0 (Attribute) is mapped inside Tile 0 (normal). Shift only face material UV by uv_offset. UV_OriginalLayout preserves the imported authoring layout."
+}
+

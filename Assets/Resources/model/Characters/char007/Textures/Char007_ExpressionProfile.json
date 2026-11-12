@@ -1,0 +1,478 @@
+{
+  "schemaVersion": 1,
+  "characterId": "char007",
+  "atlasTexture": "Char007_FaceAtlas.png",
+  "atlasSizePixels": [
+    3072,
+    2048
+  ],
+  "grid": [
+    3,
+    2
+  ],
+  "tileSizePixels": 1024,
+  "paddingPixels": 24,
+  "propertyPath": "Char007_Rig[\"Face_Expression\"]",
+  "material": "Char007_Face_Atlas",
+  "materialSlot": 1,
+  "uvChannel": "Attribute",
+  "uvOrigin": "bottom-left",
+  "layoutMode": "base-tile-uv",
+  "sourceRect": [
+    0.0,
+    0.0,
+    0.3333333333333333,
+    0.5
+  ],
+  "defaultExpressionId": "normal",
+  "outOfRangePolicy": "clamp",
+  "entries": [
+    {
+      "index": 0,
+      "id": "normal",
+      "displayName": "기본",
+      "rect": [
+        0.0,
+        0.0,
+        0.3333333333333333,
+        0.5
+      ],
+      "offset": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "index": 1,
+      "id": "smile",
+      "displayName": "장난기 가득한 씨익 웃음",
+      "rect": [
+        0.3333333333333333,
+        0.0,
+        0.3333333333333333,
+        0.5
+      ],
+      "offset": [
+        0.3333333333333333,
+        0.0
+      ]
+    },
+    {
+      "index": 2,
+      "id": "excited",
+      "displayName": "신나서 텐션 폭발",
+      "rect": [
+        0.6666666666666666,
+        0.0,
+        0.3333333333333333,
+        0.5
+      ],
+      "offset": [
+        0.6666666666666666,
+        0.0
+      ]
+    },
+    {
+      "index": 3,
+      "id": "squeezed",
+      "displayName": "눈 질끈",
+      "rect": [
+        0.0,
+        0.5,
+        0.3333333333333333,
+        0.5
+      ],
+      "offset": [
+        0.0,
+        0.5
+      ]
+    },
+    {
+      "index": 4,
+      "id": "surprised",
+      "displayName": "깜짝 놀란 허당 표정",
+      "rect": [
+        0.3333333333333333,
+        0.5,
+        0.3333333333333333,
+        0.5
+      ],
+      "offset": [
+        0.3333333333333333,
+        0.5
+      ]
+    },
+    {
+      "index": 5,
+      "id": "dazed",
+      "displayName": "넋 나감",
+      "rect": [
+        0.6666666666666666,
+        0.5,
+        0.3333333333333333,
+        0.5
+      ],
+      "offset": [
+        0.6666666666666666,
+        0.5
+      ]
+    }
+  ],
+  "texture": "Char007_FaceAtlas.png",
+  "textureSize": [
+    3072,
+    2048
+  ],
+  "defaultId": "normal",
+  "mesh": "tripo_020ff63e_e82a_4235_a3a7_1668ed0d2e0b",
+  "uvLayer": "Attribute",
+  "unityUvChannel": 0,
+  "uvBasis": "base-tile-uv",
+  "backupOriginalUvLayer": "UV_OriginalLayout",
+  "blender": {
+    "object": "Char007_Rig",
+    "property": "Face_Expression",
+    "materialMappingNode": "Expression UV Offset",
+    "keyInterpolation": "CONSTANT"
+  },
+  "clipExpressions": {
+    "death": [
+      {
+        "frame": 1,
+        "id": "surprised"
+      },
+      {
+        "frame": 18,
+        "id": "squeezed"
+      },
+      {
+        "frame": 38,
+        "id": "dazed"
+      },
+      {
+        "frame": 72,
+        "id": "dazed"
+      }
+    ],
+    "entering": [
+      {
+        "frame": 1,
+        "id": "smile"
+      },
+      {
+        "frame": 45,
+        "id": "excited"
+      },
+      {
+        "frame": 83,
+        "id": "smile"
+      },
+      {
+        "frame": 97,
+        "id": "normal"
+      },
+      {
+        "frame": 108,
+        "id": "normal"
+      }
+    ],
+    "exit": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 10,
+        "id": "smile"
+      },
+      {
+        "frame": 51,
+        "id": "excited"
+      },
+      {
+        "frame": 152,
+        "id": "excited"
+      }
+    ],
+    "hit": [
+      {
+        "frame": 1,
+        "id": "squeezed"
+      },
+      {
+        "frame": 12,
+        "id": "normal"
+      },
+      {
+        "frame": 14,
+        "id": "normal"
+      }
+    ],
+    "idle": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 94,
+        "id": "normal"
+      }
+    ],
+    "reloading": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 37,
+        "id": "normal"
+      }
+    ],
+    "reloading_end": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 15,
+        "id": "normal"
+      }
+    ],
+    "reloading_loop": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 17,
+        "id": "normal"
+      }
+    ],
+    "reloading_start": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 13,
+        "id": "normal"
+      }
+    ],
+    "run_backward": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 17,
+        "id": "normal"
+      }
+    ],
+    "run_forward": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 22,
+        "id": "normal"
+      }
+    ],
+    "run_left": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 17,
+        "id": "normal"
+      }
+    ],
+    "run_right": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 21,
+        "id": "normal"
+      }
+    ],
+    "shoot": [
+      {
+        "frame": 1,
+        "id": "squeezed"
+      },
+      {
+        "frame": 11,
+        "id": "normal"
+      },
+      {
+        "frame": 30,
+        "id": "normal"
+      }
+    ],
+    "skill": [
+      {
+        "frame": 1,
+        "id": "smile"
+      },
+      {
+        "frame": 11,
+        "id": "excited"
+      },
+      {
+        "frame": 26,
+        "id": "smile"
+      },
+      {
+        "frame": 34,
+        "id": "normal"
+      },
+      {
+        "frame": 36,
+        "id": "normal"
+      }
+    ],
+    "ultimate": [
+      {
+        "frame": 1,
+        "id": "smile"
+      },
+      {
+        "frame": 76,
+        "id": "smile"
+      }
+    ],
+    "ultimate_crash": [
+      {
+        "frame": 1,
+        "id": "squeezed"
+      },
+      {
+        "frame": 8,
+        "id": "surprised"
+      },
+      {
+        "frame": 25,
+        "id": "squeezed"
+      },
+      {
+        "frame": 28,
+        "id": "smile"
+      },
+      {
+        "frame": 33,
+        "id": "excited"
+      },
+      {
+        "frame": 36,
+        "id": "excited"
+      }
+    ],
+    "ultimate_end": [
+      {
+        "frame": 1,
+        "id": "excited"
+      },
+      {
+        "frame": 2,
+        "id": "squeezed"
+      },
+      {
+        "frame": 10,
+        "id": "excited"
+      },
+      {
+        "frame": 27,
+        "id": "smile"
+      },
+      {
+        "frame": 33,
+        "id": "squeezed"
+      },
+      {
+        "frame": 36,
+        "id": "smile"
+      },
+      {
+        "frame": 42,
+        "id": "normal"
+      },
+      {
+        "frame": 48,
+        "id": "normal"
+      }
+    ],
+    "ultimate_left": [
+      {
+        "frame": 1,
+        "id": "smile"
+      },
+      {
+        "frame": 20,
+        "id": "smile"
+      }
+    ],
+    "ultimate_right": [
+      {
+        "frame": 1,
+        "id": "smile"
+      },
+      {
+        "frame": 20,
+        "id": "smile"
+      }
+    ],
+    "ultimate_run": [
+      {
+        "frame": 1,
+        "id": "smile"
+      },
+      {
+        "frame": 20,
+        "id": "smile"
+      }
+    ],
+    "walk_backward": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 43,
+        "id": "normal"
+      }
+    ],
+    "walk_forward": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 42,
+        "id": "normal"
+      }
+    ],
+    "walk_left": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 30,
+        "id": "normal"
+      }
+    ],
+    "walk_right": [
+      {
+        "frame": 1,
+        "id": "normal"
+      },
+      {
+        "frame": 44,
+        "id": "normal"
+      }
+    ]
+  }
+}
