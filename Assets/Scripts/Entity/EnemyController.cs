@@ -62,24 +62,7 @@ public class EnemyController : NetworkBehaviour, ILootTableProvider
 
     private void InitializeEnemyData()
     {
-        myData = null;
-        if (enemyId != 0)
-        {
-            myData = DataManager.Instance.GetData<EnemyData>("Enemy", enemyId);
-        }
-        else
-        {
-            string cleanName = gameObject.name.Replace("(Clone)", "").Trim().Split(' ')[0];
-            var allEnemies = DataManager.Instance.GetAllData<EnemyData>("Enemy");
-            foreach (var enemy in allEnemies)
-            {
-                if (enemy.prefabName == cleanName)
-                {
-                    myData = enemy;
-                    break;
-                }
-            }
-        }
+        myData = ResolveEnemyData();
 
         if (myData == null)
         {
@@ -89,6 +72,42 @@ public class EnemyController : NetworkBehaviour, ILootTableProvider
 
         GetComponent<Health>().SetHealth(myData.hp, myData.hp);
         InitializeWeapon();
+    }
+
+    public EnemyData GetEnemyData()
+    {
+        if (myData == null)
+        {
+            myData = ResolveEnemyData();
+        }
+        return myData;
+    }
+
+    public bool HasTag(string tag)
+    {
+        EnemyData data = GetEnemyData();
+        return data != null && data.HasTag(tag);
+    }
+
+    private EnemyData ResolveEnemyData()
+    {
+        if (DataManager.Instance == null || !DataManager.Instance.IsDataLoaded) return null;
+        if (enemyId != 0)
+        {
+            return DataManager.Instance.GetData<EnemyData>("Enemy", enemyId);
+        }
+
+        string cleanName = gameObject.name.Replace("(Clone)", "").Trim().Split(' ')[0];
+        var allEnemies = DataManager.Instance.GetAllData<EnemyData>("Enemy");
+        if (allEnemies == null) return null;
+        foreach (var enemy in allEnemies)
+        {
+            if (enemy != null && enemy.prefabName == cleanName)
+            {
+                return enemy;
+            }
+        }
+        return null;
     }
 
     private void InitializeWeapon()

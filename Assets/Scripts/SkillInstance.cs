@@ -80,7 +80,8 @@ public class SkillInstance
                 return; // 비용과 쿨타임은 조준을 확정했을 때만 적용합니다.
             case SkillActiveType.Instant:
                 if (!ExecuteSkillBeginFunc(data.func, shooter, data.funcValue)) return;
-                ReduceRemain(shooter);
+                if (data.func != 5 || data.remainCostType != RemainCostType.Ammo)
+                    ReduceRemain(shooter);
                 isInstantOffExecuted = false;
                 currentCooldown = data.cooltime;
                 break;
@@ -165,7 +166,11 @@ public class SkillInstance
     /// <summary>Abandons pending effects without firing release/completion logic or refunding costs.</summary>
     public void CancelActiveAction(Shooter shooter = null)
     {
-        if (isContinuousRunning && Data?.func == 6) shooter?.CancelReloadAnimation();
+        if ((isContinuousRunning && Data?.func == 6)
+            || (!isInstantOffExecuted && currentCooldown > 0f && Data?.func == 5))
+        {
+            shooter?.CancelReloadAnimation();
+        }
         isCharging = false;
         isContinuousRunning = false;
         isToggledOn = false;
@@ -193,7 +198,12 @@ public class SkillInstance
                 }
                 break;
             case 5: // 재장전 (전체)
-                if (playerShooter != null) playerShooter.TriggerReloadAnimation();
+                if (playerShooter != null)
+                {
+                    if (Data != null && Data.duration > 0f)
+                        return playerShooter.TriggerReloadAnimation(Data.duration);
+                    playerShooter.TriggerReloadAnimation();
+                }
                 break;
             case 6: // 재장전 (1발)
                 return playerShooter != null && Data != null
@@ -205,14 +215,26 @@ public class SkillInstance
     private void RefundChamberAmmo(Shooter playerShooter)
     {
         if (playerShooter == null || playerShooter.chamberAmmoQueue == null) return;
-        if (PlayerSkillController.Instance == null || CharacterStateManager.Instance == null || CharacterStateManager.Instance.CurrentCharData == null) return;
-
-        CharacterState state = PlayerSkillController.Instance.GetSkillState(CharacterStateManager.Instance.CurrentCharData.id);
-        if (state == null || state.normalSkills == null) return;
+        var selfData = Data;
+        CharacterState state = (PlayerSkillController.Instance != null
+            && CharacterStateManager.Instance != null
+            && CharacterStateManager.Instance.CurrentCharData != null)
+            ? PlayerSkillController.Instance.GetSkillState(CharacterStateManager.Instance.CurrentCharData.id)
+            : null;
 
         foreach (var group in playerShooter.chamberAmmoQueue)
         {
             if (group.ammoId <= 0) continue;
+
+            if (selfData != null && (selfData.func == 5 || selfData.func == 6)
+                && selfData.funcValue != null && selfData.funcValue.Length > 1
+                && (int)selfData.funcValue[1] == group.ammoId)
+            {
+                remainAmount += group.count;
+                continue;
+            }
+
+            if (state == null || state.normalSkills == null) continue;
 
             // 이 ammoId를 장전하는 스킬을 찾아서 remainAmount 환불
             foreach (var skill in state.normalSkills)
@@ -249,9 +271,17 @@ public class SkillInstance
                     // 챔버를 비우기 전에 남은 탄환들을 각각의 스킬 인벤토리로 환불
                     RefundChamberAmmo(playerShooter);
                     
-                    if (data != null && data.remainCostType == RemainCostType.Ammo && playerShooter.CurrentAmmoData != null && remainAmount < playerShooter.CurrentAmmoData.maxAmmo)
+                    if (data != null && data.remainCostType == RemainCostType.Ammo && playerShooter.CurrentAmmoData != null)
                     {
-                        playerShooter.Reload(remainAmount, ammoId);
+                        int maxLoad = amount > 0
+                            ? Mathf.Min(amount, playerShooter.CurrentAmmoData.maxAmmo)
+                            : playerShooter.CurrentAmmoData.maxAmmo;
+                        int toLoad = Mathf.Min(remainAmount, maxLoad);
+                        if (toLoad > 0)
+                        {
+                            remainAmount -= toLoad;
+                            playerShooter.Reload(toLoad, ammoId);
+                        }
                     }
                     else
                     {

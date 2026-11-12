@@ -74,10 +74,44 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
         if (IsDeathPresented) movement = Vector2.zero;
         animator.SetFloat("InputX", movement.x);
         animator.SetFloat("InputY", movement.y);
+        if (HasParameter("SteerX", AnimatorControllerParameterType.Float))
+            animator.SetFloat("SteerX", Mathf.Clamp(movement.x, -1f, 1f));
     }
 
     public void PlayShoot() => PlayUpperBody("Armature|shoot");
-    public void PlayReload() => PlayUpperBody("Armature|reloading");
+
+    public void PlayReload()
+    {
+        if (animator != null && HasParameter(ReloadSpeedParameter, AnimatorControllerParameterType.Float))
+            animator.SetFloat(ReloadSpeedParameter, 1f);
+        PlayUpperBody("Armature|reloading");
+    }
+
+    public bool PlayReload(float duration)
+    {
+        if (!isActiveAndEnabled || IsDeathPresented || IsFullBodyPlaying || animator == null) return false;
+        if (!IsPositiveFinite(duration))
+        {
+            Debug.LogError($"[CharacterAnimationPresenter] Reload duration must be finite and positive: {duration}.", this);
+            return false;
+        }
+        if (!HasState(1, "Armature|reloading")) return false;
+
+        if (!HasParameter(ReloadSpeedParameter, AnimatorControllerParameterType.Float)
+            || !TryGetFullReloadLength(out float clipLength))
+        {
+            Debug.LogError("[CharacterAnimationPresenter] Full reload requires ReloadSpeed and an upper-body reload clip.", this);
+            return false;
+        }
+
+        float speed = clipLength / duration;
+        if (!IsPositiveFinite(speed)) return false;
+
+        animator.SetFloat(ReloadSpeedParameter, speed);
+        animator.Play("Armature|reloading", 1, 0f);
+        return true;
+    }
+
     public bool PlayUpperBodySkill() => PlayUpperBody("Skill");
 
     public bool PlayUpperBodyAim() => PlayUpperBody("ThrowAim");
@@ -112,9 +146,7 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
 
         if (!HasState(1, "ReloadStart") || !HasState(1, "ReloadLoop") || !HasState(1, "ReloadEnd"))
         {
-            if (!HasState(1, "Armature|reloading")) return false;
-            PlayReload();
-            return true;
+            return PlayReload(duration);
         }
 
         if (!HasParameter(ReloadingParameter, AnimatorControllerParameterType.Bool)
@@ -160,7 +192,8 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
     {
         startLength = loopLength = 0f;
         AnimationClip start = null;
-        AnimationClip loop = null;
+        AnimationClip explicitLoop = null;
+        AnimationClip fallbackLoop = null;
         foreach (var clip in animator.runtimeAnimatorController.animationClips)
         {
             if (clip.name.EndsWith("_upperbody_reloading_start", StringComparison.Ordinal))
@@ -168,17 +201,53 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
                 if (start != null && start != clip) return false;
                 start = clip;
             }
-            else if (clip.name.EndsWith("_upperbody_reloading_loop", StringComparison.Ordinal)
-                || clip.name.EndsWith("_upperbody_reloading", StringComparison.Ordinal))
+            else if (clip.name.EndsWith("_upperbody_reloading_loop", StringComparison.Ordinal))
             {
-                if (loop != null && loop != clip) return false;
-                loop = clip;
+                if (explicitLoop != null && explicitLoop != clip) return false;
+                explicitLoop = clip;
+            }
+            else if (clip.name.EndsWith("_upperbody_reloading", StringComparison.Ordinal))
+            {
+                if (fallbackLoop != null && fallbackLoop != clip) return false;
+                fallbackLoop = clip;
             }
         }
+        AnimationClip loop = explicitLoop != null ? explicitLoop : fallbackLoop;
         if (start == null || loop == null) return false;
         startLength = start.length;
         loopLength = loop.length;
         return IsPositiveFinite(startLength) && IsPositiveFinite(loopLength);
+    }
+
+    private bool TryGetFullReloadLength(out float reloadLength)
+    {
+        reloadLength = 0f;
+        AnimationClip upperReload = null;
+        AnimationClip upperLoop = null;
+        AnimationClip legacyReload = null;
+        foreach (var clip in animator.runtimeAnimatorController.animationClips)
+        {
+            if (clip.name.EndsWith("_upperbody_reloading", StringComparison.Ordinal))
+            {
+                if (upperReload != null && upperReload != clip) return false;
+                upperReload = clip;
+            }
+            else if (clip.name.EndsWith("_upperbody_reloading_loop", StringComparison.Ordinal))
+            {
+                if (upperLoop != null && upperLoop != clip) return false;
+                upperLoop = clip;
+            }
+            else if (clip.name.EndsWith("_reloading", StringComparison.Ordinal)
+                || clip.name.EndsWith("|reloading", StringComparison.Ordinal))
+            {
+                if (legacyReload != null && legacyReload != clip) return false;
+                legacyReload = clip;
+            }
+        }
+        AnimationClip resolved = upperReload != null ? upperReload : (upperLoop != null ? upperLoop : legacyReload);
+        if (resolved == null) return false;
+        reloadLength = resolved.length;
+        return IsPositiveFinite(reloadLength);
     }
 
     private static bool IsPositiveFinite(float value) => value > 0f && !float.IsNaN(value) && !float.IsInfinity(value);
@@ -224,11 +293,12 @@ public sealed class CharacterAnimationPresenter : MonoBehaviour
 
     public int PlayRoll(float duration)
     {
-        int token = PlayFullBody("Roll");
+        string rollState = HasState(0, "Roll") ? "Roll" : "Skill";
+        int token = PlayFullBody(rollState);
         if (token == 0) return token;
         animator.Update(0f);
         var state = animator.GetCurrentAnimatorStateInfo(0);
-        if (duration > 0f && state.IsName("Roll")) animator.speed = state.length / duration;
+        if (duration > 0f && state.IsName(rollState)) animator.speed = state.length / duration;
         return token;
     }
 

@@ -24,7 +24,7 @@ public abstract class BaseUltimateSkill : MonoBehaviour
     private int animationToken;
     private int cinematicToken;
 
-    public bool IsPresentationPlaying => presentationPlaying;
+    public virtual bool IsPresentationPlaying => presentationPlaying;
     public SkillData CurrentData => currentData;
     public bool LastPresentationCompleted { get; private set; }
     public int PresentationVersion { get; private set; }
@@ -218,7 +218,7 @@ public abstract class BaseUltimateSkill : MonoBehaviour
     }
 
     /// <summary>Ends presentation and effects without replacing a death or hit pose.</summary>
-    public void CancelPresentation()
+    public virtual void CancelPresentation()
     {
         unchecked { PresentationVersion++; }
         LastPresentationCompleted = false;

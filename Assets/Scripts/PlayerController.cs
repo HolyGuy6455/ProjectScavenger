@@ -39,6 +39,8 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     private System.Action _cinematicOnComplete;
     private System.Action _cinematicOnCancelled;
     private Coroutine _rollRoutine;
+    private Coroutine _remoteRollRoutine;
+    private int _remoteRollPlayback;
     private bool _deathHandled;
     private bool _interruptingPresentation;
     public int PresentationVersion => _presentationInterruptionVersion;
@@ -53,10 +55,10 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         || (IsOwner && IsSpawned && !IsLoadingReady)
         || (IsOwner && IsSpawned && !IsServer && _receivedStateSlot != ActiveSlotIndex);
     public bool CanChangeCharacter => !IsInputLocked && !(GetActiveUltimateSkill()?.IsPresentationPlaying ?? false)
-        && GetComponent<SkillAimController>()?.BlocksOtherActions != true
-        && GetComponent<Char004ThrowSkill>()?.BlocksCharacterChange != true;
+        && !IsControlOverrideBlockingCharacterSwitch();
     private Health _health;
     private SectorIndicator _sectorIndicator;
+    private readonly List<ICharacterControlOverride> _controlOverrideBuffer = new List<ICharacterControlOverride>(4);
 
     // 네트워크 동기화를 위한 변수 (오너가 쓰고 모두가 읽음)
     private NetworkVariable<Vector2> _netAnimInput = new NetworkVariable<Vector2>(Vector2.zero, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
@@ -176,6 +178,99 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         if (_sectorIndicator != null) _sectorIndicator.Hide();
     }
 
+    public void DrawAimCircleIndicator(Vector3 worldPoint, float radius)
+    {
+        if (_sectorIndicator == null) return;
+        _sectorIndicator.transform.position = worldPoint + Vector3.up * 0.1f;
+        _sectorIndicator.DrawCircle(radius);
+    }
+
+    private void CollectControlOverrides(List<ICharacterControlOverride> results)
+    {
+        results.Clear();
+        GameObject activeModel = GetActiveCharacterModel();
+        if (activeModel != null)
+        {
+            var modelOverrides = activeModel.GetComponents<ICharacterControlOverride>();
+            for (int i = 0; i < modelOverrides.Length; i++)
+            {
+                if (modelOverrides[i] != null) results.Add(modelOverrides[i]);
+            }
+        }
+        var rootOverrides = GetComponents<ICharacterControlOverride>();
+        for (int i = 0; i < rootOverrides.Length; i++)
+        {
+            if (rootOverrides[i] != null) results.Add(rootOverrides[i]);
+        }
+    }
+
+    private bool IsControlOverrideBlockingCharacterSwitch()
+    {
+        CollectControlOverrides(_controlOverrideBuffer);
+        for (int i = 0; i < _controlOverrideBuffer.Count; i++)
+        {
+            var ov = _controlOverrideBuffer[i];
+            if (ov.IsControlOverrideActive && ov.BlocksCharacterSwitch) return true;
+        }
+        return false;
+    }
+
+    private bool IsControlOverrideBlockingRoll()
+    {
+        CollectControlOverrides(_controlOverrideBuffer);
+        for (int i = 0; i < _controlOverrideBuffer.Count; i++)
+        {
+            var ov = _controlOverrideBuffer[i];
+            if (ov.IsControlOverrideActive && ov.BlocksRoll) return true;
+        }
+        return false;
+    }
+
+    private bool IsControlOverrideBlockingHitAnimation()
+    {
+        CollectControlOverrides(_controlOverrideBuffer);
+        for (int i = 0; i < _controlOverrideBuffer.Count; i++)
+        {
+            var ov = _controlOverrideBuffer[i];
+            if (ov.IsControlOverrideActive && ov.BlocksHitAnimation) return true;
+        }
+        return false;
+    }
+
+    private bool IsControlOverrideDeferringDeathAnimation()
+    {
+        CollectControlOverrides(_controlOverrideBuffer);
+        for (int i = 0; i < _controlOverrideBuffer.Count; i++)
+        {
+            var ov = _controlOverrideBuffer[i];
+            if (ov.IsDeferringDeathAnimation) return true;
+        }
+        return false;
+    }
+
+    private void NotifyControlOverridesBeforeRoll()
+    {
+        CollectControlOverrides(_controlOverrideBuffer);
+        for (int i = 0; i < _controlOverrideBuffer.Count; i++)
+        {
+            _controlOverrideBuffer[i].OnBeforeRoll(this);
+        }
+    }
+
+    private bool TryBeginCustomDeathSequence(System.Action playDefaultDeath)
+    {
+        CollectControlOverrides(_controlOverrideBuffer);
+        for (int i = 0; i < _controlOverrideBuffer.Count; i++)
+        {
+            var ov = _controlOverrideBuffer[i];
+            if (ov.IsControlOverrideActive && ov.TryHandleCustomDeathSequence(this, playDefaultDeath))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void Awake()
     {
         if (shooter == null) shooter = GetComponent<Shooter>();
@@ -211,8 +306,9 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     private void HandleDamage(DamageInfo damage)
     {
         var presenter = GetAnimationPresenter();
-        if (presenter == null || !presenter.HandlesDamageAnimations || IsInputLocked || _isRolling) return;
+        if (presenter == null || !presenter.HandlesDamageAnimations || IsInputLocked || IsRolling) return;
         if (_health != null && (_health.IsDead || _health.CurrentHealth <= 0f)) return;
+        if (IsControlOverrideBlockingHitAnimation()) return;
         var ultimate = GetActiveUltimateSkill();
         if (ultimate != null && ultimate.IsPresentationPlaying) return;
         var skills = GetComponent<PlayerSkillController>();
@@ -225,10 +321,17 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         if (_deathHandled) return;
         _deathHandled = true;
         IsWaitingForDeathAnimation = true;
-        SetCinematicInputLocked(this, true);
         CancelGameplayActions();
-        InterruptPresentation();
-        GetAnimationPresenter()?.PlayDeath();
+        if (!TryBeginCustomDeathSequence(() =>
+            {
+                SetCinematicInputLocked(this, true);
+                GetAnimationPresenter()?.PlayDeath();
+            }))
+        {
+            SetCinematicInputLocked(this, true);
+            InterruptPresentation();
+            GetAnimationPresenter()?.PlayDeath();
+        }
         RefreshLocalParty();
         SendCharacterStates();
     }
@@ -236,6 +339,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     private void UpdateDeathAnimation()
     {
         if (!IsWaitingForDeathAnimation
+            || IsControlOverrideDeferringDeathAnimation()
             || GetAnimationPresenter()?.IsDeathAnimationPlaying == true) return;
         if (IsServer) TrySwitchToLivingCharacter();
         IsWaitingForDeathAnimation = false;
@@ -255,10 +359,24 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
 
     private void StopRoll()
     {
+        bool wasOwnerRolling = _isRolling;
         if (_rollRoutine != null) StopCoroutine(_rollRoutine);
         _rollRoutine = null;
         if (_isRolling && _health != null) _health.IsInvincible = false;
         SetRolling(false);
+        StopRemoteRoll();
+        if (wasOwnerRolling && IsOwner && IsSpawned) BroadcastRollCancelServerRpc();
+    }
+
+    private void StopRemoteRoll()
+    {
+        if (_remoteRollRoutine != null) StopCoroutine(_remoteRollRoutine);
+        _remoteRollRoutine = null;
+        if (_remoteRollPlayback != 0)
+        {
+            GetAnimationPresenter()?.CancelFullBody(_remoteRollPlayback);
+            _remoteRollPlayback = 0;
+        }
     }
 
     private void SetRolling(bool rolling)
@@ -532,6 +650,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     public bool TrySwitchToLivingCharacter()
     {
         if (!IsServer || _health.CurrentHealth > 0f || _characterStates[ActiveSlotIndex] == null
+            || IsControlOverrideDeferringDeathAnimation()
             || GetAnimationPresenter()?.IsDeathAnimationPlaying == true) return false;
         _characterStates[ActiveSlotIndex].currentHealth = 0f;
         for (int offset = 1; offset < 4; offset++)
@@ -873,31 +992,54 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
             combinedInput.Normalize();
         }
 
-        Vector3 moveDir = new Vector3(combinedInput.x, 0f, combinedInput.y);
-        _rb.MovePosition(_rb.position + moveDir * (moveSpeed * Time.fixedDeltaTime));
+        Vector3 moveDir;
+        Vector2 animInput;
+        bool movementOverridden = false;
+        CollectControlOverrides(_controlOverrideBuffer);
+        for (int i = 0; i < _controlOverrideBuffer.Count; i++)
+        {
+            var ov = _controlOverrideBuffer[i];
+            if (ov.IsControlOverrideActive
+                && ov.TryOverrideMovement(this, _rb, combinedInput, moveSpeed, Time.fixedDeltaTime, out moveDir, out animInput))
+            {
+                movementOverridden = true;
+                _netAnimInput.Value = animInput;
+                break;
+            }
+        }
 
-        // 애니메이션 동기화 변수 업데이트 (로컬 이동 방향 기준)
-        Vector3 localMoveDir = transform.InverseTransformDirection(moveDir);
-        _netAnimInput.Value = new Vector2(localMoveDir.x, localMoveDir.z);
+        if (!movementOverridden)
+        {
+            moveDir = new Vector3(combinedInput.x, 0f, combinedInput.y);
+            _rb.MovePosition(_rb.position + moveDir * (moveSpeed * Time.fixedDeltaTime));
 
-        // 2. 회전 처리
+            // 애니메이션 동기화 변수 업데이트 (로컬 이동 방향 기준)
+            Vector3 localMoveDir = transform.InverseTransformDirection(moveDir);
+            _netAnimInput.Value = new Vector2(localMoveDir.x, localMoveDir.z);
+        }
+        else
+        {
+            moveDir = new Vector3(combinedInput.x, 0f, combinedInput.y);
+        }
+
+        // 2. 회전 및 조준 처리
+        CollectControlOverrides(_controlOverrideBuffer);
+        for (int i = 0; i < _controlOverrideBuffer.Count; i++)
+        {
+            var ov = _controlOverrideBuffer[i];
+            if (ov.IsControlOverrideActive
+                && ov.TryOverrideAimAndRotation(this, _rb, moveDir, _joystickRotationInput, rotationSpeed, Time.fixedDeltaTime))
+            {
+                return;
+            }
+        }
+
         Vector3 lookDir = Vector3.zero;
 
         bool isReloading = PlayerSkillController.Instance != null && PlayerSkillController.Instance.IsReloading();
 
         // 우측 회전 조이스틱 입력이 있는 경우 우선 처리 (발사 방향), 단 장전 중이 아닐 때만
-        var skillAim = GetComponent<SkillAimController>();
-        if (skillAim != null && skillAim.BlocksWeapon)
-        {
-            StopWeaponForSkillAim();
-            if (skillAim.UpdateTarget(_joystickRotationInput, out lookDir, out var aimPoint, out var aimRadius)
-                && _sectorIndicator != null)
-            {
-                _sectorIndicator.transform.position = aimPoint + Vector3.up * .1f;
-                _sectorIndicator.DrawCircle(aimRadius);
-            }
-        }
-        else if (_joystickRotationInput.sqrMagnitude > 0.001f && !isReloading)
+        if (_joystickRotationInput.sqrMagnitude > 0.001f && !isReloading)
         {
             Vector3 inputDir = new Vector3(_joystickRotationInput.x, 0f, _joystickRotationInput.y).normalized;
             float inputMag = Mathf.Clamp01(_joystickRotationInput.magnitude);
@@ -1040,10 +1182,139 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     public void StartRoll(float duration, float distance, float invincibleTime)
     {
         if (_isRolling || !IsOwner || IsInputLocked || duration <= 0f) return;
-        var aim = GetComponent<SkillAimController>();
-        if (aim != null && aim.BlocksOtherActions) return;
-        aim?.CancelPreparation();
+        if (IsControlOverrideBlockingRoll()) return;
+        NotifyControlOverridesBeforeRoll();
         _rollRoutine = StartCoroutine(RollRoutine(duration, distance, invincibleTime));
+    }
+
+    private void OnCollisionEnter(Collision collision) => ForwardCollisionToOverrides(collision);
+
+    private void OnCollisionStay(Collision collision) => ForwardCollisionToOverrides(collision);
+
+    private void ForwardCollisionToOverrides(Collision collision)
+    {
+        if (!IsOwner || IsInputLocked) return;
+        CollectControlOverrides(_controlOverrideBuffer);
+        for (int i = 0; i < _controlOverrideBuffer.Count; i++)
+        {
+            var ov = _controlOverrideBuffer[i];
+            if (ov.IsControlOverrideActive)
+            {
+                ov.OnCharacterCollision(this, collision);
+            }
+        }
+    }
+
+    public void RequestRamHit(
+        NetworkObject targetNetObj,
+        float damage,
+        Vector3 hitPoint,
+        Vector3 hitNormal,
+        long hitSourceKey,
+        float hitCooldown,
+        Vector3 knockbackDir,
+        float knockbackSpeed,
+        float knockbackDuration)
+    {
+        if (!IsOwner || !IsSpawned || damage <= 0f) return;
+        NetworkObjectReference targetRef = targetNetObj != null ? new NetworkObjectReference(targetNetObj) : default;
+        RequestRamHitServerRpc(
+            targetRef,
+            targetNetObj != null,
+            damage,
+            hitPoint,
+            hitNormal,
+            hitSourceKey,
+            hitCooldown,
+            knockbackDir,
+            knockbackSpeed,
+            knockbackDuration);
+    }
+
+    [ServerRpc]
+    private void RequestRamHitServerRpc(
+        NetworkObjectReference targetRef,
+        bool hasTargetRef,
+        float damage,
+        Vector3 hitPoint,
+        Vector3 hitNormal,
+        long hitSourceKey,
+        float hitCooldown,
+        Vector3 knockbackDir,
+        float knockbackSpeed,
+        float knockbackDuration)
+    {
+        if (_health == null || _health.IsDead || HasCleared || damage <= 0f) return;
+
+        IDamageable damageable = null;
+        EntityMovement movement = null;
+        if (hasTargetRef && targetRef.TryGet(out NetworkObject netObj) && netObj != null)
+        {
+            damageable = netObj.GetComponentInParent<IDamageable>();
+            movement = netObj.GetComponentInParent<EntityMovement>();
+        }
+        else
+        {
+            Collider[] cols = Physics.OverlapSphere(hitPoint, 0.75f);
+            for (int i = 0; i < cols.Length; i++)
+            {
+                if (cols[i].transform.root == transform.root) continue;
+                var candidate = cols[i].GetComponentInParent<IDamageable>();
+                if (candidate != null)
+                {
+                    damageable = candidate;
+                    movement = cols[i].GetComponentInParent<EntityMovement>();
+                    break;
+                }
+            }
+        }
+
+        if (damageable != null)
+        {
+            DamageInfo info = new DamageInfo(
+                damage,
+                gameObject,
+                hitPoint,
+                hitNormal,
+                0,
+                transform.position,
+                hitSourceKey,
+                hitCooldown);
+            damageable.TakeDamage(info);
+        }
+
+        if (movement != null && knockbackSpeed > 0f && knockbackDuration > 0f)
+        {
+            movement.ApplyKnockback(knockbackDir, knockbackSpeed, knockbackDuration);
+        }
+    }
+
+    public void BroadcastCharacterFullBodyState(string stateName, bool returnToLocomotion = false)
+    {
+        if (!IsOwner || !IsSpawned) return;
+        BroadcastCharacterFullBodyStateServerRpc(stateName, returnToLocomotion);
+    }
+
+    [ServerRpc]
+    private void BroadcastCharacterFullBodyStateServerRpc(string stateName, bool returnToLocomotion)
+    {
+        BroadcastCharacterFullBodyStateClientRpc(stateName, returnToLocomotion);
+    }
+
+    [ClientRpc]
+    private void BroadcastCharacterFullBodyStateClientRpc(string stateName, bool returnToLocomotion)
+    {
+        if (IsOwner) return;
+        var presenter = GetAnimationPresenter();
+        if (presenter == null) return;
+        if (returnToLocomotion)
+        {
+            presenter.StopPlayback();
+        }
+        else if (!string.IsNullOrEmpty(stateName))
+        {
+            presenter.PlayFullBody(stateName);
+        }
     }
 
     private System.Collections.IEnumerator RollRoutine(float duration, float distance, float invincibleTime)
@@ -1052,6 +1323,7 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         var rollPresenter = GetAnimationPresenter();
         int rollPlayback = rollPresenter != null ? rollPresenter.PlayRoll(duration) : 0;
         SetRolling(true);
+        if (IsSpawned) BroadcastRollStartServerRpc(duration);
         if (_health != null) _health.IsInvincible = true;
 
         Vector2 combinedInput = _keyboardInput + _joystickInput;
@@ -1105,6 +1377,61 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         _rollRoutine = null;
     }
 
+    [ServerRpc]
+    private void BroadcastRollStartServerRpc(float duration)
+    {
+        if (duration <= 0f || _deathHandled) return;
+        BroadcastRollStartClientRpc(duration);
+    }
+
+    [ClientRpc]
+    private void BroadcastRollStartClientRpc(float duration)
+    {
+        if (IsOwner || _deathHandled || duration <= 0f) return;
+        StopRemoteRoll();
+        _remoteRollRoutine = StartCoroutine(RemoteRollRoutine(duration));
+    }
+
+    [ServerRpc]
+    private void BroadcastRollCancelServerRpc()
+    {
+        BroadcastRollCancelClientRpc();
+    }
+
+    [ClientRpc]
+    private void BroadcastRollCancelClientRpc()
+    {
+        if (IsOwner) return;
+        StopRemoteRoll();
+    }
+
+    private System.Collections.IEnumerator RemoteRollRoutine(float duration)
+    {
+        var presenter = GetAnimationPresenter();
+        int token = presenter != null ? presenter.PlayRoll(duration) : 0;
+        if (token == 0)
+        {
+            _remoteRollRoutine = null;
+            yield break;
+        }
+        _remoteRollPlayback = token;
+
+        float elapsed = 0f;
+        while (elapsed < duration && !_deathHandled && presenter != null && presenter.IsCurrentPlayback(token))
+        {
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (presenter != null && !_deathHandled && presenter.IsCurrentPlayback(token))
+        {
+            presenter.FinishFullBody(token, true);
+        }
+
+        if (_remoteRollPlayback == token) _remoteRollPlayback = 0;
+        _remoteRollRoutine = null;
+    }
+
     public BaseUltimateSkill GetActiveUltimateSkill()
     {
         int activeIndex = ActiveSlotIndex;
@@ -1127,6 +1454,13 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
     public void PlayReloadAnimation()
     {
         if (!IsInputLocked) GetAnimationPresenter()?.PlayReload();
+    }
+
+    public bool PlayReloadAnimation(float duration)
+    {
+        if (IsInputLocked) return false;
+        var presenter = GetAnimationPresenter();
+        return presenter == null || presenter.PlayReload(duration);
     }
 
     public bool PlayReloadAnimation(float duration, bool firstRound)

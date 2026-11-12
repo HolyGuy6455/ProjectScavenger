@@ -25,6 +25,11 @@ public class EntityMovement : MonoBehaviour
     private Vector3 _moveDirection;
     private float _customSpeed;
 
+    // 넉백/밀침 처리용
+    private Vector3 _knockbackDirection;
+    private float _knockbackSpeed;
+    private float _knockbackEndTime;
+
     private Vector3 _lookAtPosition;
     private bool _hasLookAtPosition;
 
@@ -127,8 +132,26 @@ public class EntityMovement : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// 외부 충격으로 대상을 지정 방향으로 잠시 밀어냅니다.
+    /// </summary>
+    public void ApplyKnockback(Vector3 direction, float speed, float duration)
+    {
+        direction.y = 0f;
+        if (direction.sqrMagnitude <= 0.0001f || speed <= 0f || duration <= 0f) return;
+        _knockbackDirection = direction.normalized;
+        _knockbackSpeed = speed;
+        _knockbackEndTime = Time.time + duration;
+    }
+
     private void FixedUpdate()
     {
+        if (Time.time < _knockbackEndTime)
+        {
+            _rb.MovePosition(_rb.position + _knockbackDirection * (_knockbackSpeed * Time.fixedDeltaTime));
+            return;
+        }
+
         Vector3 movementDirection = Vector3.zero;
 
         if (_isMovingInDirection)

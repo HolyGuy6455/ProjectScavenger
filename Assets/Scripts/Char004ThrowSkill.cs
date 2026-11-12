@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>char004의 조준 준비, 투척 시점과 서버 발사체 생성을 연결합니다.</summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(PlayerController), typeof(PlayerSkillController), typeof(Health))]
-public sealed class Char004ThrowSkill : NetworkBehaviour
+public sealed class Char004ThrowSkill : NetworkBehaviour, ICharacterControlOverride
 {
     [SerializeField] private Char004Throwable smokePrefab;
     [SerializeField] private Char004Throwable bottlePrefab;
@@ -21,6 +21,45 @@ public sealed class Char004ThrowSkill : NetworkBehaviour
     private int localUltimateId;
 
     public bool BlocksCharacterChange => preparedUltimateId != 0 || pendingSkillId != 0 || localUltimateId != 0;
+    public bool IsControlOverrideActive => BlocksCharacterChange;
+    public bool BlocksCharacterSwitch => BlocksCharacterChange;
+    public bool BlocksRoll => false;
+    public bool BlocksHitAnimation => false;
+    public bool IsDeferringDeathAnimation => false;
+
+    public bool TryOverrideMovement(
+        PlayerController playerController,
+        Rigidbody rb,
+        Vector2 rawMoveInput,
+        float baseMoveSpeed,
+        float fixedDeltaTime,
+        out Vector3 worldMoveDirection,
+        out Vector2 animInput)
+    {
+        worldMoveDirection = Vector3.zero;
+        animInput = Vector2.zero;
+        return false;
+    }
+
+    public bool TryOverrideAimAndRotation(
+        PlayerController playerController,
+        Rigidbody rb,
+        Vector3 worldMoveDirection,
+        Vector2 rotationInput,
+        float baseRotationSpeed,
+        float fixedDeltaTime)
+    {
+        return false;
+    }
+
+    public void OnBeforeRoll(PlayerController playerController) { }
+
+    public void OnCharacterCollision(PlayerController playerController, Collision collision) { }
+
+    public bool TryHandleCustomDeathSequence(PlayerController playerController, System.Action playDefaultDeath)
+    {
+        return false;
+    }
     private bool IsUnavailable => player.IsDeathPresented || health.IsDead || health.CurrentHealth <= 0f
         || health.IsClearProtected || (GameFlowManager.Instance != null
             && GameFlowManager.Instance.CurrentState != GameResultState.None);

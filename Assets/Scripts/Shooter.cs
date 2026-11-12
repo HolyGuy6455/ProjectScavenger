@@ -539,6 +539,14 @@ public class Shooter : NetworkBehaviour
         animReceiver?.PlayReloadAnimation();
     }
 
+    public bool TriggerReloadAnimation(float duration)
+    {
+        if (playerController != null)
+            return playerController.PlayReloadAnimation(duration);
+        animReceiver?.PlayReloadAnimation();
+        return true;
+    }
+
     public bool TriggerReloadAnimation(float duration, bool firstRound)
     {
         return playerController != null && playerController.PlayReloadAnimation(duration, firstRound);

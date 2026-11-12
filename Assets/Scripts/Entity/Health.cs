@@ -18,6 +18,12 @@ public class Health : NetworkBehaviour, IDamageable
 
     private NetworkVariable<bool> clearProtected = new NetworkVariable<bool>(false);
 
+    // 공격 주체(sourceKey)별 다단히트 쿨타임 관리 (서버 데미지 판정용 / 로컬 물리 충돌 판정용 분리로 Host 모드 충돌 방지)
+    private readonly System.Collections.Generic.Dictionary<long, float> _serverHitCooldownUntil =
+        new System.Collections.Generic.Dictionary<long, float>();
+    private readonly System.Collections.Generic.Dictionary<long, float> _localHitCooldownUntil =
+        new System.Collections.Generic.Dictionary<long, float>();
+
     // 기존 코드 호환을 위한 프로퍼티
     public float CurrentHealth
     {
@@ -82,6 +88,17 @@ public class Health : NetworkBehaviour, IDamageable
         if (!IsServer) return; // 서버만 데미지 처리 가능
         if (IsDead) return;
         if (damageInfo.amount <= 0) return;
+
+        // 공격 주체(hitSourceKey)별 서버 측 피격 쿨타임 확인
+        if (damageInfo.hitSourceKey != 0 && damageInfo.hitCooldown > 0f)
+        {
+            if (_serverHitCooldownUntil.TryGetValue(damageInfo.hitSourceKey, out float nextTime)
+                && Time.time < nextTime)
+            {
+                return;
+            }
+            _serverHitCooldownUntil[damageInfo.hitSourceKey] = Time.time + damageInfo.hitCooldown;
+        }
 
         CurrentHealth -= damageInfo.amount;
         
@@ -173,10 +190,36 @@ public class Health : NetworkBehaviour, IDamageable
     }
 
     /// <summary>
+    /// 클라이언트(IsOwner) 측 물리 충돌 판정에서 특정 공격 주체(sourceKey)에 대한 피격 쿨타임을 확인합니다.
+    /// </summary>
+    public bool CanTakeLocalHitFrom(long sourceKey)
+    {
+        if (IsDead || IsInvincible || IsClearProtected) return false;
+        if (sourceKey == 0) return true;
+        return !_localHitCooldownUntil.TryGetValue(sourceKey, out float nextTime) || Time.time >= nextTime;
+    }
+
+    /// <summary>
+    /// 클라이언트(IsOwner) 측 물리 충돌 판정에서 쿨타임을 확인하고 즉시 등록합니다.
+    /// 서버의 TakeDamage 쿨타임 테이블(_serverHitCooldownUntil)과 분리되어 있어 Host(IsOwner && IsServer)에서도 이중 차단되지 않습니다.
+    /// </summary>
+    public bool TryConsumeLocalHitCooldown(long sourceKey, float cooldown)
+    {
+        if (!CanTakeLocalHitFrom(sourceKey)) return false;
+        if (sourceKey != 0 && cooldown > 0f)
+        {
+            _localHitCooldownUntil[sourceKey] = Time.time + cooldown;
+        }
+        return true;
+    }
+
+    /// <summary>
     /// 체력을 최대치로 초기화하고 사망 플래그를 해제합니다. (서버 전용)
     /// </summary>
     public void ResetHealth()
     {
+        _serverHitCooldownUntil.Clear();
+        _localHitCooldownUntil.Clear();
         if (!IsServer) return;
         IsDead = false;
         CurrentHealth = maxHealth;

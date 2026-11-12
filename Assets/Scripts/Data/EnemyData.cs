@@ -11,6 +11,22 @@ public class EnemyData : IData
     public int lootTable;
     public string prefabName;
     public int ammoId; // 0이면 사격 무기 없음
+    public string[] tags;
+
+    public bool HasTag(string tag)
+    {
+        if (tags == null || string.IsNullOrWhiteSpace(tag)) return false;
+        string target = tag.Trim();
+        for (int i = 0; i < tags.Length; i++)
+        {
+            if (!string.IsNullOrWhiteSpace(tags[i])
+                && string.Equals(tags[i].Trim(), target, System.StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public int GetId()
     {
