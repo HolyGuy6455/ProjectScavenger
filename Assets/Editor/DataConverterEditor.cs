@@ -1,19 +1,62 @@
 using UnityEngine;
 using UnityEditor;
 using System.IO;
+using System.Linq;
 using System.Collections.Generic;
 using Scavenger.Audio;
 using Scavenger.Network.DTOs;
 
 public class DataConverterEditor : EditorWindow
 {
-    [MenuItem("Tools/Data/Convert TSV to Binary")]
+    private static readonly string[] TabTitles =
+    {
+        "XLSX ↔ TSV 동기화",
+        "TSV → Binary & 서버 배포"
+    };
+
+    private int _selectedTab;
+    private Vector2 _syncScrollPos;
+    private Vector2 _binaryScrollPos;
+    private List<XlsxTsvConverter.SheetComparison> _comparisons;
+
+    [MenuItem("Tools/Data/Data Converter (XLSX · TSV · Binary)", priority = 1)]
     public static void ShowWindow()
     {
-        GetWindow<DataConverterEditor>("Data Converter");
+        var window = GetWindow<DataConverterEditor>("Data Converter");
+        window.minSize = new Vector2(620f, 520f);
+        window.RefreshComparisons();
     }
 
-    [MenuItem("Tools/Data/Fill CharLvl TSV (Interpolate)")]
+    [MenuItem("Tools/Data/One-Click: XLSX -> TSV -> Binary", priority = 20)]
+    public static void OneClickXlsxToBinaryMenu()
+    {
+        int imported = XlsxTsvConverter.ImportAllXlsxToTsv(refreshAssets: true);
+        if (imported <= 0) return;
+        ConvertAllDataStatic();
+        RefreshOpenWindowIfAny();
+    }
+
+    [MenuItem("Tools/Data/Sync All XLSX -> TSV", priority = 21)]
+    public static void SyncAllXlsxToTsvMenu()
+    {
+        XlsxTsvConverter.ImportAllXlsxToTsv(refreshAssets: true);
+        RefreshOpenWindowIfAny();
+    }
+
+    [MenuItem("Tools/Data/Sync All TSV -> XLSX (Preserve Formulas)", priority = 22)]
+    public static void SyncAllTsvToXlsxMenu()
+    {
+        XlsxTsvConverter.ExportAllTsvToXlsx(interactive: false);
+        RefreshOpenWindowIfAny();
+    }
+
+    [MenuItem("Tools/Data/Convert All TSV -> Binary", priority = 23)]
+    public static void ConvertAllTsvToBinaryMenu()
+    {
+        ConvertAllDataStatic();
+    }
+
+    [MenuItem("Tools/Data/Fill CharLvl TSV (Interpolate)", priority = 40)]
     public static void FillCharLvlTsv()
     {
         string tsvPath = Path.Combine(Application.dataPath, "Data", "Scavenger - CharLvl.tsv");
@@ -27,7 +70,7 @@ public class DataConverterEditor : EditorWindow
         if (lines.Length < 2) return;
 
         string header = lines[0];
-        
+
         List<CharLvlData> existingData = new List<CharLvlData>();
         for (int i = 1; i < lines.Length; i++)
         {
@@ -76,7 +119,7 @@ public class DataConverterEditor : EditorWindow
                 {
                     if (kf.level <= lvl) prev = kf;
                 }
-                
+
                 next = keyframes.Find(k => k.level >= lvl);
                 if (next == null) next = keyframes[keyframes.Count - 1];
 
@@ -107,130 +150,15 @@ public class DataConverterEditor : EditorWindow
         }
 
         AssetDatabase.Refresh();
+        RefreshOpenWindowIfAny();
         Debug.Log($"Successfully interpolated CharLvl TSV. Total rows: {newData.Count}");
     }
 
-    private void OnGUI()
-    {
-        GUILayout.Label("Data Converter", EditorStyles.boldLabel);
-        GUILayout.Space(10);
-
-        if (GUILayout.Button("Convert Ammo Data"))
-        {
-            ConvertData<AmmoDataList, AmmoData>("Ammo", "Scavenger - Ammo.tsv");
-        }
-
-        if (GUILayout.Button("Convert Buff Data"))
-        {
-            ConvertData<BuffDataList, BuffData>("Buff", "Scavenger - Buff.tsv");
-        }
-
-        if (GUILayout.Button("Convert Item Data"))
-        {
-            ConvertData<ItemDataList, ItemData>("Item", "Scavenger - Item.tsv");
-        }
-
-        if (GUILayout.Button("Convert User Currency Data"))
-        {
-            ConvertData<UserCurrencyDataList, UserCurrencyData>("UserCurrency", "Scavenger - UserCurrency.tsv");
-        }
-
-        if (GUILayout.Button("Convert Char Data"))
-        {
-            ConvertData<CharDataList, CharData>("Char", "Scavenger - Char.tsv");
-        }
-
-        if (GUILayout.Button("Convert Skill Data"))
-        {
-            ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - Skill.tsv");
-        }
-
-        if (GUILayout.Button("Convert Char Lvl Data"))
-        {
-            ConvertData<CharLvlDataList, CharLvlData>("CharLvl", "Scavenger - CharLvl.tsv");
-        }
-
-        if (GUILayout.Button("Convert Level Data"))
-        {
-            ConvertData<LevelDataList, LevelData>("Level", "Scavenger - Level.tsv");
-        }
-
-        if (GUILayout.Button("Convert Quest Data"))
-        {
-            ConvertQuestData();
-        }
-
-        if (GUILayout.Button("Convert Stage Data"))
-        {
-            ConvertData<StageDataList, StageData>("Stage", "Scavenger - Stage.tsv");
-        }
-
-        GUILayout.Space(20);
-
-
-        if (GUILayout.Button("Convert Loot Data"))
-        {
-            ConvertData<LootDataList, LootData>("Loot", "Scavenger - Loot.tsv");
-        }
-        
-        if (GUILayout.Button("Convert Enemy Data"))
-        {
-            ConvertData<EnemyDataList, EnemyData>("Enemy", "Scavenger - Enemy.tsv");
-        }
-        
-        if (GUILayout.Button("Convert Obstacle Data"))
-        {
-            ConvertData<ObstacleDataList, ObstacleData>("Obstacle", "Scavenger - Obstacle.tsv");
-        }
-        
-        if (GUILayout.Button("Convert MobGroup Data (JSON -> Bytes)"))
-        {
-            ConvertMobGroupData();
-        }
-
-        if (GUILayout.Button("Convert Localization Data (KO/EN/JA)"))
-        {
-            LocalizationEditorUtility.ConvertLocalizationTsvToBytes();
-        }
-        
-        GUILayout.Space(10);
-
-        if (GUILayout.Button("Convert All Data"))
-        {
-            ConvertAllData();
-        }
-    }
-
-    private void ConvertAllData()
-    {
-        LocalizationEditorUtility.ConvertLocalizationTsvToBytes();
-        ConvertData<AmmoDataList, AmmoData>("Ammo", "Scavenger - Ammo.tsv");
-        ConvertData<BuffDataList, BuffData>("Buff", "Scavenger - Buff.tsv");
-        ConvertData<ItemDataList, ItemData>("Item", "Scavenger - Item.tsv");
-        ConvertData<UserCurrencyDataList, UserCurrencyData>("UserCurrency", "Scavenger - UserCurrency.tsv");
-        ConvertData<CharDataList, CharData>("Char", "Scavenger - Char.tsv");
-        ConvertData<CharLvlDataList, CharLvlData>("CharLvl", "Scavenger - CharLvl.tsv");
-        ConvertData<LevelDataList, LevelData>("Level", "Scavenger - Level.tsv");
-        ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - Skill.tsv");
-        ConvertQuestData();
-        ConvertData<StageDataList, StageData>("Stage", "Scavenger - Stage.tsv");
-
-        ConvertData<LootDataList, LootData>("Loot", "Scavenger - Loot.tsv");
-        ConvertData<EnemyDataList, EnemyData>("Enemy", "Scavenger - Enemy.tsv");
-        ConvertData<ObstacleDataList, ObstacleData>("Obstacle", "Scavenger - Obstacle.tsv");
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
-
-        Debug.Log("All Data Converted Successfully.");
-    }
-
-    [MenuItem("Tools/Data/Copy Master Data To Server")]
+    [MenuItem("Tools/Data/Copy Master Data To Server", priority = 41)]
     public static void CopyMasterDataToServer()
     {
-        string clientDataPath = Application.dataPath + "/Data/";
         // Assuming ScavengerServer is adjacent to the Unity project folder
         string serverResourcesPath = System.IO.Path.GetFullPath(Application.dataPath + "/../../ScavengerServer/Resources/");
-        string serverTmpPath = System.IO.Path.GetFullPath(Application.dataPath + "/../../ScavengerServer/tmp/");
 
         if (!System.IO.Directory.Exists(serverResourcesPath))
         {
@@ -257,7 +185,478 @@ public class DataConverterEditor : EditorWindow
         }
     }
 
-    private void ConvertMobGroupData()
+    private void OnEnable()
+    {
+        RefreshComparisons();
+    }
+
+    private void OnFocus()
+    {
+        RefreshComparisons();
+    }
+
+    private static void RefreshOpenWindowIfAny()
+    {
+        if (HasOpenInstances<DataConverterEditor>())
+        {
+            var win = GetWindow<DataConverterEditor>(false, null, false);
+            if (win != null)
+            {
+                win.RefreshComparisons();
+                win.Repaint();
+            }
+        }
+    }
+
+    public void RefreshComparisons()
+    {
+        _comparisons = XlsxTsvConverter.CompareAll();
+    }
+
+    private void OnGUI()
+    {
+        EditorGUILayout.Space(6);
+
+        // Top Tab Bar
+        var tabStyle = new GUIStyle(EditorStyles.toolbarButton)
+        {
+            fixedHeight = 28f,
+            fontSize = 12,
+            fontStyle = FontStyle.Bold
+        };
+        _selectedTab = GUILayout.Toolbar(_selectedTab, TabTitles, tabStyle, GUILayout.Height(28f));
+
+        EditorGUILayout.Space(6);
+
+        // Main Tab Body (expands to fill window above the bottom One-Click bar)
+        EditorGUILayout.BeginVertical(GUILayout.ExpandHeight(true));
+        if (_selectedTab == 0)
+        {
+            DrawXlsxTsvSyncTab();
+        }
+        else
+        {
+            DrawBinaryConvertTab();
+        }
+        EditorGUILayout.EndVertical();
+
+        // Fixed Bottom One-Click Pipeline Footer
+        DrawBottomOneClickFooter();
+    }
+
+    private void DrawXlsxTsvSyncTab()
+    {
+        if (_comparisons == null)
+        {
+            RefreshComparisons();
+        }
+
+        string xlsxPath = XlsxTsvConverter.GetXlsxPath();
+        bool xlsxExists = File.Exists(xlsxPath);
+
+        // 1. Excel Path & Status Box
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("엑셀 파일:", GUILayout.Width(58f));
+        EditorGUILayout.SelectableLabel(xlsxPath, EditorStyles.textField, GUILayout.Height(18f));
+
+        if (GUILayout.Button("찾기...", GUILayout.Width(54f)))
+        {
+            string startDir = File.Exists(xlsxPath) ? Path.GetDirectoryName(xlsxPath) : Application.dataPath;
+            string picked = EditorUtility.OpenFilePanel("Select Scavenger.xlsx", startDir, "xlsx");
+            if (!string.IsNullOrEmpty(picked))
+            {
+                XlsxTsvConverter.SetXlsxPath(picked);
+                RefreshComparisons();
+            }
+        }
+
+        if (GUILayout.Button("기본값", GUILayout.Width(50f)))
+        {
+            XlsxTsvConverter.SetXlsxPath(null);
+            RefreshComparisons();
+        }
+
+        using (new EditorGUI.DisabledScope(!xlsxExists))
+        {
+            if (GUILayout.Button("엑셀 열기", GUILayout.Width(66f)))
+            {
+                EditorUtility.OpenWithDefaultApp(xlsxPath);
+            }
+        }
+
+        if (GUILayout.Button("새로고침", GUILayout.Width(62f)))
+        {
+            RefreshComparisons();
+        }
+        EditorGUILayout.EndHorizontal();
+
+        if (!xlsxExists)
+        {
+            EditorGUILayout.HelpBox("지정된 경로에 Scavenger.xlsx 파일이 없습니다. [찾기...] 버튼으로 엑셀 위치를 지정해 주세요.", MessageType.Warning);
+        }
+        else if (_comparisons != null)
+        {
+            int identical = _comparisons.Count(c => c.State == XlsxTsvConverter.SyncState.Identical);
+            int commentDiff = _comparisons.Count(c => c.State == XlsxTsvConverter.SyncState.CommentOnlyDiff);
+            int dataDiff = _comparisons.Count(c => c.State == XlsxTsvConverter.SyncState.DataDiff);
+            int missingInXlsx = _comparisons.Count(c => c.State == XlsxTsvConverter.SyncState.MissingInXlsx);
+
+            string summary = $"총 {_comparisons.Count}개 시트  |  일치 {identical}  ·  데이터 차이 {dataDiff}  ·  수식/주석표시 차이 {commentDiff}  ·  엑셀 미생성 {missingInXlsx}";
+            EditorGUILayout.LabelField(summary, EditorStyles.miniLabel);
+            EditorGUILayout.LabelField("※ TSV → XLSX 내보내기 시 기존 셀 수식(VLOOKUP), 스타일, 보조 시트(DescList, SoundRef)는 덮어쓰지 않고 보존됩니다.", EditorStyles.miniLabel);
+        }
+        EditorGUILayout.EndVertical();
+
+        EditorGUILayout.Space(4);
+
+        // 2. Bulk Sync Buttons (Left: XLSX -> TSV, Right: TSV -> XLSX)
+        using (new EditorGUI.DisabledScope(!xlsxExists))
+        {
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("전체 XLSX → TSV 가져오기", GUILayout.Height(28f)))
+            {
+                if (ConfirmBulkXlsxToTsv())
+                {
+                    XlsxTsvConverter.ImportAllXlsxToTsv(xlsxPath, refreshAssets: true);
+                    RefreshComparisons();
+                }
+            }
+
+            GUILayout.Space(8f);
+
+            if (GUILayout.Button("전체 TSV → XLSX 내보내기 (수식 보존)", GUILayout.Height(28f)))
+            {
+                if (ConfirmBulkTsvToXlsx())
+                {
+                    XlsxTsvConverter.ExportAllTsvToXlsx(xlsxPath, interactive: true);
+                    RefreshComparisons();
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        EditorGUILayout.Space(6);
+
+        // 3. Split Columns for Individual Sheets (Left: XLSX -> TSV, Right: TSV -> XLSX)
+        _syncScrollPos = EditorGUILayout.BeginScrollView(_syncScrollPos);
+        EditorGUILayout.BeginHorizontal();
+
+        // Left Column: XLSX -> TSV
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.ExpandWidth(true));
+        EditorGUILayout.LabelField("XLSX → TSV (엑셀에서 가져오기)", EditorStyles.boldLabel);
+        EditorGUILayout.Space(2);
+
+        if (_comparisons != null)
+        {
+            foreach (var comp in _comparisons)
+            {
+                bool canImport = xlsxExists &&
+                                 comp.State != XlsxTsvConverter.SyncState.MissingInXlsx &&
+                                 comp.State != XlsxTsvConverter.SyncState.XlsxNotFound;
+
+                using (new EditorGUI.DisabledScope(!canImport))
+                {
+                    string label = FormatImportButtonLabel(comp);
+                    if (GUILayout.Button(label, GUILayout.Height(23f)))
+                    {
+                        if (ConfirmSingleXlsxToTsv(comp))
+                        {
+                            XlsxTsvConverter.ImportSheetToTsv(comp.SheetName, xlsxPath, refreshAssets: true);
+                            RefreshComparisons();
+                        }
+                    }
+                }
+            }
+        }
+        EditorGUILayout.EndVertical();
+
+        GUILayout.Space(6f);
+
+        // Right Column: TSV -> XLSX
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.ExpandWidth(true));
+        EditorGUILayout.LabelField("TSV → XLSX (엑셀로 내보내기 · 수식 보존)", EditorStyles.boldLabel);
+        EditorGUILayout.Space(2);
+
+        if (_comparisons != null)
+        {
+            foreach (var comp in _comparisons)
+            {
+                bool canExport = xlsxExists && comp.State != XlsxTsvConverter.SyncState.MissingInTsv;
+                bool hasDiff = comp.State == XlsxTsvConverter.SyncState.DataDiff ||
+                               comp.State == XlsxTsvConverter.SyncState.CommentOnlyDiff;
+
+                EditorGUILayout.BeginHorizontal();
+                using (new EditorGUI.DisabledScope(!canExport))
+                {
+                    string label = FormatExportButtonLabel(comp);
+                    if (GUILayout.Button(label, GUILayout.Height(23f)))
+                    {
+                        if (ConfirmSingleTsvToXlsx(comp))
+                        {
+                            XlsxTsvConverter.ExportSingleTsvToXlsx(comp.SheetName, xlsxPath, interactive: true);
+                            RefreshComparisons();
+                        }
+                    }
+                }
+
+                using (new EditorGUI.DisabledScope(!hasDiff))
+                {
+                    if (GUILayout.Button("비교", GUILayout.Width(42f), GUILayout.Height(23f)))
+                    {
+                        XlsxTsvConverter.LogSheetDiff(comp.SheetName, xlsxPath);
+                    }
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+        }
+        EditorGUILayout.EndVertical();
+
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.EndScrollView();
+    }
+
+    private void DrawBinaryConvertTab()
+    {
+        _binaryScrollPos = EditorGUILayout.BeginScrollView(_binaryScrollPos);
+
+        // 1. Convert All TSV -> Binary
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("전체 마스터 데이터 빌드 (Assets/Data/*.tsv → .bytes & .json)", EditorStyles.boldLabel);
+        EditorGUILayout.Space(2);
+        if (GUILayout.Button("Convert All TSV → Binary (.bytes & .json)", GUILayout.Height(30f)))
+        {
+            ConvertAllDataStatic();
+        }
+        EditorGUILayout.EndVertical();
+
+        EditorGUILayout.Space(6);
+
+        // 2. Individual Table Converters (2-Column Grid)
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("개별 테이블 변환 (TSV → Binary)", EditorStyles.boldLabel);
+        EditorGUILayout.Space(2);
+
+        var actions = new (string label, System.Action run)[]
+        {
+            ("Char Data", () => ConvertData<CharDataList, CharData>("Char", "Scavenger - Char.tsv")),
+            ("CharLvl Data", () => ConvertData<CharLvlDataList, CharLvlData>("CharLvl", "Scavenger - CharLvl.tsv")),
+            ("Level Data", () => ConvertData<LevelDataList, LevelData>("Level", "Scavenger - Level.tsv")),
+            ("Ammo Data", () => ConvertData<AmmoDataList, AmmoData>("Ammo", "Scavenger - Ammo.tsv")),
+            ("Skill Data", () => ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - Skill.tsv")),
+            ("Buff Data", () => ConvertData<BuffDataList, BuffData>("Buff", "Scavenger - Buff.tsv")),
+            ("Item Data", () => ConvertData<ItemDataList, ItemData>("Item", "Scavenger - Item.tsv")),
+            ("Loot Data", () => ConvertData<LootDataList, LootData>("Loot", "Scavenger - Loot.tsv")),
+            ("Enemy Data", () => ConvertData<EnemyDataList, EnemyData>("Enemy", "Scavenger - Enemy.tsv")),
+            ("Obstacle Data", () => ConvertData<ObstacleDataList, ObstacleData>("Obstacle", "Scavenger - Obstacle.tsv")),
+            ("UserCurrency Data", () => ConvertData<UserCurrencyDataList, UserCurrencyData>("UserCurrency", "Scavenger - UserCurrency.tsv")),
+            ("Quest Data", ConvertQuestDataStatic),
+            ("Stage Data", () => ConvertData<StageDataList, StageData>("Stage", "Scavenger - Stage.tsv")),
+            ("Localization (KO/EN/JA)", LocalizationEditorUtility.ConvertLocalizationTsvToBytes),
+            ("MobGroup (JSON → Bytes)", ConvertMobGroupDataStatic)
+        };
+
+        for (int i = 0; i < actions.Length; i += 2)
+        {
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button($"Convert {actions[i].label}", GUILayout.Height(24f), GUILayout.ExpandWidth(true)))
+            {
+                actions[i].run();
+            }
+
+            if (i + 1 < actions.Length)
+            {
+                if (GUILayout.Button($"Convert {actions[i + 1].label}", GUILayout.Height(24f), GUILayout.ExpandWidth(true)))
+                {
+                    actions[i + 1].run();
+                }
+            }
+            else
+            {
+                GUILayout.FlexibleSpace();
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+        EditorGUILayout.EndVertical();
+
+        EditorGUILayout.Space(6);
+
+        // 3. Utilities & Server Sync
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        EditorGUILayout.LabelField("유틸리티 & 서버 배포", EditorStyles.boldLabel);
+        EditorGUILayout.Space(2);
+        EditorGUILayout.BeginHorizontal();
+        if (GUILayout.Button("Fill CharLvl TSV (키프레임 선형 보간)", GUILayout.Height(26f)))
+        {
+            FillCharLvlTsv();
+        }
+        if (GUILayout.Button("Copy Master Data To Server (서버 JSON 복사)", GUILayout.Height(26f)))
+        {
+            CopyMasterDataToServer();
+        }
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.EndVertical();
+
+        EditorGUILayout.EndScrollView();
+    }
+
+    private void DrawBottomOneClickFooter()
+    {
+        EditorGUILayout.Space(4);
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+
+        string xlsxPath = XlsxTsvConverter.GetXlsxPath();
+        bool xlsxExists = File.Exists(xlsxPath);
+
+        Color prevBg = GUI.backgroundColor;
+        GUI.backgroundColor = new Color(0.55f, 0.88f, 0.62f);
+
+        var btnStyle = new GUIStyle(GUI.skin.button)
+        {
+            fontSize = 13,
+            fontStyle = FontStyle.Bold
+        };
+
+        using (new EditorGUI.DisabledScope(!xlsxExists))
+        {
+            if (GUILayout.Button("[원클릭]  XLSX  →  전체 TSV  →  전체 Binary 빌드", btnStyle, GUILayout.Height(36f)))
+            {
+                if (ConfirmBulkXlsxToTsv())
+                {
+                    int imported = XlsxTsvConverter.ImportAllXlsxToTsv(xlsxPath, refreshAssets: true);
+                    if (imported > 0)
+                    {
+                        ConvertAllDataStatic();
+                        RefreshComparisons();
+                    }
+                }
+            }
+        }
+
+        GUI.backgroundColor = prevBg;
+        EditorGUILayout.EndVertical();
+    }
+
+    private static string FormatImportButtonLabel(XlsxTsvConverter.SheetComparison comp)
+    {
+        switch (comp.State)
+        {
+            case XlsxTsvConverter.SyncState.Identical:
+                return $"[일치]  {comp.SheetName}";
+            case XlsxTsvConverter.SyncState.CommentOnlyDiff:
+                return $"[주석차이]  {comp.SheetName}";
+            case XlsxTsvConverter.SyncState.DataDiff:
+                return $"[차이 {comp.DataDiffRows}행]  {comp.SheetName}  ({comp.XlsxRowCount} → {comp.TsvRowCount}행)";
+            case XlsxTsvConverter.SyncState.MissingInXlsx:
+                return $"[시트 없음]  {comp.SheetName}";
+            case XlsxTsvConverter.SyncState.MissingInTsv:
+                return $"[신규 TSV]  {comp.SheetName} ({comp.XlsxRowCount}행)";
+            default:
+                return comp.SheetName;
+        }
+    }
+
+    private static string FormatExportButtonLabel(XlsxTsvConverter.SheetComparison comp)
+    {
+        switch (comp.State)
+        {
+            case XlsxTsvConverter.SyncState.Identical:
+                return $"[일치]  {comp.SheetName}";
+            case XlsxTsvConverter.SyncState.CommentOnlyDiff:
+                return $"[주석차이]  {comp.SheetName}";
+            case XlsxTsvConverter.SyncState.DataDiff:
+                return $"[차이 {comp.DataDiffRows}행]  {comp.SheetName}  ({comp.TsvRowCount} → {comp.XlsxRowCount}행)";
+            case XlsxTsvConverter.SyncState.MissingInXlsx:
+                return $"[시트 신규생성]  {comp.SheetName} ({comp.TsvRowCount}행)";
+            case XlsxTsvConverter.SyncState.MissingInTsv:
+                return $"[TSV 없음]  {comp.SheetName}";
+            default:
+                return comp.SheetName;
+        }
+    }
+
+    private bool ConfirmBulkXlsxToTsv()
+    {
+        if (_comparisons == null) RefreshComparisons();
+        var newerTsvs = _comparisons
+            .Where(c => c.State == XlsxTsvConverter.SyncState.DataDiff && c.IsTsvFileNewer)
+            .Select(c => c.SheetName)
+            .ToList();
+
+        if (newerTsvs.Count == 0) return true;
+
+        string list = string.Join(", ", newerTsvs);
+        return EditorUtility.DisplayDialog(
+            "최신 TSV 덮어쓰기 확인",
+            $"다음 TSV 파일이 엑셀 파일보다 더 최근에 수정되었으며 데이터 차이가 있습니다:\n\n• {list}\n\n엑셀(XLSX) 내용으로 TSV 파일들을 덮어쓰시겠습니까?",
+            "덮어쓰기 (XLSX → TSV)",
+            "취소");
+    }
+
+    private bool ConfirmBulkTsvToXlsx()
+    {
+        if (_comparisons == null) RefreshComparisons();
+        var newerXlsx = _comparisons
+            .Where(c => c.State == XlsxTsvConverter.SyncState.DataDiff && c.IsXlsxFileNewer)
+            .Select(c => c.SheetName)
+            .ToList();
+
+        if (newerXlsx.Count == 0) return true;
+
+        string list = string.Join(", ", newerXlsx);
+        return EditorUtility.DisplayDialog(
+            "엑셀 업데이트 확인",
+            $"Scavenger.xlsx 파일 저장 시각이 다음 TSV보다 최신이며 데이터 차이가 있습니다:\n\n• {list}\n\nTSV 내용으로 엑셀 시트를 업데이트하시겠습니까?\n(기존 VLOOKUP 수식과 보조 시트는 보존됩니다)",
+            "업데이트 (TSV → XLSX)",
+            "취소");
+    }
+
+    private static bool ConfirmSingleXlsxToTsv(XlsxTsvConverter.SheetComparison comp)
+    {
+        if (comp.State != XlsxTsvConverter.SyncState.DataDiff || !comp.IsTsvFileNewer) return true;
+
+        return EditorUtility.DisplayDialog(
+            "최신 TSV 덮어쓰기 확인",
+            $"'{comp.SheetName}' TSV 파일이 엑셀보다 더 최근에 수정되었으며 {comp.DataDiffRows}개 행 차이가 있습니다.\n\n엑셀 내용으로 TSV를 덮어쓰시겠습니까?",
+            "덮어쓰기",
+            "취소");
+    }
+
+    private static bool ConfirmSingleTsvToXlsx(XlsxTsvConverter.SheetComparison comp)
+    {
+        if (comp.State != XlsxTsvConverter.SyncState.DataDiff || !comp.IsXlsxFileNewer) return true;
+
+        return EditorUtility.DisplayDialog(
+            "엑셀 시트 업데이트 확인",
+            $"엑셀 파일 저장 시각이 '{comp.SheetName}' TSV보다 최신이며 {comp.DataDiffRows}개 행 차이가 있습니다.\n\nTSV 내용으로 엑셀 '{comp.SheetName}' 시트를 업데이트하시겠습니까?\n(기존 수식은 보존됩니다)",
+            "업데이트",
+            "취소");
+    }
+
+    public static void ConvertAllDataStatic()
+    {
+        LocalizationEditorUtility.ConvertLocalizationTsvToBytes();
+        ConvertData<AmmoDataList, AmmoData>("Ammo", "Scavenger - Ammo.tsv");
+        ConvertData<BuffDataList, BuffData>("Buff", "Scavenger - Buff.tsv");
+        ConvertData<ItemDataList, ItemData>("Item", "Scavenger - Item.tsv");
+        ConvertData<UserCurrencyDataList, UserCurrencyData>("UserCurrency", "Scavenger - UserCurrency.tsv");
+        ConvertData<CharDataList, CharData>("Char", "Scavenger - Char.tsv");
+        ConvertData<CharLvlDataList, CharLvlData>("CharLvl", "Scavenger - CharLvl.tsv");
+        ConvertData<LevelDataList, LevelData>("Level", "Scavenger - Level.tsv");
+        ConvertData<SkillDataList, SkillData>("Skill", "Scavenger - Skill.tsv");
+        ConvertQuestDataStatic();
+        ConvertData<StageDataList, StageData>("Stage", "Scavenger - Stage.tsv");
+
+        ConvertData<LootDataList, LootData>("Loot", "Scavenger - Loot.tsv");
+        ConvertData<EnemyDataList, EnemyData>("Enemy", "Scavenger - Enemy.tsv");
+        ConvertData<ObstacleDataList, ObstacleData>("Obstacle", "Scavenger - Obstacle.tsv");
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log("All Data Converted Successfully.");
+    }
+
+    private static void ConvertMobGroupDataStatic()
     {
         string folderPath = Application.dataPath + "/GameData/MobGroups/";
         if (!Directory.Exists(folderPath))
@@ -268,7 +667,7 @@ public class DataConverterEditor : EditorWindow
 
         string[] files = Directory.GetFiles(folderPath, "*.json");
         MobGroupDataList dataList = new MobGroupDataList();
-        
+
         foreach (string file in files)
         {
             try
@@ -297,18 +696,18 @@ public class DataConverterEditor : EditorWindow
 
         string savePath = Path.Combine(dataPath, "MobGroupData.bytes");
         File.WriteAllBytes(savePath, encryptedBytes);
-        
+
         UnityEditor.AssetDatabase.Refresh();
-        
+
         Debug.Log($"Successfully converted {dataList.Groups.Count} Mob Groups to: {savePath}");
     }
 
-    private void ConvertQuestData()
+    private static void ConvertQuestDataStatic()
     {
         ConvertData<QuestDataList, QuestData>("Quest", "Scavenger - Quest.tsv", ParseQuestTsv, ExportQuestJson);
     }
 
-    private List<QuestData> ParseQuestTsv(string tsvContent)
+    private static List<QuestData> ParseQuestTsv(string tsvContent)
     {
         var quests = new List<QuestData>();
         string[] lines = tsvContent.Split(new[] { '\r', '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
@@ -433,7 +832,7 @@ public class DataConverterEditor : EditorWindow
         public List<ServerQuestData> quests = new List<ServerQuestData>();
     }
 
-    private string ExportQuestJson(QuestDataList dataList)
+    private static string ExportQuestJson(QuestDataList dataList)
     {
         var serverData = new ServerQuestDataList();
         foreach (var quest in dataList.quests)
@@ -459,7 +858,7 @@ public class DataConverterEditor : EditorWindow
         return JsonUtility.ToJson(serverData);
     }
 
-    private void ConvertData<TList, TData>(string dataName, string tsvFileName,
+    private static void ConvertData<TList, TData>(string dataName, string tsvFileName,
         System.Func<string, List<TData>> parser = null, System.Func<TList, string> jsonExporter = null)
         where TList : IDataList<TData>, new()
         where TData : class, IData, new()
@@ -478,7 +877,7 @@ public class DataConverterEditor : EditorWindow
         {
             SpriteResourcePaths.Normalize(data);
         }
-        
+
         // Find the List<TData> field and set it
         var fields = typeof(TList).GetFields();
         foreach (var field in fields)
@@ -504,11 +903,11 @@ public class DataConverterEditor : EditorWindow
         // 확장자를 .bytes 로 변경
         string savePath = Path.Combine(dataPath, $"{dataName}Data.bytes");
         File.WriteAllBytes(savePath, encryptedBytes);
-        
+
         string jsonPath = Application.dataPath + "/Data/Json";
         if (!Directory.Exists(jsonPath)) Directory.CreateDirectory(jsonPath);
         File.WriteAllText(Path.Combine(jsonPath, $"{dataName}.json"), exportedJson);
-        
+
         AssetDatabase.Refresh();
         RegisterDataAssetInAddressables($"Assets/Resources_moved/Data/{dataName}Data.bytes", $"{dataName}Data");
         Debug.Log($"Successfully converted and encrypted {dataName}Data to: {savePath}");
@@ -530,7 +929,7 @@ public class DataConverterEditor : EditorWindow
         }
     }
 
-    private List<T> ParseTsv<T>(string tsvContent) where T : new()
+    private static List<T> ParseTsv<T>(string tsvContent) where T : new()
     {
         List<T> list = new List<T>();
         string[] lines = tsvContent.Split(new[] { '\r', '\n' }, System.StringSplitOptions.RemoveEmptyEntries);
