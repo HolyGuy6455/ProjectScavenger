@@ -20,7 +20,7 @@ public sealed class SkillAimController : MonoBehaviour, ICharacterControlOverrid
     public bool IsPrepared => prepared != null && !executing;
     public bool IsExecuting => executing;
     public bool BlocksWeapon => prepared != null || waitForRelease;
-    public bool BlocksOtherActions => executing || (prepared != null && !prepared.CanCancelAim);
+    public bool BlocksOtherActions => executing || (prepared != null && !prepared.CanCancelAim(skills));
     public bool IsPreparedSkill(SkillInstance skill) => IsPrepared && ReferenceEquals(prepared, skill);
 
     public bool IsControlOverrideActive => BlocksWeapon || BlocksOtherActions;
@@ -96,7 +96,7 @@ public sealed class SkillAimController : MonoBehaviour, ICharacterControlOverrid
     {
         if (!player.IsOwner || !player.IsSpawned || player.IsInputLocked || player.IsRolling
             || skills.IsReloading() || BlocksOtherActions || skill == null || !skill.IsReady) return false;
-        if (!(skill.AimRange > 0f) || !(skill.AimRadius >= 0f)) return false;
+        if (!(skill.GetAimRange(skills) > 0f) || !(skill.GetAimRadius(skills) >= 0f)) return false;
         ForceCancel();
         prepared = skill;
         state = ownerState;
@@ -109,7 +109,7 @@ public sealed class SkillAimController : MonoBehaviour, ICharacterControlOverrid
 
     public void CancelPreparation()
     {
-        if (IsPrepared && prepared.CanCancelAim) ForceCancel();
+        if (IsPrepared && prepared.CanCancelAim(skills)) ForceCancel();
     }
 
     public void ForceCancel()
@@ -174,7 +174,7 @@ public sealed class SkillAimController : MonoBehaviour, ICharacterControlOverrid
     {
         direction = Vector3.zero;
         point = target;
-        radius = prepared != null ? prepared.AimRadius : 0f;
+        radius = prepared != null ? prepared.GetAimRadius(skills) : 0f;
         if (executing)
         {
             direction = Vector3.ProjectOnPlane(target - transform.position, Vector3.up).normalized;
@@ -185,7 +185,7 @@ public sealed class SkillAimController : MonoBehaviour, ICharacterControlOverrid
         if (input.sqrMagnitude > .001f)
         {
             var flat = new Vector3(input.x, 0f, input.y);
-            target = transform.position + flat.normalized * (prepared.AimRange * Mathf.Clamp01(flat.magnitude));
+            target = transform.position + flat.normalized * (prepared.GetAimRange(skills) * Mathf.Clamp01(flat.magnitude));
             float nearest = float.PositiveInfinity;
             foreach (var hit in Physics.RaycastAll(target + Vector3.up * 10f, Vector3.down, 20f,
                          Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))

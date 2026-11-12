@@ -1,52 +1,42 @@
-using Scavenger.Manager;
-using Unity.Netcode;
 using UnityEngine;
 
-/// <summary>char003의 응급처치. Player 루트에 두어 교대 후에도 공용 회복 버프를 유지합니다.</summary>
+/// <summary>char003의 응급처치. 캐릭터 프리팹에 위치하며 Player 루트의 공용 BuffController에 지속 회복을 부여합니다.</summary>
 [DisallowMultipleComponent]
-[RequireComponent(typeof(PlayerController), typeof(PlayerSkillController), typeof(BuffController))]
-public sealed class Char003HealSkill : NetworkBehaviour
+[RequireComponent(typeof(CharacterAnimationPresenter))]
+public sealed class Char003HealSkill : BaseCharacterSkill
 {
     // 데이터 테이블의 양수 Buff ID와 구별하는 스킬 생성 효과의 ID입니다.
     // 응급처치 첫 레벨의 Skill ID를 사용하여 세 레벨 모두 같은 효과로 갱신합니다.
     private const int RecoveryBuffId = -37;
 
-    private PlayerController player;
-    private PlayerSkillController skills;
-    private Health health;
-    private BuffController buffs;
+    private bool CanUse => isActiveAndEnabled && IsSpawned && !IsPlayerUnavailable
+        && Player.GetLocalDeck().GetCharId(Player.ActiveSlotIndex) == 3
+        && Player.GetActiveCharacterModel() == gameObject
+        && !Player.IsInputLocked && !Player.IsRolling
+        && !SkillRouter.IsReloading();
 
-    private void Awake()
-    {
-        player = GetComponent<PlayerController>();
-        skills = GetComponent<PlayerSkillController>();
-        health = GetComponent<Health>();
-        buffs = GetComponent<BuffController>();
-    }
-
-    private bool CanUse => isActiveAndEnabled && IsSpawned
-        && player.GetLocalDeck().GetCharId(player.ActiveSlotIndex) == 3
-        && !player.IsInputLocked && !player.IsRolling && !player.IsDeathPresented
-        && health != null && !health.IsDead && health.CurrentHealth > 0f && !health.IsClearProtected
-        && !skills.IsReloading()
-        && (GameFlowManager.Instance == null || GameFlowManager.Instance.CurrentState == GameResultState.None);
+    public override bool HandlesSkill(SkillData data)
+        => data != null && data.charId == 3 && data.func == 4;
 
     public bool TryUse(int skillId)
     {
-        if (!IsOwner || !CanUse || GetSkillData(skillId) == null) return false;
+        var data = DataManager.Instance != null ? DataManager.Instance.GetData<SkillData>("Skill", skillId) : null;
+        return TryUseSkill(data);
+    }
+
+    public override bool TryUseSkill(SkillData data)
+    {
+        if (!IsOwner || !CanUse || !ValidateSkillData(data)) return false;
         if (!PlayAnimation()) return false;
-        ApplyRecoveryServerRpc(skillId);
+        SkillRouter.RequestCharacterSkill(data.id);
         return true;
     }
 
-    [ServerRpc]
-    private void ApplyRecoveryServerRpc(int skillId)
+    public override bool TryAcceptOnServer(SkillData data, Vector3 target, Vector3 origin)
     {
-        if (!CanUse) return;
-        var data = GetSkillData(skillId);
-        if (data == null) return;
+        if (!CanUse || !ValidateSkillData(data) || Buffs == null) return false;
 
-        buffs.AddSharedBuff(new BuffData
+        Buffs.AddSharedBuff(new BuffData
         {
             id = RecoveryBuffId,
             name = data.name,
@@ -56,33 +46,31 @@ public sealed class Char003HealSkill : NetworkBehaviour
             value = data.funcValue[0],
             tickInterval = data.funcValue[1]
         });
-        PlayRecoveryClientRpc();
+        return true;
     }
 
-    [ClientRpc]
-    private void PlayRecoveryClientRpc()
+    public override void OnClientAccepted(SkillData data, Vector3 target, bool isOwner)
     {
-        if (IsOwner || player.GetLocalDeck().GetCharId(player.ActiveSlotIndex) != 3) return;
+        if (isOwner || IsPlayerUnavailable) return;
         PlayAnimation();
     }
 
     private bool PlayAnimation()
     {
-        var model = player.GetActiveCharacterModel();
-        var presenter = model != null ? model.GetComponent<CharacterAnimationPresenter>() : null;
+        var presenter = GetComponent<CharacterAnimationPresenter>();
         if (presenter != null && presenter.PlayUpperBodySkill()) return true;
         Debug.LogError("[Char003HealSkill] Cannot play char003's upper-body Skill animation.", this);
         return false;
     }
 
-    private SkillData GetSkillData(int skillId)
+    private bool ValidateSkillData(SkillData data)
     {
-        var data = DataManager.Instance != null ? DataManager.Instance.GetData<SkillData>("Skill", skillId) : null;
-        if (data != null && data.charId == 3 && data.func == 4 && IsPositiveFinite(data.duration)
+        if (HandlesSkill(data) && IsPositiveFinite(data.duration)
             && data.funcValue != null && data.funcValue.Length >= 2
-            && IsPositiveFinite(data.funcValue[0]) && IsPositiveFinite(data.funcValue[1])) return data;
-        Debug.LogError($"[Char003HealSkill] Invalid recovery SkillData {skillId}: duration, heal amount and interval must be positive.", this);
-        return null;
+            && IsPositiveFinite(data.funcValue[0]) && IsPositiveFinite(data.funcValue[1]))
+            return true;
+        Debug.LogError($"[Char003HealSkill] Invalid recovery SkillData {data?.id}: duration, heal amount and interval must be positive.", this);
+        return false;
     }
 
     private static bool IsPositiveFinite(float value)

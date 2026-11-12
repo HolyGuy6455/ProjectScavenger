@@ -11,10 +11,27 @@ public class EnemyController : NetworkBehaviour, ILootTableProvider
 
     private EnemyData myData;
     private Coroutine dataInitialization;
+    private Health _health;
+    private bool _deathRecorded;
 
     private void Awake()
     {
+        _health = GetComponent<Health>();
+        if (_health != null)
+        {
+            _health.OnDeath += HandleDeath;
+        }
+        _deathRecorded = false;
         if (TryGetComponent<Shooter>(out var shooter)) shooter.Target = BulletTarget.Player;
+    }
+
+    public override void OnDestroy()
+    {
+        if (_health != null)
+        {
+            _health.OnDeath -= HandleDeath;
+        }
+        base.OnDestroy();
     }
 
     public void SetEnemyId(int id)
@@ -24,6 +41,7 @@ public class EnemyController : NetworkBehaviour, ILootTableProvider
 
     public override void OnNetworkSpawn()
     {
+        _deathRecorded = false;
         if (!IsServer) return;
 
         if (DataManager.Instance != null && DataManager.Instance.IsDataLoaded)
@@ -134,5 +152,27 @@ public class EnemyController : NetworkBehaviour, ILootTableProvider
     public int GetLootTableId()
     {
         return myData != null ? myData.lootTable : 0;
+    }
+
+    private void HandleDeath(DamageInfo damageInfo)
+    {
+        if (_deathRecorded) return;
+
+        // 온라인(NGO 구동 중) 환경에서는 서버만 권위 있게 집계하여 NetworkList로 공유합니다.
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening && !IsServer)
+        {
+            return;
+        }
+
+        EnemyData data = GetEnemyData();
+        int resolvedId = data != null ? data.id : enemyId;
+        if (resolvedId <= 0)
+        {
+            Debug.LogWarning($"[EnemyController] 사망한 적의 EnemyData ID를 확인할 수 없어 처치 집계에서 제외됩니다. (GameObject: {gameObject.name})", this);
+            return;
+        }
+
+        _deathRecorded = true;
+        MobManager.RecordKill(resolvedId);
     }
 }

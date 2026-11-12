@@ -14,6 +14,7 @@ public class PlayerSkillController : NetworkBehaviour
     private Shooter cachedShooter;
     private PlayerController cachedPlayerController;
     private Health cachedHealth;
+    private readonly List<BaseCharacterSkill> characterSkillBuffer = new List<BaseCharacterSkill>(4);
 
     private bool HasDied
     {
@@ -64,6 +65,12 @@ public class PlayerSkillController : NetworkBehaviour
                 HandleCharacterChanged(CharacterStateManager.Instance.CurrentCharData);
             }
         }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        CancelAllCharacterSkillsLocalAndServer();
+        base.OnNetworkDespawn();
     }
 
     private void Start()
@@ -119,6 +126,7 @@ public class PlayerSkillController : NetworkBehaviour
     public void CancelActiveActions()
     {
         ActiveActionsCancelled?.Invoke();
+        CancelAllCharacterSkillsLocalAndServer();
         // CharacterStateManager contains the local party, not other network players' skill state.
         if (!IsOwner) return;
 
@@ -381,6 +389,133 @@ public class PlayerSkillController : NetworkBehaviour
             return;
         }
         skill.ReleaseUse(GetShooter());
+    }
+
+    public BaseCharacterSkill FindActiveCharacterSkill(int skillId, out SkillData data)
+    {
+        data = skillId > 0 && DataManager.Instance != null
+            ? DataManager.Instance.GetData<SkillData>("Skill", skillId)
+            : null;
+        if (data == null) return null;
+        if (cachedPlayerController == null) cachedPlayerController = GetComponent<PlayerController>();
+        if (cachedPlayerController == null) return null;
+        if (data.charId != cachedPlayerController.GetLocalDeck().GetCharId(cachedPlayerController.ActiveSlotIndex))
+            return null;
+        return cachedPlayerController.FindActiveCharacterSkill(data);
+    }
+
+    public void CancelCharacterSkillAim(SkillData data)
+    {
+        if (data == null) return;
+        if (cachedPlayerController == null) cachedPlayerController = GetComponent<PlayerController>();
+        if (cachedPlayerController == null) return;
+        cachedPlayerController.CollectAllCharacterSkills(characterSkillBuffer);
+        for (int i = 0; i < characterSkillBuffer.Count; i++)
+        {
+            if (characterSkillBuffer[i].HandlesSkill(data))
+                characterSkillBuffer[i].OnAimCancelled();
+        }
+    }
+
+    public void RequestCharacterSkill(int skillId, Vector3 target = default, Vector3 origin = default)
+    {
+        if (!IsOwner || !IsSpawned || HasGameEnded || HasDied) return;
+        RequestCharacterSkillServerRpc(skillId, target, origin);
+    }
+
+    [ServerRpc]
+    private void RequestCharacterSkillServerRpc(int skillId, Vector3 target, Vector3 origin)
+    {
+        if (HasGameEnded || HasDied)
+        {
+            RejectCharacterSkillClientRpc(skillId);
+            return;
+        }
+        var skill = FindActiveCharacterSkill(skillId, out var data);
+        if (skill == null || !skill.TryAcceptOnServer(data, target, origin))
+        {
+            RejectCharacterSkillClientRpc(skillId);
+            return;
+        }
+        BroadcastCharacterSkillClientRpc(skillId, target);
+    }
+
+    [ClientRpc]
+    private void BroadcastCharacterSkillClientRpc(int skillId, Vector3 target)
+    {
+        var skill = FindActiveCharacterSkill(skillId, out var data);
+        skill?.OnClientAccepted(data, target, IsOwner);
+    }
+
+    [ClientRpc]
+    private void RejectCharacterSkillClientRpc(int skillId)
+    {
+        if (!IsOwner) return;
+        var skill = FindActiveCharacterSkill(skillId, out var data);
+        if (skill != null) skill.OnClientRejected(data);
+        else GetComponent<SkillAimController>()?.ForceCancel();
+    }
+
+    public void NotifyCharacterSkillAnimationEvent(int skillId, int eventId = 0, Vector3 worldPoint = default)
+    {
+        if (!IsOwner || !IsSpawned || HasGameEnded || HasDied) return;
+        NotifyCharacterSkillAnimationEventServerRpc(skillId, eventId, worldPoint);
+    }
+
+    [ServerRpc]
+    private void NotifyCharacterSkillAnimationEventServerRpc(int skillId, int eventId, Vector3 worldPoint)
+    {
+        var skill = FindActiveCharacterSkill(skillId, out var data);
+        skill?.OnServerAnimationEvent(data, eventId, worldPoint);
+    }
+
+    public void RequestCancelCharacterSkill(int skillId = 0)
+    {
+        if (IsServer)
+        {
+            CancelAllServerCharacterSkills();
+        }
+        else if (IsOwner && IsSpawned)
+        {
+            CancelCharacterSkillServerRpc(skillId);
+        }
+    }
+
+    [ServerRpc]
+    private void CancelCharacterSkillServerRpc(int skillId)
+    {
+        if (skillId > 0)
+        {
+            var skill = FindActiveCharacterSkill(skillId, out _);
+            if (skill != null)
+            {
+                skill.OnServerCancel();
+                return;
+            }
+        }
+        CancelAllServerCharacterSkills();
+    }
+
+    private void CancelAllServerCharacterSkills()
+    {
+        if (cachedPlayerController == null) cachedPlayerController = GetComponent<PlayerController>();
+        if (cachedPlayerController == null) return;
+        cachedPlayerController.CollectAllCharacterSkills(characterSkillBuffer);
+        for (int i = 0; i < characterSkillBuffer.Count; i++)
+        {
+            characterSkillBuffer[i].OnServerCancel();
+        }
+    }
+
+    private void CancelAllCharacterSkillsLocalAndServer()
+    {
+        if (cachedPlayerController == null) cachedPlayerController = GetComponent<PlayerController>();
+        if (cachedPlayerController == null) return;
+        cachedPlayerController.CollectAllCharacterSkills(characterSkillBuffer);
+        for (int i = 0; i < characterSkillBuffer.Count; i++)
+        {
+            characterSkillBuffer[i].OnLocalAndServerCancel();
+        }
     }
 
 }

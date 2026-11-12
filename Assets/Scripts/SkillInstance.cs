@@ -30,13 +30,58 @@ public class SkillInstance
 
     public bool IsReady => currentCooldown <= 0f;
 
-    public virtual bool CanCancelAim => true;
-    public virtual bool DeferAimCost => false;
-    public virtual float AimRange => 0f;
-    public virtual float AimRadius => 0f;
-    public virtual bool TryBeginAim(Shooter shooter) => true;
-    public virtual bool TryExecuteAim(Shooter shooter, Vector3 target) => false;
-    public virtual void OnAimCancelled(Shooter shooter) { }
+    public float AimRange => GetAimRange(PlayerSkillController.Instance);
+    public float AimRadius => GetAimRadius(PlayerSkillController.Instance);
+
+    public float GetAimRange(PlayerSkillController router)
+        => ResolveCharacterSkill(router, out var data)?.GetAimRange(data) ?? 0f;
+
+    public float GetAimRadius(PlayerSkillController router)
+        => ResolveCharacterSkill(router, out var data)?.GetAimRadius(data) ?? 0f;
+
+    public bool CanCancelAim(PlayerSkillController router)
+        => ResolveCharacterSkill(router, out var data)?.CanCancelAim(data) ?? true;
+
+    public bool DeferAimCost(PlayerSkillController router)
+        => ResolveCharacterSkill(router, out var data)?.DeferAimCost(data) ?? false;
+
+    public bool TryBeginAim(Shooter shooter)
+    {
+        var skill = ResolveCharacterSkill(shooter, out var data);
+        if (skill != null) return skill.TryBeginAim(data);
+        Debug.LogError($"[SkillInstance] 활성 캐릭터에서 조준 스킬 ID {skillId}을 처리할 BaseCharacterSkill을 찾을 수 없습니다.", shooter);
+        return false;
+    }
+
+    public bool TryExecuteAim(Shooter shooter, Vector3 target)
+    {
+        var skill = ResolveCharacterSkill(shooter, out var data);
+        if (skill != null) return skill.TryCommitAim(data, target);
+        Debug.LogError($"[SkillInstance] 활성 캐릭터에서 조준 확정 스킬 ID {skillId}을 처리할 BaseCharacterSkill을 찾을 수 없습니다.", shooter);
+        return false;
+    }
+
+    public void OnAimCancelled(Shooter shooter)
+    {
+        var router = shooter != null ? shooter.GetComponent<PlayerSkillController>() : PlayerSkillController.Instance;
+        if (router == null) return;
+        var activeSkill = router.FindActiveCharacterSkill(skillId, out _);
+        if (activeSkill != null) activeSkill.OnAimCancelled();
+        else router.CancelCharacterSkillAim(Data);
+    }
+
+    private BaseCharacterSkill ResolveCharacterSkill(Shooter shooter, out SkillData data)
+    {
+        var router = shooter != null ? shooter.GetComponent<PlayerSkillController>() : PlayerSkillController.Instance;
+        return ResolveCharacterSkill(router, out data);
+    }
+
+    private BaseCharacterSkill ResolveCharacterSkill(PlayerSkillController router, out SkillData data)
+    {
+        if (router != null) return router.FindActiveCharacterSkill(skillId, out data);
+        data = Data;
+        return null;
+    }
 
     public void Use(CharacterState state, Shooter shooter)
     {
@@ -149,7 +194,8 @@ public class SkillInstance
         var data = Data;
         if (data == null || data.activeType != SkillActiveType.Aim || !IsReady
             || !CanExecuteSkillFunc(data.func, shooter) || !TryExecuteAim(shooter, target)) return false;
-        if (!DeferAimCost) ConsumeAimCost(state, shooter);
+        var router = shooter != null ? shooter.GetComponent<PlayerSkillController>() : PlayerSkillController.Instance;
+        if (!DeferAimCost(router)) ConsumeAimCost(state, shooter);
         return true;
     }
 
@@ -178,16 +224,18 @@ public class SkillInstance
         isInstantOffExecuted = true;
     }
 
-    public virtual bool ExecuteSkillBeginFunc(int funcCode, Shooter playerShooter, params float[] funcValues)
+    public bool ExecuteSkillBeginFunc(int funcCode, Shooter playerShooter, params float[] funcValues)
     {
         if (funcCode == 0) return true;
 
         switch (funcCode)
         {
             case 1: // 궁극기
-                if (PlayerSkillController.Instance != null)
+                var ultRouter = (playerShooter != null ? playerShooter.GetComponent<PlayerSkillController>() : null)
+                    ?? PlayerSkillController.Instance;
+                if (ultRouter != null)
                 {
-                    PlayerSkillController.Instance.CmdUseUltimateServerRpc(skillId);
+                    ultRouter.CmdUseUltimateServerRpc(skillId);
                 }
                 break;
             case 3: // 구르기
@@ -208,6 +256,12 @@ public class SkillInstance
             case 6: // 재장전 (1발)
                 return playerShooter != null && Data != null
                     && playerShooter.TriggerReloadAnimation(Data.duration, !isContinuousRunning);
+            default:
+                var customSkill = ResolveCharacterSkill(playerShooter, out var skillData);
+                if (customSkill != null)
+                    return customSkill.TryUseSkill(skillData);
+                Debug.LogError($"[SkillInstance] 활성 캐릭터에서 스킬 ID {skillId} (func={funcCode})을 처리할 BaseCharacterSkill을 찾을 수 없습니다.", playerShooter);
+                return false;
         }
         return true;
     }

@@ -227,6 +227,7 @@ GameObject:
   - component: {fileID: 8465281904700000004}
   - component: {fileID: 1000715293840938480}
   - component: {fileID: 4082435947556090557}
+  - component: {fileID: 3871985170536140104}
   m_Layer: 6
   m_Name: char004
   m_TagString: Untagged
@@ -402,6 +403,21 @@ MonoBehaviour:
   - {fileID: 3711139389798086815}
   - {fileID: 6186671432299735295}
   - {fileID: 8218779192326019134}
+--- !u!114 &3871985170536140104
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 175291255607039418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 80a6d888b74221c4b989a18c9dc3fc21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Char004ThrowSkill
+  smokePrefab: {fileID: 8591780217847057363, guid: 187b6e19b77675544acd0202fe5984ff, type: 3}
+  bottlePrefab: {fileID: 9157244214043574801, guid: c8aab434dfa3b054993a04b092015b3d, type: 3}
+  molotovPrefab: {fileID: 607768393819723639, guid: 7623813ac5f715c46b8d318706c5d694, type: 3}
 --- !u!1 &243803134088798812
 GameObject:
   m_ObjectHideFlags: 0

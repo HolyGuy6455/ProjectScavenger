@@ -1446,6 +1446,34 @@ public class PlayerController : NetworkBehaviour, IShooterAnimationReceiver
         return null;
     }
 
+    public BaseCharacterSkill FindActiveCharacterSkill(SkillData data)
+    {
+        if (data == null) return null;
+        GameObject activeModel = GetActiveCharacterModel();
+        if (activeModel == null) return null;
+        var skills = activeModel.GetComponents<BaseCharacterSkill>();
+        for (int i = 0; i < skills.Length; i++)
+        {
+            if (skills[i] != null && skills[i].HandlesSkill(data))
+                return skills[i];
+        }
+        return null;
+    }
+
+    public void CollectAllCharacterSkills(List<BaseCharacterSkill> results)
+    {
+        results.Clear();
+        for (int i = 0; i < _characterModels.Length; i++)
+        {
+            if (_characterModels[i] == null) continue;
+            var skills = _characterModels[i].GetComponents<BaseCharacterSkill>();
+            for (int j = 0; j < skills.Length; j++)
+            {
+                if (skills[j] != null) results.Add(skills[j]);
+            }
+        }
+    }
+
     public void PlayShootAnimation()
     {
         if (!IsInputLocked) GetAnimationPresenter()?.PlayShoot();

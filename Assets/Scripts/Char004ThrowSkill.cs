@@ -1,24 +1,25 @@
-using Scavenger.Manager;
 using Unity.Netcode;
 using UnityEngine;
 
-/// <summary>char004의 조준 준비, 투척 시점과 서버 발사체 생성을 연결합니다.</summary>
+/// <summary>char004 프리팹에 부착되어 조준 준비, 투척 시점과 서버 발사체 생성을 연결합니다.</summary>
 [DisallowMultipleComponent]
-[RequireComponent(typeof(PlayerController), typeof(PlayerSkillController), typeof(Health))]
-public sealed class Char004ThrowSkill : NetworkBehaviour, ICharacterControlOverride
+[RequireComponent(typeof(Char004ThrowAnimation))]
+public sealed class Char004ThrowSkill : BaseCharacterSkill, ICharacterControlOverride
 {
     [SerializeField] private Char004Throwable smokePrefab;
     [SerializeField] private Char004Throwable bottlePrefab;
     [SerializeField] private Char004Throwable molotovPrefab;
 
-    private PlayerController player;
-    private PlayerSkillController skills;
-    private Health health;
+    private Char004ThrowAnimation cachedAnimation;
     private int pendingSkillId;
     private Vector3 pendingTarget;
     private int preparedUltimateId;
     // Negative while waiting for this cinematic, positive only after its normal completion.
     private int localUltimateId;
+    private int activeSkillId;
+
+    private Char004ThrowAnimation Animation
+        => cachedAnimation != null ? cachedAnimation : (cachedAnimation = GetComponent<Char004ThrowAnimation>());
 
     public bool BlocksCharacterChange => preparedUltimateId != 0 || pendingSkillId != 0 || localUltimateId != 0;
     public bool IsControlOverrideActive => BlocksCharacterChange;
@@ -60,177 +61,181 @@ public sealed class Char004ThrowSkill : NetworkBehaviour, ICharacterControlOverr
     {
         return false;
     }
-    private bool IsUnavailable => player.IsDeathPresented || health.IsDead || health.CurrentHealth <= 0f
-        || health.IsClearProtected || (GameFlowManager.Instance != null
-            && GameFlowManager.Instance.CurrentState != GameResultState.None);
 
-    private void Awake()
-    {
-        player = GetComponent<PlayerController>();
-        skills = GetComponent<PlayerSkillController>();
-        health = GetComponent<Health>();
-    }
+    public override bool HandlesSkill(SkillData data)
+        => data != null && data.charId == 4 && (data.func == 1 || data.func == 8 || data.func == 9);
 
-    private void OnEnable()
-    {
-        skills.ActiveActionsCancelled += CancelAim;
-        player.PresentationInterrupted += CancelAim;
-    }
+    public override float GetAimRange(SkillData data)
+        => data?.funcValue != null && data.funcValue.Length > 0 ? data.funcValue[0] : 0f;
 
-    private void OnDisable()
-    {
-        skills.ActiveActionsCancelled -= CancelAim;
-        player.PresentationInterrupted -= CancelAim;
-        CancelAim();
-    }
+    public override float GetAimRadius(SkillData data)
+        => data?.funcValue != null && data.funcValue.Length > 1 ? data.funcValue[1] : 0f;
 
-    public override void OnNetworkDespawn()
-    {
-        pendingSkillId = preparedUltimateId = localUltimateId = 0;
-        GetActiveAnimation()?.CancelAimVisual();
-    }
+    public override bool CanCancelAim(SkillData data)
+        => data?.func != 1;
+
+    public override bool DeferAimCost(SkillData data)
+        => true;
 
     public bool TryPrepare(int skillId)
     {
-        if (!IsOwner || !IsSpawned || IsUnavailable || player.IsInputLocked || player.IsRolling || skills.IsReloading()) return false;
-        var data = GetSkillData(skillId);
-        var animation = GetActiveAnimation();
+        var data = DataManager.Instance != null ? DataManager.Instance.GetData<SkillData>("Skill", skillId) : null;
+        return TryBeginAim(data);
+    }
+
+    public override bool TryBeginAim(SkillData data)
+    {
+        if (!isActiveAndEnabled || !IsOwner || !IsSpawned || IsPlayerUnavailable
+            || Player.IsInputLocked || Player.IsRolling || SkillRouter.IsReloading())
+            return false;
+        if (!ValidateSkillData(data)) return false;
+        var animation = Animation;
         var prefab = GetPrefab(data);
-        if (data == null || animation == null || animation.IsPlaying || prefab == null) return false;
-        if (data.func != 1) return animation.ShowAim(prefab.gameObject);
-        if (!(player.GetActiveUltimateSkill() is Char004Ultimate ultimate) || ultimate.IsPresentationPlaying) return false;
-        localUltimateId = -skillId;
-        skills.CmdUseUltimateServerRpc(skillId);
+        if (animation == null || animation.IsPlaying || prefab == null) return false;
+        if (data.func != 1)
+        {
+            if (!animation.ShowAim(prefab.gameObject)) return false;
+            activeSkillId = data.id;
+            return true;
+        }
+        if (!(Player.GetActiveUltimateSkill() is Char004Ultimate ultimate) || ultimate.IsPresentationPlaying)
+            return false;
+        localUltimateId = -data.id;
+        activeSkillId = data.id;
+        SkillRouter.CmdUseUltimateServerRpc(data.id);
         return true;
     }
 
     public bool TryThrow(int skillId, Vector3 target)
     {
-        if (!IsOwner || !IsSpawned || IsUnavailable || player.IsInputLocked || player.IsRolling || skills.IsReloading()) return false;
-        var data = GetSkillData(skillId);
-        var animation = GetActiveAnimation();
-        Vector3 confirmedOrigin = player.transform.position;
-        if (data == null || animation == null || !animation.CanThrow || !IsTargetInRange(data, target, confirmedOrigin)
-            || (data.func == 1 && localUltimateId != skillId)) return false;
+        var data = DataManager.Instance != null ? DataManager.Instance.GetData<SkillData>("Skill", skillId) : null;
+        return TryCommitAim(data, target);
+    }
+
+    public override bool TryCommitAim(SkillData data, Vector3 target)
+    {
+        if (!isActiveAndEnabled || !IsOwner || !IsSpawned || IsPlayerUnavailable
+            || Player.IsInputLocked || Player.IsRolling || SkillRouter.IsReloading())
+            return false;
+        if (!ValidateSkillData(data)) return false;
+        var animation = Animation;
+        Vector3 confirmedOrigin = Player.transform.position;
+        if (animation == null || !animation.CanThrow || !IsTargetInRange(data, target, confirmedOrigin)
+            || (data.func == 1 && localUltimateId != data.id))
+            return false;
         localUltimateId = 0;
-        BeginThrowServerRpc(skillId, target, confirmedOrigin);
+        activeSkillId = data.id;
+        SkillRouter.RequestCharacterSkill(data.id, target, confirmedOrigin);
         return true;
     }
 
     public void MarkUltimatePreparedOnServer(int skillId)
     {
-        var data = GetSkillData(skillId);
-        if (IsServer && IsSpawned && !IsUnavailable && data?.func == 1 && GetActiveAnimation() != null)
+        var data = DataManager.Instance != null ? DataManager.Instance.GetData<SkillData>("Skill", skillId) : null;
+        if (IsServer && IsSpawned && !IsPlayerUnavailable && ValidateSkillData(data) && data.func == 1 && Animation != null)
             preparedUltimateId = skillId;
     }
 
     public void MarkUltimateReady(int skillId)
     {
-        if (IsUnavailable || (IsOwner && localUltimateId != -skillId)) return;
-        var animation = GetActiveAnimation();
+        if (IsPlayerUnavailable || (IsOwner && localUltimateId != -skillId)) return;
+        var animation = Animation;
         if (molotovPrefab != null && animation != null && animation.ShowAim(molotovPrefab.gameObject))
         {
-            if (IsOwner) localUltimateId = skillId;
+            if (IsOwner)
+            {
+                localUltimateId = skillId;
+                activeSkillId = skillId;
+            }
         }
         else
         {
             Debug.LogError("[Char004ThrowSkill] Cannot prepare the ignited bottle after its cinematic.", this);
-            if (IsOwner) GetComponent<SkillAimController>()?.ForceCancel();
+            if (IsOwner) AimController?.ForceCancel();
         }
     }
 
-    [ServerRpc]
-    private void BeginThrowServerRpc(int skillId, Vector3 target, Vector3 confirmedOrigin)
+    public override bool TryAcceptOnServer(SkillData data, Vector3 target, Vector3 origin)
     {
-        if (pendingSkillId != 0 || IsUnavailable || player.IsInputLocked)
+        if (pendingSkillId != 0 || IsPlayerUnavailable || Player.IsInputLocked)
+            return false;
+        var animation = Animation;
+        if (!ValidateSkillData(data) || animation == null || GetPrefab(data) == null || !IsFinite(origin)
+            || Vector3.Distance(origin, Player.transform.position) > MaximumReach(animation)
+            || !IsTargetInRange(data, target, origin)
+            || (data.func == 1 && preparedUltimateId != data.id))
         {
-            RejectThrowClientRpc();
-            return;
+            Debug.LogError($"[Char004ThrowSkill] Invalid throw request for SkillData {data?.id}.", this);
+            return false;
         }
-        var data = GetSkillData(skillId);
-        var animation = GetActiveAnimation();
-        if (data == null || animation == null || GetPrefab(data) == null || !IsFinite(confirmedOrigin)
-            || Vector3.Distance(confirmedOrigin, player.transform.position) > MaximumReach(animation)
-            || !IsTargetInRange(data, target, confirmedOrigin)
-            || (data.func == 1 && preparedUltimateId != skillId))
-        {
-            Debug.LogError($"[Char004ThrowSkill] Invalid throw request for SkillData {skillId}.", this);
-            RejectThrowClientRpc();
-            return;
-        }
-        pendingSkillId = skillId;
+        pendingSkillId = data.id;
         pendingTarget = target;
         if (data.func == 1) preparedUltimateId = 0;
-        PlayThrowClientRpc(skillId);
+        return true;
     }
 
-    [ClientRpc]
-    private void PlayThrowClientRpc(int skillId)
+    public override void OnClientAccepted(SkillData data, Vector3 target, bool isOwner)
     {
-        if (IsOwner)
+        if (isOwner)
         {
-            var aim = GetComponent<SkillAimController>();
-            if (IsUnavailable || aim == null || !aim.IsExecuting)
+            var aim = AimController;
+            if (IsPlayerUnavailable || aim == null || !aim.IsExecuting)
             {
                 CancelPendingThrow();
                 return;
             }
-            var ownerData = GetSkillData(skillId);
-            var ownerAnimation = GetActiveAnimation();
-            if (ownerData == null || ownerAnimation == null || !ownerAnimation.TryPlay(ThrowDuration(ownerData)))
+            var ownerAnimation = Animation;
+            if (!ValidateSkillData(data) || ownerAnimation == null || !ownerAnimation.TryPlay(ThrowDuration(data)))
             {
                 Debug.LogError("[Char004ThrowSkill] Cannot begin the accepted throwing animation.", this);
                 aim.ForceCancel();
                 return;
             }
+            activeSkillId = data.id;
             // Keep the ready pose while awaiting acceptance, then begin the gesture and its cost together.
             aim.ConfirmExecution();
             return;
         }
-        if (IsUnavailable) return;
-        var data = GetSkillData(skillId);
-        var animation = GetActiveAnimation();
+        if (IsPlayerUnavailable) return;
+        var animation = Animation;
         var prefab = GetPrefab(data);
-        if (data == null || prefab == null || animation == null
+        if (!ValidateSkillData(data) || prefab == null || animation == null
             || !animation.ShowAim(prefab.gameObject) || !animation.TryPlay(ThrowDuration(data)))
             Debug.LogError("[Char004ThrowSkill] Cannot play the remote character's throwing animation.", this);
     }
 
-    [ClientRpc]
-    private void RejectThrowClientRpc()
+    public override void OnClientRejected(SkillData data)
     {
-        if (IsOwner) GetComponent<SkillAimController>()?.ForceCancel();
+        if (IsOwner) AimController?.ForceCancel();
     }
 
     public void OnReleaseAnimationEvent()
     {
-        if (!IsOwner || !IsSpawned || IsUnavailable) return;
-        var animation = GetActiveAnimation();
+        if (!IsOwner || !IsSpawned || IsPlayerUnavailable || activeSkillId == 0) return;
+        var animation = Animation;
         if (animation != null && animation.IsPlaying && animation.ReleasePoint != null)
-            ReleaseThrowServerRpc(animation.ReleasePoint.position);
+            SkillRouter?.NotifyCharacterSkillAnimationEvent(activeSkillId, 0, animation.ReleasePoint.position);
     }
 
-    [ServerRpc]
-    private void ReleaseThrowServerRpc(Vector3 handPosition)
+    public override void OnServerAnimationEvent(SkillData data, int eventId, Vector3 worldPoint)
     {
-        if (pendingSkillId == 0) return;
-        var data = GetSkillData(pendingSkillId);
+        if (pendingSkillId == 0 || data == null || pendingSkillId != data.id) return;
         pendingSkillId = 0;
-        if (IsUnavailable || data == null) return;
-        var animation = GetActiveAnimation();
+        if (IsPlayerUnavailable || !ValidateSkillData(data)) return;
+        var animation = Animation;
         var prefab = GetPrefab(data);
-        if (animation == null || prefab == null || !IsFinite(handPosition)) return;
-        if (Vector3.Distance(handPosition, player.transform.position) > MaximumReach(animation))
+        if (animation == null || prefab == null || !IsFinite(worldPoint)) return;
+        if (Vector3.Distance(worldPoint, Player.transform.position) > MaximumReach(animation))
         {
             Debug.LogError("[Char004ThrowSkill] Throw release point lies outside the character's reach.", this);
             return;
         }
         // The owner provides the animated hand pose, while the server keeps the confirmed target.
         // This also works when a dedicated server does not evaluate character animation.
-        var projectile = Instantiate(prefab, handPosition, Quaternion.identity);
+        var projectile = Instantiate(prefab, worldPoint, Quaternion.identity);
         projectile.transform.localScale = Vector3.Scale(prefab.transform.localScale, animation.transform.lossyScale);
         var networkObject = projectile.GetComponent<NetworkObject>();
-        if (networkObject == null || !projectile.Initialize(pendingTarget, gameObject, data))
+        if (networkObject == null || !projectile.Initialize(pendingTarget, Player.gameObject, data))
         {
             Debug.LogError("[Char004ThrowSkill] The throwable prefab could not be initialized.", this);
             Destroy(projectile.gameObject);
@@ -243,39 +248,46 @@ public sealed class Char004ThrowSkill : NetworkBehaviour, ICharacterControlOverr
     {
         if (!IsOwner) return;
         CancelPendingThrow();
-        GetComponent<SkillAimController>()?.FinishExecution();
+        activeSkillId = 0;
+        AimController?.FinishExecution();
     }
+
+    public override void OnAimCancelled() => CancelAim();
+
+    public override void OnServerCancel() => pendingSkillId = preparedUltimateId = 0;
+
+    public override void OnLocalAndServerCancel() => CancelAim();
+
+    protected override void OnPresentationInterrupted() => CancelAim();
 
     public void CancelAim()
     {
+        var animation = Animation;
+        bool hadClientState = localUltimateId != 0 || activeSkillId != 0
+            || (animation != null && (animation.IsPlaying || animation.CanThrow));
+        int cancelId = activeSkillId != 0 ? activeSkillId : Mathf.Abs(localUltimateId);
         localUltimateId = 0;
-        CancelPendingThrow();
-        GetActiveAnimation()?.CancelAimVisual();
+        activeSkillId = 0;
+        if (IsServer) pendingSkillId = preparedUltimateId = 0;
+        else if (hadClientState && IsOwner && IsSpawned)
+            SkillRouter?.RequestCancelCharacterSkill(cancelId);
+        animation?.CancelAimVisual();
     }
 
     public void CancelPendingThrow()
     {
+        int cancelId = activeSkillId != 0 ? activeSkillId : Mathf.Abs(localUltimateId);
         if (IsServer) pendingSkillId = preparedUltimateId = 0;
-        else if (IsOwner && IsSpawned) CancelThrowServerRpc();
+        else if (IsOwner && IsSpawned) SkillRouter?.RequestCancelCharacterSkill(cancelId);
     }
 
-    [ServerRpc]
-    private void CancelThrowServerRpc() => pendingSkillId = preparedUltimateId = 0;
-
-    private Char004ThrowAnimation GetActiveAnimation()
+    private bool ValidateSkillData(SkillData data)
     {
-        if (player == null || player.GetLocalDeck().GetCharId(player.ActiveSlotIndex) != 4) return null;
-        return player.GetActiveCharacterModel()?.GetComponent<Char004ThrowAnimation>();
-    }
-
-    private SkillData GetSkillData(int skillId)
-    {
-        var data = DataManager.Instance != null ? DataManager.Instance.GetData<SkillData>("Skill", skillId) : null;
-        if (data != null && data.charId == 4 && (data.func == 1 || data.func == 8 || data.func == 9)
-            && data.duration > 0f && data.funcValue != null && data.funcValue.Length >= 2 && data.funcValue[0] > 0f)
-            return data;
-        Debug.LogError($"[Char004ThrowSkill] Missing or invalid char004 throwable SkillData: {skillId}.", this);
-        return null;
+        if (HandlesSkill(data) && data.duration > 0f
+            && data.funcValue != null && data.funcValue.Length >= 2 && data.funcValue[0] > 0f)
+            return true;
+        Debug.LogError($"[Char004ThrowSkill] Missing or invalid char004 throwable SkillData: {data?.id}.", this);
+        return false;
     }
 
     private Char004Throwable GetPrefab(SkillData data)
