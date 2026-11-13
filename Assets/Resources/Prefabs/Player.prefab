@@ -232,13 +232,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 905f14e2cba7d204792077dcc4567a00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthBarSpawner
-  healthBarPrefab: {fileID: 4891483080001246480, guid: 15ccd5586b0187a40a1a4dd9b7986d52, type: 3}
+  healthBarPrefab: {fileID: 4891483080001246480, guid: 0977d689f837f9e4fa1b0ab55cc36be0, type: 3}
   parentTransform: {fileID: 0}
   targetHealth: {fileID: 269122440633132477}
   targetTransform: {fileID: 6942228983306488926}
-  worldOffset: {x: 0, y: 2, z: 0}
+  worldOffset: {x: 0, y: 1.9, z: 0}
   useCustomColor: 1
   barColor: {r: 0.4745098, g: 0.5764706, b: 1, a: 1}
+  onlyShowForRemotePlayer: 1
 --- !u!114 &7917902695277357669
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -882,6 +882,6 @@ MonoBehaviour:
   nameText: {fileID: 1711235060726408348}
   distanceText: {fileID: 1652850061106691178}
   target: {fileID: 0}
-  worldOffset: {x: 0, y: 2, z: 0}
+  worldOffset: {x: 0, y: 2.6, z: 0}
   paddingX: 50
   paddingY: 50
