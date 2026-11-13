@@ -7,10 +7,11 @@ public class PlayerInventory : NetworkBehaviour
 {
     public static PlayerInventory Instance { get; private set; }
 
-    public const int MaxSlots = 8;
+    public const int MaxSlots = 4;
     
     private Dictionary<int, CharacterInventory> charInventories = new Dictionary<int, CharacterInventory>();
     private CharacterInventory currentInventory;
+    private CharacterStateManager _subscribedStateManager;
 
     public InventoryItem[] Items => currentInventory?.Items;
 
@@ -49,14 +50,31 @@ public class PlayerInventory : NetworkBehaviour
         }
     }
 
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
+
     private void OnEnable()
     {
-        CharacterStateManager.Instance.OnCharacterChanged += HandleCharacterChanged;
+        _subscribedStateManager = CharacterStateManager.Instance;
+        if (_subscribedStateManager != null)
+        {
+            _subscribedStateManager.OnCharacterChanged += HandleCharacterChanged;
+        }
     }
 
     private void OnDisable()
     {
-        CharacterStateManager.Instance.OnCharacterChanged -= HandleCharacterChanged;
+        if (_subscribedStateManager != null)
+        {
+            _subscribedStateManager.OnCharacterChanged -= HandleCharacterChanged;
+            _subscribedStateManager = null;
+        }
     }
 
     private void HandleCharacterChanged(CharData charData)
@@ -94,6 +112,9 @@ public class PlayerInventory : NetworkBehaviour
 
     public bool AddItemToSlot(int itemId, int totalQuantity, int targetSlotIndex)
     {
+        EnsureCurrentInventoryInitialized();
+        if (Items == null || totalQuantity <= 0) return false;
+
         if (targetSlotIndex < 0 || targetSlotIndex >= MaxSlots) 
             return AddItem(itemId, totalQuantity);
 
@@ -137,6 +158,9 @@ public class PlayerInventory : NetworkBehaviour
 
     public bool AddItem(int itemId, int totalQuantity)
     {
+        EnsureCurrentInventoryInitialized();
+        if (Items == null || totalQuantity <= 0) return false;
+
         ItemData data = DataManager.Instance.GetData<ItemData>("Item", itemId);
         if (data == null)
         {
@@ -382,4 +406,83 @@ public class PlayerInventory : NetworkBehaviour
 
         OnInventoryChanged?.Invoke();
     }
+
+    #region Pickup Capacity & Network Sync
+
+    private void EnsureCurrentInventoryInitialized()
+    {
+        if (currentInventory == null && IsOwner && _subscribedStateManager != null && _subscribedStateManager.CurrentCharData != null)
+        {
+            HandleCharacterChanged(_subscribedStateManager.CurrentCharData);
+        }
+    }
+
+    /// <summary>
+    /// 현재 인벤토리에 해당 아이템을 최대 몇 개까지 추가할 수 있는지 반환합니다.
+    /// </summary>
+    public int GetAddableQuantity(int itemId, int maxNeeded = int.MaxValue)
+    {
+        EnsureCurrentInventoryInitialized();
+        if (Items == null || maxNeeded <= 0 || DataManager.Instance == null) return 0;
+
+        ItemData data = DataManager.Instance.GetData<ItemData>("Item", itemId);
+        if (data == null) return 0;
+
+        int safeMaxQuantity = data.maxQuantity > 0 ? data.maxQuantity : 1;
+        int totalSpace = 0;
+
+        for (int i = 0; i < MaxSlots; i++)
+        {
+            InventoryItem slotItem = Items[i];
+            if (slotItem == null || slotItem.IsEmpty)
+            {
+                totalSpace += safeMaxQuantity;
+            }
+            else if (slotItem.Data != null && slotItem.Data.id == itemId)
+            {
+                int spaceLeft = safeMaxQuantity - slotItem.Quantity;
+                if (spaceLeft > 0)
+                {
+                    totalSpace += spaceLeft;
+                }
+            }
+
+            if (totalSpace >= maxNeeded)
+            {
+                return maxNeeded;
+            }
+        }
+
+        return totalSpace;
+    }
+
+    /// <summary>
+    /// 인벤토리에 들어갈 수 있는 수량만큼만 추가하고, 실제로 추가된 수량을 반환합니다.
+    /// </summary>
+    public int TryAddItem(int itemId, int totalQuantity, int targetSlotIndex = -1)
+    {
+        int addable = GetAddableQuantity(itemId, totalQuantity);
+        if (addable <= 0) return 0;
+
+        bool success = targetSlotIndex >= 0
+            ? AddItemToSlot(itemId, addable, targetSlotIndex)
+            : AddItem(itemId, addable);
+
+        return success ? addable : 0;
+    }
+
+    [ClientRpc]
+    public void GrantPickupClientRpc(int itemId, int grantedQuantity, int targetSlotIndex, ClientRpcParams clientRpcParams = default)
+    {
+        if (!IsOwner || grantedQuantity <= 0) return;
+
+        int added = TryAddItem(itemId, grantedQuantity, targetSlotIndex);
+        int overflow = grantedQuantity - added;
+        if (overflow > 0 && ItemInstanceManager.Instance != null)
+        {
+            ItemInstanceManager.Instance.SpawnFieldItem(itemId, overflow, transform.position);
+        }
+    }
+
+    #endregion
 }

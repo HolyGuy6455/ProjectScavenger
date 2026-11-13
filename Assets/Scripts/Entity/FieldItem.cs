@@ -11,7 +11,10 @@ public class FieldItem : NetworkBehaviour
 
     private Plane _dragPlane;
     private Vector3 _offset;
+    private Vector3 _dragStartPosition;
     private bool _isDragging = false;
+    private bool _pickupPending = false;
+    private float _pickupPendingUntil = 0f;
     
     // 짧은 탭(클릭) 판정을 위한 변수
     private float _pressTime;
@@ -26,11 +29,34 @@ public class FieldItem : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        _pickupPending = false;
+        _pickupPendingUntil = 0f;
         _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         UpdateSprite();
         
-        // 아이템 ID가 런타임(또는 스폰 이후)에 변경되면 클라이언트들도 스프라이트를 다시 그리도록 이벤트 구독
-        itemId.OnValueChanged += (oldValue, newValue) => { UpdateSprite(); };
+        // 아이템 ID/수량 변경 시 클라이언트 상태 갱신
+        itemId.OnValueChanged += OnItemIdChanged;
+        quantity.OnValueChanged += OnQuantityChanged;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        itemId.OnValueChanged -= OnItemIdChanged;
+        quantity.OnValueChanged -= OnQuantityChanged;
+        _pickupPending = false;
+        _pickupPendingUntil = 0f;
+        base.OnNetworkDespawn();
+    }
+
+    private void OnItemIdChanged(int oldValue, int newValue)
+    {
+        UpdateSprite();
+    }
+
+    private void OnQuantityChanged(int oldValue, int newValue)
+    {
+        _pickupPending = false;
+        _pickupPendingUntil = 0f;
     }
 
     public void Setup(int newId, int newQuantity)
@@ -61,32 +87,75 @@ public class FieldItem : NetworkBehaviour
         }
     }
 
-    public void TryPickup(int targetSlotIndex = -1)
+    public bool TryPickup(int targetSlotIndex = -1)
     {
         PlayerInventory inventory = PlayerInventory.Instance;
-        if (inventory != null)
+        if (inventory == null) return false;
+
+        if (_pickupPending && Time.unscaledTime >= _pickupPendingUntil)
         {
-            if (targetSlotIndex >= 0)
-            {
-                // 특정 슬롯을 향해 드롭한 경우 해당 슬롯 우선 처리
-                inventory.AddItemToSlot(itemId.Value, quantity.Value, targetSlotIndex);
-            }
-            else
-            {
-                // 인벤토리에 아이템 추가 (기본)
-                inventory.AddItem(itemId.Value, quantity.Value);
-            }
-            
-            // 인벤토리가 가득 차서 남은 수량이 버려지더라도 맵에서는 파괴합니다.
-            // TODO(seongmin.shin) : 수량이 남으면 맵에서 파괴되지 않게끔 변경해야 함
-            RequestDespawnServerRpc();
+            _pickupPending = false;
         }
+        if (_pickupPending) return false;
+
+        int currentItemId = itemId.Value;
+        int currentQuantity = quantity.Value;
+        if (currentItemId <= 0 || currentQuantity <= 0) return false;
+
+        int addable = inventory.GetAddableQuantity(currentItemId, currentQuantity);
+        if (addable <= 0)
+        {
+            Debug.Log("[FieldItem] 인벤토리가 가득 차 아이템을 주울 수 없습니다.");
+            return false;
+        }
+
+        // 오프라인(비네트워크) 테스트 환경 폴백
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening || !IsSpawned)
+        {
+            int added = inventory.TryAddItem(currentItemId, addable, targetSlotIndex);
+            if (added <= 0) return false;
+            if (added >= currentQuantity)
+            {
+                Destroy(gameObject);
+            }
+            return true;
+        }
+
+        _pickupPending = true;
+        _pickupPendingUntil = Time.unscaledTime + 1.0f;
+        RequestPickupServerRpc(addable, targetSlotIndex);
+        return true;
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void RequestDespawnServerRpc()
+    private void RequestPickupServerRpc(int requestedQuantity, int targetSlotIndex, ServerRpcParams rpcParams = default)
     {
-        if (NetworkObject != null && NetworkObject.IsSpawned)
+        if (requestedQuantity <= 0 || NetworkObject == null || !NetworkObject.IsSpawned) return;
+        if (itemId.Value <= 0 || quantity.Value <= 0) return;
+
+        ulong senderClientId = rpcParams.Receive.SenderClientId;
+        if (NetworkManager.Singleton == null
+            || !NetworkManager.Singleton.ConnectedClients.TryGetValue(senderClientId, out var senderClient)
+            || senderClient.PlayerObject == null)
+        {
+            return;
+        }
+
+        PlayerInventory playerInventory = senderClient.PlayerObject.GetComponent<PlayerInventory>();
+        if (playerInventory == null) return;
+
+        int grantedItemId = itemId.Value;
+        int grantedAmount = Mathf.Min(requestedQuantity, quantity.Value);
+        int remaining = quantity.Value - grantedAmount;
+        quantity.Value = remaining;
+
+        var targetRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams { TargetClientIds = new[] { senderClientId } }
+        };
+        playerInventory.GrantPickupClientRpc(grantedItemId, grantedAmount, targetSlotIndex, targetRpcParams);
+
+        if (remaining <= 0)
         {
             NetworkObject.Despawn(true);
         }
@@ -106,6 +175,7 @@ public class FieldItem : NetworkBehaviour
             if (_isDragging)
             {
                 _isDragging = false;
+                transform.position = _dragStartPosition;
                 if (_currentlyHoveredSlot != null)
                 {
                     _currentlyHoveredSlot.SetHighlight(false);
@@ -128,6 +198,7 @@ public class FieldItem : NetworkBehaviour
                 if (hit.collider.gameObject == gameObject)
                 {
                     _isDragging = true;
+                    _dragStartPosition = transform.position;
                     _pressTime = Time.time;
                     _pressPosition = mousePos;
                     _dragPlane = new Plane(Vector3.up, new Vector3(0, transform.position.y, 0));
@@ -159,6 +230,7 @@ public class FieldItem : NetworkBehaviour
             if (_isDragging)
             {
                 _isDragging = false;
+                transform.position = _dragStartPosition;
 
                 // 드래그 종료 시 호버 효과 지우기
                 if (_currentlyHoveredSlot != null)

@@ -4,25 +4,46 @@ using System.Collections.Generic;
 public class InventoryUI : MonoBehaviour
 {
     [SerializeField] private List<InventorySlot> slots = new List<InventorySlot>();
+    private PlayerInventory _boundInventory;
 
     private void Start()
     {
         InitializeSlots();
-        
-        // PlayerInventory 이벤트 구독
-        if (PlayerInventory.Instance != null)
+        BindInventory(PlayerInventory.Instance);
+    }
+
+    private void Update()
+    {
+        if (_boundInventory != PlayerInventory.Instance)
         {
-            PlayerInventory.Instance.OnInventoryChanged += RefreshUI;
-            RefreshUI(); // 초기 상태 반영
+            BindInventory(PlayerInventory.Instance);
         }
     }
 
     private void OnDestroy()
     {
-        if (PlayerInventory.Instance != null)
+        if (_boundInventory != null)
         {
-            PlayerInventory.Instance.OnInventoryChanged -= RefreshUI;
+            _boundInventory.OnInventoryChanged -= RefreshUI;
+            _boundInventory = null;
         }
+    }
+
+    private void BindInventory(PlayerInventory newInventory)
+    {
+        if (_boundInventory != null)
+        {
+            _boundInventory.OnInventoryChanged -= RefreshUI;
+        }
+
+        _boundInventory = newInventory;
+
+        if (_boundInventory != null)
+        {
+            _boundInventory.OnInventoryChanged += RefreshUI;
+        }
+
+        RefreshUI();
     }
 
     private void InitializeSlots()
@@ -38,12 +59,22 @@ public class InventoryUI : MonoBehaviour
 
     private void RefreshUI()
     {
-        if (PlayerInventory.Instance == null) return;
+        if (_boundInventory == null || _boundInventory.Items == null)
+        {
+            for (int i = 0; i < slots.Count; i++)
+            {
+                if (slots[i] != null)
+                {
+                    slots[i].UpdateSlot(null, null, false);
+                }
+            }
+            return;
+        }
 
         for (int i = 0; i < slots.Count && i < PlayerInventory.MaxSlots; i++)
         {
-            InventoryItem item = PlayerInventory.Instance.Items[i];
-            bool isSelected = (PlayerInventory.Instance.SelectedSlotIndex == i);
+            InventoryItem item = _boundInventory.Items[i];
+            bool isSelected = (_boundInventory.SelectedSlotIndex == i);
             
             if (item != null && !item.IsEmpty)
             {

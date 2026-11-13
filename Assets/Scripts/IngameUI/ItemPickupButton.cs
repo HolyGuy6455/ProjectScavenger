@@ -125,11 +125,12 @@ public class ItemPickupButton : MonoBehaviour
     {
         if (_closestItem != null)
         {
-            _closestItem.TryPickup();
-            
-            // 줍기 후 즉시 상태 리셋
-            _closestItem = null;
-            UpdateUI();
+            if (_closestItem.TryPickup())
+            {
+                // 줍기가 진행된 경우에만 즉시 상태 리셋
+                _closestItem = null;
+                UpdateUI();
+            }
         }
     }
 }
