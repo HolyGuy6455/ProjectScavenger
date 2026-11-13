@@ -66,6 +66,11 @@ public class GuageBarUI : MonoBehaviour
 
     protected virtual void LateUpdate()
     {
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+        }
+
         // 3D 월드 좌표를 2D 화면 픽셀 좌표로 변환하여 UI 요소의 위치를 업데이트
         if (mainCamera != null && targetTransform != null && positionContainer != null)
         {

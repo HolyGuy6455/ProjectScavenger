@@ -1,3 +1,5 @@
+using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
 /// <summary>
@@ -28,10 +30,81 @@ public class HealthBarSpawner : MonoBehaviour
     [SerializeField] private bool useCustomColor = false;
     [SerializeField] private Color barColor = Color.red;
 
+    [Header("Visibility Settings")]
+    [Tooltip("체크하면 멀티플레이 원격 아군(내 소유가 아닌 네트워크 오브젝트)일 때만 머리 위 체력바를 생성합니다. 내 캐릭터(싱글/멀티)에서는 숨깁니다.")]
+    [SerializeField] private bool onlyShowForRemotePlayer = false;
+
     private GameObject spawnedUI;
 
     private void Start()
     {
+        if (Application.isBatchMode || Scavenger.Network.DedicatedServerBootstrapper.IsDedicatedServer())
+        {
+            return;
+        }
+
+        var netManager = NetworkManager.Singleton;
+        if (netManager != null && netManager.IsListening && !netManager.IsClient)
+        {
+            return;
+        }
+
+        if (onlyShowForRemotePlayer)
+        {
+            // 싱글플레이/오프라인 상태이거나 NetworkObject가 없으면 원격 팀원이 아니므로 숨김
+            if (netManager == null || !netManager.IsListening)
+            {
+                return;
+            }
+
+            if (!TryGetComponent<NetworkObject>(out var netObj))
+            {
+                return;
+            }
+
+            if (!netObj.IsSpawned)
+            {
+                StartCoroutine(WaitForNetworkSpawnRoutine(netObj));
+                return;
+            }
+
+            if (!netManager.IsClient || netObj.IsOwner)
+            {
+                return;
+            }
+        }
+
+        SpawnHealthBar();
+    }
+
+    private IEnumerator WaitForNetworkSpawnRoutine(NetworkObject netObj)
+    {
+        while (netObj != null && !netObj.IsSpawned)
+        {
+            var nm = NetworkManager.Singleton;
+            if (nm == null || !nm.IsListening || !nm.IsClient)
+            {
+                yield break;
+            }
+            yield return null;
+        }
+
+        var netManager = NetworkManager.Singleton;
+        if (netObj == null || !netObj.IsSpawned || netManager == null || !netManager.IsListening || !netManager.IsClient || netObj.IsOwner)
+        {
+            yield break;
+        }
+
+        SpawnHealthBar();
+    }
+
+    private void SpawnHealthBar()
+    {
+        if (spawnedUI != null)
+        {
+            return;
+        }
+
         if (healthBarPrefab == null)
         {
             Debug.LogWarning($"[HealthBarSpawner] {gameObject.name}에 HealthBar 프리팹이 할당되지 않았습니다.");
@@ -67,7 +140,9 @@ public class HealthBarSpawner : MonoBehaviour
         }
 
         // UI 생성
-        spawnedUI = Instantiate(healthBarPrefab, parentTransform);
+        spawnedUI = parentTransform != null
+            ? Instantiate(healthBarPrefab, parentTransform, false)
+            : Instantiate(healthBarPrefab);
 
         // HealthBarUI 컴포넌트 찾아서 초기화
         HealthBarUI healthBarUI = spawnedUI.GetComponentInChildren<HealthBarUI>();
