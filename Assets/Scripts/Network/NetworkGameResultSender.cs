@@ -51,7 +51,7 @@ namespace Scavenger.Network
                 ResultStatus = state.ToString(),
                 StageId = 1, // TODO: Replace with actual StageId when available
                 CollectedItems = new List<GameItemDto>(),
-                KilledMonsters = new List<KilledMonsterDto>() // TODO: Replace with actual killed monsters list
+                KilledMonsters = MobManager.GetKilledMonsters()
             };
 
             // 모든 캐릭터의 인벤토리 아이템 취합
@@ -73,7 +73,7 @@ namespace Scavenger.Network
             string json = JsonUtility.ToJson(requestDto);
             string url = $"{NetworkAuthManager.Instance.ServerUrl}/api/game/result";
 
-            Debug.Log($"[NetworkGameResultSender] 게임 결과 전송 중... ({state}) / Items: {requestDto.CollectedItems.Count}");
+            Debug.Log($"[NetworkGameResultSender] 게임 결과 전송 중... ({state}) / Items: {requestDto.CollectedItems.Count} / KilledMonsters: {requestDto.KilledMonsters.Count}");
 
             var auth = NetworkAuthManager.Instance;
             string token = auth.AuthToken;

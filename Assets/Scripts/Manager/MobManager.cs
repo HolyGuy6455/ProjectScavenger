@@ -1,12 +1,41 @@
+using System;
 using UnityEngine;
 using Unity.Netcode;
 using System.Collections.Generic;
+using Scavenger.Manager;
+using Scavenger.Network.DTOs;
+
+public struct KilledMonsterNetEntry : INetworkSerializable, IEquatable<KilledMonsterNetEntry>
+{
+    public int MonsterId;
+    public int Amount;
+
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref MonsterId);
+        serializer.SerializeValue(ref Amount);
+    }
+
+    public bool Equals(KilledMonsterNetEntry other)
+    {
+        return MonsterId == other.MonsterId && Amount == other.Amount;
+    }
+}
 
 public class MobManager : NetworkBehaviour
 {
     public static MobManager Instance { get; private set; }
 
     private NetworkObject _mobContainerNetObj;
+    private readonly NetworkList<KilledMonsterNetEntry> _syncedKilledMonsters = new NetworkList<KilledMonsterNetEntry>();
+    private static readonly Dictionary<int, int> _fallbackKilledMonsters = new Dictionary<int, int>();
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStaticState()
+    {
+        Instance = null;
+        _fallbackKilledMonsters.Clear();
+    }
 
     private void Awake()
     {
@@ -16,6 +45,128 @@ public class MobManager : NetworkBehaviour
             return;
         }
         Instance = this;
+        _fallbackKilledMonsters.Clear();
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        _fallbackKilledMonsters.Clear();
+        if (IsServer)
+        {
+            _syncedKilledMonsters.Clear();
+        }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        _fallbackKilledMonsters.Clear();
+        for (int i = 0; i < _syncedKilledMonsters.Count; i++)
+        {
+            var entry = _syncedKilledMonsters[i];
+            if (entry.MonsterId > 0 && entry.Amount > 0)
+            {
+                _fallbackKilledMonsters[entry.MonsterId] = entry.Amount;
+            }
+        }
+        base.OnNetworkDespawn();
+    }
+
+    public override void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+        base.OnDestroy();
+    }
+
+    /// <summary>
+    /// 세션 내 적 처치 기록을 추가합니다. (온라인에서는 서버가 NetworkList로 파티원 전원에게 동기화)
+    /// </summary>
+    public static void RecordKill(int enemyId)
+    {
+        if (enemyId <= 0) return;
+
+        if (GameFlowManager.Instance != null && GameFlowManager.Instance.CurrentState != GameResultState.None)
+        {
+            return;
+        }
+
+        if (Instance != null && NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening && Instance.IsSpawned)
+        {
+            if (!Instance.IsServer) return;
+            Instance.AddSyncedKill(enemyId);
+            return;
+        }
+
+        if (_fallbackKilledMonsters.TryGetValue(enemyId, out int count))
+        {
+            _fallbackKilledMonsters[enemyId] = count + 1;
+        }
+        else
+        {
+            _fallbackKilledMonsters[enemyId] = 1;
+        }
+    }
+
+    private void AddSyncedKill(int enemyId)
+    {
+        for (int i = 0; i < _syncedKilledMonsters.Count; i++)
+        {
+            if (_syncedKilledMonsters[i].MonsterId == enemyId)
+            {
+                var updated = _syncedKilledMonsters[i];
+                updated.Amount += 1;
+                _syncedKilledMonsters[i] = updated;
+                return;
+            }
+        }
+
+        _syncedKilledMonsters.Add(new KilledMonsterNetEntry
+        {
+            MonsterId = enemyId,
+            Amount = 1
+        });
+    }
+
+    /// <summary>
+    /// 현재 세션에서 누적된 몬스터 처치 목록을 DTO 리스트로 반환합니다.
+    /// </summary>
+    public static List<KilledMonsterDto> GetKilledMonsters()
+    {
+        var result = new List<KilledMonsterDto>();
+
+        if (Instance != null && NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening && Instance.IsSpawned)
+        {
+            for (int i = 0; i < Instance._syncedKilledMonsters.Count; i++)
+            {
+                var entry = Instance._syncedKilledMonsters[i];
+                if (entry.MonsterId > 0 && entry.Amount > 0)
+                {
+                    result.Add(new KilledMonsterDto
+                    {
+                        MonsterId = entry.MonsterId,
+                        Amount = entry.Amount
+                    });
+                }
+            }
+            return result;
+        }
+
+        foreach (var kvp in _fallbackKilledMonsters)
+        {
+            if (kvp.Key > 0 && kvp.Value > 0)
+            {
+                result.Add(new KilledMonsterDto
+                {
+                    MonsterId = kvp.Key,
+                    Amount = kvp.Value
+                });
+            }
+        }
+
+        return result;
     }
 
     /// <summary>
